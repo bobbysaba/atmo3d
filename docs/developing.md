@@ -49,7 +49,7 @@ processes and renders figures.
 | `test_timing.py` | The timing hooks of `--timing` and `cm1view bench`, the log summary |
 | `test_map.py` | Map, cross-section and 3D: layers, differences, streamlines, the region and floor |
 | `test_streamlines.py` | The 3D streamline tracer on analytic winds, and the 3D pane's restyle echo |
-| `test_sounding.py` | Soundings, comparison styles, and the data the browser-drawn graphics get |
+| `test_sounding.py` | Soundings, comparison styles, zoom and the hover data |
 | `test_tracking.py` | Automatic and hand-placed tracking, save and load, storm-following soundings |
 | `test_session.py` | Session files: save, load, rows and values a run cannot take, another run's session; soundings, section, 3D, series and distributions back |
 | `test_export.py` | netCDF export: values == the volumes / map planes, heights, box, stop, missing times, the dialog, `cm1view export` |
@@ -110,7 +110,7 @@ viewer/                   the interactive page (Panel / Bokeh)
   layout.py               Viewer mixin: panels, top bar, toolbars, the main column
   events.py               Viewer mixin: time, playback, tool modes, map clicks and drags
   ui.py                   shared UI pieces: constants, figure styling, drawers, tool rail
-  sounding.py             Viewer mixin: soundings, their graphics and style
+  sounding.py             Viewer mixin: soundings, their graphics, style and zoom
   tracking.py             Viewer mixin: storm tracking and the storm chip
   series.py               Viewer mixin: the Series panel and plots
   dist.py                 Viewer mixin: the Distribution panel, plots and statistics
@@ -124,9 +124,8 @@ viewer/                   the interactive page (Panel / Bokeh)
   view3d.py               Viewer mixin: 3D scene, pressure-decomposition button, streamlines
                           (picking, the card, pins; the pointer is followed in the browser)
   items.py                Viewer mixin: the items tray
-  skewt_view.py           skew-T + hodograph drawn in the browser (Bokeh)
-  profiles_view.py        the five profile panels drawn in the browser (Bokeh)
-  zoomview.py             the sounding parameter table component
+  zoomview.py             zoomable image component (sounding graphics) and the parameter
+                          table
   timing.py               `--timing`: every update timed into a log; the hooks of bench
   numinput.py             FloatInput: a number box that keeps what you typed, tidy to 7
                           significant digits

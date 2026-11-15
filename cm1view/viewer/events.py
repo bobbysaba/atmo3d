@@ -12,6 +12,7 @@ import panel as pn
 from ..core import vectors, volume3d
 from ..core.fields import deriv_options
 from .diff import DIFF_CMAP
+from .zoomview import ZoomImage
 from .ui import PANELS, held
 
 
@@ -120,6 +121,20 @@ class Events:
             return False
         self._show_panel(True, tab)
         return True
+
+    def _zoom_image(self, filename, **kw):
+        z = ZoomImage(filename=filename, interactive=self.full, sizing_mode="stretch_width",
+                      visible=kw.pop("visible", False), **kw)
+        z.param.watch(lambda e: self._set_full(True), "clicks")  # click: expand
+        z.param.watch(partial(self._on_zoom_box, z), "box")
+        z.param.watch(partial(self._on_zoom_pan, z), "pan")
+        z.param.watch(lambda e: self._on_zoom_out(z), "zoom_out")
+        z.param.watch(lambda e: self._on_zoom_reset(z), "resets")
+        return z
+
+    def _zoom_images(self):
+        return [self.skew_png, self.prof_png] + [
+            z for tab in self.snd_tabs for z in tab if isinstance(z, ZoomImage)]
 
     def _on_pick_region(self, ev):
         self.workspace.value = "Map"

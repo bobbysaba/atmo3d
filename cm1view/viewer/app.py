@@ -145,6 +145,15 @@ class Viewer(Widgets, MapView, MapLines, Layout, Events, SoundingPanel, TrackPan
         for w in (self.xs_height, self.xs_font, self.xs_grid, self.xs_ab):
             w.param.watch(self._xs_look, "value")
 
+        def unzoom(*keys):
+            def f(*e):
+                for k in keys:
+                    self.snd_lim.pop(k, None)
+            return f
+        # zoom limits in wind units / below the profile top no longer fit
+        # (before the sounding request those changes also trigger)
+        self.wunits.param.watch(unzoom("hodo", "prof_x"), "value")
+        self.prof_top.param.watch(unzoom("prof_z", "prof_x"), "value")
         rx = lambda *e: self.request_xsec()  # noqa: E731
         for w in (self.xs_cmap, self.xs_rev, self.xs_fill_style):
             w.param.watch(rx, "value")
@@ -175,6 +184,9 @@ class Viewer(Widgets, MapView, MapLines, Layout, Events, SoundingPanel, TrackPan
         self.snd_pick.param.watch(
             lambda e: self.mode.set(e.new) if self.mode.value in PANELS and
             PANELS[self.mode.value] == 0 else None, "value")
+        self.snd_pick.param.watch(self._show_snd_pick, "value")
+        self.snd_point_btn.on_click(lambda e: setattr(self.snd_pick, "value", "Sounding"))
+        self.snd_box_btn.on_click(lambda e: setattr(self.snd_pick, "value", "Area sounding"))
         self.storm_btn.on_click(self._on_storm_btn)
         self.full_btn.on_click(lambda e: self._set_full(not self.full))
         # once a scene is shown or being rendered, 3D settings re-render it
@@ -314,7 +326,7 @@ class Viewer(Widgets, MapView, MapLines, Layout, Events, SoundingPanel, TrackPan
         for p in self.pools.values():
             p.shutdown(wait=False, cancel_futures=True)
         config.off(self._on_config)
-        self.results, self._snd_last, self._s3 = [], None, None
+        self._figs, self.results, self._snd_last, self._s3 = {}, [], None, None
         self._closed = True
 
     _closed = False

@@ -321,11 +321,18 @@ class Widgets:
             + (["Parcels"] if parcels.offered(run) else []) + ["3D region"]
         self.mode = ToolRail(tools)
         self.hint = _html()
-        # the Sounding tool's click: a point, or a dragged box (area mean)
+        # the Sounding tool's click: a point, or a dragged box (area mean). snd_pick holds
+        # the choice (not shown); the two buttons below set it and light up when chosen
         self.snd_pick = pn.widgets.RadioButtonGroup(
             options={"Click a point": "Sounding", "Drag a box (area mean)": "Area sounding"},
-            value="Sounding", button_type="primary", button_style="outline",
-            margin=(5, 10, 8, 4), description="What a click on the map makes")
+            value="Sounding")
+        self.snd_point_btn = pn.widgets.Button(
+            name="Click a point", button_type="primary", button_style="solid", height=32,
+            margin=(5, 4, 8, 4), description="A click on the map drops a sounding there")
+        self.snd_box_btn = pn.widgets.Button(
+            name="Drag a box (area mean)", button_type="primary", button_style="outline",
+            height=32, margin=(5, 10, 8, 4),
+            description="Drag a box on the map: the sounding is averaged over it")
         # the storm track, for everything storm-relative (shown in the top bar)
         self.storm_btn = pn.widgets.Button(
             name="No storm track", icon="tornado", button_type="light",
@@ -481,6 +488,7 @@ class Widgets:
         self.ps_reset = pn.widgets.Button(name="Default style", button_type="light",
                                           button_style="outline", height=32,
                                           margin=(5, 4, 8, 10))
+        self.snd_lim = {}  # zoom: skew, hodo, prof_z, prof_x (see _on_zoom_box)
 
         self.status = _html()
         # pressure decomposition for the shown time (map caption / cross-section tab)

@@ -5,6 +5,17 @@ has a matching git tag.
 
 ## Unreleased
 
+### Soundings drawn as images again
+- The live skew-T, hodograph and profile panels are matplotlib images again, as before 0.6.0:
+  the same drawing as the Figure workspace (45° isotherms at any size), click to expand,
+  drag-box zoom and pan redrawn with clean axes, − and ⟲, SVG save, and the hover readout
+  under each image. Sounding zoom limits are saved in sessions again. The browser-drawn
+  Bokeh panels of 0.6.0 are gone; they saved little time (a redraw is about 0.3 s,
+  against seconds to read the columns on a large grid).
+- T / Td and hodograph lines back to 2.2 and 2.4 wide.
+- **Click a point** and **Drag a box (area mean)** are two separate buttons (still one at a
+  time, the chosen one lit), and **Domain mean** stays lit while the domain mean is shown.
+
 ### Runs still going
 - A run the model is still writing opens with its finished output: the newest file is left
   out while it changed in the last `settle_seconds` (60) or will not open yet (locked by

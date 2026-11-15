@@ -8,8 +8,6 @@ import panel as pn
 
 from ..core import vectors, volume3d
 from ..core.fields import CMAPS
-from .profiles_view import ProfilesView
-from .skewt_view import SkewTView
 from .zoomview import ParamTable
 from ..theme import BG, CSS, GRID, PANEL
 from .numinput import FloatInput
@@ -23,12 +21,9 @@ class Layout:
     def _build_panels(self):
         F, run = self.F, self.run
         g3 = F.groups(ndim=3)
-        # the live skew-T + hodograph, drawn in the browser (viewer.skewt_view)
-        self.skew_view = SkewTView()
-        self.skew_view.panel.param.update(visible=False,
-                                          styles={"flex": "1 1 640px", "min-width": "0"})
-        self.prof_view = ProfilesView()  # the five profile panels (viewer.profiles_view)
-        self.prof_view.panel.visible = False
+        self.skew_png = self._zoom_image("skewt_hodograph.svg",
+                                         styles={"flex": "1 1 640px", "min-width": "0"})
+        self.prof_png = self._zoom_image("profiles.svg")
         self.params = ParamTable(stylesheets=[CSS], sizing_mode="stretch_width",
                                  styles={"flex": "1 1 380px", "min-width": "0"})
         self.snd_head = _html(
@@ -37,7 +32,7 @@ class Layout:
             sizing_mode="stretch_width")
         self.snd_msg = _html(sizing_mode="stretch_width")
         self.snd_tabs = pn.Tabs(sizing_mode="stretch_width", dynamic=False, visible=False)
-        self._snd_tab_names, self._snd_tab_views = [], []
+        self._snd_tab_names = []
         self.prof_row = pn.Row(
             _html('<div class="cv-hint" style="margin:8px 0 0 4px">Profile panels below '
                   'go up to</div>'), self.prof_top,
@@ -46,9 +41,9 @@ class Layout:
         # skew-T and table side by side when there is room (expanded view)
         self.snd_col = pn.Column(
             self.snd_head, self.snd_tabs,
-            pn.FlexBox(self.skew_view.panel, self.params, flex_wrap="wrap", gap="4px 16px",
+            pn.FlexBox(self.skew_png, self.params, flex_wrap="wrap", gap="4px 16px",
                        align_items="flex-start", sizing_mode="stretch_width"),
-            self.prof_row, self.prof_view.panel, sizing_mode="stretch_width")
+            self.prof_row, self.prof_png, sizing_mode="stretch_width")
 
         # ---- 3D
         iso_defaults = [("dbz", 30.0, "#7dd3fc", 0.22, True),
@@ -185,7 +180,7 @@ class Layout:
         look_btn = _settings_toggle(snd_look, "palette", "Plot style: colours, line widths, "
                                                          "axis limits")
         snd_opts = pn.Column(
-            pn.FlexBox(self.snd_pick, self.mean_btn, self.pin_btn, self.snd_clear, self.compare,
+            pn.FlexBox(self.snd_point_btn, self.snd_box_btn, self.mean_btn, self.pin_btn, self.snd_clear, self.compare,
                        _settings_toggle(snd_set, description="Sounding settings: parcel, "
                                                              "storm motion, averaging"),
                        look_btn, flex_wrap="wrap",
@@ -444,7 +439,8 @@ class Layout:
                                            "display": "flex", "flex-direction": "column"})
 
     def _set_full(self, on):
-        """Analysis panel over the whole window (map hidden).  The button turns into 'Map' to come back."""
+        """Analysis panel over the whole window (map hidden); the sounding graphics
+        become zoomable.  The button turns into 'Map' to come back."""
         self.full = on
         self.map_area.visible = not on
         if on:
@@ -453,6 +449,8 @@ class Layout:
                                      flex="1 1 100%" if on else "1 1 48%")
         self.full_btn.param.update(name="Map" if on else "",
                                    icon="arrows-minimize" if on else "arrows-maximize")
+        for z in self._zoom_images():
+            z.interactive = on
 
     def _show_panel(self, show, tab=None):
         """Show (or close) the panel, on tab `tab`.  The tool rail follows the panel:
