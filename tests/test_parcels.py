@@ -8,7 +8,7 @@ import netCDF4
 import numpy as np
 import pytest
 
-from cm1view import demo
+import synthetic as demo
 from cm1view.core import parcels as P
 
 

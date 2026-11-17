@@ -1,7 +1,7 @@
 """cm1view bench: how long the viewer's updates take on this machine, without a browser.
 
     cm1view bench RUN [options]     time a fixed list of actions on RUN
-    cm1view bench --demo            the same on the synthetic demo run (checks it works)
+    cm1view bench --demo            the same on the demo run (checks it works)
     cm1view bench --report FILE     summary of a viewer timing log (cm1view RUN --timing)
 
 The viewer is built on RUN just as a browser page gets it, then a fixed list of actions
@@ -46,8 +46,8 @@ def parser():
     ap.add_argument("--report", metavar="FILE",
                     help="print the summary of a viewer timing log instead")
     ap.add_argument("--demo", nargs="?", const="cm1", choices=("cm1", "wofs"),
-                    metavar="MODEL", help="use a synthetic demo run, CM1 (the default) or "
-                                          "wofs (written once to the cache folder)")
+                    metavar="MODEL", help="use a demo run: the real CM1 supercell (the "
+                                          "default) or the synthetic wofs ensemble")
     from .core.models import AUTO, MODELS
     ap.add_argument("--model", default=AUTO, choices=[AUTO, *MODELS])
     ap.add_argument("--config", default=None, help="settings file")
@@ -86,7 +86,8 @@ def main(argv=None):
     if args.demo:
         from . import demo, demo_wofs
         root = os.path.join(config.expand(config.get("cache_dir")), "demo")
-        args.run = demo_wofs.make(root) if args.demo == "wofs" else demo.make(root)
+        args.run = demo_wofs.make(root) if args.demo == "wofs" else \
+            demo.make(os.path.join(root, "cm1"))
     if not args.run:
         parser().error("give a run folder (or --demo, or --report FILE)")
     out = args.out or config.cache_dir("timing", time.strftime("bench-%Y%m%d-%H%M%S.json"))

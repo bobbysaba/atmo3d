@@ -286,7 +286,7 @@ def test_parcel_maps_match_the_soundings(reg, monkeypatch):
 def test_cf_style_output_reads_like_cm1s_own(reg, demo_run, tmp_path_factory):
     """Newer CM1 writes CF-style names (dims xh/xf, yh/yf, zh/zf; heights in "zh"): the
     same run in that layout opens and reads exactly as in CM1's own (ni/nip1, z)."""
-    from cm1view import demo
+    import synthetic as demo
     from cm1view.core import export
     path = str(tmp_path_factory.mktemp("cf") / "supercell_cf")
     demo.write_run(path, cf=True, **demo.RUNS["supercell"])

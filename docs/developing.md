@@ -13,10 +13,16 @@ pytest -m browser                       # the viewer in headless Firefox, with s
 Run the suite on a compute node rather than a shared login node: it starts reader
 processes and renders figures.
 
-- **Demo data.** `cm1view/demo.py` writes small analytic runs shaped like CM1 output
-  (staggered winds, base state, swaths, one level per chunk) and their storm tracks. They
-  are written once to `$CM1VIEW_TEST_DATA` (default `<tmp>/cm1view-demo-$USER`) and
-  rewritten only when `demo.py` changes. Bump `demo.VERSION` when the fields change.
+- **Test data.** `tests/synthetic.py` writes small analytic runs shaped like CM1 output
+  (staggered winds, base state, swaths, one level per chunk), a weak-mesocyclone twin and
+  their storm tracks, so the tests know every answer in advance. They are written once to
+  `$CM1VIEW_TEST_DATA` (default `<tmp>/cm1view-demo-$USER`) and rewritten only when
+  `synthetic.py` changes. Bump its `VERSION` when the fields change.
+- **Demo run.** `cm1view --demo` opens `demo_data/supercell`, a real CM1 run cut down by
+  `tools/make_real_demo.py` (a box around the storms, every 10 min, 16-bit packed fields,
+  1500 parcels; about 35 MB). `cm1view/demo.py` copies it into the cache once.
+  `tests/test_real_demo.py` checks it; to rebuild it from a new run:
+  `python tools/make_real_demo.py RUN demo_data/supercell --force`.
 - **Isolation.** Tests use a throwaway settings file and write only into temporary
   folders. The pressure-decomposition tests work on copies of demo files.
 - **Browser tests** need Firefox (on `PATH`, or `$FIREFOX`). Screenshots go to
@@ -73,8 +79,8 @@ processes and renders figures.
 ```
 cm1view/                  config.py (settings: file, precedence, save folders, run search),
                           registry.py (open runs shared by sessions, run discovery),
-                          theme.py (colours and CSS), demo.py (synthetic CM1 runs for
-                          cm1view --demo and the tests), __main__.py (command line; `render` goes
+                          theme.py (colours and CSS), demo.py (the real demo run
+                          cm1view --demo opens, demo_data/), __main__.py (command line; `render` goes
                           to figures/batch.py, `export` to core/export.py), bench.py
                           (`cm1view bench`: the viewer's actions timed without a browser)
 

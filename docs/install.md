@@ -59,8 +59,12 @@ the preview; install the system's Mesa OpenGL libraries (e.g. `libgl1-mesa-dri`,
 cm1view --demo
 ```
 
-This writes two small synthetic runs to the cache folder (a supercell and a
-weak-mesocyclone twin, with storm tracks) and starts the viewer on them. Open the URL it
+This opens the demo run, a real CM1 supercell that ships with the repository
+(`demo_data/supercell`): CM1 r21.1's supercell case (Weisman and Rotunno 2000,
+quarter-circle hodograph) at 1 km grid spacing, with 44 stretched levels, 2 h of output
+every 10 min and parcels, cut to an 80 × 80 km box around the storms. It is copied to the
+cache folder once and the viewer starts on it. A pip install has no copy; clone the
+repository to get it. Open the URL it
 prints. On a cluster, see [Running on a cluster](hpc.md) for how to reach it from your
 laptop. `cm1view --demo wofs` opens a small synthetic WoFS ensemble instead
 ([WoFS](guide/wofs.md)).

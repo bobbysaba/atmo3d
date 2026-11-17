@@ -26,7 +26,7 @@ a cluster) and opens in your own browser.
 git clone https://github.com/bobbysaba/cm1view.git
 cd cm1view
 conda env create -f environment.yml && conda activate cm1view
-cm1view --demo                    # synthetic runs, to try it out
+cm1view --demo                    # a real CM1 supercell, to try it out
 cm1view /path/to/cm1/run          # your own output
 ```
 

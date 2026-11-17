@@ -5,6 +5,15 @@ has a matching git tag.
 
 ## Unreleased
 
+### A real demo run
+- `cm1view --demo` opens a real CM1 run instead of synthetic ones: CM1 r21.1's supercell
+  case (Weisman and Rotunno 2000, quarter-circle hodograph), 1 km grid spacing, 44
+  stretched levels (100 m at the ground to 500 m above 6 km), 2 h of output every 10 min
+  and 1500 parcels, cut to an 80 × 80 km box around the split storms. It ships with the
+  repository in `demo_data/supercell` (about 35 MB, 16-bit packed fields) and is copied to
+  the cache folder once. `tools/make_real_demo.py` builds it from a full run.
+- The synthetic runs are now test data only (`tests/synthetic.py`).
+
 ### Soundings drawn as images again
 - The live skew-T, hodograph and profile panels are matplotlib images again, as before 0.6.0:
   the same drawing as the Figure workspace (45° isotherms at any size), click to expand,

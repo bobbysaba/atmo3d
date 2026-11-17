@@ -1,4 +1,4 @@
-"""Shared test setup: synthetic demo runs (cm1view.demo), a throwaway settings file, and
+"""Shared test setup: synthetic demo runs (tests/synthetic.py), a throwaway settings file, and
 one Registry for the whole session.
 
   pytest                 tests on the demo data (the default)
@@ -7,7 +7,8 @@ one Registry for the whole session.
   pytest --make-baselines   rewrite the PNGs in tests/baseline (test_images.py)
 
 The demo data is written once to $CM1VIEW_TEST_DATA (default: <tmp>/cm1view-demo-$USER)
-and rewritten only when cm1view/demo.py changes.
+and rewritten only when tests/synthetic.py changes.  (cm1view --demo opens a real
+run instead, demo_data/: test_real_demo.py.)
 """
 import os
 import re
@@ -40,7 +41,7 @@ def pytest_configure(config):
 
 @pytest.fixture(scope="session")
 def demo_root():
-    from cm1view import demo
+    import synthetic as demo
     root = os.environ.get("CM1VIEW_TEST_DATA") or os.path.join(
         tempfile.gettempdir(), f"cm1view-demo-{os.environ.get('USER', 'user')}")
     demo.make(root)
