@@ -5,6 +5,31 @@ this step. For each field, mark **confirmed**, **corrected** (say how) or **drop
 the Decision column. Step 3 fixes the corrected ones and adds a test with an analytic
 answer for each confirmed one (the "Test" lines are the proposed cases).
 
+## Decisions so far (2026-11-19)
+
+- F1: UH counts only w > 0 and ζ > 0, as CM1 does. **The derived `uh25` is computed
+  only when the data has no 2–5 km UH of its own.** A new role `uh25` maps to CM1's `uh`
+  and WoFS's `UH`; when the run has it, that field is listed, labelled "Updraft helicity
+  2–5 km", so the depth shows. `uh01` is always derived.
+- F2: `buoy` in CM1's form, g [θ′/θ0 + (Rv/Rd − 1) qv′ − Σ q_cond], with CM1's condensate
+  list, so acc_b = buoy + pgrad_b.
+- F3: `hdiv`, `bgen_*` use the real x, y spacing (`hgrad`). Identical on uniform grids.
+- F4: proposed −ζ ∇h·V, no f, labelled so. **Awaiting Bobby's OK.**
+- F5: proposed the slope correction (and §8 choice B). **Awaiting Bobby's OK.**
+- F6: keep the default; the motion used is always shown, the default too ("domain motion
+  (0, 0), none chosen"). Check that the figure editor draws the note.
+- F7: waiting for a node. Script `tools/pdecomp_bands.py` (tested on the demo).
+- F8: one copy. `fields.py` calls `thermo`'s θe, dewpoint and es.
+- RH (1.8): over liquid, as now.
+- CAPE (4.5):
+  - **Subtract the negative pockets between LFC and EL**, as MetPy's `cape_cin` does.
+  - Keep the virtual-temperature correction without condensate loading, as SHARPpy does
+    (Doswell & Rasmussen 1994).
+- Shear and SRH (4.3, 4.4): when the data type has 10 m winds (WoFS `U10`, `V10`), the
+  profile starts with them at 10 m AGL. Otherwise it starts at the lowest model level.
+- κ (1.6): proposed per-data-type constants (WRF's κ = 2/7 for WoFS, the exact inverse of
+  how WRF defines θ). **Awaiting Bobby's OK**; otherwise CM1's κ for both.
+
 Scope: every derived field in `core/fields.py`, the pressure decomposition in
 `pdecomp/cm1_pdecomp.py`, the derivatives (`ddx. ddy. ddz. gradh.`), and the fields the
 WoFS reader computes on read (§7). The sounding panel (`thermo.analyze`: Bunkers
