@@ -1,6 +1,6 @@
 # Phase 2b, step 2: derived-field audit
 
-Status: **prepared 2026-11-19; reviewed by Bobby 2026-11-19** (open: F7). Nothing in the code has changed for
+Status: **prepared 2026-11-19; reviewed by Bobby 2026-11-19** (nothing open). Nothing in the code has changed for
 this step. For each field, mark **confirmed**, **corrected** (say how) or **dropped** in
 the Decision column. Step 3 fixes the corrected ones and adds a test with an analytic
 answer for each confirmed one (the "Test" lines are the proposed cases).
@@ -77,8 +77,7 @@ section).
   left out, and said so.
 - F6: keep the default; the motion used is always shown, the default too ("domain motion
   (0, 0), none chosen"). Check that the figure editor draws the note.
-- F7: cause found (§5.3): B and pgrad_b on different vertical filters. Candidate fix
-  `acc_b_w` waits for one more node run.
+- F7: cause found and fix confirmed (§5.3): acc_b sums B and pgrad_b at the w levels.
 - F8: one copy. `fields.py` calls `thermo`'s θe, dewpoint and es.
 - RH (1.8): over liquid, as now.
 - CAPE (4.5):
@@ -555,7 +554,15 @@ node; output `/glade/derecho/scratch/rasaba/pdecomp_bands/`):**
   more node run.
 - Cause 4 (CM1's own `pgradb`) is not needed if the rerun confirms: CM1 writes pgradb
   at the w levels, with no B added, so it has no such mismatch.
-- Decision (how to proceed): rerun, then take `acc_b_w` as acc_b if the bands go.
+- **Rerun (2026-11-19, same file): confirmed.** Banding ratio of `acc_b_w` is 0.16–0.28 at
+  every level (acc_b: 1.2–3.1 from 6 km up), the same as acc_l and acc_nl. The x–z
+  section through the updraft has no horizontal stripes, above 12 km or below; the
+  updraft's own structure is unchanged. rms of acc_b_w is 10–60 % below acc_b's,
+  the removed part being the stripes.
+- Decision: **acc_b becomes `acc_b_w`** in step 3 (B and pgrad_b added at the w levels,
+  then averaged to the scalar levels). `buoy` stays the scalar-level B (F2): so
+  acc_b = buoy + pgrad_b no longer holds exactly, only to within B's 2Δz part. Said in
+  the field's description.
 
 ---
 
@@ -639,5 +646,8 @@ times). Computing them from the winds turns on, for WoFS:
 | F8 θe clip | no (no supersaturation in the demo, to check) |
 | §8 WoFS ζ, ξ, η | WoFS only: new fields |
 
-Before step 3, I'll grep `tests/baseline/` specs for the fields concerned and give the
-exact list.
+Image baselines (checked 2026-11-19, `tests/test_images.py`): the figures draw dbz, w,
+max-w series, zvort/w joint, w azimuthal and the sounding. None draws a field step 3
+changes, except possibly `sounding.png` and `parts.png` (which holds a sounding): the
+negative-pocket CAPE goes in the shared `thermo` code, so their CAPE numbers move if the
+demo sounding has a negative area between LFC and EL. The test run will tell.
