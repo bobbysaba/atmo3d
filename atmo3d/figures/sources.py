@@ -285,7 +285,8 @@ class FigureSources:
         the whole domain at 1 km."""
         tool = list((getattr(self.v, "dists", {}) or {}).values())
         r = dict(tool[-1]["recipe"]) if tool else self._new_dist_recipe()
-        r["yfield"] = "zvort" if "zvort" in self.F and r["field"] != "zvort" else r["field"]
+        zv = self.F.role("zvort")
+        r["yfield"] = zv if zv and r["field"] != zv else r["field"]
         return r
 
     def _new_azim_recipe(self):

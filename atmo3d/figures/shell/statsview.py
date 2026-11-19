@@ -28,7 +28,8 @@ def new_joint_recipe(shell):
     over the whole domain at 1 km."""
     tool = list((getattr(shell.v, "dists", {}) or {}).values())
     r = dict(tool[-1]["recipe"]) if tool else new_dist_recipe(shell)
-    r["yfield"] = "zvort" if "zvort" in shell.fields and r["field"] != "zvort" else r["field"]
+    zv = shell.fields.role("zvort")
+    r["yfield"] = zv if zv and r["field"] != zv else r["field"]
     return r
 
 

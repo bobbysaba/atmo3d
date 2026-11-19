@@ -63,7 +63,7 @@ ROLES = {
 }
 
 CATALOG = register(Catalog(
-    "cm1", NATIVES, ROLES, turbulence=("tke", "kmh", "kmv", "khh", "khv"),
-    extra_groups={"pi0": "Base state", "rho0": "Base state", "u": "Kinematics",
-                  "v": "Kinematics", "w": "Kinematics", "pi": "Thermodynamics",
+    "cm1", NATIVES, ROLES, also={"u": ("u",), "v": ("v",), "w": ("w",)},
+    turbulence=("tke", "kmh", "kmv", "khh", "khv"),
+    extra_groups={"pi0": "Base state", "rho0": "Base state", "pi": "Thermodynamics",
                   "rho": "Thermodynamics"}))

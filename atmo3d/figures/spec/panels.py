@@ -27,7 +27,7 @@ def series_defaults(F, recipe, n=0, label=""):
         lo, cmap = 0.0, "viridis"
     elif d is not None and d.diverging and red == "min":
         hi, cmap = 0.0, "viridis_r"
-    if recipe["field"] in ("winterp", "w") and red == "max":  # updraft speed
+    if F.cat.is_role(recipe["field"], "w") and red == "max":  # updraft speed
         cmap, white, lo, hi = _w_cmap(), True, 0.0, max(hi, 40.0)
     units = d.units if d is not None else ""
     return dict(recipe=recipe, label=label or (ser.describe(recipe, d.label) if d else

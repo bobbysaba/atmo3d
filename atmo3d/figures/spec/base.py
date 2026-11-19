@@ -18,7 +18,7 @@ def layer_defaults(kind, F, field=None, z=1.0):
     if kind == "fill":
         d = F[field]
         lo, hi = d.vrange if d.vrange is not None else (0.0, 1.0)
-        refl = field in ("dbz", "cref")
+        refl = F.cat.reflectivity(field)
         return dict(type="fill", on=True, field=field, mode="height", z=z, units=d.units,
                     cmap=_refl_cmap() if refl else d.cmap, reverse=False,
                     white_first=False, vmin=0.0 if refl else lo, vmax=60.0 if refl else hi,

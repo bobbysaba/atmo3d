@@ -100,11 +100,11 @@ class SectionPanel:
         self.xs_fill_add.on_click(lambda e: self._xs_add_fill())
         self.xs_ov_add.on_click(lambda e: self._xs_add_contour())
         self.xs_vec_add.on_click(lambda e: self._xs_add_vec())
-        self._xs_ov_next = [("winterp", "-10, -5, 5, 10, 20, 30") if "winterp" in F
+        self._xs_ov_next = [(F.role("w"), "-10, -5, 5, 10, 20, 30") if F.role("w")
                             else (self.xs_fill.value, "auto"),
                             ("thpert", "-6, -4, -2, -1") if "thpert" in F
                             else (self.xs_fill.value, "auto")]
-        self._xs_add_contour(on="winterp" in F)
+        self._xs_add_contour(on=bool(F.role("w")))
         self._xs_add_vec()
         # (a terrain run's section is above sea level: its top over the highest ground)
         zend = float(np.floor(self.run.z[-1] + (float(self.run.terrain_height().max())

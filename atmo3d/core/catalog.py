@@ -13,11 +13,16 @@ A data type supplies one Catalog:
   natives   {field name: (label, units, scale, cmap, vrange, diverging)}: display
             defaults of fields in its files (others: their long name and units)
   roles     {role: field name}; a role a data type lacks is left out
+  also      {role: more field names} that are the same quantity on another grid
+            (CM1's staggered w is vertical velocity too): they count for is_role and
+            role_of, never for name (optional)
   turbulence  names grouped as "Turbulence" (optional)
+  extra_groups  {field name: field-list group} for fields no role places (optional)
 
 The roles (ROLES below) are the inputs of the core's derived fields and defaults; a
 new data type maps the ones it has.  Display defaults per role (isosurface values,
-contour levels) are the core's, in DEFAULTS, so every data type gets the same ones."""
+contour levels, which role a new map starts on) stay with the code that uses them,
+written by role, so every data type gets the same ones."""
 
 ROLES = {
     # kinematics, on scalar points, grid-relative (m/s)
@@ -42,25 +47,21 @@ KINEMATIC = ("u", "v", "w", "xvort", "yvort", "zvort")
 THERMO = ("theta", "pres", "qv")
 BASE = ("theta0", "pres0", "qv0", "u0", "v0")
 
-# the core's defaults, by role
-DEFAULTS = dict(
-    isos=(("refl", 30.0), ("w", 10.0), ("w", -5.0), ("zvort", 0.05)),  # 3D isosurfaces
-    main="w",              # the field a new map / section / series / track starts on
-    contour=("w", 3.0, (5.0, 15.0, 25.0)),  # (role, height km, levels): a map's contours
-)
-
-
 class Catalog:
-    def __init__(self, key, natives, roles, turbulence=(), extra_groups=None):
-        unknown = set(roles) - set(ROLES)
+    def __init__(self, key, natives, roles, also=None, turbulence=(), extra_groups=None):
+        unknown = (set(roles) | set(also or {})) - set(ROLES)
         if unknown:
             raise ValueError(f"unknown roles {sorted(unknown)} (see core.catalog.ROLES)")
         self.key, self.natives, self.roles = key, dict(natives), dict(roles)
+        self.also = {r: tuple(ns) for r, ns in (also or {}).items()}
         self.turbulence = frozenset(turbulence)
         self.extra_groups = dict(extra_groups or {})  # {field name: group}
         self._by_name = {}
         for r, n in self.roles.items():
             self._by_name.setdefault(n, r)
+        for r, ns in self.also.items():
+            for n in ns:
+                self._by_name.setdefault(n, r)
 
     def name(self, role):
         """The field playing `role`, or None."""
@@ -75,8 +76,8 @@ class Catalog:
         return self._by_name.get(name)
 
     def is_role(self, name, *roles):
-        """Whether field `name` plays one of `roles`."""
-        return name is not None and any(self.roles.get(r) == name for r in roles)
+        """Whether field `name` (or a derivative's base field: no) plays one of `roles`."""
+        return name is not None and self._by_name.get(name) in roles
 
     def group(self, name, ndim):
         """The field-list group of a field in the files."""
@@ -106,19 +107,6 @@ class Catalog:
             return "Other model fields"
         return "Microphysics"
 
-    # ---- the core's defaults, as this data type's names
-    def main(self):
-        return self.name(DEFAULTS["main"])
-
-    def isos(self):
-        """[(field, value)] default isosurfaces (fields this data type has a role for)."""
-        return [(self.name(r), v) for r, v in DEFAULTS["isos"] if self.name(r)]
-
-    def contour(self):
-        """(field or None, height km, levels) of a map's default contours."""
-        r, h, lv = DEFAULTS["contour"]
-        return self.name(r), h, lv
-
     def reflectivity(self, name):
         """Whether `name` is a reflectivity field (its colours and limits)."""
         return self.is_role(name, "refl", "cref")
@@ -128,6 +116,27 @@ class Catalog:
         any is missing."""
         got = self.names(("theta", "pres", "qv", "u", "v"))
         return None if None in got else got
+
+
+class Union:
+    """The catalogs of several runs seen as one (a figure's runs): a field plays a role
+    if it does in any of them; names come from the first that has the role."""
+
+    def __init__(self, cats):
+        self.cats = list(dict.fromkeys(cats))
+        self.key = self.cats[0].key if self.cats else None
+
+    def name(self, role):
+        return next((n for n in (c.name(role) for c in self.cats) if n), None)
+
+    def role_of(self, name):
+        return next((r for r in (c.role_of(name) for c in self.cats) if r), None)
+
+    def is_role(self, name, *roles):
+        return any(c.is_role(name, *roles) for c in self.cats)
+
+    def reflectivity(self, name):
+        return self.is_role(name, "refl", "cref")
 
 
 CATALOGS = {}

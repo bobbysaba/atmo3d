@@ -73,7 +73,7 @@ class Widgets:
         """The widgets of one more fill over the first (map or cross-section).  w:
         5 to 30 m/s, cleared outside its range so the fill below shows through."""
         d = self.F[var]
-        lo, hi = (5.0, 30.0) if var == "winterp" else (d.vrange or (0.0, 1.0))
+        lo, hi = (5.0, 30.0) if var == self.F.role("w") else (d.vrange or (0.0, 1.0))
         o = dict(
             on=pn.widgets.Checkbox(value=True, width=18, margin=(5, 0, 14, 8)),
             var=pn.widgets.Select(name="Field", groups=groups, value=var, width=220),
@@ -82,7 +82,7 @@ class Widgets:
                                     value="image", width=130),
             cmap=pn.widgets.Select(name="Colormap", options=CMAPS, value=d.cmap, width=130),
             rev=pn.widgets.Checkbox(name="Reverse", value=False, margin=(5, 10, 14, 10)),
-            auto=pn.widgets.Checkbox(name="Auto range", value=var != "winterp",
+            auto=pn.widgets.Checkbox(name="Auto range", value=var != self.F.role("w"),
                                      margin=(5, 10, 14, 10)),
             vmin=FloatInput(name="Min", value=lo, width=80),
             vmax=FloatInput(name="Max", value=hi, width=80),
@@ -377,7 +377,7 @@ class Widgets:
         self.fill_add.on_click(lambda e: self._add_fill())
 
         # ---- contour overlays: a row each in the Contours drawer, "Add contour" adds one
-        self._ov_next = [("winterp", "height", 3.0, "5, 15, 25") if "winterp" in F
+        self._ov_next = [(F.role("w"), "height", 3.0, "5, 15, 25") if F.role("w")
                          else (default_fill, "height", 1.0, "auto"),
                          ("thpert", "level", 0.0, "-6, -4, -2, -1") if "thpert" in F
                          else (default_fill, "height", 1.0, "auto")]

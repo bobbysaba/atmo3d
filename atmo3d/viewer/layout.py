@@ -46,10 +46,9 @@ class Layout:
             self.prof_row, self.prof_png, sizing_mode="stretch_width")
 
         # ---- 3D
-        iso_defaults = [("dbz", 30.0, "#7dd3fc", 0.22, True),
-                        ("winterp", 10.0, "#f97316", 0.85, True),
-                        ("winterp", -5.0, "#3b82f6", 0.7, False),
-                        ("zvort", 0.05, "#e11d48", 0.95, False)]
+        iso_defaults = [(F.role(r), val, c, op, on) for r, val, c, op, on in (
+            ("refl", 30.0, "#7dd3fc", 0.22, True), ("w", 10.0, "#f97316", 0.85, True),
+            ("w", -5.0, "#3b82f6", 0.7, False), ("zvort", 0.05, "#e11d48", 0.95, False))]
         first3d = next(iter(next(iter(g3.values())).values()))
         self.isos = []
         for var, val, col, op, on in iso_defaults:

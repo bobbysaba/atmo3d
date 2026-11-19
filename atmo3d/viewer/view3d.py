@@ -59,7 +59,7 @@ class View3DPanel:
         a field and the height along each, against distance from its seed."""
         F = self.F
         along = {}
-        if all(n in F for n in ("xvort", "yvort", "zvort")):
+        if all(F.role(r) for r in ("xvort", "yvort", "zvort")):
             along["Streamwise vorticity (streamline frame)"] = "_ws"
         along["Speed (streamline frame)"] = "_speed"
         self.sl_field = pn.widgets.Select(
@@ -530,8 +530,8 @@ class View3DPanel:
     def _sl_job(self, g, s3, name, lines):
         run, F, t, st = self.run, self.F, s3["t"], s3["stream"]
         try:
-            wind = ["uinterp", "vinterp", "winterp"]
-            vort = ["xvort", "yvort", "zvort"] if name == "_ws" else []
+            wind = list(F.cat.names(("u", "v", "w")))
+            vort = list(F.cat.names(("xvort", "yvort", "zvort"))) if name == "_ws" else []
             # (fields too large for the 3D cache: only the columns around the lines)
             parts = not F.fits(wind + vort if name in ("_ws", "_speed") else [name], t)
             if name in ("_ws", "_speed"):
@@ -564,9 +564,9 @@ class View3DPanel:
                         return samp(run.volume(n, t))
 
                 if name in ("_ws", "_speed"):
-                    u = native("uinterp") - cu
-                    v = native("vinterp") - cv
-                    w = native("winterp")
+                    u = native(wind[0]) - cu
+                    v = native(wind[1]) - cv
+                    w = native(wind[2])
                     spd = np.sqrt(u * u + v * v + w * w)
                     if name == "_speed":
                         val = spd

@@ -21,8 +21,9 @@ def next_iso(F, isos):
     last one's field."""
     have = [(e.get("var"), e.get("val")) for e in isos]
     return next((dict(var=v, val=x, color=c, op=o) for v, x, c, o in (
-        ("dbz", 30.0, "#7dd3fc", 0.25), ("winterp", 10.0, "#f97316", 0.85),
-        ("winterp", -5.0, "#3b82f6", 0.7)) if v in F and (v, x) not in have),
+        (F.role(r), x, c, o) for r, x, c, o in (
+            ("refl", 30.0, "#7dd3fc", 0.25), ("w", 10.0, "#f97316", 0.85),
+            ("w", -5.0, "#3b82f6", 0.7))) if v and (v, x) not in have),
         dict(var=have[-1][0] if have else None, val=0.0, color="#a3a3a3", op=0.5))
 
 
@@ -187,8 +188,8 @@ class FigureScene:
                       parcels=self._scene_parcels() if getattr(v, "par_3d", None) is not None
                       and v.par_3d.value else [])
         except AttributeError:  # (a viewer without the 3D workspace)
-            sc = dict(isos=[dict(on=True, var="dbz", val=30.0, color="#7dd3fc", op=0.25)]
-                      if "dbz" in self.F else [])
+            sc = dict(isos=[dict(on=True, var=self.F.role("refl"), val=30.0,
+                                 color="#7dd3fc", op=0.25)] if self.F.role("refl") else [])
         for e in sc.get("vecs", []):
             if e["ref"] is None:
                 e.pop("ref")

@@ -41,7 +41,8 @@ class AllFields:
     def __init__(self, fields):
         self.defs, self._some = OrderedDict(), set()
         self._fields = list(fields)
-        self.cat = self._fields[0].cat if self._fields else None
+        from ..core.catalog import Union
+        self.cat = Union(F.cat for F in self._fields)
         for F in fields:
             for name, d in F.defs.items():
                 self.defs.setdefault(name, d)
