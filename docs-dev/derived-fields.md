@@ -1,6 +1,6 @@
 # Phase 2b, step 2: derived-field audit
 
-Status: **prepared 2026-11-19; reviewed by Bobby 2026-11-19** (open: WoFS base state, F4, F5, κ, F7). Nothing in the code has changed for
+Status: **prepared 2026-11-19; reviewed by Bobby 2026-11-19** (open: f in F4, F7). Nothing in the code has changed for
 this step. For each field, mark **confirmed**, **corrected** (say how) or **dropped** in
 the Decision column. Step 3 fixes the corrected ones and adds a test with an analytic
 answer for each confirmed one (the "Test" lines are the proposed cases).
@@ -15,8 +15,8 @@ section).
   B = g [θ′/θ0 + (Rv/Rd − 1)(qv − qv0) − (Σ q_liquid+ice − qc0 − qi0)].
   qc0, qi0 are subtracted when the file has them (CM1 writes them only for some base
   states; normally 0).
-- 1.3, WoFS base state: **open.** Bobby is not sure the first time is the right
-  reference. Options (they also set θ′, p′, θρ′ for WoFS):
+- 1.3, WoFS base state: **keep the first time** (2026-11-19: stay as close to the
+  output as possible). Considered: Options (they also set θ′, p′, θρ′ for WoFS):
   - (a) now: the member's first time. B includes the diurnal and synoptic change since
     then, and any storm already there at the first time.
   - (b) proposed: the member's horizontal mean on each model level at the same time.
@@ -71,8 +71,10 @@ section).
 - F2: `buoy` in CM1's form, g [θ′/θ0 + (Rv/Rd − 1) qv′ − Σ q_cond], with CM1's condensate
   list, so acc_b = buoy + pgrad_b.
 - F3: `hdiv`, `bgen_*` use the real x, y spacing (`hgrad`). Identical on uniform grids.
-- F4: proposed −ζ ∇h·V, no f, labelled so. **Awaiting Bobby's OK.**
-- F5: proposed the slope correction (and §8 choice B). **Awaiting Bobby's OK.**
+- F4: anelastic form −ζ ∇h·V (2026-11-19). Whether to add f is still open: CM1's
+  namelist has fcor (8e-5 in rm_tor_125m), WoFS files have `F`.
+- F5: **slope correction** for WoFS ∂/∂x, ∂/∂y (and §8 choice B for ξ, η). Map factor
+  left out, and said so.
 - F6: keep the default; the motion used is always shown, the default too ("domain motion
   (0, 0), none chosen"). Check that the figure editor draws the note.
 - F7: waiting for a node. Script `tools/pdecomp_bands.py` (tested on the demo).
@@ -84,8 +86,8 @@ section).
     (Doswell & Rasmussen 1994).
 - Shear and SRH (4.3, 4.4): when the data type has 10 m winds (WoFS `U10`, `V10`), the
   profile starts with them at 10 m AGL. Otherwise it starts at the lowest model level.
-- κ (1.6): proposed per-data-type constants (WRF's κ = 2/7 for WoFS, the exact inverse of
-  how WRF defines θ). **Awaiting Bobby's OK**; otherwise CM1's κ for both.
+- κ (1.6): per-data-type constants: WRF's κ = 2/7 for WoFS (as WRF and MetPy), CM1's
+  for CM1.
 
 Scope: every derived field in `core/fields.py`, the pressure decomposition in
 `pdecomp/cm1_pdecomp.py`, the derivatives (`ddx. ddy. ddz. gradh.`), and the fields the
