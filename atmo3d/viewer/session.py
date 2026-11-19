@@ -20,6 +20,7 @@ from .. import config, pdecomp
 from ..core import dist, series as ser
 from ..theme import DIALOG_DARK
 from .ui import PANELS, TOOL_OF, _html, held
+from .fieldmenu import FieldSelect
 
 # the session file's version ("atmo3d_session"); 2: fields by their data type's own
 # names (1: WoFS's by CM1's, renamed on load by upgrade)
@@ -87,18 +88,26 @@ def read(path):
     return s
 
 
+def _field_names():
+    from ..core.catalog import FIELD_NAMES
+    return FIELD_NAMES
+
+
 def upgrade(s):
     """A session of an earlier FORMAT brought up to date, in place: version 1 named a
-    WoFS run's fields by CM1's names (core.catalog.rename_fields).  Its figure is left
-    to the figure's own upgrade (its runs may be of other data types)."""
-    from ..core.catalog import rename_fields, renames_for
+    WoFS run's fields by CM1's names (core.catalog.rename_fields); and derived fields
+    renamed since it was saved (its "field_names": core.catalog.derived_renames).  Its
+    figure is left to the figure's own upgrade (its runs may be of other data types)."""
+    from ..core.catalog import FIELD_NAMES, derived_renames, rename_fields, renames_for
     ver = s.get("atmo3d_session", s.get("cm1view_session", 1))
+    figure = s.pop("figure", None)
+    rename_fields(s, derived_renames(s))
     if isinstance(ver, (int, float)) and ver < 2:
         table, _ = renames_for([config.expand(s["run"])] if s.get("run") else [])
-        figure = s.pop("figure", None)
         rename_fields(s, table)
-        if figure is not None:
-            s["figure"] = figure
+    s["field_names"] = FIELD_NAMES
+    if figure is not None:
+        s["figure"] = figure
     return s
 
 
@@ -123,7 +132,7 @@ def _put(w, v):
             lo, hi = getattr(w, "start", None), getattr(w, "end", None)
             v = v if lo is None else max(v, lo)
             v = v if hi is None else min(v, hi)
-        if isinstance(w, SingleSelectBase):  # (Panel takes a value not among the options)
+        if isinstance(w, (SingleSelectBase, FieldSelect)):  # (both take a value not listed)
             have = w.values
             if isinstance(w.value, list):  # (MultiChoice: each of them)
                 if not all(x in have for x in v):
@@ -205,7 +214,8 @@ class Sessions:
         x0, x1, y0, y1 = self.view
         tool = self.mode.value
         s = dict(
-            atmo3d_session=FORMAT, run=os.path.abspath(self.run.path),
+            atmo3d_session=FORMAT, field_names=_field_names(),
+            run=os.path.abspath(self.run.path),
             time_s=float(self.run.times[self.t]), view=[x0, x1, y0, y1],
             workspace=self.workspace.value, tool=tool,
             panel=dict(open=bool(self.panel_col.visible), tab=int(self.tabs.active),

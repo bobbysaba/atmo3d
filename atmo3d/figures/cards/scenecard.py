@@ -8,6 +8,7 @@ from ...core.fields import CMAPS
 from .base import _GRID_N, PAR_MOVING, PAR_TAILS, _BTN, _f, _grid, _hex, cmap_select
 from .layercard import parcel_pick, parcel_sets
 from ...viewer.ui import held
+from ...viewer.fieldmenu import FieldSelect
 
 SCENE_VIEWS = {"From the southwest": "oblique", "From above": "top", "From the south": "south",
                "From the north": "north", "From the west": "west", "From the east": "east"}
@@ -47,7 +48,7 @@ class IsoRow:
         var = e.get("var") if e.get("var") in F else first
         self.w = w = dict(
             on=_onbox(e.get("on", True)),
-            var=pn.widgets.Select(name="Field", groups=g3, value=var),
+            var=FieldSelect(name="Field", groups=g3, value=var),
             val=_f("Value", float(e.get("val") or 0.0)),
             color=pn.widgets.ColorPicker(name="Colour", value=_hex(e.get("color") or "#7dd3fc")),
             op=_f("Opacity", float(e.get("op", 0.5)), step=0.05, start=0.05, end=1.0))

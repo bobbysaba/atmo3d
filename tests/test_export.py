@@ -50,8 +50,8 @@ def test_model_levels_match_the_volumes(reg, tmp_path):
                 assert v.dimensions == ("time", "z", "yh", "xh")
                 ref = F.volume(n, 2)[p["ks"], j0:j1, i0:i1]
                 assert np.array_equal(v[1], ref), n
-        assert d["ddz_winterp"].units == "1e-3 s-1"
-        assert d["ddz_winterp"].units_shown == "10⁻³ s⁻¹"
+        assert d["ddz_winterp"].units == "1/s"
+        assert d["ddz_winterp"].units_shown == "1/s"
         if "srh03" in names:
             assert "storm_u" in d.variables and d["srh03"].storm_relative
 

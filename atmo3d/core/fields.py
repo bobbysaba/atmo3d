@@ -82,8 +82,11 @@ def mpl_cmap(name, reverse=False):
 class FieldDef:
     def __init__(self, name, label, units, group, ndim=3, scale=1.0, cmap="viridis",
                  vrange=None, diverging=False, deps=(), func=None, pointwise=True,
-                 storm=False, layer=None, edges=False, costly=False):
+                 storm=False, layer=None, edges=False, costly=False, tier="main"):
         self.name, self.label, self.units, self.group = name, label, units, group
+        # tier: where the field lists put it: "main", "other" (under Other) or
+        # "hidden" (only with the show_hidden_fields setting): core.catalog.Catalog.tier
+        self.tier = tier
         # layer: a column field (2D from 3D natives) over (z0, z1) km AGL, z1 None: the
         # model top.  func(f, c) gets f(n) -> (levels, ny, nx) of native n on the model
         # levels whose cells reach into the layer, c["dz"] (m, each one's thickness in
@@ -100,7 +103,7 @@ class FieldDef:
             ndim, pointwise = 2, False
         self.ndim, self.scale, self.cmap, self.vrange = ndim, scale, cmap, vrange
         self.diverging, self.deps, self.func = diverging, tuple(deps), func
-        # deps may name derivatives of native fields ("ddz.winterp": per km, in the
+        # deps may name derivatives of native fields ("ddz.winterp": per m, in the
         # field's display units), which Fields and the series worker compute for func
         # pointwise: func works on any samples of its inputs (no spatial derivatives)
         self.pointwise = pointwise and not any(split_deriv(n)[0] for n in self.deps)
@@ -129,7 +132,7 @@ class FieldDef:
         return f"{self.label} ({self.units})" if self.units else self.label
 
 
-PDECOMP = ("p_b", "p_l", "p_nl", "acc_b", "acc_l", "acc_nl")
+PDECOMP = ("p_b", "p_l", "p_nl", "p_c", "acc_b", "acc_l", "acc_nl", "acc_c")
 
 
 # ---- derived fields: f(name) fetches a native field (raw units) on the same
@@ -236,11 +239,11 @@ def _make_fields(avail, cat):
                       deps=("theta", "pres", "qv"), func=_thetae))
     D.append(FieldDef("tempc", "Temperature", "°C", "Thermodynamics", cmap="cmo.thermal",
                       deps=("theta", "pres"), func=lambda f, c: _tempk(f, c) - 273.15))
-    D.append(FieldDef("dewc", "Dewpoint", "°C", "Thermodynamics", cmap="BrBG",
+    D.append(FieldDef("dewc", "Dewpoint", "°C", "Thermodynamics", cmap="YlGnBu",
                       deps=("pres", "qv"), func=_dewc))
     D.append(FieldDef("rh", "Relative humidity (liquid)", "%", "Thermodynamics",
                       cmap="YlGnBu", vrange=(0, 100), deps=("theta", "pres", "qv"), func=_rh))
-    D.append(FieldDef("wspd", "Wind speed (ground-relative)", "m/s", "Kinematics",
+    D.append(FieldDef("wspd3d", "Wind speed (ground-relative)", "m/s", "Kinematics",
                       cmap="turbo", vrange=(0, 40), deps=("u", "v"),
                       func=lambda f, c: np.hypot(f("u") + c["umove"],
                                                  f("v") + c["vmove"])))
@@ -280,16 +283,17 @@ def _make_fields(avail, cat):
     D.append(FieldDef("wcross", "Crosswise vorticity", "1/s", "Kinematics", cmap="RdBu_r",
                       vrange=(-0.05, 0.05), diverging=True, deps=vdeps, func=wcross,
                       storm=True))
-    D.append(FieldDef("p_dyn", "p′ dynamic (p_l + p_nl)", "Pa", "Pressure decomposition",
-                      cmap="PuOr_r", diverging=True, deps=("p_l", "p_nl"),
-                      func=lambda f, c: f("p_l") + f("p_nl")))
-    D.append(FieldDef("acc_dyn", "Dynamic VPPGA (linear + nonlinear)", "m/s²",
+    D.append(FieldDef("p_dyn", "p′ dynamic (p_l + p_nl + p_c)", "Pa", "Pressure decomposition",
+                      cmap="PuOr_r", diverging=True, deps=("p_l", "p_nl", "p_c"),
+                      func=lambda f, c: f("p_l") + f("p_nl") + f("p_c")))
+    D.append(FieldDef("acc_dyn", "Dynamic VPPGA (linear + nonlinear + Coriolis)", "m/s²",
                       "Pressure decomposition", cmap="RdBu_r", diverging=True,
-                      deps=("acc_l", "acc_nl"), func=lambda f, c: f("acc_l") + f("acc_nl")))
-    D.append(FieldDef("acc_tot", "Total acceleration (b + l + nl)", "m/s²",
+                      deps=("acc_l", "acc_nl", "acc_c"),
+                      func=lambda f, c: f("acc_l") + f("acc_nl") + f("acc_c")))
+    D.append(FieldDef("acc_tot", "Total acceleration (b + l + nl + c)", "m/s²",
                       "Pressure decomposition", cmap="RdBu_r", diverging=True,
-                      deps=("acc_b", "acc_l", "acc_nl"),
-                      func=lambda f, c: f("acc_b") + f("acc_l") + f("acc_nl")))
+                      deps=("acc_b", "acc_l", "acc_nl", "acc_c"),
+                      func=lambda f, c: f("acc_b") + f("acc_l") + f("acc_nl") + f("acc_c")))
     if hyd:
         cl = [n for n in CLOUD if n in hyd]
         pr = [n for n in PRECIP if n in hyd]
@@ -311,17 +315,17 @@ def _make_fields(avail, cat):
 
 def _vort_tendencies():
     """Vertical-vorticity tendencies and the Okubo–Weiss parameter, in 10⁻⁴ s⁻².  Their
-    deps' derivatives are per km (m/s per km = 10⁻³ s⁻¹)."""
+    deps' derivatives are per m (m/s per m = 1/s)."""
     def stretch(f, c):  # ζ ∂w/∂z
-        return 10.0 * f("zvort") * f("ddz.w")
+        return 1.0e4 * f("zvort") * f("ddz.w")
 
     def tilt(f, c):  # ξ ∂w/∂x + η ∂w/∂y
-        return 10.0 * (f("xvort") * f("ddx.w") + f("yvort") * f("ddy.w"))
+        return 1.0e4 * (f("xvort") * f("ddx.w") + f("yvort") * f("ddy.w"))
 
     def okubo(f, c):  # W = s_n² + s_s² − ω² (strain dominates > 0, rotation < 0)
         ux, uy, vx, vy = (f("ddx.u"), f("ddy.u"), f("ddx.v"),
                           f("ddy.v"))
-        return 0.01 * ((ux - vy) ** 2 + (vx + uy) ** 2 - (vx - uy) ** 2)
+        return 1.0e4 * ((ux - vy) ** 2 + (vx + uy) ** 2 - (vx - uy) ** 2)
 
     g, kw = "Vorticity tendencies", dict(cmap="RdBu_r", vrange=(-5, 5), diverging=True)
     sdeps = ("zvort", "ddz.w")
@@ -406,17 +410,18 @@ def _sounding_kinematics():
 
     g, deps = "Sounding parameters", ("u", "v")
     kw = dict(deps=deps, edges=True)
+    # (name, label of the layer, top km, starting range top): shear, then SRH
+    shears = (("shear0250", "0–250 m", 0.25, 15), ("shear0500", "0–500 m", 0.5, 20),
+              ("shear01", "0–1 km", 1.0, 25), ("shear03", "0–3 km", 3.0, 35),
+              ("shear06", "0–6 km", 6.0, 40))
+    srhs = (("srh0250", "0–250 m", 0.25, 200), ("srh0500", "0–500 m", 0.5, 250),
+            ("srh01", "0–1 km", 1.0, 300), ("srh03", "0–3 km", 3.0, 500))
     return [
-        FieldDef("shear01", "Bulk shear 0–1 km", "m/s", g, cmap="viridis", vrange=(0, 25),
-                 func=shear, layer=(0.0, 1.0), **kw),
-        FieldDef("shear06", "Bulk shear 0–6 km", "m/s", g, cmap="viridis", vrange=(0, 40),
-                 func=shear, layer=(0.0, 6.0), **kw),
-        FieldDef("srh01", "Storm-relative helicity 0–1 km", "m²/s²", g, cmap="RdBu_r",
-                 vrange=(-300, 300), diverging=True, func=srh, layer=(0.0, 1.0),
-                 storm=True, **kw),
-        FieldDef("srh03", "Storm-relative helicity 0–3 km", "m²/s²", g, cmap="RdBu_r",
-                 vrange=(-500, 500), diverging=True, func=srh, layer=(0.0, 3.0),
-                 storm=True, **kw),
+        *(FieldDef(n, f"Bulk shear {lab}", "m/s", g, cmap="viridis", vrange=(0, top),
+                   func=shear, layer=(0.0, z), **kw) for n, lab, z, top in shears),
+        *(FieldDef(n, f"Storm-relative helicity {lab}", "m²/s²", g, cmap="RdBu_r",
+                   vrange=(-top, top), diverging=True, func=srh, layer=(0.0, z),
+                   storm=True, **kw) for n, lab, z, top in srhs),
     ]
 
 
@@ -609,11 +614,11 @@ def in_layer(a, dz, fill):
 
 
 def ddz_volume(b, z):
-    """∂/∂z (per km) of a volume (nk, ...) on heights z: (nk,) as np.gradient, or each
-    column's own (nk, ...) with the same centred / one-sided differences."""
+    """∂/∂z (per m) of a volume (nk, ...) on heights z (km): (nk,) as np.gradient, or
+    each column's own (nk, ...) with the same centred / one-sided differences."""
     z = np.asarray(z)
     if z.ndim == 1:
-        return np.gradient(b, z, axis=0)
+        return np.gradient(b, 1000.0 * z, axis=0)
     out = np.empty(b.shape, dtype=np.float32)
     for k in range(b.shape[0]):
         out[k] = ddz_level(lambda kk: b[kk], z, k)
@@ -622,11 +627,52 @@ def ddz_volume(b, z):
 
 GROUP_ORDER = ["Radar", "Kinematics", "Vorticity tendencies", "Column fields",
                "Sounding parameters", "Thermodynamics",
-               "Pressure decomposition", "Microphysics", "Swaths & 2D", "Turbulence",
-               "Budgets", "Other model fields", "Base state"]
+               "Pressure decomposition", "Microphysics", "Microphysics (number & moments)",
+               "Swaths & 2D", "Turbulence", "Boundary layer", "Radiation", "Cumulus",
+               "Electrification", "Budgets", "Time averages", "Heights",
+               "Other model fields", "Base state"]
 
 
-# ---- derivatives of any field, per km: "ddz.winterp" (∂w/∂z), "ddx.", "ddy.", "gradh."
+# group-name prefixes of the field lists: derived fields, Other, hidden (group_options;
+# viewer.fieldmenu nests them under entries of their own)
+DERIVED_PREFIX, OTHER_PREFIX, HIDDEN_PREFIX = "Derived · ", "Other · ", "Hidden · "
+
+
+def show_hidden():
+    """Whether the field lists show hidden fields (the show_hidden_fields setting)."""
+    from .. import config
+    return bool(config.get("show_hidden_fields"))
+
+
+def listed(d):
+    """Whether FieldDef d is offered in field lists (not hidden, or the
+    show_hidden_fields setting on)."""
+    return d.tier != "hidden" or show_hidden()
+
+
+def group_options(defs, ndim=None, label=None):
+    """{group: {label: name}} of FieldDefs `defs` for the field pickers
+    (viewer.fieldmenu; grouped Selects too): the fields in the files by group
+    (GROUP_ORDER), then the derived ones ("Derived · <group>"), then those under Other
+    ("Other · <group>"), then the hidden ones ("Hidden · <group>") only with the
+    show_hidden_fields setting.  label(d): an option's text (default
+    "<label> [<name>]")."""
+    shown = show_hidden()
+    kinds = ("main", "derived", "other", "hidden")
+    tiers = {t: OrderedDict((g, OrderedDict()) for g in GROUP_ORDER) for t in kinds}
+    for d in defs:
+        if (ndim is not None and d.ndim != ndim) or (d.tier == "hidden" and not shown):
+            continue
+        kind = "derived" if d.tier == "main" and d.derived else d.tier
+        text = label(d) if label else f"{d.label} [{d.name}]"
+        tiers[kind].setdefault(d.group, OrderedDict())[text] = d.name
+    out = OrderedDict()
+    for kind, prefix in zip(kinds, ("", DERIVED_PREFIX, OTHER_PREFIX, HIDDEN_PREFIX)):
+        out.update((prefix + g, v) for g, v in tiers[kind].items() if v)
+    return out
+
+
+# ---- derivatives of any field, per m: "ddz.winterp" (∂w/∂z), "ddx.", "ddy.", "gradh."
 # (|∇h|).  Built on demand by Fields / AllFields, not listed in the field lists: a
 # Derivative select beside a Field select names them (deriv_name).
 DERIVS = OrderedDict([("ddz", "∂/∂z"), ("ddx", "∂/∂x"), ("ddy", "∂/∂y"), ("gradh", "|∇h|")])
@@ -650,8 +696,10 @@ def deriv_options(d):
     return {"None": ""} | {v: k for k, v in DERIVS.items() if k != "ddz" or d.ndim == 3}
 
 
-def _per_km(units):
-    return {"m/s": "10⁻³ s⁻¹", "1/s": "s⁻¹ km⁻¹", "": "km⁻¹"}.get(units, f"{units} km⁻¹")
+def _per_m(units):
+    """A field's units per metre (a derivative's)."""
+    return {"m/s": "1/s", "m": "", "1/s": "1/(m s)", "": "1/m"}.get(
+        units, f"({units})/m" if " " in units or "/" in units else f"{units}/m")
 
 
 def _no_func(f, c):
@@ -659,24 +707,24 @@ def _no_func(f, c):
 
 
 def deriv_def(op, base):
-    """FieldDef of derivative op of field `base` (a FieldDef), in its units per km
-    (m/s: 10⁻³ s⁻¹); None when there is none (∂/∂z of a 2D field)."""
+    """FieldDef of derivative op of field `base` (a FieldDef), in its units per m
+    (m/s: 1/s); None when there is none (∂/∂z of a 2D field)."""
     if op not in DERIVS or (op == "ddz" and base.ndim != 3):
         return None
     vr = None
-    if base.vrange is not None:  # (a starting range: half the field's per km)
-        m = 0.5 * max(abs(float(base.vrange[0])), abs(float(base.vrange[1])))
+    if base.vrange is not None:  # (a starting range: half the field's per km, in /m)
+        m = 0.5e-3 * max(abs(float(base.vrange[0])), abs(float(base.vrange[1])))
         vr = (0.0, m) if op == "gradh" else (-m, m)
     deps = base.deps if base.derived else (base.name,)
     return FieldDef(deriv_name(op, base.name), f"{base.label} · {DERIVS[op]}",
-                    _per_km(base.units), "Derivatives", ndim=base.ndim,
+                    _per_m(base.units), "Derivatives", ndim=base.ndim,
                     cmap="magma" if op == "gradh" else "RdBu_r", vrange=vr,
                     diverging=op != "gradh", deps=deps, func=_no_func, pointwise=False,
                     storm=base.storm)
 
 
 def ddz_level(f, z, k):
-    """∂/∂z (per km) on model level k of f(level) -> plane, on levels z (km): centred
+    """∂/∂z (per m) on model level k of f(level) -> plane, on levels z (km): centred
     on the stretched levels inside, one-sided at the bottom and top (as np.gradient of
     the volume, so maps, sections and series agree)."""
     nk = len(z)
@@ -685,17 +733,18 @@ def ddz_level(f, z, k):
     if lo == hi:
         return np.zeros_like(f(k))
     if lo == k or hi == k:
-        return (f(hi) - f(lo)) / (z[hi] - z[lo])
-    hl, hr = z[k] - z[lo], z[hi] - z[k]
+        return (f(hi) - f(lo)) / (1000.0 * (z[hi] - z[lo]))
+    hl, hr = z[k] - z[lo], z[hi] - z[k]  # (km)
     return (hl * hl * f(hi) - hr * hr * f(lo) + (hr * hr - hl * hl) * f(k)) / \
-        (hl * hr * (hl + hr))
+        (1000.0 * hl * hr * (hl + hr))
 
 
 def hgrad(op, a, xkm, ykm):
     """Horizontal derivative op ('ddx', 'ddy', 'gradh') of a (..., ny, nx) array on
-    the grid's x / y (km; stretched grids too), per km."""
+    the grid's x / y (km; stretched grids too), per m."""
     def d(axis, c):
-        return np.gradient(a, c, axis=axis) if a.shape[axis] > 1 else np.zeros_like(a)
+        return np.gradient(a, 1000.0 * np.asarray(c, dtype=np.float64), axis=axis) \
+            if a.shape[axis] > 1 else np.zeros_like(a)
     if op == "ddx":
         return d(-1, xkm)
     if op == "ddy":
@@ -775,22 +824,23 @@ class Fields:
         self.ctx = dict(dx=run.dx, dy=run.dy, umove=run.umove, vmove=run.vmove)
         self.defs = OrderedDict()
         for name, info in run.vars.items():
-            if name in cat.natives:
-                label, units, scale, cmap, vr, div = cat.natives[name]
-            else:
-                label, units, scale = info.long_name, info.units, 1.0
-                div = "b_" in name or name.endswith("vort")
-                cmap, vr = ("RdBu_r" if div else "viridis"), None
-                if (name.startswith("q") or cat.role_of(name) == "qv0") \
-                        and units == "kg/kg":
-                    units, scale = "g/kg", 1000.0
-            self.defs[name] = FieldDef(name, label, units, cat.group(name, info.ndim),
-                                       ndim=info.ndim, scale=scale, cmap=cmap,
-                                       vrange=vr, diverging=div)
+            label, units, scale, cmap, vr, div = cat.look(name, info.long_name, info.units)
+            group = cat.group(name, info.ndim)
+            if name in PDECOMP and getattr(run, "var_times", {}).get(name) == frozenset():
+                label += " (computed on request)"  # (no file holds it: pdecomp.register)
+            self.defs[name] = FieldDef(name, label, units, group, ndim=info.ndim,
+                                       scale=scale, cmap=cmap, vrange=vr, diverging=div,
+                                       tier=cat.tier(name, group, run.vars))
         for d in _make_fields(run.vars, cat):
             if d.storm and not getattr(run, "storm_relative", True):
                 continue  # (no storm motion for this run: see Run.storm_relative)
+            if d.name in self.defs and d.name in cat.file_first:
+                continue  # (the files hold it: theirs is listed)
             self.defs[d.name] = d
+        # main fields first, then Other, then hidden: a "first field" fallback
+        # (next(iter(F.defs))) is never one the lists leave out
+        order = {"main": 0, "other": 1, "hidden": 2}
+        self.defs = OrderedDict(sorted(self.defs.items(), key=lambda kv: order[kv[1].tier]))
         self._planes = OrderedDict()
         self._plane_bytes = 0
         self._lock = threading.Lock()
@@ -822,13 +872,8 @@ class Fields:
         return d
 
     def groups(self, ndim=None):
-        """{group: {label: name}} for grouped Select widgets."""
-        out = OrderedDict((g, OrderedDict()) for g in GROUP_ORDER)
-        for d in self.defs.values():
-            if ndim is not None and d.ndim != ndim:
-                continue
-            out.setdefault(d.group, OrderedDict())[f"{d.label} [{d.name}]"] = d.name
-        return OrderedDict((g, v) for g, v in out.items() if v)
+        """{group: {label: name}} for grouped Select widgets (group_options)."""
+        return group_options(self.defs.values(), ndim)
 
     def role(self, r):
         """The field playing role r (core.catalog.ROLES) if this run has it, else None."""
@@ -983,7 +1028,7 @@ class Fields:
                                       float(value), "msl" if mode == "msl" else "agl")
 
     def _ddz_level(self, base, t, k, storm):
-        """∂/∂z (per km) of field base on model level k (ddz_level)."""
+        """∂/∂z (per m) of field base on model level k (ddz_level)."""
         z = self.run.heights(t) if self.run.terrain else self.run.z  # (each column's)
         return ddz_level(lambda kk: self.plane(base, t, "level", kk, storm), z, k)
 

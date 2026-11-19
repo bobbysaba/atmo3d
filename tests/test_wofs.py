@@ -374,13 +374,14 @@ def test_column_fields_and_ddz_on_own_heights(wofs_root):
     np.testing.assert_allclose(th[1], 1000.0 * np.broadcast_to(1.0 - dz, (NJ, NI)), atol=0.01)
     np.testing.assert_allclose(zk, run.heights(c)[:2])
     np.testing.assert_allclose(F.plane("wmax", c), NK - 0.5 + c)
-    # ∂w/∂z = 1 / dz per km, on a level, at a height and as a volume
-    np.testing.assert_allclose(F.plane("ddz.W", c, "level", 2)[0], 1.0 / dz,
-                               atol=1e-4)
-    np.testing.assert_allclose(F.plane("ddz.W", c, "height", 1.0)[0], 1.0 / dz,
-                               atol=1e-4)
+    # ∂w/∂z = 1 / dz per km (dz km), so 1e-3 / dz per m, on a level, at a height and
+    # as a volume
+    np.testing.assert_allclose(F.plane("ddz.W", c, "level", 2)[0], 1e-3 / dz,
+                               atol=1e-7)
+    np.testing.assert_allclose(F.plane("ddz.W", c, "height", 1.0)[0], 1e-3 / dz,
+                               atol=1e-7)
     np.testing.assert_allclose(F.volume("ddz.W", c)[:, 0], np.broadcast_to(
-        1.0 / dz, (NK, NI)), atol=1e-4)
+        1e-3 / dz, (NK, NI)), atol=1e-7)
     assert np.isfinite(F.plane("sbcape", c)).all()
 
 

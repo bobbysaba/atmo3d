@@ -18,6 +18,7 @@ from ..core import vectors, volume3d
 from ..core.run import FileBusy, MissingAtTime
 from ..theme import GRID, MUTED
 from .ui import FRAME_SHORT, _bokeh, _html, style_fig
+from .fieldmenu import FieldSelect
 
 # The pointer on the streamline card's plot, in the browser: snap it to the nearest
 # sample of each line and put it in the `at` Span (synced to the server, which moves the
@@ -62,7 +63,7 @@ class View3DPanel:
         if all(F.role(r) for r in ("xvort", "yvort", "zvort")):
             along["Streamwise vorticity (streamline frame)"] = "_ws"
         along["Speed (streamline frame)"] = "_speed"
-        self.sl_field = pn.widgets.Select(
+        self.sl_field = FieldSelect(
             groups={"Along the streamline": along, **F.groups(ndim=3)},
             value=F.role("w") or next(iter(along.values())), width=250,
             height=32, margin=(4, 4))
@@ -301,9 +302,9 @@ class View3DPanel:
         if any(pdecomp.is_pdecomp(self.F, n) for n in names) and pdecomp.can_compute(run):
             kind, _ = pdecomp.source(run, t, block=False)
             write = self.pd_write.value and pdecomp.writable(run, t)
-            par = config.job_cpus() > 1  # ~45 s with 4 CPUs; writing ~+40 s
-            est = {(True, False): "~45 s", (True, True): "~1.5 min",
-                   (False, False): "~1.5 min", (False, True): "~2 min"}[(par, write)]
+            par = config.job_cpus() > 1  # ~2 min with 4 CPUs (1280 x 1280 x 115); writing ~+40 s
+            est = {(True, False): "~2 min", (True, True): "~2.5 min",
+                   (False, False): "~5 min", (False, True): "~6 min"}[(par, write)]
             if kind is None:
                 label = (f"Compute pressure decomposition for {run.time_label(t)}"
                          f"{' and write it to the file' if write else ''} ({est})")

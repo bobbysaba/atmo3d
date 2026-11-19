@@ -22,6 +22,7 @@ from ..theme import ACCENT, BG, GROUND, MUTED
 from .numinput import FloatInput
 from .ui import EMPTY_LINES, EMPTY_VEC, _cbar_label, _html, style_fig
 from .widgets import _layer_row
+from .fieldmenu import FieldSelect
 
 
 class SectionPanel:
@@ -72,9 +73,9 @@ class SectionPanel:
 
         F = self.F
         g3 = F.groups(ndim=3)
-        self.xs_fill = pn.widgets.Select(groups=g3,
-                                         value=F.role("refl") or next(iter(F.defs)),
-                                         width=220, height=32, margin=(4, 2))
+        self.xs_fill = FieldSelect(groups=g3,
+                                    value=F.role("refl") or next(iter(F.defs)),
+                                    width=220, height=32, margin=(4, 2))
         self.xs_fill_style = pn.widgets.RadioButtonGroup(
             options={"Pixels": "image", "Filled contours": "contourf"}, value="image",
             button_type="primary", button_style="outline", width=230, margin=(5, 10, 8, 10))

@@ -339,7 +339,7 @@ def _worker(task):
 
                 def fetch(n):
                     """Input n on level k: native (raw units), or a derivative of one
-                    (per km, in its display units, as Fields gives it)."""
+                    (per m, in its display units, as Fields gives it)."""
                     if n not in memo:
                         dop, dn = split_deriv(n)
                         sc = np.float32(task.get("dscale", {}).get(dn, 1.0))

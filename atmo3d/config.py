@@ -42,9 +42,9 @@ KEYS = [
         "Throwaway files atmo3d can rebuild (computed series, parcel trajectories). Scratch is a good "
         "place: home quotas are small.", kind="outdir"),
     Key("pdecomp_script", "paths", "", "Pressure-decomposition script",
-        "Optional: your own script for times whose files lack p_b/p_l/p_nl, with the "
-        "same functions as atmo3d's solver (pdecomp_solver.py). Empty: atmo3d's "
-        "solver.", kind="file"),
+        "Optional: your own script for times whose files lack the decomposition, with "
+        "cm1_pdecomp's run_decomposition (or the older pdecomp_solver.py functions). "
+        "Empty: CM1's method (cm1_pdecomp.py), built in.", kind="file"),
     Key("track_dirs", "tracks", ["storm_tracks"], "Track folders",
         "Where storm track files are looked for. A plain name (storm_tracks) is a "
         "folder of that name in the run folder or up to 4 folders above it; a full "
@@ -86,6 +86,10 @@ KEYS = [
     Key("allow_writes_to_output", "data", False, "Allow writing into output files",
         "Lets the pressure decomposition write its fields into the CM1 output files. "
         "Off: results stay in memory.", kind="bool"),
+    Key("show_hidden_fields", "data", False, "Show hidden fields",
+        "List the fields atmo3d hides (WoFS's static, land-surface, radiation and "
+        "time-step fields, and WRF fields it does not know) under \"Hidden\" at the "
+        "end of the field lists. Applies to runs opened after saving.", kind="bool"),
     Key("column_stride", "data", "auto", "Sounding-parameter stride",
         "CAPE, CIN, LCL, STP and SCP maps are computed on every n-th column in x and "
         "y (each n x n block shows its middle column). auto = as few as keep them to "

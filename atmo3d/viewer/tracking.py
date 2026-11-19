@@ -20,6 +20,7 @@ from ..core import models, track as trk
 from ..theme import ACCENT
 from .numinput import FloatInput
 from .ui import _bokeh, _html, pd_empty, style_fig
+from .fieldmenu import FieldSelect
 
 
 class TrackPanel:
@@ -34,7 +35,7 @@ class TrackPanel:
                                            start=0.0, end=float(run.z[-1]), width=90,
                                            visible=self.trk_metric.value != "uh")
         groups = self.F.groups()
-        self.trk_field = pn.widgets.Select(
+        self.trk_field = FieldSelect(
             name="Field", groups=groups, width=200, visible=False,
             value=self.F.role("w") or next(iter(next(iter(groups.values())).values())))
         self.trk_sense = pn.widgets.Select(

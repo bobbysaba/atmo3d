@@ -18,6 +18,7 @@ from .numinput import FloatInput
 from .picker import RunPicker
 from .settings import ConfirmOverwrite, Settings
 from .ui import LEVEL_MODES, ON, TERRAIN_LEVEL_MODES, TIME_BAR, ToolRail, _html
+from .fieldmenu import FieldSelect
 
 
 class Widgets:
@@ -58,7 +59,7 @@ class Widgets:
         color = next((c for c in self.OV_COLORS if c not in used), self.OV_COLORS[0])
         return dict(
             on=pn.widgets.Checkbox(value=True, width=18, margin=(5, 0, 14, 8)),
-            var=pn.widgets.Select(name="Field", groups=groups, value=var, width=220),
+            var=FieldSelect(name="Field", groups=groups, value=var, width=220),
             levels=pn.widgets.TextInput(name="Levels", value=levels, width=170,
                                         placeholder="auto  |  5, 10, 20  |  -4:4:1"),
             color=pn.widgets.ColorPicker(name="Color", value=color, width=60),
@@ -76,7 +77,7 @@ class Widgets:
         lo, hi = (5.0, 30.0) if var == self.F.role("w") else (d.vrange or (0.0, 1.0))
         o = dict(
             on=pn.widgets.Checkbox(value=True, width=18, margin=(5, 0, 14, 8)),
-            var=pn.widgets.Select(name="Field", groups=groups, value=var, width=220),
+            var=FieldSelect(name="Field", groups=groups, value=var, width=220),
             style=pn.widgets.Select(name="Draw as", options={"Pixels": "image",
                                                              "Filled contours": "contourf"},
                                     value="image", width=130),
@@ -344,11 +345,11 @@ class Widgets:
 
         # ---- fill layer
         fd = F[default_fill]
-        self.fill_var = pn.widgets.Select(groups=g_all, value=default_fill, width=220,
-                                          height=32, margin=(4, 2))
+        self.fill_var = FieldSelect(groups=g_all, value=default_fill, width=220,
+                                     height=32, margin=(4, 2))
         self.fill_op = pn.widgets.Select(
             options=deriv_options(fd), value="", width=80, height=32, margin=(4, 2),
-            description="A derivative of the field (per km): ∂/∂z on the model levels, "
+            description="A derivative of the field (per m): ∂/∂z on the model levels, "
                         "∂/∂x, ∂/∂y or the horizontal gradient's size")
         self.fill_mode, self.fill_lvl = self._level_pair("height", 1.0, compact=True)
         self.fill_style = pn.widgets.RadioButtonGroup(
@@ -494,8 +495,8 @@ class Widgets:
         # pressure decomposition for the shown time (map caption / cross-section tab)
         pdb = dict(button_type="warning", button_style="outline", height=30,
                    description=f"Run {pdecomp.script_name()} on this output time "
-                               "in a separate process (~45 s and ~40 GB with 4 CPUs, "
-                               "~80 s and ~30 GB on one)")
+                               "in a separate process (on a 1280 x 1280 x 115 grid: "
+                               "~2 min and ~45 GB with 4 CPUs, longer on one)")
         self.pd_write = pn.widgets.Checkbox(
             name="Write into the output file", value=pdecomp.writes_allowed(),
             disabled=not pdecomp.writes_allowed(), margin=(10, 4, 0, 10),

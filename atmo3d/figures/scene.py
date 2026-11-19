@@ -12,6 +12,7 @@ from ..viewer.numinput import FloatInput
 from .cards import (SCENE_ARROWS, SCENE_BARS, SCENE_BG, SCENE_FLOOR_CMAPS,
                     SCENE_FLOOR_RANGE, SCENE_LIGHTS, SCENE_PROJ, SCENE_RES, SCENE_STREAM_BY,
                     SCENE_STREAM_DIR, SCENE_VIEWS, _auto, _chk, _dark, _f, _hex, parcel_pick)
+from ..viewer.fieldmenu import FieldSelect
 
 ISO_MAX = VEC_MAX = PAR_MAX = 6
 
@@ -57,7 +58,7 @@ class FigureScene:
                                                        "y min (km)", "y max (km)")]
         self.sc_g = dict(
             on=_chk("Floor", True),
-            var=pn.widgets.Select(name="Field", groups=F.groups(), value=floor0),
+            var=FieldSelect(name="Field", groups=F.groups(), value=floor0),
             z=_f("Height (km; 0: lowest level)", 0.0, step=0.25, start=0.0),
             cmap=pn.widgets.Select(name="Colormap", options=SCENE_FLOOR_CMAPS,
                                    value="Field default"),
@@ -223,7 +224,7 @@ def _put(ws, d):
             v = int(v)
         elif isinstance(x, FloatInput):
             v = None if v is None else float(v)
-        elif isinstance(x, pn.widgets.Select):
+        elif isinstance(x, (pn.widgets.Select, FieldSelect)):
             vals = [y for g in x.groups.values() for y in g.values()] if x.groups \
                 else list(x.values)
             if v not in vals:

@@ -9,7 +9,7 @@ from collections import OrderedDict
 
 from .. import config, registry
 from ..core import models
-from ..core.fields import GROUP_ORDER, deriv_def, split_deriv
+from ..core.fields import deriv_def, group_options, split_deriv
 from ..viewer.ui import held
 
 
@@ -71,13 +71,10 @@ class AllFields:
         return next((n for n in (F.role(r) for F in self._fields) if n), None)
 
     def groups(self, ndim=None):
-        out = OrderedDict((g, OrderedDict()) for g in GROUP_ORDER)
-        for d in self.defs.values():
-            if ndim is not None and d.ndim != ndim:
-                continue
+        def label(d):
             some = " · not in every run" if d.name in self._some else ""
-            out.setdefault(d.group, OrderedDict())[f"{d.label} [{d.name}]{some}"] = d.name
-        return OrderedDict((g, v) for g, v in out.items() if v)
+            return f"{d.label} [{d.name}]{some}"
+        return group_options(self.defs.values(), ndim, label)
 
 
 class FigureRuns:

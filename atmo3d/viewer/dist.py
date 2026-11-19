@@ -21,6 +21,7 @@ from ..core.fields import palette
 from ..theme import GRID, MUTED, POINT_COLORS, TEXT
 from .numinput import FloatInput
 from .ui import _bokeh, _html, style_fig, held
+from .fieldmenu import FieldSelect
 
 DIST_PLOTS = {"Histogram": "hist", "Box": "box", "Violin": "violin", "Cumulative": "ecdf"}
 
@@ -33,8 +34,8 @@ class DistPanel:
         run, F = self.run, self.F
         ztop = float(np.floor(run.z[-1] * 10) / 10)
         first = F.role("w") or next(iter(F.defs))
-        self.dist_field = pn.widgets.Select(name="Field", groups=F.groups(), value=first,
-                                            width=230)
+        self.dist_field = FieldSelect(name="Field", groups=F.groups(), value=first,
+                                       width=230)
         self.dist_vmode = pn.widgets.Select(
             name="Vertical", options={"At a height": "height", "Layer (every level)": "layer",
                                       "Every level (whole depth)": "all"},

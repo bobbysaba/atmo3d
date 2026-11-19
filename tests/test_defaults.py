@@ -75,7 +75,7 @@ def test_roles_name_each_data_types_own_fields(reg, wofs_pair):
 def test_derived_fields_alike_in_both(reg, wofs_pair):
     """The core's derived fields are there for WoFS too, from WRF's names."""
     (_, F1), (_, F2) = reg.get(), wofs_pair
-    for name in ("thpert", "prspert", "buoy", "thetae", "rh", "wspd", "hdiv", "sbcape"):
+    for name in ("thpert", "prspert", "buoy", "thetae", "rh", "wspd3d", "hdiv", "sbcape"):
         assert name in F1 and name in F2, name
     assert F2["thpert"].deps == ("THETA", "THETA0")
     assert F1["thpert"].deps == ("th", "th0")

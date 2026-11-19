@@ -34,7 +34,7 @@ A figure made from the map keeps the map's fill, more fills, contours and vector
 layers, with their colormaps and ranges.
 
 A fill, contour or shading layer's **Derivative** draws ∂/∂z, ∂/∂x, ∂/∂y or |∇h| of its
-Field (per km) instead of the field ([Derivatives of any field](fields.md#derivatives-of-any-field)):
+Field (per m) instead of the field ([Derivatives of any field](fields.md#derivatives-of-any-field)):
 contours of ∂w/∂z over a fill of w, say.
 
 ## Differences

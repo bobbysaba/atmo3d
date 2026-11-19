@@ -642,9 +642,17 @@ class Run:
 
     @property
     def catalog(self):
-        """The data type's field catalog (core.catalog): its names for each role."""
+        """The data type's field catalog (core.catalog): its names for each role, as
+        this run's files have them (Catalog.resolved: a CM1 run with only staggered
+        u, v, w has those play the winds)."""
         from .catalog import of_model
-        return of_model(self.model)
+        names = getattr(self, "vars", None) or ()
+        key = (self.model, len(names))  # (vars only grow: pdecomp.register)
+        got = self.__dict__.get("_catalog")
+        if got is None or got[0] != key:
+            got = (key, of_model(self.model).resolved(names))
+            self.__dict__["_catalog"] = got
+        return got[1]
 
     def role(self, r):
         """The field in the files playing role r (core.catalog.ROLES), or None."""

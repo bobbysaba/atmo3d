@@ -18,6 +18,7 @@ from .base import (
     card_body, color_widgets, known_cmap,
 )
 from ...viewer.ui import held
+from ...viewer.fieldmenu import FieldSelect
 
 ENS_STATS = {"Mean": "mean", "Median": "median", "Spread (sd)": "sd", "Min": "min",
              "Max": "max", "Range (max − min)": "range",
@@ -79,11 +80,11 @@ class LayerCard:
         t = self.type
         if t in ("fill", "contour", "shade"):
             op, base = split_deriv(lay["field"])
-            w["field"] = pn.widgets.Select(name="Field", groups=g, value=base)
+            w["field"] = FieldSelect(name="Field", groups=g, value=base)
             dopts = _deriv_opts(F, base)
             w["deriv"] = pn.widgets.Select(
                 name="Derivative", options=dopts, value=op if op in dopts.values() else "",
-                width=100, description="Plot a derivative of the field (per km): ∂/∂z on "
+                width=100, description="Plot a derivative of the field (per m): ∂/∂z on "
                 "the model levels, ∂/∂x, ∂/∂y or the horizontal gradient's size on the "
                 "grid")
             # (watched before the fill's colours: a 2D field has no ∂/∂z)

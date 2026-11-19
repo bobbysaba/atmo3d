@@ -233,7 +233,7 @@ for each other run of the figure, in its panel.
 *Then apply* **d/dz** draws the profile's vertical derivative, per metre (e.g. s⁻¹ for w).
 It is d/dz of the reduced profile, e.g. of the maximum w at each level, not the maximum
 of ∂w/∂z at each level. For that, pick ∂/∂z in the card's **Derivative** select (a
-[field derivative](fields.md#derivatives-of-any-field), per km), which series cards
+[field derivative](fields.md#derivatives-of-any-field), per m), which series cards
 have too.
 
 A profile is a layer series computed only at the times it needs, and cached with the

@@ -21,6 +21,7 @@ from .times import _nearest_t
 from .kinds import KIND_LABELS, KINDS, MAPS
 from .shell import docedit as de
 from .shell.gridview import main_kind
+from ..viewer.fieldmenu import FieldSelect
 
 ALL_FOLDERS = "Newest first, all folders"
 GALLERY_STEP = 12  # thumbnails shown at a time
@@ -53,7 +54,7 @@ class FigureQuick:
                                          value="times")
         self.qs_rows = pn.widgets.IntInput(name="Rows", start=1, end=8, value=2)
         self.qs_cols = pn.widgets.IntInput(name="Columns", start=1, end=8, value=3)
-        self.qs_field = pn.widgets.Select(name="Colour fill")
+        self.qs_field = FieldSelect(name="Colour fill")
         self.qs_size = pn.widgets.Select(name="Width", value="", options={
             ("8 in wide" if v == "" else k): v for k, v in SIZE_PRESETS.items()})
         self.qs_note = _hint("")

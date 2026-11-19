@@ -260,7 +260,7 @@ def _header(ds, run, F, p, any3, stormy, compress):
             a["units_shown"] = d.units
         op, base = split_deriv(name)
         if op:
-            a["comment"] = (f"{op} of {base}, per km" + (" (centred on the stretched "
+            a["comment"] = (f"{op} of {base}, per m" + (" (centred on the stretched "
                             "levels, one-sided at the bottom and top)" if op == "ddz" else ""))
         if d.column:
             z0, z1 = d.layer

@@ -1,14 +1,21 @@
-"""Pressure decomposition (p_b, p_l, p_nl and the matching vertical accelerations).
+"""Pressure decomposition: CM1's own method (cm1_pdecomp.py: buoyancy p_b, linear
+p_l, nonlinear p_nl and Coriolis p_c, and the matching vertical accelerations).
 
-The fields come from the output files when post-processing wrote them there, or are
-computed here for one time on request by the solver in pdecomp_solver.py (or the
-user's own script with the same functions: the pdecomp_script setting), in a
-separate process, so the viewer's memory is freed again as soon as it is done.  With several CPUs and enough
-memory the script's inputs are read in parallel first and its FFTs use several
-threads (~45 s with 4 CPUs, ~40 GB peak; otherwise ~80 s, ~30 GB): the math is the
-script's own either way.  The result is kept in memory (run.extra) for the last
-MAX_TIMES times and, on request, written into the output file with the script's own
-write_data (float64, with its pdecomp_version attribute), replacing older values.
+The fields come from the output files when cm1_pdecomp wrote them there, or are
+computed here for one time on request (cm1_pdecomp.py, or the user's own script: the
+pdecomp_script setting), in a separate process, so the viewer's memory is freed again
+as soon as it is done.  With several CPUs and enough memory the script's inputs are
+read in parallel first and its array work and FFTs use several threads (~2 min with 4
+CPUs on a 1280 x 1280 x 115 grid).  The result is kept in memory (run.extra) for the
+last MAX_TIMES times and, on request, written into the output file with the script's
+own write_data (with its pdecomp_version attribute), replacing older values.
+
+A script either has cm1_pdecomp's run_decomposition(path, run_dir=..., t0_path=...,
+threads=...) or the older interface of pdecomp_solver.py (lbc_type, domain_info,
+compute_base_state, setup_pressure_solver, pressure_decomposition), which gives the
+first six fields only (no Coriolis part, and its own split: p_l twice CM1's, p_nl the
+residual).  Values in a file count as current only when written by cm1_pdecomp; others
+show with a note and can be recomputed.
 """
 
 import contextlib
@@ -26,17 +33,20 @@ from .. import config
 from ..core import pool as readers
 from ..core.run import IO_LOCK, VarInfo
 
-NAMES = ("p_b", "p_l", "p_nl", "acc_b", "acc_l", "acc_nl")
-NEEDS = ("th", "qv", "pi", "rho", "prs")
-BUILTIN = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pdecomp_solver.py")
-# free memory wanted before starting, measured on a 1280 x 1280 x 115 grid (serial reads:
-# peak ~30 GB; inputs read in parallel up front: ~40 GB, ~45 s with 4 CPUs) and scaled
-# by the number of grid points (see need_gb)
-NEED_GB = 34.0
-NEED_GB_PAR = 44.0
+NAMES = ("p_b", "p_l", "p_nl", "p_c", "acc_b", "acc_l", "acc_nl", "acc_c")
+CORE = ("p_b", "p_l", "p_nl", "acc_b", "acc_l", "acc_nl")   # (what every script gives)
+NEEDS = ("th", "qv")
+WINDS = (("u", "v", "w"), ("uinterp", "vinterp", "winterp"))
+BASE = ("th0", "qv0", "pi0", "prs0", "u0", "v0")
+CURRENT = "cm1_pdecomp"   # pdecomp_version prefix of values that count as current
+BUILTIN = os.path.join(os.path.dirname(os.path.abspath(__file__)), "cm1_pdecomp.py")
+# free memory wanted before starting on a 1280 x 1280 x 115 grid (serial reads / inputs
+# read in parallel up front; a 64 GB job ran CM1's method and the older solver one
+# after the other), scaled by the number of grid points (see need_gb)
+NEED_GB = 36.0
+NEED_GB_PAR = 46.0
 REF_POINTS = 1280 * 1280 * 115
-EXPECT_S = {False: 85.0, True: 50.0}  # typical durations (serial / parallel reads)
-MAX_TIMES = 2      # computed times kept in memory (6 float32 volumes each)
+MAX_TIMES = 2      # computed times kept in memory (8 float32 volumes each)
 
 _lock = threading.Lock()
 _running = {}      # (run path, t) -> started (time.time())
@@ -53,7 +63,7 @@ def script():
 
 
 def script_name():
-    return os.path.basename(config.pdecomp_script()) or "atmo3d's solver"
+    return os.path.basename(config.pdecomp_script()) or "CM1's method (cm1_pdecomp.py)"
 
 
 def need_gb(run, parallel):
@@ -63,8 +73,21 @@ def need_gb(run, parallel):
 
 
 def can_compute(run):
-    return (run.model == "cm1" and script() is not None and all(run.has(n) for n in NEEDS)
-            and (run.has("w") or run.has("winterp")))
+    sp = script()
+    if run.model != "cm1" or sp is None or not all(run.has(n) for n in NEEDS):
+        return False
+    if not new_interface(sp):  # pdecomp_solver.py's interface: what it reads
+        return all(run.has(n) for n in ("pi", "rho", "prs")) and \
+            (run.has("w") or run.has("winterp"))
+    return (run.has("pi") or run.has("prs")) and \
+        any(all(run.has(n) for n in w) for w in WINDS)
+
+
+def new_interface(path):
+    """True for a script with cm1_pdecomp's run_decomposition."""
+    if path == BUILTIN:
+        return True
+    return _has_run_decomposition(path)
 
 
 def register(run):
@@ -73,7 +96,7 @@ def register(run):
     if not can_compute(run):
         return
     units = {"p": "Pa", "a": "m/s^2"}
-    for n in NAMES:
+    for n in NAMES:  # (p_c, acc_c only from cm1_pdecomp)
         if n not in run.vars:
             run.vars[n] = VarInfo(n, n, units[n[0]], 3, None)
             run.var_times[n] = frozenset()
@@ -114,8 +137,8 @@ def source(run, t, block=True):
             finally:
                 IO_LOCK.release()
         ver = _version_cache[key]
-        kind = "file-fixed" if ver else "file-old"
-    if all((n, t) in run.extra for n in NAMES):
+        kind = "file-fixed" if ver.startswith(CURRENT) else "file-old"
+    if all((n, t) in run.extra for n in CORE):
         if kind == "file-fixed":
             return "computed", (f"computed here with {script_name()} and written to the "
                                 f"output file")
@@ -123,8 +146,10 @@ def source(run, t, block=True):
     if kind == "file-fixed":
         return kind, f"from the output file ({_version_cache[(run.path, t)]})"
     if kind == "file-old":
-        return kind, ("from the output file, written by an earlier pdecomp script (no "
-                      "pdecomp_version; pdecomp_new.py swapped x and y in p_b and p_l)")
+        ver = _version_cache[(run.path, t)]
+        return kind, ("from the output file, written by an older method "
+                      f"({ver or 'no pdecomp_version'}: p_l twice CM1's, p_nl the residual, "
+                      "no Coriolis part); recompute for CM1's")
     return None, "not available"
 
 
@@ -177,6 +202,12 @@ class _Inputs:
     def close(self):
         self._d.close()
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        self.close()
+
 
 def nc_dataset(path, mode="r"):
     import netCDF4
@@ -195,7 +226,7 @@ def _worker(script_path, run_path, file0, file_t, pre0, pre_t, nthreads, outdir,
             ready, go):
     """Process-pool worker: the script's decomposition of file_t (write=False), then,
     with `write`, its write_data into file_t once the viewer has let go of the file
-    (ready -> go).  Saves the six fields as float32 .npy; returns paths, log, wrote."""
+    (ready -> go).  Saves the fields as float32 .npy; returns paths, log, wrote."""
     import types
     import scipy.fft
 
@@ -205,22 +236,26 @@ def _worker(script_path, run_path, file0, file_t, pre0, pre_t, nthreads, outdir,
     with contextlib.redirect_stdout(log):
         spec.loader.exec_module(P)
         a0, at = _load(pre0), _load(pre_t)
-        # the script opens file_t itself: hand it the pre-read inputs
+        # the script opens the files itself: hand it the pre-read inputs
         P.nc = types.SimpleNamespace(
-            Dataset=lambda p, mode="r": _Inputs(p, at if p == file_t else {}, mode))
+            Dataset=lambda p, mode="r": _Inputs(
+                p, at if p == file_t else a0 if p == file0 else {}, mode))
         with scipy.fft.set_workers(nthreads):
-            d0 = _Inputs(file0, a0)
-            periodic = P.lbc_type(run_path.rstrip("/") + "/")
-            dom = P.domain_info(d0)
-            base = P.compute_base_state(d0)
-            d0.close()
-            del a0
-            solver = P.setup_pressure_solver(dom, base, periodic)
-            out = P.pressure_decomposition(file_t, dom, base, solver, write=False)
-        del at
+            if hasattr(P, "run_decomposition"):  # cm1_pdecomp
+                out = P.run_decomposition(file_t, run_dir=run_path, t0_path=file0,
+                                          threads=nthreads)
+            else:  # the older interface (pdecomp_solver.py)
+                d0 = _Inputs(file0, a0)
+                periodic = P.lbc_type(run_path.rstrip("/") + "/")
+                dom = P.domain_info(d0)
+                base = P.compute_base_state(d0)
+                d0.close()
+                solver = P.setup_pressure_solver(dom, base, periodic)
+                out = P.pressure_decomposition(file_t, dom, base, solver, write=False)
+        del at, a0
     # the in-memory copy first: a failed write must not lose the computation
     paths, tag = {}, uuid.uuid4().hex
-    for n in NAMES:
+    for n in (n for n in NAMES if n in out):
         p = os.path.join(outdir, f"atmo3d-pdecomp-{os.getpid()}-{tag}-{n}.npy")
         np.save(p, np.asarray(out[n], dtype=np.float32))
         paths[n] = p
@@ -274,11 +309,19 @@ def compute(run, t, progress=None, write=False):
             _running.pop(key, None)
 
 
-def _inputs(run, t):
-    """Fields the script reads from file t and from the first file."""
-    hyd = [n for n in ("qc", "qr", "qi", "qs", "qg", "qhl") if run.has(n)]
-    at = ["th", "qv", *hyd, "pi", "rho", "w" if run.has("w") else "winterp"]
-    a0 = ["pi" if run.has("pi") else "prs", "th", "qv"]
+def _inputs(run, t, new=True):
+    """Fields the script reads from file t and from the first file (read in parallel
+    beforehand)."""
+    hyd = [n for n in ("qc", "qr", "qi", "qs", "qg", "qh", "qhl", "qi1", "qi2", "qi3")
+           if run.has(n)]
+    pres = "pi" if run.has("pi") else "prs"
+    if not new:  # pdecomp_solver.py
+        at = ["th", "qv", *hyd, "pi", "rho", "w" if run.has("w") else "winterp"]
+        return at, [pres, "th", "qv"]
+    winds = next(list(w) for w in WINDS if all(run.has(n) for n in w))
+    base = all(run.has(n) for n in BASE)
+    at = ["th", "qv", *hyd, pres, *winds, *(BASE if base else ())]
+    a0 = [] if base else [pres, "th", "qv", *winds]
     return at, a0
 
 
@@ -315,7 +358,7 @@ def _compute(run, t, progress, write):
 
     try:
         if parallel:  # read the script's inputs in parallel, straight to /dev/shm
-            at, a0 = _inputs(run, t)
+            at, a0 = _inputs(run, t, new_interface(sp))
             run._not_writing(t)
             ex = readers.get(max(2, run.workers))  # (the reader processes every run uses)
             futs = {("t", n): ex.submit(_read_raw, run.files[t], n, outdir) for n in at}
@@ -377,6 +420,15 @@ def _compute(run, t, progress, write):
     source(run, t)  # read the (new) version tag here, not in the page-updating thread
     return dict(elapsed=time.time() - t0, wrote=wrote, parallel=parallel, log=log,
                 write_error=werr)
+
+
+def _has_run_decomposition(path):
+    """True for a script with cm1_pdecomp's interface (a cheap look at its text)."""
+    try:
+        with open(path) as fh:
+            return "def run_decomposition(" in fh.read()
+    except OSError:
+        return False
 
 
 def _remove_raw(fut):

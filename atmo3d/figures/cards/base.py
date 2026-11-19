@@ -14,6 +14,7 @@ from ...core.fields import CMAPS, DERIVS, deriv_options, split_deriv
 from ...viewer.numinput import FloatInput
 from ...theme import GRID, PANEL, RAISED, TEXT
 from ...viewer.ui import held
+from ...viewer.fieldmenu import FieldSelect
 
 
 PYART_CMAPS = ["HomeyerRainbow", "ChaseSpectral", "NWSRef", "NWSVel", "LangRainbow12",
@@ -414,11 +415,11 @@ def _deriv_pair(F, name, width=210, first=None):
     op, base = split_deriv(name)
     if base not in F:
         op, base = "", first or next(iter(F.defs))
-    field = pn.widgets.Select(name="Field", groups=F.groups(), value=base, width=width)
+    field = FieldSelect(name="Field", groups=F.groups(), value=base, width=width)
     opts = _deriv_opts(F, base)
     deriv = pn.widgets.Select(
         name="Derivative", options=opts, value=op if op in opts.values() else "", width=100,
-        description="A derivative of the field (per km), taken before the reduction: ∂/∂z "
+        description="A derivative of the field (per m), taken before the reduction: ∂/∂z "
                     "on the model levels, ∂/∂x, ∂/∂y or the horizontal gradient's size")
 
     def follow(ev):  # (registered first: other watchers of the Field see valid options)
@@ -484,8 +485,8 @@ def label_widget(ent, name="Legend text (blank: automatic)", default=""):
 
 def field_widget(F, name, label="Field"):
     """A Field list, at field `name` if there is such a field (else the first)."""
-    return pn.widgets.Select(name=label, groups=F.groups(), width=210,
-                             value=name if name in F else next(iter(F.defs)))
+    return FieldSelect(name=label, groups=F.groups(), width=210,
+                       value=name if name in F else next(iter(F.defs)))
 
 
 def layer_widgets(w, r):

@@ -291,8 +291,9 @@ class ParcelFile:
         F = self.fields
         if F is None:
             return {}
+        from .fields import listed
         return {f"{d.label} [{d.name}]": GRID + d.name for d in F.defs.values()
-                if d.ndim == 3 and not d.column}
+                if d.ndim == 3 and not d.column and listed(d)}
 
     # ------------------------------------------------------------------ times
     def index_before(self, t, tol=0.5):

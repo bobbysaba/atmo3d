@@ -63,7 +63,7 @@ def _cpus():
 
 THREADS = int(os.environ.get('PDECOMP_THREADS', _cpus()))
 
-VERSION = 'atmo3d pdecomp_solver.py (= pdecomp_new_fixed_mp.py)'
+VERSION = 'atmo3d pdecomp_solver.py (= pdecomp_new_fixed_mp.py; accelerations -cp thv0 dpi/dz)'
 
 # ============================================================================
 # THREADING HELPER
@@ -465,34 +465,41 @@ def compute_linear_dynamic_pressure(nc_file, domain, base_state, solver):
     return solve_pressure_equation(forcing, solver)
 
 # post processing
+def vertical_pgf(pi_part, domain, base_state):
+    """-cp thv0 d(pi)/dz of one part at the interior w levels, averaged to the scalar
+    levels (zero flux at the bottom and top), as CM1 writes its pgrad* fields. pi is only
+    defined up to a constant: this form does not depend on it, where -(1/rho) dp/dz with
+    p from p00 (pi0 + pi)^(cp/Rd) does (pi times dpi0/dz enters)."""
+    zh, zf = domain['zh'], domain['zf']
+    thv = base_state['theta0_v']
+    wgt = (zf[1:-1] - zh[:-1]) / (zh[1:] - zh[:-1])
+    thv_w = thv[:-1] + wgt * (thv[1:] - thv[:-1])
+    pg = np.zeros((pi_part.shape[0] + 1,) + pi_part.shape[1:])
+    pg[1:-1] = (-cp * thv_w / domain['dz_center'])[:, np.newaxis, np.newaxis] \
+        * (pi_part[1:] - pi_part[:-1])
+    lw = ((zf[1:] - zh) / domain['dz_layer'])[:, np.newaxis, np.newaxis]   # weight of w level k
+    return lw * pg[:-1] + (1.0 - lw) * pg[1:]
+
+
 def post_process(pi_b, pi_l, pi_nl, rho, B, domain, base_state):
     """
-    Convert Exner perturbations to pressure perturbations (Pa) and compute vertical accelerations.
+    Convert Exner perturbations to pressure perturbations (Pa) and compute vertical
+    accelerations (-cp thv0 dpi/dz: see vertical_pgf; rho is no longer used).
     """
     pi0_large = base_state['pi0_large']
     ny = pi0_large.shape[1]
-    zh = domain['zh']
 
     print("Converting to pressure units...")
     out = {k: np.empty(pi0_large.shape) for k in ('p_b', 'p_l', 'p_nl', 'acc_b', 'acc_l', 'acc_nl')}
     def rows_(rows):
         p0 = pi0_large[:, rows]
         p_t0 = pbb * p0 ** (cp / Rd)
-        pb_pert  = pbb * (p0 + pi_b[:, rows])  ** (cp / Rd) - p_t0
-        pl_pert  = pbb * (p0 + pi_l[:, rows])  ** (cp / Rd) - p_t0
-        pnl_pert = pbb * (p0 + pi_nl[:, rows]) ** (cp / Rd) - p_t0
-        out['p_b'][:, rows], out['p_l'][:, rows], out['p_nl'][:, rows] = pb_pert, pl_pert, pnl_pert
-
-        # gradients along z: each column is independent
-        dpb_dz  = np.gradient(pb_pert, zh, axis = 0)
-        dpl_dz  = np.gradient(pl_pert, zh, axis = 0)
-        dpnl_dz = np.gradient(pnl_pert, zh, axis = 0)
-
-        r = rho[:, rows]
-        out['acc_b'][:, rows]  = B[:, rows] - (1.0 / r) * dpb_dz
-        out['acc_l'][:, rows]  = -(1.0 / r) * dpl_dz
-        out['acc_nl'][:, rows] = -(1.0 / r) * dpnl_dz
-    print("Computing gradients...")
+        out['p_b'][:, rows] = pbb * (p0 + pi_b[:, rows]) ** (cp / Rd) - p_t0
+        out['p_l'][:, rows] = pbb * (p0 + pi_l[:, rows]) ** (cp / Rd) - p_t0
+        out['p_nl'][:, rows] = pbb * (p0 + pi_nl[:, rows]) ** (cp / Rd) - p_t0
+        out['acc_b'][:, rows] = B[:, rows] + vertical_pgf(pi_b[:, rows], domain, base_state)
+        out['acc_l'][:, rows] = vertical_pgf(pi_l[:, rows], domain, base_state)
+        out['acc_nl'][:, rows] = vertical_pgf(pi_nl[:, rows], domain, base_state)
     print("Computing accelerations...")
     parallel_rows(rows_, ny)
 

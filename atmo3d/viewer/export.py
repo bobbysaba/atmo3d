@@ -14,6 +14,7 @@ from ..core import export as ex
 from ..core.fields import COSTLY, DERIVS, column_stride, deriv_name, split_deriv
 from ..theme import DIALOG_DARK
 from .ui import _html
+from .fieldmenu import FieldSelect
 
 REGIONS = {"Whole domain": "domain", "Map view": "view", "Box": "box"}
 VERTICAL = {"Model levels": "levels", "Heights": "heights"}
@@ -51,7 +52,8 @@ class DataExport:
     def _exp_widgets(self):
         self._exp_built = True
         run, F = self.run, self.F
-        opts = {f"{d.label} [{n}]": n for n, d in F.defs.items()}
+        from ..core.fields import listed
+        opts = {f"{d.label} [{n}]": n for n, d in F.defs.items() if listed(d)}
         fill = self._fill_name()
         if fill not in opts.values():
             opts[f"{F[fill].label} [{fill}]"] = fill
@@ -61,8 +63,8 @@ class DataExport:
                         "a derivative: add it below")
         self.exp_dop = pn.widgets.Select(name="Derivative", width=90,
                                          options={v: k for k, v in DERIVS.items()})
-        self.exp_dvar = pn.widgets.Select(name="of", groups=F.groups(), width=300,
-                                          value=split_deriv(fill)[1])
+        self.exp_dvar = FieldSelect(name="of", groups=F.groups(), width=300,
+                                     value=split_deriv(fill)[1])
         self.exp_dadd = pn.widgets.Button(name="Add", icon="plus", width=80,
                                           margin=(24, 4, 5, 4))
         labels = {f"{run.time_label(t)} ({run.times[t] / 60:g} min)": t

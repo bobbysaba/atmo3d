@@ -101,7 +101,7 @@ def test_base_state_is_the_domain_mean(reg):
 
 
 def test_derivatives_of_any_field(reg):
-    """'ddz.w', 'ddx.', 'ddy.', 'gradh.' (per km): not in the field lists; maps (at a
+    """'ddz.w', 'ddx.', 'ddy.', 'gradh.' (per m): not in the field lists; maps (at a
     level or a height) agree with the volume's np.gradient on the stretched levels, so
     maps and cross-sections agree; ∂/∂z only of 3D fields."""
     from atmo3d.core.fields import deriv_name, deriv_options, split_deriv
@@ -112,26 +112,28 @@ def test_derivatives_of_any_field(reg):
     assert "ddz.winterp" in F and "ddq.winterp" not in F and "ddz.nothing" not in F
     assert not any("ddz.winterp" in g.values() for g in F.groups().values())
     d = F["ddz.winterp"]
-    assert d.units == "10⁻³ s⁻¹" and d.ndim == 3 and d.diverging and d.vrange == (-10, 10)
+    # (per m: the wind's 1/s; the starting range half the field's per km: ±20 -> ±0.01)
+    assert d.units == "1/s" and d.ndim == 3 and d.diverging and d.vrange == (-0.01, 0.01)
     w = np.asarray(F.volume("winterp", T), np.float64)
-    ref = np.gradient(w, run.z, axis=0)  # (km: per km)
+    ref = np.gradient(w, 1000.0 * run.z, axis=0)  # (heights in m: per m)
+    tol = 1e-3 * np.abs(ref).max()
     vol = F.volume("ddz.winterp", T)
     assert vol is F.volume("ddz.winterp", T)
-    assert np.abs(vol - ref).max() < 1e-3 * max(1.0, np.abs(ref).max())
-    assert np.abs(F.plane("ddz.winterp", T, "level", K) - ref[K]).max() < \
-        1e-3 * max(1.0, np.abs(ref).max())
+    assert np.abs(vol - ref).max() < tol
+    assert np.abs(F.plane("ddz.winterp", T, "level", K) - ref[K]).max() < tol
     zk = 0.5 * (run.z[K] + run.z[K + 1])
     mid = 0.5 * (ref[K] + ref[K + 1])
-    assert np.abs(F.plane("ddz.winterp", T, "height", zk) - mid).max() < \
-        1e-3 * max(1.0, np.abs(ref).max())
-    assert np.allclose(F.plane("ddz.winterp", T, "colmax", 0), ref.max(axis=0), atol=1e-3)
+    assert np.abs(F.plane("ddz.winterp", T, "height", zk) - mid).max() < tol
+    assert np.allclose(F.plane("ddz.winterp", T, "colmax", 0), ref.max(axis=0), atol=tol)
     # horizontal, of a derived field too, on the grid's x / y
     th = np.asarray(F.plane("thpert", T, "height", 1.0), np.float64)
-    gx, gy = np.gradient(th, run.xh, axis=-1), np.gradient(th, run.yh, axis=-2)
-    assert np.allclose(F.plane("ddx.thpert", T, "height", 1.0), gx, atol=1e-4)
-    assert np.allclose(F.plane("ddy.thpert", T, "height", 1.0), gy, atol=1e-4)
-    assert np.allclose(F.plane("gradh.thpert", T, "height", 1.0), np.hypot(gx, gy), atol=1e-4)
-    assert F["gradh.thpert"].vrange[0] == 0.0 and F["ddx.thpert"].units == "K km⁻¹"
+    gx = np.gradient(th, 1000.0 * run.xh, axis=-1)
+    gy = np.gradient(th, 1000.0 * run.yh, axis=-2)
+    htol = 1e-3 * max(np.abs(gx).max(), np.abs(gy).max(), 1e-12)
+    assert np.allclose(F.plane("ddx.thpert", T, "height", 1.0), gx, atol=htol)
+    assert np.allclose(F.plane("ddy.thpert", T, "height", 1.0), gy, atol=htol)
+    assert np.allclose(F.plane("gradh.thpert", T, "height", 1.0), np.hypot(gx, gy), atol=htol)
+    assert F["gradh.thpert"].vrange[0] == 0.0 and F["ddx.thpert"].units == "K/m"
     # a 2D field: horizontal derivatives only
     two = next(n for n, x in F.defs.items() if x.ndim == 2)
     assert "ddz." + two not in F and "ddx." + two in F
@@ -151,10 +153,10 @@ def test_vorticity_tendencies(reg):
     assert sorted(F.native_deps("ztend")) == ["winterp", "xvort", "yvort", "zvort"]
     assert F.native_deps("okubo") == ["uinterp", "vinterp"]
     assert not F["ztilt"].pointwise and F["ztilt"].units == "10⁻⁴ s⁻²"
-    assert "Vorticity tendencies" in F.groups()
+    assert "Derived · Vorticity tendencies" in F.groups()
     v = {n: np.asarray(F.volume(n, T), np.float64)
          for n in ("zvort", "xvort", "yvort", "winterp", "uinterp", "vinterp")}
-    wz = np.gradient(v["winterp"], run.z, axis=0) * 1e-3  # 1/s
+    wz = np.gradient(v["winterp"], run.z, axis=0) * 1e-3  # 1/s (per m)
     wx = np.gradient(v["winterp"], run.xh, axis=-1) * 1e-3
     wy = np.gradient(v["winterp"], run.yh, axis=-2) * 1e-3
     ref = {"zstretch": 1e4 * v["zvort"] * wz,
@@ -171,11 +173,11 @@ def test_vorticity_tendencies(reg):
         assert np.allclose(F.plane(n, T, "colmax", 0), r.max(axis=0), atol=tol), n
     # at a height: the inputs' planes there (∂w/∂z between the levels' values)
     a = F.plane("zstretch", T, "height", 1.0)
-    b = 10.0 * F.plane("zvort", T, "height", 1.0) * F.plane("ddz.winterp", T, "height", 1.0)
+    b = 1e4 * F.plane("zvort", T, "height", 1.0) * F.plane("ddz.winterp", T, "height", 1.0)
     assert np.allclose(a, b, atol=1e-5)
     # and a derivative of one: ∂/∂z of stretching
-    assert np.abs(F.volume("ddz.zstretch", T) - np.gradient(ref["zstretch"], run.z, axis=0)
-                  ).max() < 1e-2 * max(1.0, np.abs(ref["zstretch"]).max())
+    dref = np.gradient(ref["zstretch"], 1000.0 * run.z, axis=0)
+    assert np.abs(F.volume("ddz.zstretch", T) - dref).max() < 1e-2 * np.abs(dref).max()
     F.forget(T, ["winterp"])
     assert run.cached("~zstretch", T) is None and run.cached("~ddz.zstretch", T) is None
 
@@ -190,7 +192,7 @@ def test_column_fields(reg):
     assert F["uh25"].group == "Column fields" and F["uh25"].ndim == 2
     assert F["uh25"].column and not F["uh25"].pointwise
     assert sorted(F.native_deps("uh25")) == ["winterp", "zvort"]
-    assert "uh25" in F.groups(2)["Column fields"].values()
+    assert "uh25" in F.groups(2)["Derived · Column fields"].values()
     ks, dz = column_levels(run.z, run.zf, 2.0, 5.0)
     assert abs(dz.sum() - 3000.0) < 1e-6 and (dz > 0).all()
     assert run.zf[ks[0]] <= 2.0 < run.zf[ks[0] + 1] and run.zf[ks[-1]] < 5.0 <= run.zf[ks[-1] + 1]
@@ -207,7 +209,8 @@ def test_column_fields(reg):
     k1, _ = column_levels(run.z, run.zf, 0.0, 1.0)
     assert np.allclose(F.plane("zvmax01", T), z[k1].max(axis=0), atol=1e-6)
     assert np.allclose(F.plane("wmax", T), w.max(axis=0), atol=1e-5)
-    assert np.allclose(F.plane("ddx.uh25", T), np.gradient(a, run.xh, axis=-1), atol=1e-3)
+    ax = np.gradient(a, 1000.0 * run.xh, axis=-1)
+    assert np.allclose(F.plane("ddx.uh25", T), ax, atol=1e-3 * max(np.abs(ax).max(), 1e-12))
 
 
 def test_sounding_kinematics_match_the_soundings(reg):
@@ -354,7 +357,7 @@ def test_own_heights_helpers_match_one_profile(reg):
         ks3, dz3, zk3 = column_levels_3d(Z, Zw, *layer, edges=edges)
         assert ks3 == ks and np.allclose(dz3[:, 2, 3], dz) and np.allclose(zk3, Z[ks])
         assert np.allclose(layer_sum(dz, u[ks]), layer_sum(dz3, u[ks]))
-    assert np.allclose(ddz_volume(u, Z), np.gradient(u, run.z, axis=0))
+    assert np.allclose(ddz_volume(u, Z), np.gradient(u, 1000.0 * run.z, axis=0))
     p, th, qv = (np.asarray(F.volume(n, T), np.float64)[:, :3, :3] for n in ("prs", "th", "qv"))
     one = thermo.parcel_columns(1000.0 * run.z, p, th, qv, "sb")
     per = thermo.parcel_columns(1000.0 * np.broadcast_to(run.z[:, None, None], p.shape),
@@ -427,8 +430,8 @@ def test_volumes_in_slabs_match_whole_volumes(reg, monkeypatch):
             assert a.dtype == np.float32 and np.array_equal(a, whole[n], equal_nan=True), n
         drop()
     w = np.asarray(run.volume("winterp", T), np.float64)
-    assert np.allclose(whole["ddz.winterp"], np.gradient(w, run.z, axis=0),
-                       rtol=1e-4, atol=1e-3)
+    assert np.allclose(whole["ddz.winterp"], np.gradient(w, 1000.0 * run.z, axis=0),
+                       rtol=1e-4, atol=1e-6)
 
 
 def test_take_scales_the_part_taken(reg):

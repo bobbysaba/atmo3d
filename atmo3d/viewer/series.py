@@ -25,6 +25,7 @@ from ..core.fields import CMAPS, deriv_name, deriv_options, palette
 from ..theme import BG, GRID, MUTED, POINT_COLORS, TEXT
 from .numinput import FloatInput
 from .ui import _bokeh, _html, _settings_toggle, style_fig, held
+from .fieldmenu import FieldSelect
 
 
 class SeriesPanel:
@@ -35,11 +36,11 @@ class SeriesPanel:
         run, F = self.run, self.F
         ztop = float(np.floor(run.z[-1] * 10) / 10)
         first = "thpert" if "thpert" in F else next(iter(F.defs))
-        self.ser_field = pn.widgets.Select(name="Field", groups=F.groups(), value=first,
-                                           width=230)
+        self.ser_field = FieldSelect(name="Field", groups=F.groups(), value=first,
+                                      width=230)
         self.ser_op = pn.widgets.Select(
             name="Derivative", options=deriv_options(F[first]), value="", width=90,
-            description="A derivative of the field (per km), taken before the reduction: "
+            description="A derivative of the field (per m), taken before the reduction: "
                         "∂/∂z on the model levels, ∂/∂x, ∂/∂y or the horizontal "
                         "gradient's size")
         self.ser_vmode = pn.widgets.Select(

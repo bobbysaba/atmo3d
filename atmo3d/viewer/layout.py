@@ -15,6 +15,7 @@ from .ui import (
     BAR, DRAWER, FILL, PANEL_TITLES, PANELS, RAIL_BTN, TAB_MODE, Drawer, Plotly3D,
     _bar, _bokeh, _group, _html, _pill, _settings_toggle, out_of_flow,
 )
+from .fieldmenu import FieldSelect
 
 
 class Layout:
@@ -56,7 +57,7 @@ class Layout:
                 var, on = first3d, False
             self.isos.append(dict(
                 on=pn.widgets.Checkbox(value=on, width=24, margin=(18, 4, 0, 4)),
-                var=pn.widgets.Select(name="Field", groups=g3, value=var, width=230),
+                var=FieldSelect(name="Field", groups=g3, value=var, width=230),
                 val=FloatInput(name="Value", value=val, width=90),
                 color=pn.widgets.ColorPicker(name="Color", value=col, width=60),
                 op=pn.widgets.FloatSlider(name="Opacity", start=0.05, end=1.0, step=0.05,
@@ -79,8 +80,8 @@ class Layout:
         fl0 = F.role("cref") or F.role("refl") or first3d
         self.v3_ground = pn.widgets.Checkbox(value=F.cat.reflectivity(fl0), width=18,
                                              margin=(14, 0, 0, 8))
-        self.v3_floor = pn.widgets.Select(name="Field", groups=F.groups(), value=fl0,
-                                          width=250)
+        self.v3_floor = FieldSelect(name="Field", groups=F.groups(), value=fl0,
+                                     width=250)
         self.v3_floor_z = pn.widgets.FloatSlider(name="Height (km AGL; 0 = lowest level)",
                                                  start=0.0, end=min(10.0, ztop), step=0.05,
                                                  value=0.0, width=210)

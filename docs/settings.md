@@ -22,6 +22,7 @@ edits the file itself). They are saved in `~/.config/atmo3d/config.toml`
 | `traj_max_interval` | `300` | runs without parcel output (WoFS) get trajectories traced through the 3D winds; turned off when the output comes less often than this many seconds (0: never) |
 | `settle_seconds` | `60` | a run still going opens without the file being written: the newest file is left out while it changed within this many seconds or will not open (0: only files that will not open); Reload run adds files finished since |
 | `allow_writes_to_output` | off | lets the pressure decomposition write into output files |
+| `show_hidden_fields` | off | lists the hidden fields (WoFS's static, land-surface, radiation and time-step fields, and WRF fields atmo3d does not know) under "Hidden" at the end of the field lists |
 | `column_stride` | auto | CAPE, CIN, LCL, STP and SCP maps on every n-th column (auto: every column up to 500 × 500 points) |
 | `cache_gb`, `workers` | auto | from the job's memory and CPUs (restart to apply) |
 | `port`, `maxpix` | 5006, 900 | server port (restart to apply), map pixels per axis |
