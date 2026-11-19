@@ -249,3 +249,31 @@ state and perturbations, heights), `test_geo.py`, `test_storms.py`, `test_runnin
 
 No tests were added in this step. These three are small (no baselines, no big data) and
 use only the existing demo runs.
+
+# Phase 2 status (2026-11-18)
+
+Sections 1-5 and the core modules in section 10 now name **roles** (`core/catalog.py`
+`ROLES`: `u`, `v`, `w`, `theta`, `pres`, `qv`, `refl`, ...) and ask the run's catalog
+(`run.catalog`, `Fields.cat`, `F.role(r)`) for the field. Catalogs: `core/cm1_catalog.py`,
+`core/wofs_catalog.py`. Derived fields in `core/fields.py` are written with role names and
+bound per catalog (`_bind`). WoFS keeps WRF names; `core/wofs.py` only sums `THETA` (T+300)
+and `PRES` (P+PB); base state `THETA0`, `PRES0`, `QVAPOR0`, `U0`, `V0`.
+
+Deliberately left as they are:
+
+- `zagl`, `zmsl` (section 8 and the terrain code): atmo3d's own height fields of a
+  terrain-following run, computed by the reader, not a CM1 name. Phase 3 (terrain
+  capability) is the place to revisit.
+- Derived-field names (`thpert`, `prspert`, `buoy`, `uh25`, ...): the core's, the same
+  for every data type.
+- Section 7 (parcels, tracking metrics, `pdecomp/`): CM1-only code, moves in Phase 5.
+  `pdecomp/` still names `prs`, `qv`, `uinterp`... and is gated to CM1.
+- Section 6: panel kind `"th"` is part of the file format (untouched; the upgrade's key
+  allowlist never sees it).
+- Placeholder text such as `"e.g. 2x3 dbz w"` (figures/style.py).
+
+Saved files: session format 2; `core.catalog.rename_fields` + `renames_for` rename an
+old WoFS file's fields by `wofs_catalog.OLD_NAMES` when all its runs are WoFS (a figure
+mixing CM1 and WoFS runs is left as saved, with a note: one layer's field name cannot
+suit both). Figure documents keep `version` 3: the renaming is idempotent, so no marker
+is needed. Fixtures: `tests/data/old_files` (written by the pre-Phase-2 code).
