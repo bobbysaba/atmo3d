@@ -161,6 +161,43 @@ Done when: CM1 images are pixel-identical to baselines; WoFS tests updated and p
 old saved files load.
 **CHECKPOINT**.
 
+### Phase 2b: Field and equation audit (interactive, with Bobby; do not skip)
+
+Starts only after the Phase 2 CHECKPOINT is passed. Bobby confirms every decision; the
+agent prepares the lists and does not decide alone.
+
+1. **Variable audit, CM1 and WoFS.** For every field a reader lists, decide with Bobby:
+   shown or hidden, display name, units, colormap, range, diverging or not. Settle the
+   fields that are not plainly "in the file":
+   - WoFS sums `THETA` (T + 300) and `PRES` (P + PB);
+   - WoFS base state `THETA0`, `PRES0`, `QVAPOR0`, `U0`, `V0` (the first time's field,
+     not a true base state);
+   - `zagl` and `zmsl` (computed from the geopotential);
+   - CM1 pressure decomposition, offered as computable when no file holds it;
+   - derivatives (`ddz.X`, `ddx.X`, `ddy.X`, `gradh.X`) of any field;
+   - WoFS's WRF 2D/3D diagnostics, currently all listed.
+
+   Output: each data type's catalog (`core/cm1_catalog.py`, `core/wofs_catalog.py`)
+   updated to the reviewed list; a field hidden by the audit is not shown anywhere.
+2. **Derived-field audit.** The agent writes `docs-dev/derived-fields.md`, one entry per
+   derived field in `core/fields.py` (and `pdecomp/`): the equation as coded, its
+   reference (e.g. Bolton 1980 eq. 43 for θe), units, sign convention, inputs by role,
+   and every assumption flagged for confirmation (e.g. buoyancy loads hydrometeors in
+   θρ but not in the base state; RH over liquid only; a WoFS perturbation is the change
+   since the first time; storm-relative fields hidden without a storm motion). Bobby
+   goes through it and marks each field confirmed, corrected, or dropped.
+3. **Fix and test.** Correct the equations Bobby changes. Each confirmed field gets a
+   test with an analytic answer on synthetic data.
+4. **Show only confirmed fields with their inputs.** Add a `confirmed` flag to derived
+   fields. A derived field is listed only when it is confirmed and every input it needs
+   exists in the run (the input check already exists in `_make_fields`). While the audit
+   is under way, unconfirmed fields are listed marked "unverified"; once it is done they
+   are hidden. Say beforehand if this moves any image baseline in `tests/baseline/`.
+
+Done when: both lists reviewed by Bobby; catalogs and derived fields match them; tests
+pass. The radar variable audit (Phase 6, step 1) follows the same template.
+**CHECKPOINT** after step 1, and after step 2 is reviewed.
+
 ### Phase 3: Capabilities and panel registration API
 
 1. A data type declares its capabilities (soundings, parcels, pressure decomposition,
