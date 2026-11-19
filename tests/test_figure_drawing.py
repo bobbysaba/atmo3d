@@ -7,7 +7,7 @@ import sys
 import numpy as np
 import pytest
 
-from cm1view.figures import draw as figdraw, spec as fg
+from atmo3d.figures import draw as figdraw, spec as fg
 from conftest import (difference_layer, doc_now, new_spec, put, render, settled, swath_layer, txt,
                       wait)
 
@@ -409,7 +409,7 @@ def test_own_code_runs_saves_and_reports_errors(ed, tmp_path):
 
 
 def test_save_waits_for_the_series(ed, tmp_path, monkeypatch):
-    from cm1view.figures import export as X
+    from atmo3d.figures import export as X
     monkeypatch.setattr(X, "SERIES_RECHECK", 0.05)
     s = dict(new_spec(ed), kind="line")
     saved, jobs, busy = [], [], [["run: w 3/9"], ["run: w 3/9"], []]

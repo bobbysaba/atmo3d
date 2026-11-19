@@ -1,6 +1,6 @@
-"""Build cm1view's real demo run from a CM1 run:  python tools/make_real_demo.py RUN OUT
+"""Build atmo3d's real demo run from a CM1 run:  python tools/make_real_demo.py RUN OUT
 
-Run once by a maintainer when the demo run changes; cm1view itself only reads the result.
+Run once by a maintainer when the demo run changes; atmo3d itself only reads the result.
 RUN is a finished CM1 run written with output_format = 2, output_filetype = 2 (one
 cm1out_NNNNNN.nc per time, plus namelist.input and, optionally, cm1out_pdata.nc).
 OUT receives a smaller copy in the same layout, small enough to ship in the repo:
@@ -10,10 +10,10 @@ OUT receives a smaller copy in the same layout, small enough to ship in the repo
             kept (stretched vertical grids stay as they are)
   times     every --every seconds of output (t = 0, the base state, always kept);
             the files are renumbered cm1out_000001.nc, ... in time order
-  fields    everything but the staggered winds u, v, w (cm1view uses uinterp, vinterp,
+  fields    everything but the staggered winds u, v, w (atmo3d uses uinterp, vinterp,
             winterp), the number concentrations nc*, the mixing coefficients km*/kh*,
             the duplicate ground-relative swaths (rain2, sws2, ...), the fields
-            cm1view derives itself (thpert = th - th0, prspert = prs - prs0, buoyancy)
+            atmo3d derives itself (thpert = th - th0, prspert = prs - prs0, buoyancy)
             and the rarely used pi, rho; u0, v0 stay (the base-state wind profile)
   packing   each field as 16-bit integers (scale_factor, add_offset, both float32, as
             CF packing: every netCDF reader unpacks them), with zlib and shuffle, one
@@ -28,9 +28,9 @@ OUT receives a smaller copy in the same layout, small enough to ship in the repo
             writes parcels that leave an open domain.  x, y, z stay float32 (0.1 m)
 
 namelist.input is copied with nx, ny set to the box; the files' global attributes get
-the same nx, ny and a cm1view_demo note saying how the copy was made.
+the same nx, ny and an atmo3d_demo note saying how the copy was made.
 
-Example (the demo shipped with cm1view):
+Example (the demo shipped with atmo3d):
 
     python tools/make_real_demo.py /path/to/real_demo demo_data/supercell
 """
@@ -134,7 +134,7 @@ def crop_file(src, dst, i0, j0, size, note):
     with netCDF4.Dataset(src) as s, netCDF4.Dataset(dst + ".part", "w") as d:
         s.set_auto_mask(False)
         atts = {k: s.getncattr(k) for k in s.ncattrs()}
-        atts.update(nx=np.int32(size), ny=np.int32(size), cm1view_demo=note)
+        atts.update(nx=np.int32(size), ny=np.int32(size), atmo3d_demo=note)
         d.setncatts(atts)
         for n, dim in s.dimensions.items():
             L = None if dim.isunlimited() else len(dim)
@@ -169,7 +169,7 @@ def parcels(src, dst, box, n_keep, seed, note):
         keep.sort()
         gone = (np.cumsum(~inside[:, keep], axis=0) > 0)
         with netCDF4.Dataset(dst + ".part", "w") as d:
-            d.setncatts(dict({k: s.getncattr(k) for k in s.ncattrs()}, cm1view_demo=note))
+            d.setncatts(dict({k: s.getncattr(k) for k in s.ncattrs()}, atmo3d_demo=note))
             for n, dim in s.dimensions.items():
                 d.createDimension(n, None if dim.isunlimited() else
                                   len(keep) if n == "xh" else len(dim))
@@ -226,7 +226,7 @@ def main(argv=None):
     with netCDF4.Dataset(files[0]) as d:
         xf, yf = d["xf"][:], d["yf"][:]
     box = (float(xf[i0]), float(xf[i0 + a.size]), float(yf[j0]), float(yf[j0 + a.size]))
-    note = (f"cm1view demo: cropped to x {box[0]:g}..{box[1]:g} km, y {box[2]:g}..{box[3]:g} "
+    note = (f"atmo3d demo: cropped to x {box[0]:g}..{box[1]:g} km, y {box[2]:g}..{box[3]:g} "
             f"km, every {a.every:g} s, fields packed to 16 bits (tools/make_real_demo.py)")
     print(f"box centre ({center[0]:.1f}, {center[1]:.1f}) km: x {box[0]:g}..{box[1]:g}, "
           f"y {box[2]:g}..{box[3]:g} km ({a.size} x {a.size})")

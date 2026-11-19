@@ -43,7 +43,7 @@ Cache folder (⚙ Settings) and holds one figure per run, plus the one before it
   nearest output; panels past the run's end stay empty);
 - what only another run had (its soundings, a difference from it) is left out.
 
-Use a template to make the same figure for each of several runs (or `cm1view render`,
+Use a template to make the same figure for each of several runs (or `atmo3d render`,
 [below](#drawing-figures-without-the-viewer), for all of them at once).
 
 ## Animations
@@ -86,7 +86,7 @@ kept in it, and neither is a script or data: an animation has no one set of arra
 **Format** chooses GIF or MP4. An MP4 keeps every colour
 (a GIF has 256 per frame, chosen separately for each) and is much smaller, but needs an
 encoder: `ffmpeg` on your `PATH` (on a cluster, often `module load ffmpeg`), or the
-optional package `imageio-ffmpeg` (`pip install cm1view[video]`, which carries its own
+optional package `imageio-ffmpeg` (`pip install atmo3d[video]`, which carries its own
 copy). With neither, the dialog says so and GIF still works. The video is `<name>.mp4`
 (H.264, `Loop` does not apply); frames start from the saved time, not the preview
 scrubber's. To make a video yourself from the saved frames:
@@ -108,19 +108,19 @@ runs makes a side-by-side loop.
 
 ## Drawing figures without the viewer
 
-`cm1view render` draws a saved figure or a template from the runs' files, with no
+`atmo3d render` draws a saved figure or a template from the runs' files, with no
 browser or server: for example at the end of a batch job, or to make the same figure
 for every run of an experiment.
 
 ```bash
 # a saved figure again, as it was saved (its image is replaced: --overwrite)
-cm1view render ~/cm1view/figures/demo_supercell/_src/refl_spec.json --overwrite
+atmo3d render ~/atmo3d/figures/demo_supercell/_src/refl_spec.json --overwrite
 # a template on two runs, the first panel at 90 min
-cm1view render refl --run /path/to/run1 /path/to/run2 --time 90
+atmo3d render refl --run /path/to/run1 /path/to/run2 --time 90
 # a saved figure for each run, as PDFs in a folder per run
-cm1view render refl_spec.json --run /path/to/runs/* --out '~/figs/{run}/{name}.pdf'
+atmo3d render refl_spec.json --run /path/to/runs/* --out '~/figs/{run}/{name}.pdf'
 # an animation, every other output from 60 min on
-cm1view render refl_spec.json --gif --time 60 --step 2 --fps 6
+atmo3d render refl_spec.json --gif --time 60 --step 2 --fps 6
 ```
 
 The figure is a saved figure's `_src/<name>_spec.json` (or the image or script saved
@@ -169,7 +169,7 @@ The script is short: `SPEC` (the figure's settings, as in the editor) and
 in *Your own code*). It finds the files relative to itself (`../_src/`, and writes the image back
 next to `scripts/`), so the folder can be moved or copied.
 
-The spec and the script's header record the cm1view version and, from a git checkout, its
+The spec and the script's header record the atmo3d version and, from a git checkout, its
 commit, and a hash (sha256) of each run's `namelist.input`. The spec also records the
 settings that change what a figure shows (`output_glob`, `track_dirs`, `track_patterns`,
 `pdecomp_script`), so you can tell later exactly what made it.
@@ -181,9 +181,9 @@ as they were. To redraw: `python name.py`. To reopen it in the viewer, open its 
 ## Style presets (in scripts)
 
 In the editor, the presets are in [*Apply a style*](figures-style.md#style-preset), on the Figure node. In a
-script, `cm1view.figures.spec.apply_style(spec, name)` returns a copy of a figure's spec with
+script, `atmo3d.figures.spec.apply_style(spec, name)` returns a copy of a figure's spec with
 a preset applied, e.g. to restyle a saved figure's `_spec.json` for a journal or a talk (an
-exported figure script does not import cm1view):
+exported figure script does not import atmo3d):
 
 | Preset | What it sets |
 |---|---|

@@ -5,7 +5,7 @@ import time
 
 import numpy as np
 
-from cm1view.core import render, vectors, volume3d
+from atmo3d.core import render, vectors, volume3d
 from conftest import tap, wait
 
 

@@ -4,7 +4,7 @@ import os
 
 import numpy as np
 
-from cm1view.core import track as trk
+from atmo3d.core import track as trk
 from conftest import tap, txt, wait
 
 
@@ -55,7 +55,7 @@ def test_find_strongest_follows_the_storm(viewer, demo_root):
     assert len(v.trk_line_src.data["x"]) == len(v.fixes)
     assert "mean motion" in txt(v.trk_status.object)
     lines = trk.to_text(run, v.fixes, v.trk_spec).split("\n")
-    assert lines[0] == "# cm1view mesocyclone track"
+    assert lines[0] == "# atmo3d mesocyclone track"
     assert sum(1 for ln in lines if ln and not ln.startswith("#")) == len(v.fixes) + 1
 
 

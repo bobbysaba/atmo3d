@@ -10,8 +10,8 @@ from conftest import new_spec
 from matplotlib.collections import QuadMesh
 from matplotlib.lines import Line2D
 
-from cm1view.figures import draw as figdraw, spec as fg
-from cm1view.figures.shell import docedit as de, nodes
+from atmo3d.figures import draw as figdraw, spec as fg
+from atmo3d.figures.shell import docedit as de, nodes
 
 FILL = dict(type="fill", field="dbz", on=True, cmap="viridis", vmin=0.0, vmax=60.0, units="dBZ")
 
@@ -119,7 +119,7 @@ def test_entries_of_another_run_go_and_every_run_stays_so():
 
 
 def test_applied_template_draws_like_the_forms(ed):
-    from cm1view.figures import batch
+    from atmo3d.figures import batch
     form = new_spec(ed)
     t = len(ed.run.times) - 1
     a = batch.finish(fg.from_template(fg.template(form, "x"), ed.run, t), ed.run, ed.F, t)
@@ -171,7 +171,7 @@ def test_defaults_fill_what_a_document_lacks_and_keep_what_it_has(ed):
 
 
 def test_render_a_document(ed, tmp_path):
-    from cm1view.figures.batch import main
+    from atmo3d.figures.batch import main
     d = fg.to_doc(new_spec(ed))
     spec = fg.save_spec(d, str(tmp_path / "f"))
     assert main([spec, "--out", str(tmp_path / "again.png"), "--dpi", "50"]) == 0
@@ -277,8 +277,8 @@ class _Now:
 
 @pytest.fixture
 def shell(reg, monkeypatch, tmp_path):
-    monkeypatch.setenv("CM1VIEW_CACHE_DIR", str(tmp_path / "cache"))
-    from cm1view.viewer import app as A
+    monkeypatch.setenv("ATMO3D_CACHE_DIR", str(tmp_path / "cache"))
+    from atmo3d.viewer import app as A
     run, F = reg.get()
     v = A.Viewer(run, F, reg=reg)
     v.main()
@@ -303,7 +303,7 @@ def test_the_example_is_not_kept_but_an_edit_is(shell):
 
 
 def test_a_session_gives_the_document_back(shell, reg):
-    from cm1view.viewer import app as A
+    from atmo3d.viewer import app as A
     shell.edit(lambda d: d.update(suptitle="mine"))
     s = json.loads(json.dumps(shell.v.session_state()))
     assert s["figure"]["doc"]["suptitle"] == "mine"
@@ -370,7 +370,7 @@ def test_the_figure_node_has_a_legend_section_for_maps(shell):
 
 def _on_rows(ed):
     """A 2 × 2 of plan views with one colorbar per row, past the fill's range: (shell, doc)."""
-    from cm1view.figures import spec as fg
+    from atmo3d.figures import spec as fg
     ed.open_quick()
     ed.qs_kind.value = "plan"
     ed.qs_rows.value, ed.qs_cols.value = 2, 2
@@ -398,7 +398,7 @@ def _inspector_widgets(shell, node):
 
 
 def test_a_bar_has_one_controlling_panel(ed):
-    from cm1view.figures import draw as figdraw
+    from atmo3d.figures import draw as figdraw
     shell, doc = _on_rows(ed)
     assert figdraw.bar_members(figdraw.upgrade(doc)[0]) == {
         0: [0, 1], 1: [0, 1], 2: [2, 3], 3: [2, 3]}
@@ -408,7 +408,7 @@ def test_a_bar_has_one_controlling_panel(ed):
     doc["style"]["colorbar"]["mode"] = "none"
     assert figdraw.bar_members(figdraw.upgrade(doc)[0]) == {}
     doc["style"]["colorbar"]["mode"] = "row"
-    from cm1view.figures.shell import docedit as de
+    from atmo3d.figures.shell import docedit as de
     de.set_panel_colorbar(doc, 0, show=False)  # (the next panel then controls the row's)
     assert figdraw.bar_members(figdraw.upgrade(doc)[0])[1] == [1]
 
@@ -442,8 +442,8 @@ def test_bar_settings_show_only_where_they_change_the_bar(ed):
 
 
 def test_colours_on_a_shared_bar_follow_its_controlling_panel(ed):
-    from cm1view.figures import draw as figdraw
-    from cm1view.figures.shell import bars, docedit as de
+    from atmo3d.figures import draw as figdraw
+    from atmo3d.figures.shell import bars, docedit as de
     shell, doc = _on_rows(ed)
     cmap = lambda pid: figdraw.panel_layers(  # noqa: E731
         shell.doc, de.panel_by_id(shell.doc, pid))[0][1]["cmap"]
@@ -461,8 +461,8 @@ def test_colours_on_a_shared_bar_follow_its_controlling_panel(ed):
 
 
 def test_a_shared_layers_bar_settings_reach_every_panel(ed):
-    from cm1view.figures.shell import layerrow
-    from cm1view.figures.shell import bars
+    from atmo3d.figures.shell import layerrow
+    from atmo3d.figures.shell import bars
     shell, doc = _on_rows(ed)
     bars.set_value(doc, bars.bar_of(doc, 0), "extend", "neither")
     lid = next(k for k, x in doc["layers"].items() if x["type"] == "fill")

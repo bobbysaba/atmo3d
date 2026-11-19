@@ -4,7 +4,7 @@ save -> load -> draw of every panel kind giving the identical image.
   pytest tests/test_images.py                    compare (a missing baseline is written)
   pytest tests/test_images.py --make-baselines   rewrite every baseline (then commit them)
 
-CM1VIEW_IMAGE_TOL sets the allowed RMS difference (0-255, default 3); fonts and
+ATMO3D_IMAGE_TOL sets the allowed RMS difference (0-255, default 3); fonts and
 matplotlib versions shift pixels between machines. A failure leaves the image and a
 *-failed-diff.png next to it in pytest's tmp dir."""
 import os
@@ -13,7 +13,7 @@ import shutil
 import numpy as np
 import pytest
 
-from cm1view.figures import spec as fg
+from atmo3d.figures import spec as fg
 from conftest import difference_layer, doc_now, new_spec, swath_layer, txt, wait
 
 BASE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "baseline")
@@ -22,7 +22,7 @@ DPI = 72
 
 def _png(ed, figure, path):
     """Draw a figure (every panel) at DPI into path."""
-    from cm1view.figures import draw as figdraw
+    from atmo3d.figures import draw as figdraw
     ed.panel_data(figure)
     wait(lambda: not ed.series_pending(), 120, "the series")
     fig = figdraw.draw(figure, ed.panel_data(figure))
@@ -85,7 +85,7 @@ def _figure(ed, how):
     elif how == "dark":
         sh.apply_style("dark")
     elif how == "parts":
-        from cm1view.figures.combo import combine
+        from atmo3d.figures.combo import combine
         new.update(rows=1, cols=2, size=[8.0, 4.99], times=new["times"][:2],
                    times_s=new["times_s"][:2])
         parts = [sh.new_form(new), _made_by(ed, ed.from_soundings)]
@@ -107,7 +107,7 @@ def test_figure_matches_its_baseline(ed, tmp_path, request, how):
         os.makedirs(BASE, exist_ok=True)
         shutil.copyfile(out, ref)
         pytest.skip(f"wrote {ref}: look at it, then commit it")
-    tol = float(os.environ.get("CM1VIEW_IMAGE_TOL", "3"))
+    tol = float(os.environ.get("ATMO3D_IMAGE_TOL", "3"))
     err = compare_images(ref, out, tol)
     assert err is None, err
 

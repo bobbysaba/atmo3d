@@ -1,6 +1,6 @@
-"""Build cm1view/data/boundaries.npz, the map boundary lines cm1view ships (core.geo).
+"""Build atmo3d/data/boundaries.npz, the map boundary lines atmo3d ships (core.geo).
 
-Run once by a maintainer when the source data changes; cm1view itself never downloads
+Run once by a maintainer when the source data changes; atmo3d itself never downloads
 anything.  Needs pyshp (`import shapefile`) besides numpy:
 
     python tools/make_boundaries.py SRC_DIR
@@ -44,7 +44,7 @@ import numpy as np
 import shapefile
 
 Q = 1e4  # quantisation: points per degree
-OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "cm1view", "data",
+OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "atmo3d", "data",
                    "boundaries.npz")
 
 

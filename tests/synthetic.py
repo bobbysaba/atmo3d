@@ -1,6 +1,6 @@
 """Synthetic CM1 output for the tests:  python tests/synthetic.py OUTDIR
 
-(cm1view --demo opens a real CM1 run instead: cm1view/demo.py, demo_data/.)  The tests
+(atmo3d --demo opens a real CM1 run instead: atmo3d/demo.py, demo_data/.)  The tests
 need runs whose every answer is known in advance, and some layouts on purpose (an older
 CM1's dimension names, a missing parcel value, parcels leaving the domain, a second run
 to compare), so they keep this generator.
@@ -307,10 +307,10 @@ def _write(path, t, f, swaths, g, cf=False):
             d.createDimension(D[n], size)
         d.createDimension("time", 1)
         d.createDimension("one", 1)
-        d.setncatts({"cm1 version": "cm1view demo", "x_units": "km", "y_units": "km",
+        d.setncatts({"cm1 version": "atmo3d demo", "x_units": "km", "y_units": "km",
                      "z_units": "km", "nx": NI, "ny": NI, "nz": NK, "imoist": 1,
                      "iorigin": 2, "wbc": 2, "ebc": 2, "sbc": 2, "nbc": 2,
-                     "cm1view_demo_version": VERSION})
+                     "atmo3d_demo_version": VERSION})
         if cf:
             d.Conventions = "CF-1.7"
         for n, dims, val, ln, un in (
@@ -463,7 +463,7 @@ def write_parcels(path, vmax, wmax):
         d.createDimension("yh", 1)
         d.createDimension("zh", 1)
         d.createDimension("time", None)
-        d.setncatts({"CM1 version": "cm1view demo", "Conventions": "CF-1.7",
+        d.setncatts({"CM1 version": "atmo3d demo", "Conventions": "CF-1.7",
                      "missing_value": np.float32(PRCL_MISSING)})
         for name, dims, val, ln, un in (
                 ("xh", ("xh",), np.arange(1, n + 1), "parcel ID number", ""),
@@ -489,10 +489,10 @@ def _stamp(cf=False):
 def make(root, force=False, cf=False):
     """Write the demo runs under root (skipped when an up-to-date copy is there);
     returns the path of the main run.  cf: CF-style dimension names.  The stamp file
-    root/.cm1view-demo makes cm1view treat them as demo runs (cm1view.demo.is_demo):
+    root/.atmo3d-demo makes atmo3d treat them as demo runs (atmo3d.demo.is_demo):
     finished as soon as written, kept out of the recent runs."""
     root = os.path.abspath(os.path.expanduser(root))
-    stamp_file = os.path.join(root, ".cm1view-demo")
+    stamp_file = os.path.join(root, ".atmo3d-demo")
     main = os.path.join(root, "demo", "supercell")
     try:
         if not force and open(stamp_file).read().strip() == _stamp(cf):

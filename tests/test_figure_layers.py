@@ -52,7 +52,7 @@ def test_difference_layer(ed):
 
 
 def test_difference_of_different_grids():
-    from cm1view.figures import spec as fg
+    from atmo3d.figures import spec as fg
     x, y = np.arange(4.0), np.arange(3.0)
     a, b = np.ones((3, 4)), np.add.outer(y, x)
     d = fg.subtract(dict(x=x, y=y, L0=a), dict(x=x, y=y, L0=b), 0)
@@ -73,7 +73,7 @@ def test_difference_of_different_grids():
 
 
 def test_time_window_layer(ed):
-    from cm1view.core import swath
+    from atmo3d.core import swath
     base = new_spec(ed)
     spec, data, fig = render(ed, swath_layer(ed, json.loads(json.dumps(base))))
     j = next(j for j, x in enumerate(spec["layers"]) if x.get("reduce"))
@@ -108,7 +108,7 @@ class _Fields:
 
 
 def test_swaths_follow_the_ground_and_composites_the_storm(tmp_path, monkeypatch):
-    from cm1view.core import swath
+    from atmo3d.core import swath
     monkeypatch.setattr(swath, "CACHE_DIR", str(tmp_path))
     lay = dict(field="w", mode="height", z=1.0, reduce=dict(op="max", t0=None, t1=None))
     # the grid moves 1 km a minute: a blob fixed on the ground moves 1 column back
@@ -131,8 +131,8 @@ def test_swaths_follow_the_ground_and_composites_the_storm(tmp_path, monkeypatch
 # ------------------------------------------------------------------ diverging maps
 def test_a_diverging_map_stays_white_at_zero():
     import matplotlib.colors as mc
-    from cm1view.core.fields import palette
-    from cm1view.figures.draw.base import colormap
+    from atmo3d.core.fields import palette
+    from atmo3d.figures.draw.base import colormap
     mid = mc.to_rgb(colormap("RdBu")(0.5))
     white = lambda c: np.allclose(mc.to_rgb(c), mid, atol=2 / 255)  # noqa: E731  (a
     # reversed map's middle is the colour next to it: #f7f6f6 or #f6f7f7)
@@ -151,7 +151,7 @@ def test_outer_labels_each_axis_on_its_own():
     """Outer: a range the panels share loses its inner tick labels, one they don't keeps
     them; the inner axis labels go either way, but a panel's own (different) label."""
     from matplotlib.figure import Figure
-    from cm1view.figures.draw.layers import _ticks
+    from atmo3d.figures.draw.layers import _ticks
     axs = Figure().subplots(1, 3)
     for ax, top in zip(axs, (1, 2, 3)):
         ax.set_xlim(0, 10)
@@ -174,7 +174,7 @@ def test_outer_labels_each_axis_on_its_own():
 # ------------------------------------------------------------------ patterns, barbs, strips
 def test_shading_hatches_or_stipples():
     from matplotlib.figure import Figure
-    from cm1view.figures.draw.layers import _shade
+    from atmo3d.figures.draw.layers import _shade
     x = np.linspace(-5.0, 5.0, 11)
     a = np.tile(np.linspace(0.0, 20.0, 11), (11, 1))
     ax = Figure().subplots()
@@ -188,7 +188,7 @@ def test_shading_hatches_or_stipples():
 def test_vectors_as_barbs_in_knots():
     from matplotlib.figure import Figure
     from matplotlib.quiver import Barbs, Quiver
-    from cm1view.figures.draw.layers import _vectors
+    from atmo3d.figures.draw.layers import _vectors
     d = dict(L0_x=np.array([0.0, 1.0]), L0_y=np.array([0.0, 1.0]),
              L0_u=np.array([10.0, 0.0]), L0_v=np.array([0.0, 5.0]))
     ax = Figure().subplots()
@@ -203,7 +203,7 @@ def test_vectors_as_barbs_in_knots():
 
 def test_strip_averaged_section():
     from types import SimpleNamespace
-    from cm1view.figures.spec.arrays import _strip
+    from atmo3d.figures.spec.arrays import _strip
     run = SimpleNamespace(dx=1000.0, dy=1000.0, z=np.array([0.5, 1.5]), terrain=False)
     vol = np.broadcast_to((np.arange(11.0) ** 2)[None, :, None], (2, 11, 11)).copy()
     fi, fj, zq = np.arange(2.0, 9.0), np.full(7, 5.0), np.array([0.5, 1.0])
@@ -214,7 +214,7 @@ def test_strip_averaged_section():
 
 
 def test_reopening_notes_a_changed_namelist(tmp_path):
-    from cm1view.figures import spec as fg
+    from atmo3d.figures import spec as fg
     (tmp_path / "namelist.input").write_text("&param1\n dx = 250.0\n/\n")
     spec = dict(runs=[dict(path=str(tmp_path), label="a")])
     spec["made_with"] = fg.made_with(spec)
@@ -224,8 +224,8 @@ def test_reopening_notes_a_changed_namelist(tmp_path):
 
 
 def test_ensemble_statistics_and_band():
-    from cm1view.figures import spec as fg
-    from cm1view.figures.draw import ens_label
+    from atmo3d.figures import spec as fg
+    from atmo3d.figures.draw import ens_label
     x, y = np.arange(4.0), np.arange(3.0)
     a, b = np.ones((3, 4)), 3 * np.ones((3, 4))
     b[0, 0] = np.nan
@@ -263,7 +263,7 @@ def test_ensemble_statistics_and_band():
 
 
 def test_table_differences():
-    from cm1view.figures import draw as figdraw
+    from atmo3d.figures import draw as figdraw
     d = dict(nq=1, row_k=np.array([0, 0, 1, 1]), row_min=np.array([30.0, 60.0, 30.0, 60.0]),
              row_run=np.array(["A", "A", "B", "B"]), Q0_v=np.array([10.0, 12.0, 15.0, 9.0]),
              Q0_name="x", Q0_units="", Q0_src="", Q0_dec=0, Q0_e=0)
@@ -281,7 +281,7 @@ def test_table_differences():
 
 
 def test_table_times_box():
-    from cm1view.figures import spec as fg
+    from atmo3d.figures import spec as fg
     outs = [0.0, 1800.0, 3600.0, 5400.0, 7200.0]
     assert fg.parse_times("30, 60", outs) == ([1800.0, 3600.0], [])
     assert fg.parse_times("30-90/30", outs) == ([1800.0, 3600.0, 5400.0], [])

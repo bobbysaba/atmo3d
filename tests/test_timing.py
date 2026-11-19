@@ -1,11 +1,11 @@
-"""The timing hooks (cm1view --timing, cm1view bench): records split into parts, the
+"""The timing hooks (atmo3d --timing, atmo3d bench): records split into parts, the
 log and its summary."""
 import json
 
 from bokeh.document import Document
 
 from conftest import wait
-from cm1view.viewer import timing
+from atmo3d.viewer import timing
 
 
 def _idle(v):

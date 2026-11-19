@@ -6,10 +6,10 @@ from types import SimpleNamespace
 
 import pytest
 
-from cm1view.figures import click as C, draw as figdraw
-from cm1view.figures.shell import docedit as de, looks, nodes
-from cm1view.figures.shell.gridview import ADDABLE
-from cm1view.figures.shell.placing import fraction_entry
+from atmo3d.figures import click as C, draw as figdraw
+from atmo3d.figures.shell import docedit as de, looks, nodes
+from atmo3d.figures.shell.gridview import ADDABLE
+from atmo3d.figures.shell.placing import fraction_entry
 
 
 def doc_of(*panels, **more):
@@ -193,7 +193,7 @@ class _Now:
 @pytest.fixture
 def shell(reg, monkeypatch):
     """The new layout showing the demo's example figure, drawing as it is asked."""
-    from cm1view.viewer import app as A
+    from atmo3d.viewer import app as A
     run, F = reg.get()
     v = A.Viewer(run, F, reg=reg)
     v.main()

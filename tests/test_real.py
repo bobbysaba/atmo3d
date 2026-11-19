@@ -1,7 +1,7 @@
 """Checks on your own CM1 output: the run opens, and a map, a sounding, a cross-section
 and a series work on it.  Reads only (never writes into the run).
 
-  CM1VIEW_TEST_RUN=/path/to/run pytest -m real
+  ATMO3D_TEST_RUN=/path/to/run pytest -m real
 
 Use a run whose files are not too large: every 3D field read here is read whole."""
 import os
@@ -11,15 +11,15 @@ import pytest
 
 from conftest import wait
 
-RUN = os.environ.get("CM1VIEW_TEST_RUN")
+RUN = os.environ.get("ATMO3D_TEST_RUN")
 pytestmark = [pytest.mark.real,
-              pytest.mark.skipif(not RUN, reason="set CM1VIEW_TEST_RUN to a CM1 run folder")]
+              pytest.mark.skipif(not RUN, reason="set ATMO3D_TEST_RUN to a CM1 run folder")]
 
 
 @pytest.fixture(scope="module")
 def real():
-    from cm1view.viewer import app as A
-    from cm1view.registry import Registry
+    from atmo3d.viewer import app as A
+    from atmo3d.registry import Registry
     reg = Registry(os.path.abspath(os.path.expanduser(RUN)), 8, None)
     run, F = reg.get()
     v = A.Viewer(run, F, reg=reg)
@@ -61,7 +61,7 @@ def test_cross_section(real):
 
 
 def test_series(real, tmp_path, monkeypatch):
-    from cm1view.core import series as S
+    from atmo3d.core import series as S
     monkeypatch.setattr(S, "CACHE_DIR", str(tmp_path))
     v = real
     v.ser_field.value, v.ser_vmode.value, v.ser_reduce.value = "winterp", "height", "max"

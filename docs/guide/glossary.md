@@ -2,7 +2,7 @@
 
 | Term | Meaning |
 |---|---|
-| **AGL** | Above ground level. All heights in cm1view are km AGL unless a label says otherwise. |
+| **AGL** | Above ground level. All heights in atmo3d are km AGL unless a label says otherwise. |
 | **Base state** | The horizontally uniform initial state of the run (`th0`, `prs0`, `qv0`, `u0`, `v0`, `rho0`). Perturbations such as θ′ and p′ are the departure from it. |
 | **Bunkers right / left mover (RM, LM)** | The storm motions of the Bunkers et al. (2000) method, from the 0–6 km mean wind and shear. The right mover is the default storm motion. |
 | **Bundle** | What *Also the script and data* saves: the image, a script, the plotted arrays, the spec and the drawing code. |
@@ -10,7 +10,7 @@
 | **CAPE, CIN** | Convective available potential energy; convective inhibition. |
 | **Column max / min** | The largest / smallest value in each vertical column. |
 | **Critical angle** | The angle between the storm-relative inflow and the 0–500 m shear. |
-| **Derived field** | A field computed by cm1view from native ones (θ′, buoyancy, θe, streamwise vorticity, …). |
+| **Derived field** | A field computed by atmo3d from native ones (θ′, buoyancy, θe, streamwise vorticity, …). |
 | **Distribution** | Every value of a field in a region at one time, summarised for plotting. |
 | **Effective inflow layer (EIL)** | The layer where parcels have at least 100 J/kg of CAPE and no more than 250 J/kg of CIN (Thompson et al. 2007). |
 | **Fill** | The coloured field layer of a map, section or figure. |

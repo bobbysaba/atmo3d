@@ -2,10 +2,10 @@
 layout."""
 import pytest
 
-from cm1view.figures import settings as table, spec as fg
-from cm1view.figures.kinds import KINDS
-from cm1view.figures.shell import findview, nodes
-from cm1view.figures.shell.looks import EXTRA_ROWS, Scope, _same, row_words
+from atmo3d.figures import settings as table, spec as fg
+from atmo3d.figures.kinds import KINDS
+from atmo3d.figures.shell import findview, nodes
+from atmo3d.figures.shell.looks import EXTRA_ROWS, Scope, _same, row_words
 
 
 class _Now:
@@ -20,7 +20,7 @@ class _Now:
 
 @pytest.fixture
 def shell(reg, monkeypatch):
-    from cm1view.viewer import app as A
+    from atmo3d.viewer import app as A
     run, F = reg.get()
     v = A.Viewer(run, F, reg=reg)
     v.main()

@@ -1,7 +1,7 @@
 """The viewer in a real browser (headless Firefox): the server starts on the demo run,
 the page draws, a click on the map gives a sounding, and the Figure workspace, the
 settings window and the page without a run open.  Screenshots of each step go to
-$CM1VIEW_SHOTS (default: a temporary folder) for a look by eye.
+$ATMO3D_SHOTS (default: a temporary folder) for a look by eye.
 
   pytest -m browser            (needs Firefox on PATH, or $FIREFOX)
 """
@@ -30,23 +30,23 @@ def free_port():
 
 @pytest.fixture(scope="module")
 def shots():
-    d = os.environ.get("CM1VIEW_SHOTS") or tempfile.mkdtemp(prefix="cm1view-shots-")
+    d = os.environ.get("ATMO3D_SHOTS") or tempfile.mkdtemp(prefix="atmo3d-shots-")
     os.makedirs(d, exist_ok=True)
     print(f"\nscreenshots: {d}")
     return d
 
 
 def serve(args, cfg_dir, extra_env=None):
-    """Start `cm1view args` on a free port with its own settings file; its base URL."""
+    """Start `atmo3d args` on a free port with its own settings file; its base URL."""
     port = free_port()
-    env = dict(os.environ, CM1VIEW_CONFIG=os.path.join(cfg_dir, "config.toml"),
+    env = dict(os.environ, ATMO3D_CONFIG=os.path.join(cfg_dir, "config.toml"),
                **(extra_env or {}))
     os.makedirs(cfg_dir, exist_ok=True)
     log = os.path.join(cfg_dir, "server.log")  # (its tail is in the error if it fails)
     with open(log, "w") as out:
-        p = subprocess.Popen([sys.executable, "-m", "cm1view", *args, "--port", str(port)],
+        p = subprocess.Popen([sys.executable, "-m", "atmo3d", *args, "--port", str(port)],
                              env=env, stdout=out, stderr=subprocess.STDOUT)
-    url = f"http://127.0.0.1:{port}/cm1view"
+    url = f"http://127.0.0.1:{port}/atmo3d"
 
     def up():
         if p.poll() is not None:  # (it stopped: no use waiting)

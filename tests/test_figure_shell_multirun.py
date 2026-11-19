@@ -1,13 +1,13 @@
 """F5: the figure saved for several runs from the editor.  The pure parts (where each run's
 files go, which runs are meant) need no data; the saving itself is batch.save_on_run, which
-`cm1view render --run` shares."""
+`atmo3d render --run` shares."""
 import os
 
 import pytest
 
-from cm1view import config
-from cm1view.figures import batch
-from cm1view.figures.shell import multirun
+from atmo3d import config
+from atmo3d.figures import batch
+from atmo3d.figures.shell import multirun
 
 
 def test_default_place_is_each_runs_figures_folder(tmp_path, monkeypatch):

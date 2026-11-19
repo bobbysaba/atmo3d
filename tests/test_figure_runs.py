@@ -5,8 +5,8 @@ import numpy as np
 
 
 def test_field_lists_cover_every_run():
-    from cm1view.core.fields import FieldDef
-    from cm1view.figures.runs import AllFields
+    from atmo3d.core.fields import FieldDef
+    from atmo3d.figures.runs import AllFields
 
     class F:
         def __init__(self, *names):
@@ -24,8 +24,8 @@ def test_field_lists_cover_every_run():
 def test_a_run_keeps_its_colour_in_every_panel():
     from matplotlib.colors import to_hex
     from matplotlib.figure import Figure
-    from cm1view.figures.draw.lines import _lines, dist_colors
-    from cm1view.figures.draw.sounding import sounding_colors
+    from atmo3d.figures.draw.lines import _lines, dist_colors
+    from atmo3d.figures.draw.sounding import sounding_colors
     runs = [dict(color="#00aa00"), dict(color="#aa0000")]
     one = dict(nsnd=1, N0_e=0)  # a panel with one sounding (distribution) of run 1
     assert sounding_colors(dict(runs=runs, soundings=[dict(run=1)]), one) == ["#aa0000"]
@@ -55,8 +55,8 @@ def test_a_series_of_one_run_draws_in_its_own_colour_and_style():
     alone in a panel or not; an older figure opens looking as it was drawn."""
     from matplotlib.colors import to_hex
     from matplotlib.figure import Figure
-    from cm1view.figures.draw.lines import _lines
-    from cm1view.figures.spec.base import series_looks
+    from atmo3d.figures.draw.lines import _lines
+    from atmo3d.figures.spec.base import series_looks
     runs = [dict(color="#00aa00", ls="-"), dict(color="#aa0000", ls=":")]
     t = np.arange(3.0)
     ax = Figure().subplots()
@@ -84,7 +84,7 @@ def test_a_series_of_one_run_draws_in_its_own_colour_and_style():
 
 
 def test_time_height_panels_follow_each_series_runs():
-    from cm1view.figures import draw as figdraw
+    from atmo3d.figures import draw as figdraw
     runs = [dict(path="/a"), dict(path="/b"), dict(path="/c")]
     s = dict(kind="th", runs=runs, runs_as="cols",
              series=[dict(runs=None), dict(runs=[2])])  # every run; run 2 alone
@@ -109,7 +109,7 @@ def _t0_spec(**kw):
 
 
 def test_run_time_zeros_move_times_taken_from_another_run():
-    from cm1view.figures import draw as figdraw, spec as fg
+    from atmo3d.figures import draw as figdraw, spec as fg
     s = _t0_spec()
     assert [fg.panel_ref(s, i) for i in range(4)] == [(0, 3900.0), (0, 4200.0),
                                                       (1, 5700.0), (1, 6000.0)]
@@ -150,8 +150,8 @@ def test_run_time_zeros_move_times_taken_from_another_run():
 def test_run_time_zeros_on_entries_of_their_own_time():
     """A profile of several runs reads each at the matching time; entries at one moment
     share a time label; animations step each run at its own time."""
-    from cm1view.figures import spec as fg
-    from cm1view.figures.draw import base
+    from atmo3d.figures import spec as fg
+    from atmo3d.figures.draw import base
     runs = [dict(path="a", t0_min=60.0), dict(path="b", t0_min=90.0), dict(path="c")]
     s = dict(kind="profile", runs=runs, time_label={})
     e = dict(run=0, runs=[0, 1], time_s=3900.0, time_s1=None, panel=0, recipe={})
@@ -206,7 +206,7 @@ class _Run:
 
 
 def test_runs_paired_by_output_number():
-    from cm1view.figures import draw as figdraw, spec as fg
+    from atmo3d.figures import draw as figdraw, spec as fg
     s = _paired_spec()
     # the nth output of each run; a time zero doesn't move it
     assert [fg.panel_ref(s, i) for i in range(4)] == [(0, 3600.0), (0, 3900.0),
@@ -238,7 +238,7 @@ def test_runs_paired_by_output_number():
 
 
 def test_entries_of_runs_paired_by_output_number():
-    from cm1view.figures import spec as fg
+    from atmo3d.figures import spec as fg
     s = _paired_spec(kind="profile", time_label={})
     e = dict(run=0, runs=[0, 1], time_s=3900.0, time_s1=4200.0, panel=0, recipe={})
     at = fg.entry_at(s, e, 1)
@@ -251,7 +251,7 @@ def test_entries_of_runs_paired_by_output_number():
 
 
 def test_animating_runs_paired_by_output_number():
-    from cm1view.figures import spec as fg
+    from atmo3d.figures import spec as fg
     runs = {"a": _Run([3600.0, 3900.0, 4200.0, 4500.0]), "b": _Run([0.0, 600.0, 1200.0])}
     s = _paired_spec()
     off = fg.frame_offsets(s, runs)
@@ -278,7 +278,7 @@ def test_animating_runs_paired_by_output_number():
 
 
 def test_paired_series_use_the_reference_runs_times():
-    from cm1view.figures import spec as fg
+    from atmo3d.figures import spec as fg
     import xarray as xr
     s = _paired_spec(kind="line", time_label={})
     ds = xr.Dataset(dict(value=("t", np.array([1.0, 2.0, 3.0])),
@@ -297,7 +297,7 @@ def test_paired_series_use_the_reference_runs_times():
 
 
 def test_a_saved_figure_pairs_runs_by_their_outputs_now():
-    from cm1view.figures import spec as fg
+    from atmo3d.figures import spec as fg
     s = dict(kind="combo", parts=[_paired_spec(), _t0_spec()])
     fg.fill_outputs(s, lambda p: (_Run([0.0, 60.0]), None))
     assert s["parts"][0]["runs"][1]["outputs_s"] == [0.0, 60.0]

@@ -144,7 +144,7 @@ The 3D scene and cross-sections offer the same vectors; see [3D](3d.md) and
 
 ## The tools
 
-A tool sets what a click on the map does; see [Using cm1view](index.md#tool-rail) for how
+A tool sets what a click on the map does; see [Using atmo3d](index.md#tool-rail) for how
 the rail and panels behave. In short:
 
 | Tool | A click on the map… | Page |

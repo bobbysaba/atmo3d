@@ -1,4 +1,4 @@
-# cm1view
+# atmo3d
 
 An interactive viewer for [CM1](https://www2.mmm.ucar.edu/people/bryan/cm1/) netCDF
 output (`output_format = 2`, one time per file). It runs where your output is (usually
@@ -17,24 +17,24 @@ a cluster) and opens in your own browser.
   cumulative), for a height, layer, region or range, compared side by side.
 - **Figures**: publication figures from any of the above, across times and runs, started
   from a short quick-start form. Each saves with a stand-alone script and data that
-  redraw the same image without cm1view. Plan views and cross-sections can also be saved
+  redraw the same image without atmo3d. Plan views and cross-sections can also be saved
   as animated GIFs.
 
 ## Quick start
 
 ```bash
-git clone https://github.com/bobbysaba/cm1view.git
-cd cm1view
-conda env create -f environment.yml && conda activate cm1view
-cm1view --demo                    # a real CM1 supercell, to try it out
-cm1view /path/to/cm1/run          # your own output
+git clone https://github.com/bobbysaba/atmo3d.git
+cd atmo3d
+conda env create -f environment.yml && conda activate atmo3d
+atmo3d --demo                    # a real CM1 supercell, to try it out
+atmo3d /path/to/cm1/run          # your own output
 ```
 
 Open the URL it prints. On a cluster, start it in a batch or interactive job, or on any
 compute node you can log in to when there is no scheduler, with the resources below.
 Reach it through the SSH tunnel command it prints, or through JupyterHub.
 
-Options (`cm1view --help` lists them): `--port`, `--address`, `--config` (settings
+Options (`atmo3d --help` lists them): `--port`, `--address`, `--config` (settings
 file), `--cache-gb` and `--workers` (memory and reader processes), `--maxpix` (map
 resolution sent to the browser) and `--pdecomp-script`. All but `--address` and
 `--config` also have a setting; see [Settings](docs/settings.md).
@@ -59,13 +59,13 @@ come from and for machines without a scheduler.
 
 ## Documentation
 
-The full documentation is at **https://bobbysaba.github.io/cm1view/**, and also here
+The full documentation is at **https://bobbysaba.github.io/atmo3d/**, and also here
 in `docs/`:
 
 - [Installing](docs/install.md): conda or pip, disk space, checking the install
 - [Running on a cluster](docs/hpc.md): Slurm / PBS jobs, SSH tunnels, JupyterHub,
   resources
-- [Using cm1view](docs/guide/index.md): the window, then a page each for the map,
+- [Using atmo3d](docs/guide/index.md): the window, then a page each for the map,
   soundings, tracking, sections, 3D, series and distributions, figures, and notes on the
   fields
 - [Settings](docs/settings.md): the config file and every setting
@@ -80,10 +80,10 @@ Linux. Any modern browser.
 
 ## License and credits
 
-cm1view is free software under the [GNU General Public License v3.0 or later](LICENSE):
+atmo3d is free software under the [GNU General Public License v3.0 or later](LICENSE):
 you may use, study, change and share it, and anything you distribute that is built on
 it must stay under the same license, with its source.
 
-The pressure-decomposition solver (`cm1view/pdecomp/pdecomp_solver.py`) was written by Bobby
+The pressure-decomposition solver (`atmo3d/pdecomp/pdecomp_solver.py`) was written by Bobby
 Saba, rewritten and corrected from earlier code by Dr. John Peters passed along by
 Andrew Muehr.

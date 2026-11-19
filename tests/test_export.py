@@ -1,4 +1,4 @@
-"""netCDF export (core/export.py): the viewer's Export data dialog and `cm1view export`
+"""netCDF export (core/export.py): the viewer's Export data dialog and `atmo3d export`
 write the values the map, volumes and column fields give, in a box, streamed per time."""
 import os
 
@@ -25,7 +25,7 @@ def _names(F):
 def test_model_levels_match_the_volumes(reg, tmp_path):
     """Native, derived, derivative and column fields in a box on model levels: the
     volumes (and 2D planes) exactly; CF coordinates and attributes."""
-    from cm1view.core import export as ex
+    from atmo3d.core import export as ex
     run, F = reg.get()
     names = _names(F)
     p = ex.plan(run, F, names, [1, 2], box=(-20, 10, -15, 15), ztop=8.0)
@@ -35,13 +35,13 @@ def test_model_levels_match_the_volumes(reg, tmp_path):
     assert r["times"] == 2 and not r["cancelled"] and not r["missing"]
     assert not os.path.exists(str(tmp_path / "a.nc.part"))
     with _open(r["path"]) as d:
-        assert d.Conventions.startswith("CF") and d.cm1view_levels == "model levels"
+        assert d.Conventions.startswith("CF") and d.atmo3d_levels == "model levels"
         assert list(d["time"][:]) == [run.times[1], run.times[2]]
         assert np.array_equal(d["xh"][:], run.xh[i0:i1])
         assert np.array_equal(d["z"][:], run.z[p["ks"]]) and d["z"].axis == "Z"
         for n in names:
             v = d[ex.var_name(n)]
-            assert v.cm1view_name == n and v.long_name == F[n].label
+            assert v.atmo3d_name == n and v.long_name == F[n].label
             if F[n].ndim == 2:
                 assert v.dimensions == ("time", "yh", "xh")
                 ref = F.plane(n, 2, storm=(run.umove, run.vmove))[j0:j1, i0:i1]
@@ -59,7 +59,7 @@ def test_model_levels_match_the_volumes(reg, tmp_path):
 def test_heights_match_the_map(reg, tmp_path):
     """At heights: the map's planes there (derived fields computed at the height, as
     the map does, not interpolated from their volume)."""
-    from cm1view.core import export as ex
+    from atmo3d.core import export as ex
     run, F = reg.get()
     names = _names(F)
     p = ex.plan(run, F, names, [2], heights=[0.5, 1.0, 3.0])
@@ -78,7 +78,7 @@ def test_heights_match_the_map(reg, tmp_path):
 
 
 def test_plan_checks_and_names(reg):
-    from cm1view.core import export as ex
+    from atmo3d.core import export as ex
     run, F = reg.get()
     with pytest.raises(ValueError, match="not a field"):
         ex.plan(run, F, ["winterp", "nope"], [0])
@@ -97,7 +97,7 @@ def test_plan_checks_and_names(reg):
 
 
 def test_stopped_keeps_the_times_done(reg, tmp_path):
-    from cm1view.core import export as ex
+    from atmo3d.core import export as ex
     run, F = reg.get()
     p = ex.plan(run, F, ["winterp", "thpert"], range(len(run.times)))
     calls = []
@@ -106,14 +106,14 @@ def test_stopped_keeps_the_times_done(reg, tmp_path):
                  cancelled=lambda: len(calls) >= 3)  # (after a time and a half)
     assert r["cancelled"] and r["times"] == 1
     with _open(r["path"]) as d:
-        assert d.dimensions["time"].size == 2 and "1 of" in d.cm1view_incomplete
-        assert "partly written" in d.cm1view_incomplete
+        assert d.dimensions["time"].size == 2 and "1 of" in d.atmo3d_incomplete
+        assert "partly written" in d.atmo3d_incomplete
         assert np.isnan(d["thpert"][1]).all() and np.isfinite(d["winterp"][1]).all()
 
 
 def test_missing_time_is_nan(reg, tmp_path, monkeypatch):
     """A field the files lack at some time: NaN there, noted in the file."""
-    from cm1view.core import export as ex
+    from atmo3d.core import export as ex
     run, F = reg.get()
     monkeypatch.setitem(run.var_times, "winterp", frozenset({0}))
     F.forget(1, ["winterp"])  # (not from the cache either)
@@ -122,14 +122,14 @@ def test_missing_time_is_nan(reg, tmp_path, monkeypatch):
     assert r["missing"] == {"winterp": [1]}
     with _open(r["path"]) as d:
         assert np.isnan(d["winterp"][1]).all() and np.isfinite(d["uinterp"][1]).all()
-        assert "winterp" in d.cm1view_missing
+        assert "winterp" in d.atmo3d_missing
     F.forget(1, ["winterp"])
 
 
 def test_viewer_dialog(viewer, tmp_path):
     """Fields (a derivative added), a box from the map view, all times, heights;
     Export writes in the background; Stop ends it with the times done."""
-    from cm1view.core import export as ex
+    from atmo3d.core import export as ex
     v = viewer
     assert not v._exp_built  # (its widgets only when it first opens)
     v._open_export()
@@ -165,7 +165,7 @@ def test_viewer_dialog(viewer, tmp_path):
 
 
 def test_cli(demo_run, tmp_path):
-    from cm1view.__main__ import main
+    from atmo3d.__main__ import main
     out = str(tmp_path / "{run}_{name}")
     assert main(["export", demo_run, "--fields", "winterp,uh25", "--from", "60",
                  "--to", "70", "--box", "-20,10,-15,15", "--ztop", "5", "--out", out]) == 0

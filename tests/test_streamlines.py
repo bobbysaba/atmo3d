@@ -6,7 +6,7 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from cm1view.core import volume3d
+from atmo3d.core import volume3d
 
 X1 = np.arange(0.25, 40.0, 0.5)  # km, dx = 500 m
 Z = np.concatenate([np.arange(0.05, 1.0, 0.1), np.arange(1.2, 10.0, 0.4)])
@@ -97,7 +97,7 @@ def test_the_3d_pane_ignores_a_late_restyle_echo():
     rewind the figure (or be sent again), while a legend click's show/hide still counts."""
     import plotly.graph_objects as go
 
-    from cm1view.viewer.ui import Plotly3D
+    from atmo3d.viewer.ui import Plotly3D
     fig = go.Figure([go.Scatter3d(x=[1.0], y=[1.0], z=[1.0])])
     pane, sent = Plotly3D(fig), []
     # (what the pane would send the browser; Panel skips what comes from the browser)
@@ -195,7 +195,7 @@ def test_build_scene_gives_arrays_and_reuses_the_streamlines():
 
 
 def test_scene_figure_arrays_from_its_spec():
-    from cm1view.figures import draw as figdraw, spec as fg
+    from atmo3d.figures import draw as figdraw, spec as fg
     zz = np.broadcast_to(Z[:, None, None], SH)
     blob = np.exp(-((XX - 20) ** 2 + (YY - 20) ** 2 + (zz - 3) ** 2) / 20.0)
     vols = dict(blob=blob, uinterp=np.full(SH, 10.0), vinterp=zeros(), winterp=zeros())
@@ -229,7 +229,7 @@ def test_scene_figure_arrays_from_its_spec():
 
 
 def test_scene_box_follows_the_track_in_an_animation():
-    from cm1view.figures import draw as figdraw, spec as fg
+    from atmo3d.figures import draw as figdraw, spec as fg
     run = _Run(xh=X1, yh=X1, z=Z, dx=500.0, dy=500.0, nk=len(Z), umove=0.0, vmove=0.0,
                vols={}, times=np.array([0.0, 300.0, 600.0]))
     fixes = {0: dict(x=10.0, y=10.0), 1: dict(x=13.0, y=11.0)}

@@ -205,7 +205,7 @@ def test_picking_a_tool_reads_its_fields_and_panels_read_ahead(viewer):
     """Picking the Sounding (or Section) tool reads its fields at the shown time in the
     background; a drawn sounding reads the next time's; a time change stops reads for
     another time."""
-    from cm1view.bench import _wait_idle
+    from atmo3d.bench import _wait_idle
     v, run = viewer, viewer.run
     _wait_idle(v)
     run.clear_cache()

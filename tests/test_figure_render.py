@@ -58,8 +58,8 @@ def _figure(ed):
 
 @pytest.mark.parametrize("kind", list(MAKERS))
 def test_headless_data_match_the_editor(ed, demo_root, kind):
-    from cm1view.figures import draw as figdraw
-    from cm1view.figures.render import FigureData
+    from atmo3d.figures import draw as figdraw
+    from atmo3d.figures.render import FigureData
     MAKERS[kind](ed)
     spec = _with_track_file(_figure(ed), demo_root)
     ed.panel_data(spec)  # (series: starts computing them in the background)
@@ -76,8 +76,8 @@ def test_headless_data_match_the_editor(ed, demo_root, kind):
 
 def test_headless_data_are_kept(ed, demo_root, monkeypatch):
     """Drawing the same figure again (restyled) reads nothing."""
-    from cm1view.figures import spec as fg
-    from cm1view.figures.render import FigureData
+    from atmo3d.figures import spec as fg
+    from atmo3d.figures.render import FigureData
     spec = _with_track_file(new_spec(ed), demo_root)
     fd = FigureData()
     fd.panel_data(spec)
@@ -96,9 +96,9 @@ def test_headless_data_are_kept(ed, demo_root, monkeypatch):
 def test_headless_figure_of_parts_and_viewer_track(ed, demo_root):
     """A figure of parts comes back keyed part * 1000 + panel; a run whose track is
     the viewer's has no track without a viewer."""
-    from cm1view.figures import spec as fg
-    from cm1view.figures.combo import combine
-    from cm1view.figures.render import FigureData
+    from atmo3d.figures import spec as fg
+    from atmo3d.figures.combo import combine
+    from atmo3d.figures.render import FigureData
     a = _with_track_file(new_spec(ed), demo_root)
     b = _with_track_file(new_spec(ed, "dist", 1, 1), demo_root)
     data = FigureData().panel_data(combine([a, b]))
@@ -111,7 +111,7 @@ def test_headless_figure_of_parts_and_viewer_track(ed, demo_root):
 
 
 def test_render_module_needs_no_panel():
-    code = ("import sys; import cm1view.figures.render; "
+    code = ("import sys; import atmo3d.figures.render; "
             "sys.exit(int(any(m in sys.modules for m in ('panel', 'bokeh'))))")
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     r = subprocess.run([sys.executable, "-c", code], cwd=root, capture_output=True,
@@ -121,7 +121,7 @@ def test_render_module_needs_no_panel():
 
 def _two_storms(demo_root, tmp_path, run):
     """A track file of two storms: A (the demo's track) and B (5 km east of it)."""
-    from cm1view.core import track as trk
+    from atmo3d.core import track as trk
     a = trk.load(run, os.path.join(demo_root, "storm_tracks", "demo_supercell.csv"))
     opts = dict(metric="uh", zkm=1.0, radius=5.0, smooth=1.0, kernel="box", stop=50.0)
     p = str(tmp_path / "two.csv")
@@ -134,8 +134,8 @@ def test_figure_runs_follow_a_named_storm(demo_root, tmp_path):
     """A run entry's "storm" picks that storm of its track file (none: the file's first;
     one the file lacks: no track, and why); templates carry it to the run they are
     applied to, and `render --storm` names it for every run (T3 of the WoFS plan)."""
-    from cm1view.figures import batch, spec as fg
-    from cm1view.figures.render import FigureData
+    from atmo3d.figures import batch, spec as fg
+    from atmo3d.figures.render import FigureData
     fd = FigureData()
     run, F = fd.open_run(os.path.join(demo_root, "demo", "supercell"))
     p, a = _two_storms(demo_root, tmp_path, run)
@@ -165,7 +165,7 @@ def test_editor_storm_select_picks_the_runs_storm(ed, demo_root, tmp_path):
     """The Runs node's Storm select (a track file of several storms) sets the run's storm;
     the viewer's track or none hides it and drops the name."""
     import panel as pn
-    from cm1view.figures.shell import nodes
+    from atmo3d.figures.shell import nodes
     p, a = _two_storms(demo_root, tmp_path, ed.run)
     shell = ed.shell
 

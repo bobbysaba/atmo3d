@@ -1,4 +1,4 @@
-"""`cm1view render` (figures/batch.py): saved figures and templates drawn without the
+"""`atmo3d render` (figures/batch.py): saved figures and templates drawn without the
 viewer, as images, bundles and GIFs, as saved or for other runs."""
 import os
 import subprocess
@@ -14,8 +14,8 @@ from test_figure_render import _with_track_file, same
 
 def _demo_spec(demo_root, t=2):
     """The default figure on the demo supercell (its track file), with no editor."""
-    from cm1view.figures import spec as fg
-    from cm1view.figures.render import FigureData
+    from atmo3d.figures import spec as fg
+    from atmo3d.figures.render import FigureData
     fd = FigureData()
     run, F = fd.open_run(os.path.join(demo_root, "demo", "supercell"))
     return _with_track_file(fg.default_spec(run, F, t), demo_root), fd
@@ -23,7 +23,7 @@ def _demo_spec(demo_root, t=2):
 
 def _saved(demo_root, tmp_path):
     """A figure saved with its script and data: (spec path, data path)."""
-    from cm1view.figures import spec as fg
+    from atmo3d.figures import spec as fg
     spec, fd = _demo_spec(demo_root)
     out = fg.save_bundle(spec, fd.panel_data(spec), str(tmp_path / "saved" / "refl"))
     return out["spec"], out["data"]
@@ -35,7 +35,7 @@ def _npz(path):
 
 
 def render(*args):
-    from cm1view.figures.batch import main
+    from atmo3d.figures.batch import main
     return main([str(a) for a in args])
 
 
@@ -52,8 +52,8 @@ def test_render_as_saved_draws_the_same_data(demo_root, tmp_path):
 def test_render_on_runs_like_applying_a_template(ed, demo_root, tmp_path):
     """--run draws the figure as the editor's Apply to this run would a template of it,
     and once per run with {run} in --out."""
-    from cm1view.figures import batch, spec as fg
-    from cm1view.figures.render import FigureData
+    from atmo3d.figures import batch, spec as fg
+    from atmo3d.figures.render import FigureData
     spec_path, data_path = _saved(demo_root, tmp_path)
     runs = [os.path.join(demo_root, "demo", r) for r in ("supercell", "supercell_weak")]
     out = tmp_path / "{run}" / "{name}.png"
@@ -80,7 +80,7 @@ def test_render_on_runs_like_applying_a_template(ed, demo_root, tmp_path):
 
 
 def test_render_refuses_what_it_should(demo_root, tmp_path, capsys):
-    from cm1view.figures import spec as fg
+    from atmo3d.figures import spec as fg
     spec_path, _ = _saved(demo_root, tmp_path)
     img = tmp_path / "saved" / "refl.png"
     before = img.stat().st_mtime_ns
@@ -112,12 +112,12 @@ def test_render_gif(demo_root, tmp_path):
     assert render(spec_path, "--gif", "--overwrite", "--time", 1e6, "--out", base) == 1
 
 
-def test_cm1view_render_command(demo_root, tmp_path):
-    """`cm1view render` reaches it (no Panel loaded); `cm1view RUN` is unchanged."""
-    from cm1view.__main__ import main
+def test_atmo3d_render_command(demo_root, tmp_path):
+    """`atmo3d render` reaches it (no Panel loaded); `atmo3d RUN` is unchanged."""
+    from atmo3d.__main__ import main
     with pytest.raises(SystemExit) as e:
         main(["render", "--help"])
     assert e.value.code == 0
-    code = ("import sys, cm1view.figures.batch; "
+    code = ("import sys, atmo3d.figures.batch; "
             "sys.exit(int('panel' in sys.modules or 'bokeh' in sys.modules))")
     assert subprocess.run([sys.executable, "-c", code]).returncode == 0

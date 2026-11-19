@@ -1,8 +1,8 @@
-site_name: cm1view
+site_name: atmo3d
 site_description: An interactive viewer for CM1 netCDF output
-site_url: https://bobbysaba.github.io/cm1view/
-repo_url: https://github.com/bobbysaba/cm1view
-repo_name: bobbysaba/cm1view
+site_url: https://bobbysaba.github.io/atmo3d/
+repo_url: https://github.com/bobbysaba/atmo3d
+repo_name: bobbysaba/atmo3d
 edit_uri: edit/master/docs/
 
 theme:
@@ -40,7 +40,7 @@ nav:
   - Home: index.md
   - Installing: install.md
   - Running on a cluster: hpc.md
-  - Using cm1view:
+  - Using atmo3d:
       - Basics: guide/index.md
       - The map: guide/map.md
       - Soundings: guide/soundings.md

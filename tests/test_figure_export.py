@@ -3,14 +3,14 @@ figures of parts."""
 
 import numpy as np
 
-from cm1view.figures import spec as fg
+from atmo3d.figures import spec as fg
 from conftest import txt
 
 
 def test_drawing_code_stitches_into_one_module():
     """Exported scripts carry draw's modules as one: no imports between them, and
     every name the package has (bar source and MODULES) defined there."""
-    from cm1view.figures import draw as figdraw
+    from atmo3d.figures import draw as figdraw
     src = figdraw.source()
     assert "from ." not in src and '"""Shared pieces' not in src
     ns = {}
@@ -47,7 +47,7 @@ def test_animation_frames_stop_where_a_panel_runs_out():
 
 def test_held_entries_stay_while_the_others_step():
     """An entry with time_lock keeps its times in the frames and does not end them."""
-    from cm1view.figures import spec as fg
+    from atmo3d.figures import spec as fg
 
     class Run:
         def __init__(self, n):
@@ -72,7 +72,7 @@ def test_held_entries_stay_while_the_others_step():
 
 
 def test_save_asks_before_replacing_the_image_or_the_spec(ed, tmp_path, monkeypatch):
-    from cm1view.figures import spec as fg
+    from atmo3d.figures import spec as fg
     base, asked = str(tmp_path / "fig"), []
     monkeypatch.setattr(ed.v.confirm, "ask", lambda paths, then: asked.append(paths))
     ed.path.value = base

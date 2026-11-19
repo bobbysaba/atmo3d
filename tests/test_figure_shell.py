@@ -2,7 +2,7 @@
 the preview, edits, undo, and the switch that shows it."""
 import pytest
 
-from cm1view.figures.shell import nodes
+from atmo3d.figures.shell import nodes
 
 
 def small_doc():
@@ -72,7 +72,7 @@ def test_pick_at():
 
 
 def test_grid_map_shows_spans_and_empty_cells():
-    from cm1view.figures.shell.inspector import grid_map
+    from atmo3d.figures.shell.inspector import grid_map
     doc = small_doc()
     doc["grid"] = dict(rows=2, cols=3)
     doc["panels"][1]["cell"] = [0, 0, 2, 1]
@@ -83,7 +83,7 @@ def test_grid_map_shows_spans_and_empty_cells():
 
 
 def test_a_preview_doc_only_touches_a_scene():
-    from cm1view.figures.shell.frame import preview_doc, preview_dpi
+    from atmo3d.figures.shell.frame import preview_doc, preview_dpi
     doc = small_doc()
     assert preview_doc(doc, 100.0) is doc
     doc["kinds"] = dict(scene=dict(scene3d=dict(zoom=1.0)))
@@ -109,7 +109,7 @@ class _Now:
 def shell(reg, monkeypatch):
     """The new layout showing the demo's example figure, drawing as it is asked (not in the
     background)."""
-    from cm1view.viewer import app as A
+    from atmo3d.viewer import app as A
     run, F = reg.get()
     v = A.Viewer(run, F, reg=reg)
     v.main()
@@ -262,7 +262,7 @@ def test_every_kind_opens_and_every_node_shows(shell):
 
 def test_the_plain_code_box_holds_the_same_code():
     import panel as pn
-    from cm1view.figures.shell.looks import code_extra
+    from atmo3d.figures.shell.looks import code_extra
     editor = pn.widgets.TextInput(value="x = 1")
     plain, box = code_extra({"code.text": editor})
     assert plain.value == "x = 1"

@@ -20,7 +20,7 @@ def _own_legend(ax, text="mean", color="C0"):
 
 
 def _legends(fig, placed, entries, **lg):
-    from cm1view.figures.draw.figure import _legends
+    from atmo3d.figures.draw.figure import _legends
     _legends(fig, dict(legend=lg), placed, entries)
 
 
@@ -93,7 +93,7 @@ def test_figure_legend_gathers_the_axes_beside_a_panel():
 
 
 def test_panel_legend_opts_and_their_merge():
-    from cm1view.figures.draw import legend_opts, panel_view
+    from atmo3d.figures.draw import legend_opts, panel_view
     assert legend_opts("plan", {"on": True}) == {} and legend_opts("line", {}) == {}
     assert legend_opts("line", {"ncol": 2, "frame": True}) == \
         {"ts": {"legend_ncol": 2, "legend_frame": True}}
@@ -107,7 +107,7 @@ def test_panel_legend_opts_and_their_merge():
 
 
 def test_panel_edit_legend_reaches_that_panel_alone():
-    from cm1view.figures.draw import upgrade
+    from atmo3d.figures.draw import upgrade
     v1 = dict(kind="line", rows=1, cols=2, size=[6, 3], ts=dict(legend_ncol=1),
               series=[dict(panel=0), dict(panel=1)], edits={"1": {"legend": {"ncol": 2}}})
     v2, _ = upgrade(v1)
@@ -116,7 +116,7 @@ def test_panel_edit_legend_reaches_that_panel_alone():
 
 
 def test_panel_edit_axis_labels_reach_that_panel_alone():
-    from cm1view.figures.draw import upgrade, panel_view
+    from atmo3d.figures.draw import upgrade, panel_view
     v1 = dict(kind="line", rows=1, cols=2, size=[6, 3], axes=dict(xlabel="t", ylabel=""),
               series=[dict(panel=0), dict(panel=1)],
               edits={"1": {"xlabel": "time (min)", "ylabel": " ",
@@ -130,7 +130,7 @@ def test_panel_edit_axis_labels_reach_that_panel_alone():
 
 def _keeping(placed, i):
     """Panel i's Tree legend set to Yes: it keeps its own legend."""
-    from cm1view.figures.draw import legend_opts
+    from atmo3d.figures.draw import legend_opts
     p, ax, _ = placed[i]
     placed[i] = (dict(p, kind="line"), ax, legend_opts("line", {"on": True}))
 
@@ -165,7 +165,7 @@ def test_legend_anchor_puts_its_corner_at_the_point():
 
 
 def test_panel_legend_anchor():
-    from cm1view.figures.draw.base import panel_legend
+    from atmo3d.figures.draw.base import panel_legend
     fig, axs, _ = _axes(1)
     leg = panel_legend(axs[0], [Line2D([], [], label="w")],
                        dict(legend_loc="upper left", legend_anchor=[1.02, 1.0]), {}, "best",
@@ -175,13 +175,13 @@ def test_panel_legend_anchor():
 
 
 def test_anchor_text_round_trip():
-    from cm1view.figures.cards import _xy, _xy_text
+    from atmo3d.figures.cards import _xy, _xy_text
     assert _xy("1.02, -0.1") == [1.02, -0.1] and _xy("1") is None and _xy("") is None
     assert _xy_text([1.02, 1.0]) == "1.02, 1" and _xy_text(None) == ""
 
 
 def test_blank_label_has_no_legend_entry():
-    from cm1view.figures.draw.base import panel_legend
+    from atmo3d.figures.draw.base import panel_legend
     fig, axs, _ = _axes(2)
     named, = axs[0].plot([0, 1], [0, 1], label="a")
     blank, = axs[0].plot([0, 1], [1, 0], label="")  # (matplotlib calls it "_child1")
@@ -193,7 +193,7 @@ def test_blank_label_has_no_legend_entry():
 
 
 def test_legend_entry_annotations_join_the_panels_legend():
-    from cm1view.figures.draw.base import legend_handles, panel_legend
+    from atmo3d.figures.draw.base import legend_handles, panel_legend
     anns = [dict(kind="legend", text="Obs", look="line", ls="--", panel=-1),
             dict(kind="legend", text="Window", look="patch", alpha=0.3, color="red", panel=0),
             dict(kind="legend", text="Pt", look="marker", marker="o", panel=1),

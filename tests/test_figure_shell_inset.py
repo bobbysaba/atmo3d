@@ -6,9 +6,9 @@ import numpy as np
 import pytest
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 
-from cm1view.figures import draw as figdraw, spec as fg
-from cm1view.figures.shell import docedit as de, findview, nodes
-from cm1view.figures.shell.looks import InsetScope
+from atmo3d.figures import draw as figdraw, spec as fg
+from atmo3d.figures.shell import docedit as de, findview, nodes
+from atmo3d.figures.shell.looks import InsetScope
 
 
 def doc_of(*panels):
@@ -222,7 +222,7 @@ def test_an_inset_says_it_has_no_data():
 
 
 def test_arrays_of_an_inset_go_through_a_file_by_their_key(tmp_path):
-    from cm1view.figures.spec.bundle import flatten, unflatten
+    from atmo3d.figures.spec.bundle import flatten, unflatten
     keys = flatten({0: dict(a=np.arange(2)), -1: dict(a=np.arange(3))})
     np.savez(tmp_path / "d.npz", **keys)
     with np.load(tmp_path / "d.npz") as z:
@@ -231,7 +231,7 @@ def test_arrays_of_an_inset_go_through_a_file_by_their_key(tmp_path):
 
 
 def test_a_drawn_inset_is_found_in_the_preview_ahead_of_its_panel():
-    from cm1view.figures.click import panel_boxes
+    from atmo3d.figures.click import panel_boxes
     doc = fill_doc()
     fig = _drawn(doc, {0: plan_data(), -1: plan_data(0.0, 4.0)})
     W, H = fig.get_size_inches() * fig.dpi
@@ -254,7 +254,7 @@ class _Now:
 
 @pytest.fixture
 def shell(reg, monkeypatch):
-    from cm1view.viewer import app as A
+    from atmo3d.viewer import app as A
     run, F = reg.get()
     v = A.Viewer(run, F, reg=reg)
     v.main()
@@ -435,7 +435,7 @@ def test_a_cross_section_has_insets_too(shell):
 
 
 def test_an_inset_saves_and_renders(shell, tmp_path):
-    from cm1view.figures.batch import main
+    from atmo3d.figures.batch import main
     pid, iid = _made(shell)
     path = fg.save_spec(de.plain(shell.doc), str(tmp_path / "f"))
     again = fg.load_spec(path)

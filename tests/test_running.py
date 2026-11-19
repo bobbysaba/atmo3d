@@ -7,8 +7,8 @@ import time
 
 import pytest
 
-from cm1view.core import run as R
-from cm1view.registry import Registry
+from atmo3d.core import run as R
+from atmo3d.registry import Registry
 
 OLD = time.time() - 3600
 
@@ -17,7 +17,7 @@ OLD = time.time() - 3600
 def running(demo_run, tmp_path, monkeypatch):
     """A copy of the demo supercell (not a demo run: no stamp two folders up), all files
     an hour old, with the 60 s settle time of the default settings."""
-    monkeypatch.setenv("CM1VIEW_SETTLE_SECONDS", "60")
+    monkeypatch.setenv("ATMO3D_SETTLE_SECONDS", "60")
     d = str(tmp_path / "a" / "b" / "run")
     shutil.copytree(demo_run, d)
     files = sorted(glob.glob(os.path.join(d, "cm1out_[0-9]*.nc")))
@@ -54,7 +54,7 @@ def test_only_the_newest_files_count(running, monkeypatch):
 
 def test_settle_zero_checks_only_that_it_opens(running, monkeypatch):
     _, files = running
-    monkeypatch.setenv("CM1VIEW_SETTLE_SECONDS", "0")
+    monkeypatch.setenv("ATMO3D_SETTLE_SECONDS", "0")
     os.utime(files[-1], None)
     assert R.finished(files) == len(files)
 
@@ -97,19 +97,19 @@ def test_failed_reopen_keeps_the_open_run(running):
 
 
 def test_demo_runs_are_never_busy(demo_run, monkeypatch):
-    monkeypatch.setenv("CM1VIEW_SETTLE_SECONDS", "100000000")
+    monkeypatch.setenv("ATMO3D_SETTLE_SECONDS", "100000000")
     files = sorted(glob.glob(os.path.join(demo_run, "cm1out_[0-9]*.nc")))
     assert R.finished(files, demo_run) == len(files)
 
 
 def test_wofs_member_and_mean_leave_out_the_newest_cycle(tmp_path, monkeypatch):
-    from cm1view.core import models
+    from atmo3d.core import models
     from test_wofs import NC, make_wofs
     root = make_wofs(str(tmp_path / "exp" / "20220523"))
     late = sorted(glob.glob(os.path.join(root, "*", "wrfout_d01_*")))
     for f in late:
         os.utime(f, (OLD, OLD))
-    monkeypatch.setenv("CM1VIEW_SETTLE_SECONDS", "60")
+    monkeypatch.setenv("ATMO3D_SETTLE_SECONDS", "60")
     newest = sorted(f for f in late if f.endswith("_2"))[-1]
     os.utime(newest, None)  # member 2 is still writing the last cycle
     m1 = models.open_run(os.path.join(root, "mem01"), workers=1)
@@ -124,7 +124,7 @@ def test_wofs_member_and_mean_leave_out_the_newest_cycle(tmp_path, monkeypatch):
 def test_reload_button(demo_run):
     """Nothing new: the run is swapped in place (no page reload).  (Its own registry: a
     reopen replaces the run that other tests share.)"""
-    from cm1view.viewer import app as A
+    from atmo3d.viewer import app as A
     reg = Registry(demo_run, 4, 1)
     run, F = reg.get()
     v = A.Viewer(run, F, reg=reg)

@@ -4,7 +4,7 @@ model output needed."""
 import numpy as np
 import pytest
 
-from cm1view.core import track as trk
+from atmo3d.core import track as trk
 
 OPTS = dict(metric="uh", zkm=1.0, radius=5.0, smooth=1.0, kernel="box", stop=50.0)
 
@@ -37,7 +37,7 @@ def line(run, x0, y0, u, v, ts, value=100.0, jitter=0.0, seed=0):
 def window(monkeypatch):
     """Sets the track_motion_window setting (minutes or auto); auto to begin with."""
     def put(v):
-        monkeypatch.setenv("CM1VIEW_TRACK_MOTION_WINDOW", v)
+        monkeypatch.setenv("ATMO3D_TRACK_MOTION_WINDOW", v)
     put("auto")
     return put
 
@@ -132,14 +132,14 @@ def test_motion_window_follows_the_setting_and_the_run(window):
 
 
 def test_wofs_runs_fit_motion_over_30_min():
-    from cm1view.core.run import CM1Run, Run
-    from cm1view.core.wofs import WoFSRun
+    from atmo3d.core.run import CM1Run, Run
+    from atmo3d.core.wofs import WoFSRun
     assert Run.track_window == 0.0 and CM1Run.track_window == 0.0
     assert WoFSRun.track_window == 1800.0
 
 
 def test_export_reads_the_named_storm(tmp_path):
-    from cm1view.core import export
+    from atmo3d.core import export
     run = FakeRun()
     p = str(tmp_path / "two.csv")
     trk.save(run, line(run, 0, 0, 10, 0, range(13)), OPTS, p, storm="A")

@@ -145,7 +145,7 @@ is one storm, as CM1 tracks always are, and saving over it replaces it.
 
 Give the same storm the same name in every member's file: a storm is matched across
 members by its name. The command-line export picks a storm with `--track-storm NAME`. In figures each run picks
-its storm ([Fields and runs](figures.md#fields-and-runs)), and `cm1view render --storm NAME`
+its storm ([Fields and runs](figures.md#fields-and-runs)), and `atmo3d render --storm NAME`
 names it for every run.
 
 In the viewer, the **Storm** box beside the path box picks the storm. It is shown for WoFS

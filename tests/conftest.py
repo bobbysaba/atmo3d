@@ -2,12 +2,12 @@
 one Registry for the whole session.
 
   pytest                 tests on the demo data (the default)
-  pytest -m real         checks on your own run: CM1VIEW_TEST_RUN=/path/to/run (slow)
+  pytest -m real         checks on your own run: ATMO3D_TEST_RUN=/path/to/run (slow)
   pytest -m browser      the viewer in headless Firefox, with screenshots (slow)
   pytest --make-baselines   rewrite the PNGs in tests/baseline (test_images.py)
 
-The demo data is written once to $CM1VIEW_TEST_DATA (default: <tmp>/cm1view-demo-$USER)
-and rewritten only when tests/synthetic.py changes.  (cm1view --demo opens a real
+The demo data is written once to $ATMO3D_TEST_DATA (default: <tmp>/atmo3d-demo-$USER)
+and rewritten only when tests/synthetic.py changes.  (atmo3d --demo opens a real
 run instead, demo_data/: test_real_demo.py.)
 """
 import os
@@ -29,21 +29,21 @@ def pytest_addoption(parser):
 
 
 def pytest_configure(config):
-    # before cm1view.config is imported anywhere; spawned readers inherit these
-    cfg = tempfile.mkdtemp(prefix="cm1view-testcfg-")
-    os.environ["CM1VIEW_CONFIG"] = os.path.join(cfg, "config.toml")
-    os.environ["CM1VIEW_CACHE_DIR"] = os.path.join(cfg, "cache")
-    os.environ["CM1VIEW_ALLOW_WRITES_TO_OUTPUT"] = "1"
+    # before atmo3d.config is imported anywhere; spawned readers inherit these
+    cfg = tempfile.mkdtemp(prefix="atmo3d-testcfg-")
+    os.environ["ATMO3D_CONFIG"] = os.path.join(cfg, "config.toml")
+    os.environ["ATMO3D_CACHE_DIR"] = os.path.join(cfg, "cache")
+    os.environ["ATMO3D_ALLOW_WRITES_TO_OUTPUT"] = "1"
     # runs written by tests are opened at once: no file counts as still being written
     # for being new (test_running.py sets its own)
-    os.environ["CM1VIEW_SETTLE_SECONDS"] = "0"
+    os.environ["ATMO3D_SETTLE_SECONDS"] = "0"
 
 
 @pytest.fixture(scope="session")
 def demo_root():
     import synthetic as demo
-    root = os.environ.get("CM1VIEW_TEST_DATA") or os.path.join(
-        tempfile.gettempdir(), f"cm1view-demo-{os.environ.get('USER', 'user')}")
+    root = os.environ.get("ATMO3D_TEST_DATA") or os.path.join(
+        tempfile.gettempdir(), f"atmo3d-demo-{os.environ.get('USER', 'user')}")
     demo.make(root)
     return root
 
@@ -55,7 +55,7 @@ def demo_run(demo_root):
 
 @pytest.fixture(scope="session")
 def reg(demo_run):
-    from cm1view.registry import Registry
+    from atmo3d.registry import Registry
     r = Registry(demo_run, 4, 2)
     yield r
 
@@ -63,7 +63,7 @@ def reg(demo_run):
 @pytest.fixture
 def viewer(reg):
     """A fresh Viewer on the demo supercell, at the first storm time."""
-    from cm1view.viewer import app as A
+    from atmo3d.viewer import app as A
     run, F = reg.get()
     v = A.Viewer(run, F, reg=reg)
     v.main()
@@ -100,15 +100,15 @@ def ed(viewer):
 
 def doc_now(ed):
     """A copy of the figure the editor holds, as a file has it."""
-    from cm1view.figures import spec as fg
+    from atmo3d.figures import spec as fg
     return fg.plain_copy(ed.shell.doc)
 
 
 def new_spec(ed, kind="plan", rows=2, cols=3, vary="times"):
     """The version-1 spec the New dialog starts a figure of a kind from (time series and
     time-height: with two series, as nothing is computed without one)."""
-    from cm1view.figures import spec as fg
-    from cm1view.figures.kinds import KINDS
+    from atmo3d.figures import spec as fg
+    from atmo3d.figures.kinds import KINDS
     ed.open_quick()
     ed.quick.hide()
     ed.qs_kind.value = kind
@@ -133,7 +133,7 @@ def set_look(ed, kind, block, **values):
 
 def put(s, widget, value):
     """Spec s with the setting of widget name `widget` (settings.py) as if typed there."""
-    from cm1view.figures import settings as table
+    from atmo3d.figures import settings as table
     st = next(x for x in table.SETTINGS if x.widget == widget)
     block, _, key = st.key.rpartition(".")
     held = s.setdefault(block, {}) if block else s
@@ -147,7 +147,7 @@ def put(s, widget, value):
 def render(ed, figure=None):
     """Draw a figure (default: the one the editor holds) as the preview does (raises on errors):
     (the figure, its data, the matplotlib figure)."""
-    from cm1view.figures import draw as figdraw
+    from atmo3d.figures import draw as figdraw
     figure = doc_now(ed) if figure is None else figure
     data = ed.panel_data(figure)
     return figure, data, figdraw.draw(figure, data)
@@ -175,7 +175,7 @@ def coarse_run(demo_root, tmp_path_factory):
 
 def difference_layer(ed, s):
     """Spec s's first fill as a difference: minus the run's first output, diverging about 0."""
-    from cm1view.figures.cards.layercard import _nice
+    from atmo3d.figures.cards.layercard import _nice
     lay = next(x for x in s["layers"] if x["type"] == "fill")
     a = _nice(0.25 * (float(lay["vmax"]) - float(lay["vmin"])))
     lay.update(minus=dict(run=None, time_s=float(ed.run.times[0]), grid="ask"), cmap="RdBu",

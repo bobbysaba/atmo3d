@@ -1,8 +1,8 @@
-# cm1view environment (conda-forge, versions cm1view is tested with)
+# atmo3d environment (conda-forge, versions atmo3d is tested with)
 #   conda env create -f environment.yml
-#   conda activate cm1view
+#   conda activate atmo3d
 # Update after editing:  conda env update -f environment.yml --prune
-name: cm1view
+name: atmo3d
 channels:
   - conda-forge
 dependencies:
@@ -15,7 +15,7 @@ dependencies:
   - pandas=2.3.1
   - xarray=2025.7.1
   - netcdf4=1.7.2
-  - matplotlib-base=3.10.3  # no Qt: cm1view draws off-screen
+  - matplotlib-base=3.10.3  # no Qt: atmo3d draws off-screen
   - contourpy=1.3.3
   - metpy=1.7.0
   - pyproj=3.7.2           # map projections of WRF / WoFS grids (core.geo)

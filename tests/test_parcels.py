@@ -9,7 +9,7 @@ import numpy as np
 import pytest
 
 import synthetic as demo
-from cm1view.core import parcels as P
+from atmo3d.core import parcels as P
 
 
 @pytest.fixture
@@ -101,7 +101,7 @@ def test_selection_later_near_point_values_and_cap(pf):
 
 
 def test_saved_sets(pf, demo_run, tmp_path, monkeypatch):
-    monkeypatch.setenv("CM1VIEW_EXPORTS_DIR", str(tmp_path / "exports"))
+    monkeypatch.setenv("ATMO3D_EXPORTS_DIR", str(tmp_path / "exports"))
     s = P.select(pf, dict(box=[-12, -8, -8, -4], cap=5), "inflow / low")
     path = P.save_set(demo_run, s)
     assert path in P.list_sets(demo_run) and os.path.basename(path) == "inflow_low.npz"
@@ -197,7 +197,7 @@ def _wait_sets(v, n):
 
 @pytest.fixture
 def pviewer(viewer, tmp_path, monkeypatch):
-    monkeypatch.setenv("CM1VIEW_EXPORTS_DIR", str(tmp_path / "exports"))
+    monkeypatch.setenv("ATMO3D_EXPORTS_DIR", str(tmp_path / "exports"))
     viewer.tslider.value = 5  # 4800 s: between the first and last parcel times
     return viewer
 
@@ -246,7 +246,7 @@ def test_parcel_tails_heads_and_colours(pviewer):
     v.par_color.value = "w"  # read in the pool, then drawn
     wait(lambda: v.par_cbar.visible, msg="coloured by w")
     tr = v.pf.trajectories(ps, ("w",))["w"]
-    from cm1view.core import parcels as PP
+    from atmo3d.core import parcels as PP
     np.testing.assert_allclose(np.sort(v.par_head_src.data["val"]),
                                np.sort(PP.at_time(v.pf, tr, 4800.0)[np.isfinite(
                                    PP.heads(v.pf, v.pf.trajectories(ps), 4800.0)[0])]))
@@ -255,7 +255,7 @@ def test_parcel_tails_heads_and_colours(pviewer):
 
 
 def test_parcel_sets_rename_save_load_and_session(pviewer):
-    from cm1view.viewer import app as A
+    from atmo3d.viewer import app as A
     v = pviewer
     v._par_choose(-8.0, -5.0)
     _wait_sets(v, 1)
@@ -294,8 +294,8 @@ def test_section_projection():
 
 
 def test_band_matches_ensemble_band():
-    from cm1view.core import series as ser
-    from cm1view.figures.spec.panels import ensemble_band
+    from atmo3d.core import series as ser
+    from atmo3d.figures.spec.panels import ensemble_band
     V = np.array([[1.0, 2.0, np.nan], [3.0, 6.0, 5.0], [2.0, 4.0, np.nan]])
     c, lo, hi = ser.band(V, "minmax", "mean")
     np.testing.assert_allclose(c, [2.0, 4.0, 5.0])
@@ -350,7 +350,7 @@ def test_parcels_on_section_in_3d_and_plot(pviewer):
 # ------------------------------------------------------------------ figures (P4a)
 def _par_spec(reg, kind="plan", **par):
     """A one-panel figure of the demo at 4800 s: dbz and a parcels layer."""
-    from cm1view.figures import spec as fg
+    from atmo3d.figures import spec as fg
     run, F = reg.get()
     t = int(np.argmin(np.abs(run.times - 4800.0)))
     s = fg.default_spec(run, F, t)
@@ -372,8 +372,8 @@ def pcache(tmp_path, monkeypatch):
 
 
 def test_figure_parcel_layer_plan(reg, pcache):
-    from cm1view.figures import draw as figdraw
-    from cm1view.figures.render import FigureData
+    from atmo3d.figures import draw as figdraw
+    from atmo3d.figures.render import FigureData
     s, run = _par_spec(reg, cvar="w", units="m/s")
     d = FigureData().panel_data(s)[0]
     pf = P.for_run(run)
@@ -400,7 +400,7 @@ def test_figure_parcel_layer_plan(reg, pcache):
 
 
 def test_figure_parcel_layer_section_and_notes(reg, pcache):
-    from cm1view.figures.render import FigureData
+    from atmo3d.figures.render import FigureData
     s, run = _par_spec(reg, "xsec", within=2.0)
     fd = FigureData()
     d = fd.panel_data(s)[0]
@@ -424,7 +424,7 @@ def test_figure_parcel_layer_section_and_notes(reg, pcache):
 
 
 def test_figure_parcel_choice_is_kept_and_keyed(reg, pcache, monkeypatch):
-    from cm1view.figures import spec as fg
+    from atmo3d.figures import spec as fg
     s, run = _par_spec(reg)
     pf = P.for_run(run)
     a = P.chosen(pf, s["layers"][1]["rule"], name="a")
@@ -440,7 +440,7 @@ def test_figure_parcel_choice_is_kept_and_keyed(reg, pcache, monkeypatch):
 
 
 def test_template_moves_the_parcel_rule(reg):
-    from cm1view.figures import spec as fg
+    from atmo3d.figures import spec as fg
     s, run = _par_spec(reg)
     s["layers"][1]["rule"] = dict(s["layers"][1]["rule"], t=4200.0)
     tpl = fg.template(s)
@@ -481,7 +481,7 @@ def test_figure_from_map_and_section_bring_parcel_sets(pviewer, ed):
 def _scene_par_spec(reg, **par):
     """A 3D scene figure of the demo at 4800 s over a box: no surfaces, two parcel sets
     (the second coloured by w)."""
-    from cm1view.figures import spec as fg
+    from atmo3d.figures import spec as fg
     s, run = _par_spec(reg)
     e = dict(s["layers"][1], lw=1.5, **par)
     s.update(kind="scene", time_s=4800.0, scene3d=dict(
@@ -492,8 +492,8 @@ def _scene_par_spec(reg, **par):
 
 
 def test_scene_parcels_inside_the_region_and_kept_apart(reg, pcache):
-    from cm1view.figures import spec as fg
-    from cm1view.figures.render import FigureData
+    from atmo3d.figures import spec as fg
+    from atmo3d.figures.render import FigureData
     s, run = _scene_par_spec(reg)
     fd = FigureData()
     d = fd.panel_data(s)[0]
@@ -537,8 +537,8 @@ def test_scene_parcels_inside_the_region_and_kept_apart(reg, pcache):
 
 def test_scene_figure_draws_parcels(reg, pcache):
     pytest.importorskip("pyvista")
-    from cm1view.figures import draw as figdraw
-    from cm1view.figures.render import FigureData
+    from atmo3d.figures import draw as figdraw
+    from atmo3d.figures.render import FigureData
     s, run = _scene_par_spec(reg)
     s["scene3d"]["parcels"][1]["cbar_label"] = "w of the parcels"
     d = FigureData().panel_data(s)[0]
@@ -565,8 +565,8 @@ def test_parcel_series_arrays():
     d/dt along each parcel, and up to `each` parcels' own lines in one NaN-separated
     line; one parcel: its own line."""
     from types import SimpleNamespace
-    from cm1view.core import series as ser
-    from cm1view.figures import spec as fg
+    from atmo3d.core import series as ser
+    from atmo3d.figures import spec as fg
     pf = SimpleNamespace(times=np.array([0.0, 60.0, 120.0, 180.0]))
     a = np.array([[1.0, 2.0, 3.0], [2.0, 4.0, np.nan], [3.0, 6.0, 9.0], [4.0, 8.0, 12.0]])
     e = dict(ens="minmax", ens_mid="mean", each=2, op="")
@@ -594,7 +594,7 @@ def test_parcel_series_arrays():
 
 def _par_series_spec(reg, **par):
     """A one-panel time-series figure of the demo: a parcel series of w."""
-    from cm1view.figures import spec as fg
+    from atmo3d.figures import spec as fg
     run, F = reg.get()
     s = fg.default_spec(run, F, int(np.argmin(np.abs(run.times - 4800.0))))
     s.update(kind="line", rows=1, cols=1)
@@ -607,8 +607,8 @@ def _par_series_spec(reg, **par):
 def test_figure_parcel_series(reg, pcache):
     """A parcel series draws its mean and band over the parcel times (not the 3D
     output's) and its parcels' own lines faint; a variable the run lacks: a note."""
-    from cm1view.figures import draw as figdraw
-    from cm1view.figures.render import FigureData
+    from atmo3d.figures import draw as figdraw
+    from atmo3d.figures.render import FigureData
     s, run = _par_series_spec(reg, each=10)
     d = FigureData().panel_data(s)[0]
     pf = P.for_run(run)
@@ -635,7 +635,7 @@ def test_figure_parcel_series(reg, pcache):
 
 
 def test_template_moves_the_parcel_series_rule(reg):
-    from cm1view.figures import spec as fg
+    from atmo3d.figures import spec as fg
     s, run = _par_series_spec(reg)
     s["series"][0]["rule"] = dict(s["series"][0]["rule"], t=4200.0)
     assert s["time_s"] == pytest.approx(4800.0)
@@ -724,8 +724,8 @@ def test_viewer_colours_and_plots_a_grid_field(pviewer):
 
 
 def test_figure_layer_and_series_of_a_grid_field(reg, pcache):
-    from cm1view.figures import draw as figdraw
-    from cm1view.figures.render import FigureData
+    from atmo3d.figures import draw as figdraw
+    from atmo3d.figures.render import FigureData
     s, run = _par_spec(reg, cvar="@w", units="m/s")
     d = FigureData().panel_data(s)[0]
     assert "L1_hv" in d and np.isfinite(d["L1_hv"]).any() and not d.get("notes")
@@ -762,9 +762,9 @@ def test_export_netcdf_matches_trajectories(reg, pcache, tmp_path):
         np.testing.assert_allclose(d["time"][:], pf.times[ti])
         for c, n in (("x", "x"), ("z", "z"), ("w", "w"), ("w_at_parcels", "@w")):
             np.testing.assert_array_equal(d[c][:].filled(np.nan), tr[n][ti])
-        assert d["w_at_parcels"].cm1view_name == "@w" and d["x"].units == "km"
+        assert d["w_at_parcels"].atmo3d_name == "@w" and d["x"].units == "km"
         assert "at the parcels" in d["w_at_parcels"].long_name
-        assert d.cm1view_set == "up" and '"cap": 60' in d.cm1view_rule
+        assert d.atmo3d_set == "up" and '"cap": 60' in d.atmo3d_rule
     assert not os.path.exists(r["path"] + ".part")
     assert P.export_column("@ddz.winterp") == "ddz_winterp_at_parcels"
     with pytest.raises(ValueError, match="not parcel variables"):
@@ -800,8 +800,8 @@ def test_export_csv_in_blocks_and_stop(reg, pcache, tmp_path, monkeypatch):
 
 
 def test_export_command_line(reg, pcache, tmp_path, monkeypatch, capsys):
-    from cm1view.core import export as ex
-    monkeypatch.setenv("CM1VIEW_EXPORTS_DIR", str(tmp_path / "exports"))
+    from atmo3d.core import export as ex
+    monkeypatch.setenv("ATMO3D_EXPORTS_DIR", str(tmp_path / "exports"))
     run, F = reg.get()
     pf = P.for_run(run, F)
     ps = P.select(pf, dict(near=[-8.0, -5.0, 3.0]), "updraft")
@@ -885,7 +885,7 @@ def test_frame_shift_and_moving_trajectories(pf, reg):
 
 
 def test_export_writes_storm_relative_positions(reg, pcache, tmp_path, monkeypatch, capsys):
-    from cm1view.core import export as ex
+    from atmo3d.core import export as ex
     run, F = reg.get()
     pf = P.for_run(run, F)
     ps = P.select(pf, dict(box=[-15.0, -5.0, -10.0, 0.0], cap=20), "sr")
@@ -905,7 +905,7 @@ def test_export_writes_storm_relative_positions(reg, pcache, tmp_path, monkeypat
     np.testing.assert_allclose(a["x_sr_km"] - a["x_km"],
                                -sh[0][np.searchsorted(pf.times, a["time_s"])], atol=1e-4)
     # the command line: --relative with --storm, or with the run's track (none here)
-    monkeypatch.setenv("CM1VIEW_EXPORTS_DIR", str(tmp_path / "exports"))
+    monkeypatch.setenv("ATMO3D_EXPORTS_DIR", str(tmp_path / "exports"))
     P.save_set(run.path, ps)
     assert ex.main([run.path, "--parcels", "sr", "--relative", "80", "--storm",
                     f"{demo.STORM[0]},{demo.STORM[1]}"]) == 0
@@ -947,8 +947,8 @@ def test_viewer_tails_seen_moving_with_the_storm(pviewer):
 
 
 def test_figure_parcels_seen_moving_with_the_storm(reg, pcache):
-    from cm1view.figures import spec as fg
-    from cm1view.figures.render import FigureData
+    from atmo3d.figures import spec as fg
+    from atmo3d.figures.render import FigureData
     s, run = _par_spec(reg, tails="all")
     fd = FigureData()
     d = fd.panel_data(s)[0]
@@ -1039,9 +1039,9 @@ def test_figure_w_budget(reg, pcache):
     """w_budget_entries: a card per term in one panel; rates are the parcels' means of
     Dw/Dt, b, vpg and the rest; integrated, Δw and the integrals are 0 at the set's
     time and the integrals add up to Δw's integral."""
-    from cm1view.figures import draw as figdraw
-    from cm1view.figures import spec as fg
-    from cm1view.figures.render import FigureData
+    from atmo3d.figures import draw as figdraw
+    from atmo3d.figures import spec as fg
+    from atmo3d.figures.render import FigureData
     s, run = _par_series_spec(reg)
     pf = P.for_run(run)
     src = dict(name="up", rule=dict(t=4800.0, z=[0.5, 2.0], cap=150))
@@ -1095,7 +1095,7 @@ def test_traced_through_winds_read_in_parts(demo_run, monkeypatch):
     """Winds too large for the 3D cache: trajectories traced in boxes around bands of
     parcels (traced again in a wider box when their path leaves it) are the
     whole-volume ones to the bit, with the default margins and with none at all."""
-    from cm1view.core import fields as fmod, models, trajcalc
+    from atmo3d.core import fields as fmod, models, trajcalc
     ref = models.open_run(demo_run, workers=1)
     run = models.open_run(demo_run, workers=1)
     monkeypatch.setattr(run, "fits", lambda nbytes: False)

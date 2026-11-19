@@ -6,8 +6,8 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from cm1view.core import azim
-from cm1view.figures import draw as figdraw
+from atmo3d.core import azim
+from atmo3d.figures import draw as figdraw
 
 
 class _Fields(dict):

@@ -1,5 +1,5 @@
-"""The reader processes shared by every run (cm1view.core.pool) and the files a reader
-keeps open (cm1view.core.run.opened)."""
+"""The reader processes shared by every run (atmo3d.core.pool) and the files a reader
+keeps open (atmo3d.core.run.opened)."""
 import math
 import os
 import threading
@@ -8,8 +8,8 @@ from concurrent.futures import ThreadPoolExecutor
 
 import numpy as np
 
-from cm1view.core import pool
-from cm1view.core import run as R
+from atmo3d.core import pool
+from atmo3d.core import run as R
 
 
 def test_runs_share_one_pool(demo_run):
@@ -169,7 +169,7 @@ def test_ahead_keeps_order_and_width(demo_run):
 def test_tracking_ahead_matches_in_turn(reg, monkeypatch):
     """A track whose times are read ahead of the search (several at once, in the
     reader processes) is the track found one time after another."""
-    from cm1view.core import track
+    from atmo3d.core import track
     run = reg.get()[0]
     for metric in ("uh", "w"):
         opts = dict(metric=metric, zkm=1.0, radius=10.0, smooth=2.0, stop=None)

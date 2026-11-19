@@ -6,10 +6,10 @@ import json
 
 import pytest
 
-from cm1view.figures import draw as figdraw
-from cm1view.figures.kinds import KINDS
-from cm1view.figures.shell import docedit as de, gridview, nodes
-from cm1view.figures.shell.gridview import grid_map
+from atmo3d.figures import draw as figdraw
+from atmo3d.figures.kinds import KINDS
+from atmo3d.figures.shell import docedit as de, gridview, nodes
+from atmo3d.figures.shell.gridview import grid_map
 
 
 def sounding(run="r0", t=600.0):
@@ -280,7 +280,7 @@ class _Now:
 @pytest.fixture
 def shell(reg, monkeypatch):
     """The new layout showing the demo's example figure, drawing as it is asked."""
-    from cm1view.viewer import app as A
+    from atmo3d.viewer import app as A
     run, F = reg.get()
     v = A.Viewer(run, F, reg=reg)
     v.main()

@@ -4,7 +4,7 @@ The **Figure** workspace makes publication figures from anything in the viewer: 
 views, cross-sections, time–height plots, time series, soundings, distributions and 3D
 scenes, across times and runs. The figure is previewed at its final size, every change can be
 undone, and each saved figure comes with a stand-alone script and data that redraw the
-same image without cm1view.
+same image without atmo3d.
 
 This page covers how a figure starts, the editor's layout and how to save. The rest has a page
 each:

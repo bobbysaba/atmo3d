@@ -1,6 +1,6 @@
-# Using cm1view
+# Using atmo3d
 
-cm1view opens in your browser as one window with three **workspaces**, a **top bar**
+atmo3d opens in your browser as one window with three **workspaces**, a **top bar**
 that every workspace shares, and a set of **tools** down the left edge of the map. This
 page explains the parts of the window and what they have in common; the other pages take
 one area each.
@@ -160,7 +160,7 @@ netCDF file, to analyse them with your own tools:
 
 The dialog shows the size before compression. **Export** writes the file one time after
 another, so a long one can be opened while it grows; **Stop** ends it after the field
-it is on and keeps the times done (the file's `cm1view_incomplete` attribute says how
+it is on and keeps the times done (the file's `atmo3d_incomplete` attribute says how
 far it got). The default file is under `<exports_dir>/<parent>_<run>/data`, named after
 the fields and times.
 
@@ -171,23 +171,23 @@ also `level`, the index) coordinates, one variable per field (a derivative's
 the box, umove / vmove, a column field's layer. Storm-relative fields use the tracked
 storm motion where the track has a fix, else the domain motion, as the map does; that
 motion is in `storm_u`, `storm_v`. A time a field is missing from the output is NaN
-(`cm1view_missing` lists them). Winds and positions are grid-relative, as CM1 writes
+(`atmo3d_missing` lists them). Winds and positions are grid-relative, as CM1 writes
 them.
 
-Without the viewer (e.g. in a batch job), `cm1view export` does the same:
+Without the viewer (e.g. in a batch job), `atmo3d export` does the same:
 
 ```bash
-cm1view export /path/to/run --list                      # the run's field names
-cm1view export /path/to/run --fields winterp,zvort,uh25,ddz.winterp \
+atmo3d export /path/to/run --list                      # the run's field names
+atmo3d export /path/to/run --fields winterp,zvort,uh25,ddz.winterp \
     --from 60 --to 120 --every 2 --box -20,20,-10,30 --ztop 10
-cm1view export /path/to/run --fields thpert,srh03 --time 90 --heights 0.5,1,3 \
+atmo3d export /path/to/run --fields thpert,srh03 --time 90 --heights 0.5,1,3 \
     --out '~/data/{run}_{name}'
 ```
 
 `--track FILE` (default: the run's storm track file, if one is found) sets the storm
 motion of storm-relative fields, `--storm U,V` a fixed one; `--no-compress` writes
 faster, larger files; an existing file is replaced only with `--overwrite`. See
-`cm1view export -h`. `--parcels SET` writes a saved parcel set's trajectories instead
+`atmo3d export -h`. `--parcels SET` writes a saved parcel set's trajectories instead
 ([Parcels](parcels.md#exporting-a-set)).
 
 ## Switching runs

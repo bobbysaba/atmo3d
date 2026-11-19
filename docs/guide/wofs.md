@@ -1,12 +1,12 @@
 # WoFS and WRF ensemble output
 
-cm1view also reads the output of **WoFS** (the Warn-on-Forecast System) and of other
-DART-cycled WRF ensembles laid out the same way. A WoFS experiment is **one run** in cm1view;
+atmo3d also reads the output of **WoFS** (the Warn-on-Forecast System) and of other
+DART-cycled WRF ensembles laid out the same way. A WoFS experiment is **one run** in atmo3d;
 you choose which **member** (or the **ensemble mean**) to look at inside it, and the map,
 soundings, cross-sections, series, 3D views, figures and export work on it as on a CM1 run. This
 page covers what is different.
 
-To try it without data, run `cm1view --demo wofs`: a small synthetic ensemble (three members,
+To try it without data, run `atmo3d --demo wofs`: a small synthetic ensemble (three members,
 terrain that rises toward the east, a storm moving north-east).
 
 ## What is read
@@ -36,9 +36,9 @@ model. Auto-detect looks at the file names, so a WoFS folder is found without an
 *WoFS* to list only WoFS runs, or *CM1* for only CM1 runs. On the command line:
 
 ```
-cm1view /path/to/root                  # detected from the file names
-cm1view --model wofs /path/to/root
-cm1view export --model wofs ...        # likewise for the export command
+atmo3d /path/to/root                  # detected from the file names
+atmo3d --model wofs /path/to/root
+atmo3d export --model wofs ...        # likewise for the export command
 ```
 
 To look in a folder you type or paste into the picker, end it with `/` or press Enter. The
@@ -84,7 +84,7 @@ storm-relative winds draws them ground-relative.
 ## Heights
 
 WRF's model levels follow the terrain, so every column has its own heights, and they change
-with time. cm1view keeps the native levels and carries the true heights of every column.
+with time. atmo3d keeps the native levels and carries the true heights of every column.
 Wherever a height is asked for, you can use:
 
 - **Model level (k)**: the level number, as in the file;
@@ -115,7 +115,7 @@ base-state profile, so this is the closest equivalent.
 
 ## Trajectories
 
-WoFS writes no parcel files, so cm1view **traces** trajectories itself, through the 3D winds
+WoFS writes no parcel files, so atmo3d **traces** trajectories itself, through the 3D winds
 of the run: a lattice of parcels seeded at the first time, carried by the grid-relative winds
 with the true heights of each column, and kept at the output times. The result is stored in the
 cache folder and reused, so each run is traced once. They then appear everywhere CM1 parcels do
@@ -139,7 +139,7 @@ WoFS grids sit on the Earth (their map projection is in the files), so the map h
   labelled along the bottom (longitudes) and left (latitudes) edges of the domain.
 - Hovering over the map shows **lat, lon** under *x, y* and the value.
 
-Sessions keep these settings. The lines ship with cm1view (public-domain US Census and
+Sessions keep these settings. The lines ship with atmo3d (public-domain US Census and
 Natural Earth data); nothing is downloaded. Idealized CM1 runs have no Boundaries pill.
 
 In figures, plan views get a **Map boundaries** layer (*Add a layer* → *Map boundaries*): the
@@ -161,7 +161,7 @@ stops the reading that is no longer needed. What it means for the fields:
 - Fields in the files (temperature, winds, hydrometeors, reflectivity, WRF's 2D diagnostics
   such as hourly maxima) are **member means of the values**. The mean of reflectivity is
   therefore the mean of dBZ, not the dBZ of mean hydrometeors.
-- Fields that cm1view derives (e.g. CAPE, vorticity, buoyancy, gradients) are computed **from
+- Fields that atmo3d derives (e.g. CAPE, vorticity, buoyancy, gradients) are computed **from
   the mean state**, not averaged member by member. The two differ for non-linear fields;
   to get the mean of a derived field, compute it on each member and average.
 - The base state is the mean of the members' first-time fields, so perturbations are the

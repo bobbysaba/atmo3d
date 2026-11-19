@@ -2,8 +2,8 @@
 arrays and table settings the figure draws (draw.tbl_grid), so these use arrays of the shape
 spec.tbl_panel makes and need no run."""
 
-from cm1view.figures import batch, draw as figdraw, tablefile
-from cm1view.figures.spec import tables as st
+from atmo3d.figures import batch, draw as figdraw, tablefile
+from atmo3d.figures.spec import tables as st
 
 
 def arrays():

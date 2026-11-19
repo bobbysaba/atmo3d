@@ -4,8 +4,8 @@ from types import SimpleNamespace
 
 import numpy as np
 
-from cm1view.figures import spec as fg
-from cm1view.figures.shell import scrub
+from atmo3d.figures import spec as fg
+from atmo3d.figures.shell import scrub
 
 
 def fake_run(times):

@@ -4,8 +4,8 @@ import os
 
 import pytest
 
-from cm1view import registry
-from cm1view.viewer.picker import RunPicker
+from atmo3d import registry
+from atmo3d.viewer.picker import RunPicker
 
 
 @pytest.fixture
@@ -15,7 +15,7 @@ def runs_root(tmp_path, demo_root, monkeypatch):
     proj.mkdir(parents=True)
     for n in ("supercell", "supercell_weak"):
         os.symlink(os.path.join(demo_root, "demo", n), proj / n)
-    monkeypatch.setenv("CM1VIEW_RUNS_ROOT", str(tmp_path / "root"))
+    monkeypatch.setenv("ATMO3D_RUNS_ROOT", str(tmp_path / "root"))
     monkeypatch.setattr(registry, "recent_runs", lambda: [])
     return tmp_path / "root"
 
@@ -74,7 +74,7 @@ def test_enter_looks_in_a_typed_folder(runs_root):
 
 
 def test_shared_folders_never_searched(runs_root, monkeypatch):
-    from cm1view import config
+    from atmo3d import config
     looked = []
     monkeypatch.setattr(RunPicker, "_runs_under", lambda self, f: looked.append(f))
     p = RunPicker()

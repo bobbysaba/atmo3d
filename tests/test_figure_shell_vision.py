@@ -4,7 +4,7 @@ import io
 import numpy as np
 from matplotlib import image as mimg
 
-from cm1view.figures.shell import vision
+from atmo3d.figures.shell import vision
 
 
 def png_of(arr):

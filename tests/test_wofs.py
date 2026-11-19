@@ -9,10 +9,10 @@ import netCDF4
 import numpy as np
 import pytest
 
-from cm1view import config, registry
-from cm1view.core import models, wofs
-from cm1view.core.fields import Fields
-from cm1view.demo_wofs import PROJ
+from atmo3d import config, registry
+from atmo3d.core import models, wofs
+from atmo3d.core.fields import Fields
+from atmo3d.demo_wofs import PROJ
 from conftest import txt
 
 NI, NJ, NK, NC = 8, 6, 5, 3  # mass points, levels, cycles (every 3 minutes)
@@ -135,7 +135,7 @@ def test_experiment_is_one_run(wofs_root, tmp_path):
                                             ("9", "mem01"), ("junk", "mem01")])
 def test_member_opened_first_is_a_setting(wofs_root, monkeypatch, setting, opens):
     exp = os.path.dirname(wofs_root)
-    monkeypatch.setenv("CM1VIEW_WOFS_MEMBER", setting)
+    monkeypatch.setenv("ATMO3D_WOFS_MEMBER", setting)
     assert models.canonical(exp) == os.path.join(exp, opens)
     run = models.open_run(exp, workers=1)
     assert run.path == os.path.join(exp, opens)
@@ -170,7 +170,7 @@ def test_member_run(wofs_root):
     assert run.dx == pytest.approx(1000.0) and run.dy == pytest.approx(1000.0)
     np.testing.assert_allclose(run.zf, 0.5 * np.arange(NK + 1), atol=1e-4)
     np.testing.assert_allclose(run.z, 0.25 + 0.5 * np.arange(NK), atol=1e-4)
-    # names: cm1view's where there is one, else WRF's; nothing off the model grid
+    # names: atmo3d's where there is one, else WRF's; nothing off the model grid
     for n in ("th", "prs", "qv", "qc", "qr", "qi", "qs", "qg", "qhl", "dbz", "uinterp",
               "vinterp", "winterp", "th0", "prs0", "qv0", "u0", "v0", "PH", "HGT",
               "UP_HELI_MAX", "zagl", "zmsl"):
@@ -300,7 +300,7 @@ def test_registry_keeps_members_apart(wofs_root):
 
 
 def test_picker_lists_the_experiment(wofs_root, tmp_path, monkeypatch):
-    from cm1view.viewer.picker import RunPicker
+    from atmo3d.viewer.picker import RunPicker
     monkeypatch.setattr(registry, "recent_runs", lambda: [])
     exp = os.path.dirname(wofs_root)
     p = RunPicker()
@@ -323,7 +323,7 @@ def _w_at(h_agl, c):
 def test_section_on_terrain(wofs_root):
     """A section across the slope: above sea level, from the lowest ground along it,
     each column on its own heights, blank under the ground; the figure's the same."""
-    from cm1view.core import render
+    from atmo3d.core import render
     run = models.open_run(os.path.join(wofs_root, "mem02"), workers=1)
     F, c = Fields(run), 2
     s, fi, fj, _ = render.section_coords(run, (run.xh[0], 0.0), (run.xh[-1], 0.0))
@@ -338,8 +338,8 @@ def test_section_on_terrain(wofs_root):
     # a top under the lowest ground: that far above it
     assert render.section_span(run, fi, fj, 0.3)[:2] == (0.1, 0.4)
     # the figure: same heights, the ground, limits from the bottom
-    from cm1view.figures import spec as fg
-    from cm1view.figures.spec import arrays
+    from atmo3d.figures import spec as fg
+    from atmo3d.figures.spec import arrays
     sp = fg.default_spec(run, F, 1)
     sp.update(kind="xsec", layers=[fg.layer_defaults("fill", F, "winterp")])
     sp["sections"] = [fg.section_defaults(orient="ab", pos="fixed", a=[run.xh[0], 0.0],
@@ -354,7 +354,7 @@ def test_section_on_terrain(wofs_root):
 
 
 def test_sounding_on_the_columns_heights(wofs_root):
-    from cm1view.figures.spec import panels
+    from atmo3d.figures.spec import panels
     run = models.open_run(os.path.join(wofs_root, "mem02"), workers=1)
     r = panels.sounding_column(run, dict(time_s=360.0, where=dict(kind="pt", x=3.5, y=0.0,
                                                                    avg=0.0)), {})
@@ -363,7 +363,7 @@ def test_sounding_on_the_columns_heights(wofs_root):
 
 
 def test_column_fields_and_ddz_on_own_heights(wofs_root):
-    from cm1view.core.fields import column_levels_3d
+    from atmo3d.core.fields import column_levels_3d
     run = models.open_run(os.path.join(wofs_root, "mem02"), workers=1)
     F, c = Fields(run), 2
     dz = _dz(c)
@@ -386,7 +386,7 @@ def test_column_fields_and_ddz_on_own_heights(wofs_root):
 def test_series_on_own_heights(wofs_root, monkeypatch):
     """Series at a height and over a layer: each column on its own heights (the
     reader process reads them)."""
-    from cm1view.core import series as ser
+    from atmo3d.core import series as ser
     monkeypatch.setattr(ser, "store", lambda *a, **k: None)
     run = models.open_run(os.path.join(wofs_root, "mem02"), workers=1)
     F = Fields(run)
@@ -411,7 +411,7 @@ def test_series_on_own_heights(wofs_root, monkeypatch):
 def test_points_on_own_heights(wofs_root):
     """3D points (km MSL) placed among their column's levels: w = k + 0.5 + c at mass
     level k, between two columns bilinear; a single column like np.interp."""
-    from cm1view.core import volume3d
+    from atmo3d.core import volume3d
     run = models.open_run(os.path.join(wofs_root, "mem02"), workers=1)
     F, c = Fields(run), 2
     H, W = run.heights(c, "msl"), F.volume("winterp", c)
@@ -435,7 +435,7 @@ def test_scene_on_terrain(wofs_root):
     """The 3D scene above sea level: isosurface vertices at their columns' level
     heights, the ground drawn (the floor on it), vectors that far above the ground,
     streamlines between each column's lowest level and the top."""
-    from cm1view.core import volume3d
+    from atmo3d.core import volume3d
     run = models.open_run(os.path.join(wofs_root, "mem02"), workers=1)
     F, c = Fields(run), 2
     H = run.heights(c, "msl")
@@ -468,7 +468,7 @@ def test_scene_on_terrain(wofs_root):
     fig = volume3d.scene_figure(sc["meshes"], None, box, 3.0, 2.0, terrain=sc["terrain"])
     assert fig.data[0].name == "ground" and fig.layout.scene.zaxis.title.text == "z (km MSL)"
     # the figure's arrays keep the ground, the per-point vector heights and the ring
-    from cm1view.figures.draw import scene3d
+    from atmo3d.figures.draw import scene3d
     a = scene3d.scene_arrays(scene3d.scene_data(sc, box, 3.0))
     np.testing.assert_allclose(a["terrain"]["z"], run.terrain_height(), atol=1e-6)
     assert np.shape(a["vecs"][0]["z"]) == np.shape(v["x"]) and a["ground"]["z"] is not None
@@ -479,7 +479,7 @@ def test_scene_on_terrain_read_in_parts(wofs_root, monkeypatch):
     """A terrain run's 3D scene whose fields do not fit the 3D cache (its box and the
     level heights there read alone) is the whole-volume scene; so are the points of a
     streamline placed among their columns' levels from those columns alone."""
-    from cm1view.core import volume3d
+    from atmo3d.core import volume3d
     path = os.path.join(wofs_root, "mem02")
     ref, run, c = models.open_run(path, workers=1), models.open_run(path, workers=1), 2
     monkeypatch.setattr(run, "fits", lambda nbytes: False)
@@ -517,9 +517,9 @@ def test_traced_trajectories(wofs_root, tmp_path, monkeypatch):
     """No parcel output: trajectories traced through the 3D winds (once, to the cache),
     above sea level, never under their column's lowest level, read like CM1's; turned
     off when the output is less often than the setting."""
-    from cm1view.core import parcels as P, trajcalc, volume3d
+    from atmo3d.core import parcels as P, trajcalc, volume3d
     monkeypatch.setattr(P, "CACHE_DIR", str(tmp_path / "parcels"))
-    monkeypatch.delenv("CM1VIEW_TRAJ_MAX_INTERVAL", raising=False)
+    monkeypatch.delenv("ATMO3D_TRAJ_MAX_INTERVAL", raising=False)
     run = models.open_run(os.path.join(wofs_root, "mem02"), workers=1)
     F = Fields(run)
     assert run.traced_parcels and P.offered(run) and trajcalc.interval(run) == 180.0
@@ -540,9 +540,9 @@ def test_traced_trajectories(wofs_root, tmp_path, monkeypatch):
     assert ok.any() and (tr["x"][-1][ok] > tr["x"][0][ok]).all()  # (u > 0 everywhere)
     assert (tr["z"][-1][ok] > tr["z"][0][ok]).all()  # (w > 0 everywhere)
     assert P.for_run(run, F) is pf  # (the same files: kept)
-    monkeypatch.setenv("CM1VIEW_TRAJ_MAX_INTERVAL", "120")
+    monkeypatch.setenv("ATMO3D_TRAJ_MAX_INTERVAL", "120")
     assert "180 s" in trajcalc.off(run) and P.for_run(run, F) is None and P.offered(run)
-    monkeypatch.setenv("CM1VIEW_TRAJ_MAX_INTERVAL", "0")  # (0: never off)
+    monkeypatch.setenv("ATMO3D_TRAJ_MAX_INTERVAL", "0")  # (0: never off)
     assert trajcalc.off(run) == ""
 
 
@@ -552,7 +552,7 @@ def test_traced_trajectories_read_in_parts(wofs_root, tmp_path, monkeypatch):
     every band has to be traced again in a wider box; and a field sampled along them
     from the columns around the parcels on those columns' own heights is the one
     sampled from its volume."""
-    from cm1view.core import fields as fmod, parcels as P, trajcalc
+    from atmo3d.core import fields as fmod, parcels as P, trajcalc
     from test_parcels import _spy_parts
     monkeypatch.setattr(P, "CACHE_DIR", str(tmp_path / "parcels"))
     path = os.path.join(wofs_root, "mem02")
@@ -655,10 +655,10 @@ def test_mean_source_split():
 def test_mean_series_and_trajectories(wofs_root, tmp_path, monkeypatch):
     """Series read the mean in reader processes; trajectories follow the mean winds,
     traced to their own file (not a member's)."""
-    from cm1view.core import parcels as P, series as ser, trajcalc
+    from atmo3d.core import parcels as P, series as ser, trajcalc
     monkeypatch.setattr(ser, "store", lambda *a, **k: None)
     monkeypatch.setattr(P, "CACHE_DIR", str(tmp_path / "parcels"))
-    monkeypatch.setenv("CM1VIEW_TRAJ_MAX_INTERVAL", "0")
+    monkeypatch.setenv("ATMO3D_TRAJ_MAX_INTERVAL", "0")
     run = models.open_run(os.path.join(wofs_root, "mean"), workers=1)
     m2 = models.open_run(os.path.join(wofs_root, "mem02"), workers=1)
     rec = ser.normalize(dict(region="domain", reduce="max", field="uinterp",
@@ -684,9 +684,9 @@ def test_registry_and_figures_open_the_mean(wofs_root):
 
 
 def test_demo_ensemble(tmp_path):
-    """The synthetic demo (cm1view --demo wofs): found as a root, opens, has terrain, and a
+    """The synthetic demo (atmo3d --demo wofs): found as a root, opens, has terrain, and a
     storm that shows in reflectivity and updraft helicity; the mean differs from a member."""
-    from cm1view import demo, demo_wofs
+    from atmo3d import demo, demo_wofs
     root = demo_wofs.make(str(tmp_path))
     assert demo_wofs.make(str(tmp_path)) == root  # (up to date: not rewritten)
     assert wofs.members(root) == [1, 2, 3]
@@ -720,8 +720,8 @@ def test_ground_relative_winds_only(wofs_root):
     """No storm motion for WoFS yet: winds are ground-relative only, and the fields
     that take a storm motion (storm-relative helicity, STP, SCP, streamwise
     vorticity) are left out; a saved storm-relative frame draws ground-relative."""
-    from cm1view.core import vectors
-    from cm1view.core.volume3d import frame_offset
+    from atmo3d.core import vectors
+    from atmo3d.core.volume3d import frame_offset
     run = models.open_run(os.path.join(wofs_root, "mem02"), workers=1)
     assert not run.storm_relative
     assert vectors.frames(run) == {"Ground-relative": "ground"}
@@ -739,7 +739,7 @@ def test_mean_reports_members_and_stops_when_cancelled(wofs_root, workers):
     """Reads within reporting() say how many members of the mean are read so far,
     and stop (Cancelled, nothing half-read cached) once the block is cancelled; an
     explicit cancelled argument still makes load_volumes return False."""
-    from cm1view.core.run import Cancelled, reporting
+    from atmo3d.core.run import Cancelled, reporting
     run = models.open_run(os.path.join(wofs_root, "mean"), workers=workers)
     seen = []
     with reporting(lambda d, n, w: seen.append((d, n, w))):
@@ -764,7 +764,7 @@ def test_mean_reports_members_and_stops_when_cancelled(wofs_root, workers):
 
 def test_map_says_the_mean_is_being_read(wofs_root):
     """The map's status while a slow map is made: what is read, for how long."""
-    from cm1view.viewer.mapview import MapView
+    from atmo3d.viewer.mapview import MapView
     v = type("V", (), {"run": models.open_run(os.path.join(wofs_root, "mean"),
                                               workers=1)})()
     html = MapView._map_loading_html(v, (0, 1, "th · 18/36 members"), 4.2)
@@ -779,8 +779,8 @@ def test_map_boundaries_and_lat_lon(wofs_root):
     """A WoFS map gets a Boundaries pill: layers shown / hidden and restyled in the
     browser only, lat/lon lines with labels, lat, lon in the hover, all kept in a
     session.  A CM1 run has none of it (see test_session for the CM1 viewer)."""
-    from cm1view.registry import Registry
-    from cm1view.viewer import app as A
+    from atmo3d.registry import Registry
+    from atmo3d.viewer import app as A
     reg = Registry(os.path.join(wofs_root, "mem02"), 4, 2)
     run, F = reg.get()
     v = A.Viewer(run, F, reg=reg)
@@ -826,9 +826,9 @@ def test_figure_map_boundaries(wofs_root, tmp_path):
     A run without a projection: no layer in a new figure, a note if one is there."""
     import matplotlib
     matplotlib.use("Agg")
-    from cm1view.core import geo
-    from cm1view.figures import draw as figdraw, spec as fg
-    from cm1view.figures.spec import arrays, bundle
+    from atmo3d.core import geo
+    from atmo3d.figures import draw as figdraw, spec as fg
+    from atmo3d.figures.spec import arrays, bundle
     run = models.open_run(os.path.join(wofs_root, "mem02"), workers=1)
     F = Fields(run)
     sp = fg.default_spec(run, F, 1)
@@ -874,10 +874,10 @@ def test_figure_map_boundaries(wofs_root, tmp_path):
 def test_member_switch_loads_the_same_storm(wofs_root, tmp_path, monkeypatch):
     """Each member has its own track file; the Member box shows another member (in
     place) on the storm shown (by name), from that member's file, or says it has none."""
-    from cm1view.registry import Registry
-    from cm1view.viewer import app as A
-    from cm1view.core import track as trk
-    monkeypatch.setenv("CM1VIEW_EXPORTS_DIR", str(tmp_path / "exports"))
+    from atmo3d.registry import Registry
+    from atmo3d.viewer import app as A
+    from atmo3d.core import track as trk
+    monkeypatch.setenv("ATMO3D_EXPORTS_DIR", str(tmp_path / "exports"))
 
     def write(path, x):
         os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -922,10 +922,10 @@ def test_member_switch_keeps_the_view_without_a_reload(wofs_root, tmp_path, monk
     own run and the address follow.  A run on another grid reopens the page."""
     import copy
     import json
-    from cm1view.registry import Registry
-    from cm1view.viewer import app as A
-    from cm1view.viewer import swap
-    monkeypatch.setenv("CM1VIEW_EXPORTS_DIR", str(tmp_path / "exports"))
+    from atmo3d.registry import Registry
+    from atmo3d.viewer import app as A
+    from atmo3d.viewer import swap
+    monkeypatch.setenv("ATMO3D_EXPORTS_DIR", str(tmp_path / "exports"))
     reg = Registry(os.path.join(wofs_root, "mem02"), 4, 2)
     run, F = reg.get()
     v = A.Viewer(run, F, reg=reg)

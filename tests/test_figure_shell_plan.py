@@ -10,8 +10,8 @@ import pytest
 
 from conftest import new_spec
 
-from cm1view.figures import draw as figdraw
-from cm1view.figures.shell import docedit as de, looks
+from atmo3d.figures import draw as figdraw
+from atmo3d.figures.shell import docedit as de, looks
 
 
 def small():
@@ -390,7 +390,7 @@ class _St:
     """A row of the settings table, enough for Scope."""
 
     def __init__(self, key, default=None):
-        from cm1view.figures.settings import RAW
+        from atmo3d.figures.settings import RAW
         self.key, self.default, self.as_ = key, default, RAW
 
 
@@ -459,7 +459,7 @@ class _Now:
 
 @pytest.fixture
 def shell(reg, monkeypatch):
-    from cm1view.viewer import app as A
+    from atmo3d.viewer import app as A
     run, F = reg.get()
     v = A.Viewer(run, F, reg=reg)
     v.main()
@@ -485,7 +485,7 @@ def in_panel_doc(shell, pid):
 def own_bars(shell):
     """A colorbar per panel: each panel then controls its bar and shows its colours (on a
     shared bar only the first panel does)."""
-    from cm1view.figures import spec as fg
+    from atmo3d.figures import spec as fg
     d = fg.plain_copy(shell.doc)
     d["style"].setdefault("colorbar", {})["mode"] = "each"
     shell._take(d)

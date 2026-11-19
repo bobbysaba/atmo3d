@@ -10,7 +10,7 @@ def test_motion_section_ends_turn_with_the_motion():
     """Along / across the storm motion: behind -> ahead and left -> right of the
     tracked motion, centred ahead / right of the storm; mwin: a mean motion."""
     from types import SimpleNamespace
-    from cm1view.figures import spec as fg
+    from atmo3d.figures import spec as fg
     run = SimpleNamespace(umove=0.0, vmove=0.0, dx=1000.0, dy=1000.0,
                           xh=np.arange(100.0) + 0.5, yh=np.arange(100.0) + 0.5,
                           times=np.array([0.0, 300.0, 600.0, 900.0]))
@@ -48,7 +48,7 @@ def _a_saved_figure(folder, name, when):
 
 
 def test_gallery_newest_first_by_folder_and_more(ed, tmp_path, monkeypatch):
-    from cm1view.figures import quick
+    from atmo3d.figures import quick
     monkeypatch.setattr(quick, "GALLERY_STEP", 2)
     monkeypatch.setattr(ed, "_fig_dir", str(tmp_path / "root" / "own"))
     listed = quick.saved_list
@@ -80,7 +80,7 @@ def test_gallery_newest_first_by_folder_and_more(ed, tmp_path, monkeypatch):
 
 
 def test_gallery_with_nothing_saved(ed, tmp_path, monkeypatch):
-    from cm1view.figures import quick
+    from atmo3d.figures import quick
     monkeypatch.setattr(ed, "_fig_dir", str(tmp_path / "own"))
     listed = quick.saved_list
     monkeypatch.setattr(quick, "saved_list",
@@ -94,8 +94,8 @@ def test_gallery_with_nothing_saved(ed, tmp_path, monkeypatch):
 def test_thumbnails_of_older_figures_and_redrawn_images(tmp_path):
     import os
     from PIL import Image
-    from cm1view.figures import spec as fg
-    from cm1view.figures.export import make_thumb, saved_thumb
+    from atmo3d.figures import spec as fg
+    from atmo3d.figures.export import make_thumb, saved_thumb
     spec = _a_saved_figure(str(tmp_path), "a", 1000)
     assert saved_thumb(spec) is None  # none yet: made from the image, and kept
     assert make_thumb(spec) == saved_thumb(spec)
@@ -115,7 +115,7 @@ def test_thumbnails_of_older_figures_and_redrawn_images(tmp_path):
 
 def test_a_thumbnail_for_a_closed_dialog_is_dropped(ed, tmp_path):
     import panel as pn
-    from cm1view.figures import quick
+    from atmo3d.figures import quick
     spec = _a_saved_figure(str(tmp_path), "a", 1000)
     b = pn.widgets.Button(name="a", stylesheets=[quick._thumb_css()])
     gen = ed._gallery_gen
@@ -129,7 +129,7 @@ def test_a_series_no_longer_shown_stops(ed, monkeypatch):
     """A series job whose recipe the figure no longer needs (e.g. its region changed
     from around the storm to the whole domain) stops, and one queued behind another
     does not start; both start again (from the times kept) when needed again."""
-    from cm1view.figures import render
+    from atmo3d.figures import render
     calls = []
 
     def compute(run, F, recipe, ds, centers, storm, on_result=None, cancelled=None):
@@ -152,7 +152,7 @@ def test_a_series_no_longer_shown_stops(ed, monkeypatch):
 
 
 def test_time_windows_stop_for_a_newer_preview(ed):
-    from cm1view.core import azim, joint
+    from atmo3d.core import azim, joint
     ts = list(range(len(ed.run.times)))
     stop = lambda: True  # noqa: E731
     assert joint.compute(ed.run, ed.F, dict(field="winterp"), ts, cancelled=stop) is None
@@ -163,7 +163,7 @@ def test_time_windows_stop_for_a_newer_preview(ed):
 def test_time_height_range_is_the_layer():
     import xarray as xr
     from types import SimpleNamespace
-    from cm1view.figures import spec as fg
+    from atmo3d.figures import spec as fg
     z = np.arange(0.125, 10.0, 0.25)  # (level centres of a 0–10 km layer)
     ds = xr.Dataset(dict(computed=("t", np.ones(3, dtype=int)), value=("t", np.zeros(3)),
                          profile=(("t", "z"), np.ones((3, z.size))), z=("z", z)))
@@ -176,7 +176,7 @@ def test_time_height_range_is_the_layer():
 
 
 def test_number_boxes_round_float_tails():
-    from cm1view.viewer.numinput import FloatInput, tidy
+    from atmo3d.viewer.numinput import FloatInput, tidy
     w = FloatInput(name="x", value=float(np.float32(0.01)), step=0.001)
     assert w.value == 0.01
     w._process_events({"value": 0.008 + 0.001})  # (the arrows' step, in the browser)
@@ -187,7 +187,7 @@ def test_number_boxes_round_float_tails():
 
 
 def test_sounding_table_lists_every_parameter(ed):
-    from cm1view.figures import draw as figdraw
+    from atmo3d.figures import draw as figdraw
     ed.from_soundings()
     keys = [k for k, _, _ in figdraw.SND_PARAMS]
     assert sorted(ed.sk["table"].options.values()) == sorted(keys)
@@ -263,7 +263,7 @@ def test_sounding_storm_motion_ring_and_inset(ed):
 
 
 def test_grid_layout_places_parts_and_sizes_cells():
-    from cm1view.figures import draw as figdraw
+    from atmo3d.figures import draw as figdraw
     tall, wide = dict(size=[8.0, 8.0]), dict(size=[6.0, 4.0])
     g = figdraw.grid_layout([dict(tall, place=[0, 0, 2, 1]), wide, wide],
                             dict(rows=2, cols=2))

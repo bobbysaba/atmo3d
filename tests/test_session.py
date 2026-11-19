@@ -34,11 +34,11 @@ def _set_up(v):
 def test_session_round_trip(viewer, reg, tmp_path):
     """Saved, then loaded into a fresh viewer: the same state, one redraw with the
     difference and the extra layers, the view kept for the browser's re-fit."""
-    from cm1view.viewer import app as A
+    from atmo3d.viewer import app as A
     v = viewer
     _set_up(v)
     s1 = v.session_state()
-    assert s1["cm1view_session"] == 1 and s1["run"] == os.path.abspath(v.run.path)
+    assert s1["atmo3d_session"] == 1 and s1["run"] == os.path.abspath(v.run.path)
     assert s1["track"]["fixes"][0][1]["value"] is None  # NaN as JSON null
     path = str(tmp_path / "s" / "session.json")
     v._save_session(path)
@@ -96,7 +96,7 @@ def test_session_of_another_run_reopens_the_page(viewer, demo_root, tmp_path):
 
 
 def test_not_a_session_file(viewer, tmp_path):
-    from cm1view.viewer import session
+    from atmo3d.viewer import session
     p = tmp_path / "x.json"
     p.write_text('{"a": 1}')
     with pytest.raises(ValueError):
@@ -110,7 +110,7 @@ PARTS = ("soundings", "section", "view3d", "series", "distributions")
 
 
 def _fresh(reg):
-    from cm1view.viewer import app as A
+    from atmo3d.viewer import app as A
     run, F = reg.get()
     v = A.Viewer(run, F, reg=reg)
     v.main()
@@ -215,7 +215,7 @@ def test_session_of_the_map_only_keeps_the_rest(viewer):
 def test_session_keeps_the_figure(viewer, reg, tmp_path):
     """A figure of the user's goes in the session and comes back, with its save path and
     without running its code; only the example stays out."""
-    from cm1view.viewer import app as A
+    from atmo3d.viewer import app as A
     v = viewer
     assert "figure" not in v.session_state()  # the example alone
     ed = v.figed
@@ -264,7 +264,7 @@ def _autosaved(ed):
 def test_autosave_keeps_changes_and_the_earlier_figure(viewer, reg):
     """Nothing is written for the example; a changed figure is; a new page offers it and
     its first write keeps it to one side."""
-    from cm1view.viewer import app as A
+    from atmo3d.viewer import app as A
     ed = viewer.figed
     for name in (ed._auto_path(), ed._auto_path("figure_earlier.json")):
         if os.path.exists(name):

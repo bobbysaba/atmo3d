@@ -8,8 +8,8 @@ import netCDF4
 import numpy as np
 import pytest
 
-from cm1view import config
-from cm1view.core import track as trk
+from atmo3d import config
+from atmo3d.core import track as trk
 
 
 def test_theta_rho_matches_the_definition(reg):
@@ -104,7 +104,7 @@ def test_derivatives_of_any_field(reg):
     """'ddz.w', 'ddx.', 'ddy.', 'gradh.' (per km): not in the field lists; maps (at a
     level or a height) agree with the volume's np.gradient on the stretched levels, so
     maps and cross-sections agree; ∂/∂z only of 3D fields."""
-    from cm1view.core.fields import deriv_name, deriv_options, split_deriv
+    from atmo3d.core.fields import deriv_name, deriv_options, split_deriv
     run, F = reg.get()
     T, K = 4, 6
     assert split_deriv("ddz.winterp") == ("ddz", "winterp")
@@ -184,7 +184,7 @@ def test_column_fields(reg):
     """Updraft helicity integrates w ζ over exactly its layer (cells between the zf levels,
     clipped to it); the maxima are over the levels whose cells reach into the layer; the
     fields are 2D and have horizontal derivatives."""
-    from cm1view.core.fields import column_levels
+    from atmo3d.core.fields import column_levels
     run, F = reg.get()
     T = 4
     assert F["uh25"].group == "Column fields" and F["uh25"].ndim == 2
@@ -214,8 +214,8 @@ def test_sounding_kinematics_match_the_soundings(reg):
     """Bulk shear and storm-relative helicity maps give the sounding analysis's values
     at sampled columns (helicity to ~1%: the sounding's 10 m grid stops short of the
     layer top); helicity follows the storm motion it is given, shear does not."""
-    from cm1view.core import thermo
-    from cm1view.core.fields import column_levels
+    from atmo3d.core import thermo
+    from atmo3d.core.fields import column_levels
     run, F = reg.get()
     T, storm = 4, (10.0, 5.0)
     assert F["srh01"].group == "Sounding parameters" and F["srh01"].ndim == 2
@@ -245,7 +245,7 @@ def test_parcel_maps_match_the_soundings(reg, monkeypatch):
     """CAPE, CIN and LCL maps of the SB, ML and MU parcels give the sounding analysis's
     values at sampled columns, STP its fixed-layer STP (to the ~1% of its helicity);
     with a column stride, each block shows its middle column, in a series too."""
-    from cm1view.core import fields as FF, series as S, thermo
+    from atmo3d.core import fields as FF, series as S, thermo
     run, F = reg.get()
     T, storm = 4, (10.0, 5.0)
     assert F["mlcape"].group == "Sounding parameters" and F["mlcape"].ndim == 2
@@ -287,7 +287,7 @@ def test_cf_style_output_reads_like_cm1s_own(reg, demo_run, tmp_path_factory):
     """Newer CM1 writes CF-style names (dims xh/xf, yh/yf, zh/zf; heights in "zh"): the
     same run in that layout opens and reads exactly as in CM1's own (ni/nip1, z)."""
     import synthetic as demo
-    from cm1view.core import export
+    from atmo3d.core import export
     path = str(tmp_path_factory.mktemp("cf") / "supercell_cf")
     demo.write_run(path, cf=True, **demo.RUNS["supercell"])
     with netCDF4.Dataset(os.path.join(path, "cm1out_000002.nc")) as d:
@@ -335,8 +335,8 @@ def test_own_heights_helpers_match_one_profile(reg):
     """The per-column versions (terrain runs) of the column-field helpers give the
     one-profile results when every column has the same heights; a flat run's sections
     are the same with or without a time; parcel maps take per-column heights."""
-    from cm1view.core import render, thermo
-    from cm1view.core.fields import (at_height, bulk_shear, column_levels,
+    from atmo3d.core import render, thermo
+    from atmo3d.core.fields import (at_height, bulk_shear, column_levels,
                                      column_levels_3d, ddz_volume, helicity, layer_sum)
     run, F = reg.get()
     T = 4
@@ -375,7 +375,7 @@ def test_levels_read_together_match_single_levels(demo_run, monkeypatch):
     they are worth it) gives what read_level gives one level at a time: staggered
     fields, levels out of order, a subset of the columns, a cached field; and
     read_heights what read_height gives."""
-    from cm1view.core import run as R
+    from atmo3d.core import run as R
     T, ks = 4, [3, 4, 5, 9, 2]
     names = ["th", "u", "v", "w"]
     rows, cols = np.array([0, 5, 6, 20]), np.array([1, 2, 30])
@@ -405,7 +405,7 @@ def test_levels_read_together_match_single_levels(demo_run, monkeypatch):
 def test_volumes_in_slabs_match_whole_volumes(reg, monkeypatch):
     """A derived volume and a derivative's, computed slab by slab on threads
     (fields.by_slabs), are the values of the whole volume computed at once."""
-    from cm1view.core import fields as FF
+    from atmo3d.core import fields as FF
     T, run = 4, reg.get()[0]
 
     def drop():  # (the derived volumes kept in the 3D cache)
@@ -434,7 +434,7 @@ def test_volumes_in_slabs_match_whole_volumes(reg, monkeypatch):
 def test_take_scales_the_part_taken(reg):
     """Fields.take / raw: part of a scaled native (qv, g/kg) without a scaled copy of
     the volume, the same values as the part of volume()."""
-    from cm1view.core import fields as FF
+    from atmo3d.core import fields as FF
     run = reg.get()[0]
     T, F = 4, FF.Fields(run)
     vol, scale = F.raw("qv", T)
@@ -446,7 +446,7 @@ def test_take_scales_the_part_taken(reg):
 
 
 def test_planes_kept_within_a_byte_budget(reg, monkeypatch):
-    from cm1view.core import fields as FF
+    from atmo3d.core import fields as FF
     F = FF.Fields(reg.get()[0])
     one = F.plane("winterp", 4, "level", 0).nbytes
     monkeypatch.setattr(FF, "PLANE_SHARE", 1 << 60)  # (the floor is the budget)
@@ -465,7 +465,7 @@ def test_parts_of_fields_match_their_volumes(reg, demo_run, monkeypatch):
     with gradients, a derivative) are its volume's values, and no volume is read.  With
     reads small enough to stay in this process, then in the reader processes."""
     from scipy.ndimage import map_coordinates
-    from cm1view.core import fields as FF, render, run as R
+    from atmo3d.core import fields as FF, render, run as R
     T, G = 2, reg.get()[1]
     run = R.CM1Run(demo_run, cache_gb=1, workers=2)
     F = FF.Fields(run)
@@ -516,7 +516,7 @@ def test_3d_scene_read_in_parts_matches(reg, demo_run, monkeypatch):
     stride; the streamlines' winds just around it): fields thinned to a stride, its
     isosurfaces and streamlines, and fields along a streamline are the whole-volume
     ones, and no volume enters the cache."""
-    from cm1view.core import fields as FF, run as R, volume3d
+    from atmo3d.core import fields as FF, run as R, volume3d
     T, (ref, G) = 2, reg.get()
     run = R.CM1Run(demo_run, cache_gb=1, workers=2)
     F = FF.Fields(run)
@@ -571,7 +571,7 @@ def test_3d_scene_read_in_parts_matches(reg, demo_run, monkeypatch):
 def test_work_too_large_for_the_cache_matches(reg, demo_run, monkeypatch):
     """An azimuthal mean, a distribution and an export of fields that do not fit the
     3D cache are the ones made from their volumes."""
-    from cm1view.core import azim, dist, export, fields as FF, run as R
+    from atmo3d.core import azim, dist, export, fields as FF, run as R
     T, (ref, G) = 2, reg.get()
     run = R.CM1Run(demo_run, cache_gb=1, workers=2)
     F = FF.Fields(run)

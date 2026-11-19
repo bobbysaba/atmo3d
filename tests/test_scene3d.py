@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 from skimage.measure import marching_cubes
 
-from cm1view.figures.draw import scene3d
+from atmo3d.figures.draw import scene3d
 from conftest import render
 
 BOX = (0.0, 40.0, 0.0, 40.0)
@@ -116,7 +116,7 @@ def _scene_panel_data():
 
 
 def test_scene_data_round_trips_through_the_saved_arrays():
-    from cm1view.figures.spec import bundle
+    from atmo3d.figures.spec import bundle
     d = _scene_panel_data()
     back = bundle.unflatten({k: np.asarray(v) for k, v in bundle.flatten({0: d}).items()})[0]
     a = scene3d.scene_arrays(back)
@@ -143,7 +143,7 @@ def test_reflectivity_floor_steps_every_5_dbz():
 
 def test_scene_figure_draws_the_picture_ticks_legend_and_colorbars():
     pytest.importorskip("pyvista")
-    from cm1view.figures import draw as figdraw
+    from atmo3d.figures import draw as figdraw
     fig = figdraw.draw(_scene_spec(), {0: _scene_panel_data()})
     ax = fig._cv_axes[0]
     (im,) = ax.images
@@ -169,7 +169,7 @@ def test_scene_figure_draws_the_picture_ticks_legend_and_colorbars():
 def test_scene_figure_bundle_redraws_from_its_script(tmp_path):
     pytest.importorskip("pyvista")
     import runpy
-    from cm1view.figures.spec import bundle
+    from atmo3d.figures.spec import bundle
     out = bundle.save_bundle(_scene_spec(), {0: _scene_panel_data()}, str(tmp_path / "s3d"))
     first = (tmp_path / "s3d.png").stat().st_mtime_ns
     assert "pyvista" in open(out["script"]).read()
@@ -234,8 +234,8 @@ def test_orbit_turns_the_camera_round_the_focal_point():
 
 
 def test_scene_animation_frames_step_time_and_share_the_orbit():
-    from cm1view.figures import spec as fg
-    from cm1view.figures.anim import FigureAnimation
+    from atmo3d.figures import spec as fg
+    from atmo3d.figures.anim import FigureAnimation
     spec = dict(kind="scene", run=0, time_s=600.0, runs=[dict(path="/run")],
                 scene3d=dict(orbit=360.0, camera=dict(azimuth=0.0)))
     assert fg.animated(spec) and fg.time_refs(spec) == [("/run", 600.0)]

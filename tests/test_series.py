@@ -7,9 +7,9 @@ import numpy as np
 import pytest
 from bokeh.models import DataRange1d, Range1d
 
-from cm1view import config
-from cm1view.core import series as S, track as trk
-from cm1view.core.fields import palette
+from atmo3d import config
+from atmo3d.core import series as S, track as trk
+from atmo3d.core.fields import palette
 from conftest import wait
 
 
@@ -99,7 +99,7 @@ def test_layer_mean_and_percentile_and_memory_bound(reg, monkeypatch):
             assert abs(ds.value.values[t] - ref) <= 1e-5 * max(abs(ref), 1e-3), how
     seen = []
     monkeypatch.setattr(S, "worker_room", lambda run: 1)
-    from cm1view.core import pool as P
+    from atmo3d.core import pool as P
     real = P.spread
 
     def spread(ex, fn, items, width):
@@ -172,7 +172,7 @@ def test_vorticity_tendency_series_match_the_map(reg):
 
 
 def test_second_session_reads_the_cache(viewer, reg):
-    from cm1view.viewer import app as A
+    from atmo3d.viewer import app as A
     run, F = reg.get()
     recipe = compute(viewer, "thpert", "min", z=1.0)["recipe"]
     assert int(S.cached(run, recipe).computed.sum()) == len(run.times)
@@ -302,7 +302,7 @@ def test_store_from_threads_leaves_one_file(viewer, tmp_path, monkeypatch, capfd
     """Each write has its own temporary name, and HDF5 prints nothing off the main thread."""
     import threading
     import xarray as xr
-    from cm1view.core.run import temp_name
+    from atmo3d.core.run import temp_name
     assert temp_name("x") != temp_name("x") and temp_name("x", ".npz").endswith(".npz")
     monkeypatch.setattr(S, "CACHE_DIR", str(tmp_path))
     ds = xr.Dataset({"a": ("t", np.arange(3.0))})

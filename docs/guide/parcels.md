@@ -84,9 +84,9 @@ boundary its x or y jumps by the domain length.
 Without the viewer, a saved set:
 
 ```bash
-cm1view export /path/to/run --parcels . --list          # variables and saved sets
-cm1view export /path/to/run --parcels updraft --fields w,b,thpert --from 60 --to 90
-cm1view export /path/to/run --parcels updraft --csv --every 5
+atmo3d export /path/to/run --parcels . --list          # variables and saved sets
+atmo3d export /path/to/run --parcels updraft --fields w,b,thpert --from 60 --to 90
+atmo3d export /path/to/run --parcels updraft --csv --every 5
 ```
 
 `--fields` are parcel variables (default: all), a 3D field's name (or `@name`) the field
@@ -138,7 +138,7 @@ positions in that frame, the same as x, y at the shown time.
 
 In figures, a parcels layer and a 3D scene's parcel set have *Tails seen from* too
 (*From the map* brings the viewer's choice): the reference time is each panel's, the
-track is the layer's run's. Without the viewer, `cm1view export RUN --parcels SET
+track is the layer's run's. Without the viewer, `atmo3d export RUN --parcels SET
 --relative MIN` writes `x_sr`, `y_sr` in a frame moving at `--storm U,V`, or else with
 the run's storm track (`--track`), the same as x, y at model time MIN (minutes).
 
@@ -244,7 +244,7 @@ yet; a panel's own layers can add one too.
 A layer keeps the **rule** that chose its set (the time, box, height range, point and
 radius, value range and cap), not the parcels themselves. The figure chooses them again
 from the parcel output of the layer's run when it is drawn, so a saved figure, a
-template and `cm1view-render` need only the rule (an exported script keeps the arrays it
+template and `atmo3d-render` need only the rule (an exported script keeps the arrays it
 drew, as for every layer). *Parcels*
 on the layer's card swaps in another set of the viewer or a saved set (`parcels/` under
 the run's exports folder).

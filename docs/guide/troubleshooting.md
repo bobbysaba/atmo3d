@@ -5,13 +5,13 @@ are in red and warnings in amber. Start there; most say what to do.
 
 ## Getting started
 
-**The page does not open.** Open the URL cm1view printed, ending in `/cm1view`. On a
+**The page does not open.** Open the URL atmo3d printed, ending in `/atmo3d`. On a
 cluster you need the SSH tunnel command it printed (or JupyterHub's proxy URL); see
-[Running on a cluster](../hpc.md). If port 5006 is taken, cm1view uses the next free one
+[Running on a cluster](../hpc.md). If port 5006 is taken, atmo3d uses the next free one
 and prints it. Use `--port` or the `port` setting to choose.
 
 **`no cm1out_[0-9]*.nc files found in …`.** The folder holds no output that matches the
-`output_glob` setting (default `cm1out_[0-9]*.nc`). cm1view reads `output_format = 2`
+`output_glob` setting (default `cm1out_[0-9]*.nc`). atmo3d reads `output_format = 2`
 (one time per file), with either CM1's own dimension names (`ni`, `nip1`, …) or the
 CF-style ones of newer versions (`xh`, `xf`, …). If your files have another name, change `output_glob` in
 [Settings](../settings.md).
@@ -81,8 +81,8 @@ browser without internet shows nothing. Tick *Plain text box*.
 only after you tick *Run the code*.
 
 **A figure of another run is missing its storm.** Each run has its own track. Set it in
-the tree's **Runs** node (its *Track file* lists the files cm1view finds), or put
-`storm_tracks/<run>.csv` where cm1view looks
+the tree's **Runs** node (its *Track file* lists the files atmo3d finds), or put
+`storm_tracks/<run>.csv` where atmo3d looks
 (`track_dirs`, `track_patterns`).
 
 **The animation is huge or slow.** Lower the DPI and raise *Step (outputs)*; a GIF is
@@ -96,7 +96,7 @@ coarser *Resolution*.
 
 **A 3D scene figure says it needs pyvista, or the preview fails with an OpenGL
 error.** 3D scene figures render with PyVista (VTK) off-screen, which needs an OpenGL
-library on the machine running cm1view (not the browser). Most cluster nodes have one;
+library on the machine running atmo3d (not the browser). Most cluster nodes have one;
 see [Installing](../install.md#3d-scene-figures-and-opengl).
 
 **Clicking a streamline does nothing.** An isosurface in front of it can catch the click.
@@ -105,7 +105,7 @@ Lower its opacity or switch it off.
 ## Settings
 
 **A setting did not take effect.** `port`, `cache_gb` and `workers` apply after a restart.
-A value set by an environment variable (`CM1VIEW_<NAME>`) or a command-line flag wins
+A value set by an environment variable (`ATMO3D_<NAME>`) or a command-line flag wins
 over the file, and the settings window says when one does.
 
 **A loaded `.pkl` series warned about code.** Pickle files can run code when loaded; open

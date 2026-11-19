@@ -1,4 +1,4 @@
-"""Pressure decomposition with cm1view's solver (or the pdecomp_script setting's).
+"""Pressure decomposition with atmo3d's solver (or the pdecomp_script setting's).
 Works on copies of the demo run's first files (never on real output): computing one
 time, one decomposition at a time, writing into the file and reading it back, and a
 failed write that keeps the result in memory."""
@@ -11,8 +11,8 @@ import netCDF4
 import numpy as np
 import pytest
 
-from cm1view import pdecomp
-from cm1view.registry import Registry
+from atmo3d import pdecomp
+from atmo3d.registry import Registry
 from conftest import txt, wait
 
 
@@ -30,7 +30,7 @@ def copy_run(demo_run, tmp_path):
 
 
 def test_compute_from_the_map(copy_run):
-    from cm1view.viewer import app as A
+    from atmo3d.viewer import app as A
     run, F, reg = copy_run
     v = A.Viewer(run, F, reg=reg)
     v.main()
@@ -79,8 +79,8 @@ def test_one_at_a_time(copy_run):
 
 
 def test_write_and_read_back(copy_run):
-    from cm1view.core.fields import Fields
-    from cm1view.core.run import CM1Run
+    from atmo3d.core.fields import Fields
+    from atmo3d.core.run import CM1Run
     run, _, _ = copy_run
     r = pdecomp.compute(run, 1, write=True)
     assert r["wrote"], r.get("write_error")
@@ -124,7 +124,7 @@ def test_failed_write_keeps_the_result(copy_run):
 def test_solver_satisfies_the_pressure_equation(demo_run):
     """The solved Exner perturbation, put back into the discrete operator, gives the
     forcing (open lateral boundaries: zero-gradient images)."""
-    from cm1view.pdecomp import pdecomp_solver as P
+    from atmo3d.pdecomp import pdecomp_solver as P
     files = sorted(f for f in os.listdir(demo_run) if f.startswith("cm1out_"))
     with netCDF4.Dataset(os.path.join(demo_run, files[0])) as d0:
         dom, base = P.domain_info(d0), P.compute_base_state(d0)

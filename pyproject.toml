@@ -3,7 +3,7 @@ requires = ["setuptools>=64"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "cm1view"
+name = "atmo3d"
 version = "0.6.0"
 description = "Interactive web viewer for CM1 netCDF output"
 readme = "README.md"
@@ -15,7 +15,7 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Topic :: Scientific/Engineering :: Atmospheric Science",
 ]
-# environment.yml pins the versions cm1view is tested with (conda-forge); these are the
+# environment.yml pins the versions atmo3d is tested with (conda-forge); these are the
 # looser requirements for a pip install into an existing environment.
 dependencies = [
     "panel>=1.7,<2",
@@ -46,23 +46,23 @@ test = ["pytest>=8", "websocket-client>=1.8"]
 video = ["imageio-ffmpeg>=0.5"]
 
 [project.urls]
-Homepage = "https://github.com/bobbysaba/cm1view"
+Homepage = "https://github.com/bobbysaba/atmo3d"
 
 [project.scripts]
-cm1view = "cm1view.__main__:main"
+atmo3d = "atmo3d.__main__:main"
 
 [tool.setuptools.packages.find]
-include = ["cm1view*"]
+include = ["atmo3d*"]
 
 [tool.setuptools.package-data]
 # map boundary lines (core.geo; built by tools/make_boundaries.py)
-cm1view = ["data/*.npz"]
+atmo3d = ["data/*.npz"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-m 'not real and not browser'"
 markers = [
-    "real: checks on your own CM1 run, CM1VIEW_TEST_RUN=/path, or WoFS root, CM1VIEW_WOFS_ROOT=/path (slow; pytest -m real)",
+    "real: checks on your own CM1 run, ATMO3D_TEST_RUN=/path, or WoFS root, ATMO3D_WOFS_ROOT=/path (slow; pytest -m real)",
     "browser: drives headless Firefox for screenshots (pytest -m browser)",
 ]
 filterwarnings = [  # third-party noise only

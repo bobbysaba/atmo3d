@@ -12,7 +12,7 @@ from conftest import new_spec
 @pytest.fixture
 def tools(ed):
     """(a synchronous FigureData, the plain spec of a new figure of a kind)."""
-    from cm1view.figures.render import FigureData
+    from atmo3d.figures.render import FigureData
     fd = FigureData(ed.data.run, ed.data.F, reg=ed.data.reg, viewer_fixes=ed.data.viewer_fixes)
 
     def quick(kind, rows=1, cols=2):
@@ -23,7 +23,7 @@ def tools(ed):
 
 def _pixels(spec, data):
     from matplotlib.backends.backend_agg import FigureCanvasAgg
-    from cm1view.figures import draw as figdraw
+    from atmo3d.figures import draw as figdraw
     fig = figdraw.draw(spec, data)
     fig.set_dpi(60)
     canvas = FigureCanvasAgg(fig)
@@ -32,7 +32,7 @@ def _pixels(spec, data):
 
 
 def _same_figure(fd, form):
-    from cm1view.figures import spec as fg
+    from atmo3d.figures import spec as fg
     doc = json.loads(json.dumps(fg.to_doc(form)))  # (it has to survive a file)
     a, b = _pixels(form, fd.panel_data(form)), _pixels(doc, fd.panel_data(doc))
     # (2 levels: identical draws of a sounding can differ by 1 in a few pixels)
@@ -52,7 +52,7 @@ def test_every_kind_draws_the_same_from_its_document(tools, kind):
 
 def test_panel_settings_draw_the_same_from_the_document(tools, ed):
     """Panel edits, an empty cell, a layer in some panels, ids for places and layers."""
-    from cm1view.figures import spec as fg
+    from atmo3d.figures import spec as fg
     fd, quick = tools
     s = quick("plan", 2, 3)
     s["times_s"][1] = None
@@ -97,7 +97,7 @@ def test_runs_have_ids_and_several_runs_draw_the_same(tools, demo_root):
 
 def test_a_layers_run_is_an_id_and_a_removed_run_is_said_so(tools, demo_root):
     import os
-    from cm1view.figures import draw as figdraw, spec as fg
+    from atmo3d.figures import draw as figdraw, spec as fg
     fd, quick = tools
     s = quick("plan")
     s["runs"].append(dict(path=os.path.join(demo_root, "demo", "supercell_weak"), label="weak",
@@ -114,7 +114,7 @@ def test_a_layers_run_is_an_id_and_a_removed_run_is_said_so(tools, demo_root):
 
 
 def test_one_panel_is_a_figure_of_one_panel(tools):
-    from cm1view.figures import spec as fg
+    from atmo3d.figures import spec as fg
     _, quick = tools
     doc = fg.to_doc(quick("sounding"))
     one = fg.one_panel(doc, doc["panels"][1]["id"])
@@ -124,7 +124,7 @@ def test_one_panel_is_a_figure_of_one_panel(tools):
 
 
 def test_a_panels_own_area_comes_from_its_opts(tools):
-    from cm1view.figures import spec as fg
+    from atmo3d.figures import spec as fg
     fd, quick = tools
     doc = fg.to_doc(quick("plan"))
     doc["panels"][1]["opts"] = dict(domain=dict(mode="box", box=[-12.0, 4.0, -14.0, 2.0]))
@@ -135,7 +135,7 @@ def test_a_panels_own_area_comes_from_its_opts(tools):
 
 def test_mixed_kinds_on_one_grid_with_a_spanning_panel(tools):
     """Each kind keeps its axes; ids key the data; a panel spans two rows."""
-    from cm1view.figures import draw as figdraw, spec as fg
+    from atmo3d.figures import draw as figdraw, spec as fg
     fd, quick = tools
     doc = fg.to_doc(quick("plan"))
     snd = fg.to_doc(quick("sounding", 1, 1))
@@ -156,14 +156,14 @@ def test_mixed_kinds_on_one_grid_with_a_spanning_panel(tools):
 
 
 def _parts(quick, arrange, one=False):
-    from cm1view.figures.combo import combine
+    from atmo3d.figures.combo import combine
     return json.loads(json.dumps(combine([quick("plan"), quick("sounding", 1, 1)],
                                          arrange=arrange, one_colorbar=one), default=float))
 
 
 @pytest.mark.parametrize("arrange", ["row", "col"])
 def test_parts_go_onto_one_grid(tools, arrange):
-    from cm1view.figures import draw as figdraw, spec as fg
+    from atmo3d.figures import draw as figdraw, spec as fg
     fd, quick = tools
     doc = fg.to_doc(_parts(quick, arrange))
     assert sorted(p["id"] for p in doc["panels"]) == [0, 1, 1000]
@@ -179,7 +179,7 @@ def test_parts_go_onto_one_grid(tools, arrange):
 
 
 def test_parts_keep_their_letters_panel_settings_and_say_what_is_left_out(tools):
-    from cm1view.figures import spec as fg
+    from atmo3d.figures import spec as fg
     _, quick = tools
     s = _parts(quick, "row")
     s["parts"][1]["suptitle"] = "only here"
@@ -193,7 +193,7 @@ def test_parts_keep_their_letters_panel_settings_and_say_what_is_left_out(tools)
 
 
 def test_one_colorbar_of_parts_stays_one(tools):
-    from cm1view.figures import spec as fg
+    from atmo3d.figures import spec as fg
     _, quick = tools
     doc = fg.to_doc(_parts(quick, "row", one=True))
     assert doc["style"]["colorbar"]["mode"] == "shared"
@@ -201,7 +201,7 @@ def test_one_colorbar_of_parts_stays_one(tools):
 
 
 def test_to_doc_takes_version_1_only_and_leaves_its_input_alone(tools):
-    from cm1view.figures import spec as fg
+    from atmo3d.figures import spec as fg
     _, quick = tools
     s = quick("plan")
     was = copy.deepcopy(s)
@@ -212,7 +212,7 @@ def test_to_doc_takes_version_1_only_and_leaves_its_input_alone(tools):
 
 
 def test_upgrade_and_exported_code_know_documents(tools):
-    from cm1view.figures import draw as figdraw, spec as fg
+    from atmo3d.figures import draw as figdraw, spec as fg
     _, quick = tools
     doc = fg.to_doc(quick("plan"))
     v2, _ = figdraw.upgrade(doc)

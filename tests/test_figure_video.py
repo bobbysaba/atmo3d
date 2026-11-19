@@ -7,7 +7,7 @@ import sys
 import pytest
 from PIL import Image
 
-from cm1view.figures import spec as fg
+from atmo3d.figures import spec as fg
 
 FAKE = """#!{py}
 import sys

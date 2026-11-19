@@ -6,8 +6,8 @@ import sys
 
 import pytest
 
-from cm1view import config, demo, registry
-from cm1view.core import track as trk
+from atmo3d import config, demo, registry
+from atmo3d.core import track as trk
 
 
 def test_scan_skips_unreadable_links(tmp_path, demo_root):
@@ -41,9 +41,9 @@ def test_demo_runs_stay_out_of_recent_and_guesses(demo_run, tmp_path, monkeypatc
 
 @pytest.fixture
 def fresh(tmp_path, monkeypatch):
-    """No config file yet and no CM1VIEW_* variables; the session's file afterwards."""
+    """No config file yet and no ATMO3D_* variables; the session's file afterwards."""
     for k in list(os.environ):
-        if k.startswith("CM1VIEW_") and k != "CM1VIEW_CONFIG":
+        if k.startswith("ATMO3D_") and k != "ATMO3D_CONFIG":
             monkeypatch.delenv(k)
     old = config._state["path"]
     config.load(str(tmp_path / "cfg" / "config.toml"))
@@ -66,15 +66,15 @@ def test_defaults_save_and_precedence(fresh, demo_root, monkeypatch):
     assert C.get("workers") == "auto" and C.cache_gb() == (12.0, "set")
     text = open(C.config_path()).read()
     assert "[paths]" in text and "# Where your runs live" in text
-    monkeypatch.setenv("CM1VIEW_CACHE_GB", "20")
+    monkeypatch.setenv("ATMO3D_CACHE_GB", "20")
     assert C.get("cache_gb") == 20.0 and C.source("cache_gb").startswith("environment")
     C.override("cache_gb", 30, "--cache-gb")
     assert C.get("cache_gb") == 30.0 and C.source("cache_gb") == "command line (--cache-gb)"
     C._state["cli"].clear()
-    monkeypatch.delenv("CM1VIEW_CACHE_GB")
-    monkeypatch.setenv("CM1VIEW_PDECOMP", "/nonexistent.py")  # the old variable still works
+    monkeypatch.delenv("ATMO3D_CACHE_GB")
+    monkeypatch.setenv("ATMO3D_PDECOMP", "/nonexistent.py")  # the old variable still works
     assert C.get("pdecomp_script") == "/nonexistent.py" and "pdecomp_script" in C.problems()
-    monkeypatch.delenv("CM1VIEW_PDECOMP")
+    monkeypatch.delenv("ATMO3D_PDECOMP")
     # bad raw text is refused and leaves the file alone
     with pytest.raises((ValueError, TypeError)):
         C.save_text("[server]\ncache_gb = [1, 2]\n")
@@ -111,8 +111,8 @@ def test_runs_tracks_and_save_folders(fresh, demo_root):
 
 
 def test_viewer_follows_saved_settings(fresh, reg, demo_root):
-    from cm1view.viewer import app as A
-    from cm1view import pdecomp
+    from atmo3d.viewer import app as A
+    from atmo3d import pdecomp
     C = config
     out = fresh / "out"
     C.save(dict(runs_root=[demo_root], figures_dir=f"{out}/figs", exports_dir=f"{out}/data"))
@@ -165,8 +165,8 @@ def test_viewer_follows_saved_settings(fresh, reg, demo_root):
 def test_figure_bundle_runs_anywhere(fresh, reg, demo_root):
     """Image, script in scripts/, data and spec in _src/; the script redraws the
     image from a copied folder.  Several runs: no folder of their own until chosen."""
-    from cm1view.viewer import app as A
-    from cm1view.figures import spec as fg
+    from atmo3d.viewer import app as A
+    from atmo3d.figures import spec as fg
     C = config
     C.save(dict(runs_root=[demo_root], figures_dir=str(fresh / "figs")))
     run, F = reg.get()
@@ -203,6 +203,6 @@ def test_figure_bundle_runs_anywhere(fresh, reg, demo_root):
 
 
 def test_landing_page_without_a_run():
-    from cm1view.viewer import app
+    from atmo3d.viewer import app
     _, st = app._landing()
     assert st.modal is not None

@@ -4,8 +4,8 @@ fields of the demo run at the same points, and the recipe's keys and text."""
 import numpy as np
 import pytest
 
-from cm1view.core import joint
-from cm1view.figures import draw as figdraw
+from atmo3d.core import joint
+from atmo3d.figures import draw as figdraw
 
 
 @pytest.fixture(scope="module")

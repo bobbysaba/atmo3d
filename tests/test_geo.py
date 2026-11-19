@@ -1,10 +1,10 @@
-"""core.geo: a WRF grid's projection and the boundary lines cm1view ships."""
+"""core.geo: a WRF grid's projection and the boundary lines atmo3d ships."""
 import os
 
 import numpy as np
 import pytest
 
-from cm1view.core import geo
+from atmo3d.core import geo
 
 R = 6370000.0
 WOFS = dict(MAP_PROJ=1, TRUELAT1=30.0, TRUELAT2=60.0, STAND_LON=-102.75,
@@ -126,14 +126,14 @@ def test_lines_round_the_pole_and_across_180():
 
 
 def test_wofs_run_has_geo_cm1_run_none(tmp_path):
-    from cm1view import demo_wofs
-    from cm1view.core import models
+    from atmo3d import demo_wofs
+    from atmo3d.core import models
     root = demo_wofs.make(str(tmp_path))
     run = models.open_run(os.path.join(root, "mem01"), workers=1)
     assert run.geo is not None and run.geo.misfit < 0.01 * run.dx / 1000.0
     mean = models.open_run(os.path.join(root, "mean"), workers=1)
     assert mean.geo is not None
-    from cm1view.core.run import Run
+    from atmo3d.core.run import Run
     assert Run.geo is None
 
 

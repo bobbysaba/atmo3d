@@ -1,29 +1,29 @@
-# Installing cm1view
+# Installing atmo3d
 
-cm1view is a Python web app. It runs wherever your CM1 output is (usually a cluster),
+atmo3d is a Python web app. It runs wherever your CM1 output is (usually a cluster),
 and you look at it in your own browser. It needs Python 3.11 or newer and the packages
 listed in `environment.yml`.
 
 ## With conda (recommended)
 
-`environment.yml` pins the conda-forge versions cm1view is tested with. Use
+`environment.yml` pins the conda-forge versions atmo3d is tested with. Use
 [Miniforge](https://github.com/conda-forge/miniforge), or any conda / mamba you already
 have:
 
 ```bash
-git clone https://github.com/bobbysaba/cm1view.git
-cd cm1view
+git clone https://github.com/bobbysaba/atmo3d.git
+cd atmo3d
 conda env create -f environment.yml      # once; about 2.7 GB
-conda activate cm1view
-cm1view --demo                           # check it works (see below)
+conda activate atmo3d
+atmo3d --demo                           # check it works (see below)
 ```
 
-This installs cm1view in editable mode, so `git pull` updates it. After a pull that
+This installs atmo3d in editable mode, so `git pull` updates it. After a pull that
 changes `environment.yml`, run `conda env update -f environment.yml --prune`.
 
 **Disk space.** Miniforge plus the environment take about 4 GB. Many clusters give home
 folders a small quota. If yours does, install Miniforge (or put the environment, with
-`conda env create -p /path/to/envs/cm1view -f environment.yml`) in a work or project
+`conda env create -p /path/to/envs/atmo3d -f environment.yml`) in a work or project
 folder instead.
 
 **Clusters with a site conda.** If your site provides conda through a module
@@ -35,8 +35,8 @@ environment from `environment.yml` is the same either way.
 Into an existing environment (Python 3.11 or newer):
 
 ```bash
-git clone https://github.com/bobbysaba/cm1view.git
-pip install -e ./cm1view            # add [test] for pytest and the browser tests
+git clone https://github.com/bobbysaba/atmo3d.git
+pip install -e ./atmo3d            # add [test] for pytest and the browser tests
 ```
 
 The versions in `pyproject.toml` are looser than the pins in `environment.yml`. If
@@ -56,7 +56,7 @@ the preview; install the system's Mesa OpenGL libraries (e.g. `libgl1-mesa-dri`,
 ## Check the install
 
 ```bash
-cm1view --demo
+atmo3d --demo
 ```
 
 This opens the demo run, a real CM1 supercell that ships with the repository
@@ -66,7 +66,7 @@ every 10 min and parcels, cut to an 80 × 80 km box around the storms. It is cop
 cache folder once and the viewer starts on it. A pip install has no copy; clone the
 repository to get it. Open the URL it
 prints. On a cluster, see [Running on a cluster](hpc.md) for how to reach it from your
-laptop. `cm1view --demo wofs` opens a small synthetic WoFS ensemble instead
+laptop. `atmo3d --demo wofs` opens a small synthetic WoFS ensemble instead
 ([WoFS](guide/wofs.md)).
 
 To run the tests as well, see [Developing](developing.md).

@@ -12,7 +12,7 @@ from conftest import edited_v1
 
 
 def test_upgrade_writes_out_each_panel():
-    from cm1view.figures import draw as figdraw
+    from atmo3d.figures import draw as figdraw
     lay = dict(type="fill", on=True, field="dbz", mode="height", z=1.0, cmap="viridis",
                vmin=0.0, vmax=60.0, extend="max")
     cont = dict(type="contour", on=True, field="w", mode="height", z=3.0, levels="5",
@@ -37,7 +37,7 @@ def test_upgrade_writes_out_each_panel():
 
 
 def test_upgrade_counts_soundings_within_their_panel():
-    from cm1view.figures import draw as figdraw
+    from atmo3d.figures import draw as figdraw
     snd = [dict(run=0, time_s=0.0, panel=0), dict(run=1, time_s=0.0, panel=1),
            dict(run=1, time_s=60.0, panel=0)]
     v1 = dict(version=1, kind="sounding", rows=1, cols=2, soundings=snd, size=[8, 4],
@@ -52,7 +52,7 @@ def test_upgrade_counts_soundings_within_their_panel():
 
 
 def test_upgrade_of_parts_keeps_each_parts_settings():
-    from cm1view.figures import draw as figdraw
+    from atmo3d.figures import draw as figdraw
     part = dict(version=1, kind="plan", rows=2, cols=1, vary="time", times_s=[0.0, 60.0],
                 run=0, layers=[], runs=[dict(path="/b")], size=[4, 6], share=0.4,
                 font=dict(size=8), annotations=[dict(panel=1), dict(panel=-1),
@@ -70,7 +70,7 @@ def test_upgrade_of_parts_keeps_each_parts_settings():
 
 
 def test_colorbar_ends_auto_and_shared():
-    from cm1view.figures import draw as figdraw
+    from atmo3d.figures import draw as figdraw
     lay = dict(type="fill", vmin=0.0, vmax=10.0, extend="auto")
     assert figdraw.extend_of(lay, np.array([1.0, 5.0])) == "neither"
     assert figdraw.extend_of(lay, np.array([1.0, 12.0, np.nan])) == "max"
@@ -102,7 +102,7 @@ def _v2_plan(mode="shared"):
 
 
 def test_version_2_panels_span_cells_and_share_colorbar_ends():
-    from cm1view.figures import draw as figdraw
+    from atmo3d.figures import draw as figdraw
     from matplotlib.colors import to_hex
     spec, data = _v2_plan()
     assert figdraw._extends(spec, data) == {0: "both", 1: "both", 2: "both"}
@@ -124,7 +124,7 @@ def test_version_2_panels_span_cells_and_share_colorbar_ends():
 
 
 def test_animation_colorbar_ends_are_those_of_all_frames():
-    from cm1view.figures import draw as figdraw
+    from atmo3d.figures import draw as figdraw
     spec, data = _v2_plan("none")
     spec["panels"][0]["layers"][0]["nlevels"] = 10  # (every panel's: the norm has the ends)
     calm ={i: dict(d, L0=np.full((11, 11), 5.0)) for i, d in data.items()}
@@ -140,7 +140,7 @@ def test_animation_colorbar_ends_are_those_of_all_frames():
 
 
 def test_layers_take_the_panels_run_time_and_height():
-    from cm1view.figures import draw as figdraw
+    from atmo3d.figures import draw as figdraw
     p = dict(run=1, time_s=600.0, z=2.0)
     assert figdraw.resolved(p, dict(type="fill", z=None)) == \
         dict(type="fill", run=1, time_s=600.0, z=2.0)
@@ -150,7 +150,7 @@ def test_layers_take_the_panels_run_time_and_height():
 
 # ------------------------------------------------------------------ the panel tree
 def test_panel_edit_y_range_is_that_panel_s_and_keeps_its_legend():
-    from cm1view.figures import draw as figdraw
+    from atmo3d.figures import draw as figdraw
     v1 = dict(version=1, kind="line", rows=1, cols=2, size=[8, 4], ts=dict(ymin=-1.0, ymax=9.0),
               series=[dict(panel=0), dict(panel=1)],
               edits={"1": dict(ymax=0.0, legend=dict(on=False))})
@@ -161,7 +161,7 @@ def test_panel_edit_y_range_is_that_panel_s_and_keeps_its_legend():
 
 
 def test_panel_edits_change_that_panel_alone():
-    from cm1view.figures import draw as figdraw
+    from atmo3d.figures import draw as figdraw
     v1 = edited_v1()
     assert figdraw.panel_ref(v1, 0) == (0, 0.0) and figdraw.panel_ref(v1, 1) == (1, 900.0)
     assert figdraw.form_ref(v1, 1) == (0, 300.0)
@@ -178,7 +178,7 @@ def test_panel_edits_change_that_panel_alone():
 
 
 def test_layers_of_another_run_or_time_are_read_apart():
-    from cm1view.figures import spec as fg
+    from atmo3d.figures import spec as fg
     v1 = edited_v1()
     assert fg.layer_groups(v1, 1) == {(0, 60.0): [0]}  # the fill; the contours: the panel's
     assert fg.layer_groups(v1, 0) == {}
@@ -192,7 +192,7 @@ def test_layers_of_another_run_or_time_are_read_apart():
 
 
 def test_animation_moves_edited_times_but_locked_layers():
-    from cm1view.figures import spec as fg
+    from atmo3d.figures import spec as fg
     v1 = edited_v1()
     v1["edits"]["1"]["extra"][0].update(time_s=60.0, time_lock=True)
     s = fg.shift_times(v1, 120.0)
@@ -203,8 +203,8 @@ def test_animation_moves_edited_times_but_locked_layers():
 
 
 def test_annotation_in_several_panels():
-    from cm1view.figures.cards.distcard import parse_panels, panels_text
-    from cm1view.figures.draw.base import ann_on
+    from atmo3d.figures.cards.distcard import parse_panels, panels_text
+    from atmo3d.figures.draw.base import ann_on
     assert [parse_panels(t) for t in ("", "all", "0", "2", "1, 3-4", "a, c-d", "b")] == \
         [-1, -1, -1, 1, [0, 2, 3], [0, 2, 3], 1]
     assert panels_text([0, 2, 3]) == "a, c-d" and panels_text(-1) == "" and panels_text(1) == "b"
@@ -218,7 +218,7 @@ def test_annotation_in_several_panels():
 def _xsec_grid_v1():
     """A version 1 section figure of two runs (rows) by two sections (columns), the
     last panel at its own time."""
-    from cm1view.figures import spec as fg
+    from atmo3d.figures import spec as fg
     fill = dict(type="fill", on=True, field="w", mode="height", z=1.0, cmap="RdBu_r",
                 vmin=-10.0, vmax=10.0, extend="both")
     return dict(version=1, kind="xsec", rows=2, cols=2, time_s=600.0, times_s=[600.0],
@@ -234,7 +234,7 @@ def _xsec_grid_v1():
 def test_section_cards_give_each_panel_its_run_time_and_section():
     """A section figure of cards: each card is one panel's section, run and time (blank:
     the figure's); panels without a card are empty, the grid fits the last card."""
-    from cm1view.figures import draw as figdraw, spec as fg
+    from atmo3d.figures import draw as figdraw, spec as fg
     s = _xsec_grid_v1()
     s.update(grid=dict(rows="none", cols="none", runs=[]), edits={}, rows=2, cols=3,
              sections=[dict(fg.section_defaults(orient="x"), run=0, time_s=None, panel=0),
@@ -262,7 +262,7 @@ def test_section_cards_give_each_panel_its_run_time_and_section():
 def test_older_section_figures_become_cards():
     """to_cards: an older grid of runs × sections becomes a card per panel with its
     run, time (its panel edit's) and section; panel titles stay; cards stay cards."""
-    from cm1view.figures import spec as fg
+    from atmo3d.figures import spec as fg
     s = _xsec_grid_v1()
     before = [(fg.panel_ref(s, i), fg.panel_section(s, i)[1]["orient"]) for i in range(4)]
     fg.to_cards(s)
@@ -288,7 +288,7 @@ def test_older_time_height_figures_become_cards():
     """th_to_cards: an older time-height grid (a panel per series and run) becomes a
     card per panel with its one run and panel number; the panels show the same; cards
     stay cards; a template keeps the first run's cards."""
-    from cm1view.figures import draw as figdraw, spec as fg
+    from atmo3d.figures import draw as figdraw, spec as fg
     s = dict(kind="th", runs=[dict(path="/a"), dict(path="/b"), dict(path="/c")],
              runs_as="cols", rows=1, cols=1, titles=["A", "", "", "", "", "F"],
              series=[dict(label="w", runs=None, panel=0), dict(label="q", runs=[2], panel=0)])
@@ -317,8 +317,8 @@ def test_parts_share_sections_and_keep_the_cards():
     """A plan-view part's sections changed: the section part's cards take the new
     sections but keep their runs, times and panels (one more: a new panel); the
     section part's cards go to the plan part as they are."""
-    from cm1view.figures import spec as fg
-    from cm1view.figures.combo import share_sections
+    from atmo3d.figures import spec as fg
+    from atmo3d.figures.combo import share_sections
     xs = _xsec_grid_v1()
     fg.to_cards(xs)
     plan = dict(_xsec_grid_v1(), kind="plan",
@@ -340,7 +340,7 @@ def test_each_series_has_its_own_time_zero():
     in time series and time-height panels; the figure's time zero adds to both."""
     from types import SimpleNamespace
     import xarray as xr
-    from cm1view.figures import spec as fg
+    from atmo3d.figures import spec as fg
     times = np.arange(0.0, 5401.0, 600.0)  # 0-90 min
     nt = times.size
     run = SimpleNamespace(times=times)
@@ -370,7 +370,7 @@ def test_a_run_time_zero_shifts_its_lines():
     run, and an ensemble band of the runs lines up."""
     from types import SimpleNamespace
     import xarray as xr
-    from cm1view.figures import spec as fg
+    from atmo3d.figures import spec as fg
     times = np.arange(0.0, 5401.0, 600.0)  # 0-90 min
     nt = times.size
     run = SimpleNamespace(times=times)
@@ -422,7 +422,7 @@ def test_hand_edits_change_and_blank_a_series():
     """A series' hand edits (by model time, s) replace or blank its values for that run
     only; an edit at a time the run lacks is left out; the legend says "(edited)"
     only if asked to."""
-    from cm1view.figures import spec as fg
+    from atmo3d.figures import spec as fg
     run, ds, a, spec = _line_setup()
     a["edits"] = {"0": {fg.edit_key(1200.0): 9.5, fg.edit_key(1800.0): None,
                         fg.edit_key(99999.0): 1.0}}
@@ -440,7 +440,7 @@ def test_hand_edits_change_and_blank_a_series():
 
 
 def test_added_points_go_into_a_line_in_order():
-    from cm1view.figures import spec as fg
+    from atmo3d.figures import spec as fg
     t, v, n = fg.apply_added(np.array([0.0, 10.0]), np.array([1.0, 2.0]), np.array([600.0, 1200.0]),
                              dict(added={"0": {"900": 5.0, "1500": 6.0, "300": 7.0}}), 0)
     assert n == 3
@@ -455,7 +455,7 @@ def test_added_points_go_into_a_line_in_order():
 
 def test_hand_edits_feed_the_ensemble_band():
     """An ensemble band is made from the members as edited, and can say "(edited)"."""
-    from cm1view.figures import spec as fg
+    from atmo3d.figures import spec as fg
     run, ds, a, spec = _line_setup()
     spec["ts"]["mark_edited"] = True
     a.update(runs=None, ens="minmax", ens_members="hidden",
@@ -469,7 +469,7 @@ def test_hand_edits_feed_the_ensemble_band():
 def test_a_series_of_your_own_data_draws_without_a_run():
     """A series of your own (source "table"): its points in time order, shifted by the
     time zero, beside a computed series; nothing asked of any run."""
-    from cm1view.figures import spec as fg
+    from atmo3d.figures import spec as fg
     run, ds, a, spec = _line_setup()
     obs = dict(recipe=dict(), op="", panel=0, source="table", label="obs", ls="--",
                color="k", table=dict(t=[20.0, 0.0, 10.0, None], v=[3.0, 1.0, None, 7.0]))
@@ -491,7 +491,7 @@ def test_parse_your_own_data():
     """Pasted text: commas, tabs, semicolons or spaces; a header (its second column
     with units in brackets); # comments; blank / nan values gaps; errors with their line;
     table_text reads back the same."""
-    from cm1view.figures import spec as fg
+    from atmo3d.figures import spec as fg
     tab, notes = fg.parse_table("# obs\ntime, rain (mm)\n0,1\n5,2\n10, nan\n7,3,9\n")
     assert tab == dict(t=[0.0, 5.0, 10.0, 7.0], v=[1.0, 2.0, None, 3.0],
                        names=["time", "rain (mm)"])
@@ -513,7 +513,7 @@ def test_parse_your_own_data():
 
 
 def test_an_older_scene_with_a_grid_draws_one_picture():
-    from cm1view.figures import draw as figdraw
+    from atmo3d.figures import draw as figdraw
     s = dict(version=1, kind="scene", rows=2, cols=3, run=0, time_s=600.0, layers=[],
              size=[4.0, 3.0], runs=[dict(path="a")])
     v2, _ = figdraw.upgrade(s)

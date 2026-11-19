@@ -5,7 +5,7 @@ import re
 
 from mkdocs.structure.files import File
 
-REPO = "https://github.com/bobbysaba/cm1view/blob/master/"
+REPO = "https://github.com/bobbysaba/atmo3d/blob/master/"
 
 
 def on_files(files, config):

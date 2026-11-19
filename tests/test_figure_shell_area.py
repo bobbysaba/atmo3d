@@ -4,9 +4,9 @@ from types import SimpleNamespace
 
 import pytest
 
-from cm1view.figures import draw as figdraw, spec as fg
-from cm1view.figures.shell import docedit as de, findview, looks
-from cm1view.figures.shell.looks import Scope
+from atmo3d.figures import draw as figdraw, spec as fg
+from atmo3d.figures.shell import docedit as de, findview, looks
+from atmo3d.figures.shell.looks import Scope
 
 
 def doc_of(*panels):
@@ -94,7 +94,7 @@ class _Now:
 
 @pytest.fixture
 def shell(reg, monkeypatch):
-    from cm1view.viewer import app as A
+    from atmo3d.viewer import app as A
     run, F = reg.get()
     v = A.Viewer(run, F, reg=reg)
     v.main()
@@ -212,7 +212,7 @@ def test_the_height_follows_the_tallest_panel_of_a_row(shell):
 
 
 def test_a_panels_area_saves_and_renders(shell, tmp_path):
-    from cm1view.figures.batch import main
+    from atmo3d.figures.batch import main
     pid = shell.doc["panels"][1]["id"]
     shell.edit(lambda d: de.set_area(d, [0.0, 5.0, 0.0, 5.0], pid=pid))
     path = fg.save_spec(de.plain(shell.doc), str(tmp_path / "f"))

@@ -50,7 +50,7 @@ components. Vectors can be shown ground-, grid- or storm-relative
 | `qcloud`, `qprecip` | Cloud and precipitation condensate (g/kg) | qc + qi, and qr + qs + qg + qhl, where those are in the output |
 | `p_dyn`, `acc_dyn`, `acc_tot` | Pressure decomposition sums | see below |
 
-Other derived fields are defined in `cm1view/core/fields.py` (`_make_fields`); see
+Other derived fields are defined in `atmo3d/core/fields.py` (`_make_fields`); see
 [Developing](../developing.md) for how to add one.
 
 ### Derivatives of any field
@@ -191,7 +191,7 @@ Where post-processing wrote them into the output files they are read from there 
 subset). The map title says which version wrote them, and warns for files written by
 early versions without a `pdecomp_version` tag. Elsewhere, a **Compute pressure
 decomposition** button (under the map or section) computes that time in a separate
-process with cm1view's solver (`cm1view/pdecomp/pdecomp_solver.py`).
+process with atmo3d's solver (`atmo3d/pdecomp/pdecomp_solver.py`).
 
 ### What the solver does
 
@@ -230,7 +230,7 @@ result into the output file (float64, with a `pdecomp_version` attribute; about 
 
 The solver also works on its own, outside the viewer (its docstring shows how). To use
 another solver, point the `pdecomp_script` setting (or `--pdecomp-script`, or
-`$CM1VIEW_PDECOMP_SCRIPT`) at a Python file with the same functions:
+`$ATMO3D_PDECOMP_SCRIPT`) at a Python file with the same functions:
 
 - `lbc_type`, `domain_info`, `compute_base_state`, `setup_pressure_solver`,
 - `pressure_decomposition`, returning a dict with `p_b`, `p_l`, `p_nl`, `acc_b`, `acc_l`

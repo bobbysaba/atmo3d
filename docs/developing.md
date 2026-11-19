@@ -1,12 +1,12 @@
-# Developing cm1view
+# Developing atmo3d
 
 ## Tests
 
 ```bash
-conda activate cm1view
+conda activate atmo3d
 pytest                                  # the suite, on synthetic demo runs
 pytest tests/test_tracking.py -k manual # one file / matching tests
-CM1VIEW_TEST_RUN=/path/to/run pytest -m real   # checks on your own output (reads only)
+ATMO3D_TEST_RUN=/path/to/run pytest -m real   # checks on your own output (reads only)
 pytest -m browser                       # the viewer in headless Firefox, with screenshots
 ```
 
@@ -16,22 +16,22 @@ processes and renders figures.
 - **Test data.** `tests/synthetic.py` writes small analytic runs shaped like CM1 output
   (staggered winds, base state, swaths, one level per chunk), a weak-mesocyclone twin and
   their storm tracks, so the tests know every answer in advance. They are written once to
-  `$CM1VIEW_TEST_DATA` (default `<tmp>/cm1view-demo-$USER`) and rewritten only when
+  `$ATMO3D_TEST_DATA` (default `<tmp>/atmo3d-demo-$USER`) and rewritten only when
   `synthetic.py` changes. Bump its `VERSION` when the fields change.
-- **Demo run.** `cm1view --demo` opens `demo_data/supercell`, a real CM1 run cut down by
+- **Demo run.** `atmo3d --demo` opens `demo_data/supercell`, a real CM1 run cut down by
   `tools/make_real_demo.py` (a box around the storms, every 10 min, 16-bit packed fields,
-  1500 parcels; about 35 MB). `cm1view/demo.py` copies it into the cache once.
+  1500 parcels; about 35 MB). `atmo3d/demo.py` copies it into the cache once.
   `tests/test_real_demo.py` checks it; to rebuild it from a new run:
   `python tools/make_real_demo.py RUN demo_data/supercell --force`.
 - **Isolation.** Tests use a throwaway settings file and write only into temporary
   folders. The pressure-decomposition tests work on copies of demo files.
 - **Browser tests** need Firefox (on `PATH`, or `$FIREFOX`). Screenshots go to
-  `$CM1VIEW_SHOTS` (default: a temporary folder, printed with `pytest -s`).
+  `$ATMO3D_SHOTS` (default: a temporary folder, printed with `pytest -s`).
 - **Image baselines.** `tests/test_images.py` draws typical figures of the demo run (plan
   view, cross-section, time–height, time series, soundings, distributions, a difference
   fill, a swath, parts, a dark style) and compares each with a PNG in `tests/baseline/`;
   it also checks that save → load → draw of every panel kind gives the identical image.
-  A missing baseline is written on the first run. `CM1VIEW_IMAGE_TOL` sets the allowed RMS
+  A missing baseline is written on the first run. `ATMO3D_IMAGE_TOL` sets the allowed RMS
   difference (0–255, default 3), because fonts and matplotlib versions shift pixels
   between machines. When a figure changes **on purpose**, look at the failure's
   `*-failed-diff.png` (left in pytest's temporary folder), then rewrite the baselines with
@@ -52,13 +52,13 @@ processes and renders figures.
 |---|---|
 | `test_fields.py` | Derived fields, shared reads, the cache, the base state; levels read together, volumes in slabs, parts of fields larger than the cache |
 | `test_pool.py` | The shared reader processes: one pool for every run, files kept open, the scan of a run's files, work spread to a width, reading ahead over times |
-| `test_timing.py` | The timing hooks of `--timing` and `cm1view bench`, the log summary |
+| `test_timing.py` | The timing hooks of `--timing` and `atmo3d bench`, the log summary |
 | `test_map.py` | Map, cross-section and 3D: layers, differences, streamlines, the region and floor |
 | `test_streamlines.py` | The 3D streamline tracer on analytic winds, and the 3D pane's restyle echo |
 | `test_sounding.py` | Soundings, comparison styles, zoom and the hover data |
 | `test_tracking.py` | Automatic and hand-placed tracking, save and load, storm-following soundings |
 | `test_session.py` | Session files: save, load, rows and values a run cannot take, another run's session; soundings, section, 3D, series and distributions back |
-| `test_export.py` | netCDF export: values == the volumes / map planes, heights, box, stop, missing times, the dialog, `cm1view export` |
+| `test_export.py` | netCDF export: values == the volumes / map planes, heights, box, stop, missing times, the dialog, `atmo3d export` |
 | `test_series.py`, `test_dist.py` | Series (cache, time–height, files) and distributions |
 | `test_parcels.py` | Parcel output: reads, lattice, selections, sets, trajectory cache, heads, wraps, split files; the Parcels panel |
 | `test_pdecomp.py` | The pressure decomposition, on copies of demo files |
@@ -77,12 +77,12 @@ processes and renders figures.
 ## Layout
 
 ```
-cm1view/                  config.py (settings: file, precedence, save folders, run search),
+atmo3d/                  config.py (settings: file, precedence, save folders, run search),
                           registry.py (open runs shared by sessions, run discovery),
                           theme.py (colours and CSS), demo.py (the real demo run
-                          cm1view --demo opens, demo_data/), __main__.py (command line; `render` goes
+                          atmo3d --demo opens, demo_data/), __main__.py (command line; `render` goes
                           to figures/batch.py, `export` to core/export.py), bench.py
-                          (`cm1view bench`: the viewer's actions timed without a browser)
+                          (`atmo3d bench`: the viewer's actions timed without a browser)
 
 core/                     model output, no UI
   run.py                  file discovery, staggered->scalar reads, 3D cache, parallel reads
@@ -103,7 +103,7 @@ core/                     model output, no UI
   parcels.py              parcel output: reads grouped by parcel ID, selections, saved
                           sets, trajectory cache, heads between parcel times
   export.py               netCDF export of fields (box, times, model levels or heights,
-                          streamed per time) and `cm1view export`
+                          streamed per time) and `atmo3d export`
 
 pdecomp/                  pressure decomposition
   __init__.py             file fields, computing one time on request
@@ -159,7 +159,7 @@ figures/                  the Figure workspace
     figure.py             draw(): blocks, panels, labels, annotations
   render.py               FigureData: a spec's panel data (runs, tracks, series,
                           caches) without the editor or Panel; the editor's .data
-  batch.py                `cm1view render`: saved figures and templates drawn
+  batch.py                `atmo3d render`: saved figures and templates drawn
                           without the viewer (images, bundles, GIFs); the GIF frame
                           helpers anim.py uses
   shell/                  the editor on the document: what is on the page
@@ -212,7 +212,7 @@ the class's bases.
 
 ## Adding a derived field
 
-Derived fields are defined in `cm1view/core/fields.py` (`_make_fields`) as `FieldDef`s: a
+Derived fields are defined in `atmo3d/core/fields.py` (`_make_fields`) as `FieldDef`s: a
 name, label, units and menu group, a default colormap and range, the fields it needs
 (`deps`) and a function of them (`func`). They then appear in every
 field menu (map, section, 3D, series, figures). A dep can be a derivative of a native
@@ -233,12 +233,12 @@ against the definition, as for θρ.
 ## Adding a vector
 
 The vectors the map, the cross-section, the 3D scene and figures can draw are the
-entries of `VECTORS` in `cm1view/core/vectors.py`: a key, a label, units, the names of
+entries of `VECTORS` in `atmo3d/core/vectors.py`: a key, a label, units, the names of
 its x, y and vertical component fields, and a typical magnitude (the default reference
 arrow). The component fields must exist in the field catalog (add them as derived fields
 if they do not, as for `bgen_x` and `bgen_y`). A vector is offered only when the run has
 its components. Also add its arrow units to `KEY_UNITS` in
-`cm1view/figures/draw/layers.py`, because exported figures draw their key arrows without
+`atmo3d/figures/draw/layers.py`, because exported figures draw their key arrows without
 the viewer.
 
 ## Building the documentation
@@ -263,6 +263,6 @@ line to [Changes](changelog.md).
 
 ## Releases
 
-Versions follow `MAJOR.MINOR.PATCH` in `pyproject.toml` and `cm1view/__init__.py`, with a
+Versions follow `MAJOR.MINOR.PATCH` in `pyproject.toml` and `atmo3d/__init__.py`, with a
 matching git tag (`v0.3.0`). Move the *Unreleased* heading of [Changes](changelog.md) to the
 new version and date when you tag.

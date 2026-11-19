@@ -1,4 +1,4 @@
-"""The real demo run cm1view --demo opens (cm1view/demo.py, demo_data/supercell, built by
+"""The real demo run atmo3d --demo opens (atmo3d/demo.py, demo_data/supercell, built by
 tools/make_real_demo.py): copied once into the cache, a demo run however new its files,
 and readable as a CM1 run with its packed fields, stretched levels and parcels.  Skipped
 where the shipped copy is missing (a pip install)."""
@@ -7,8 +7,8 @@ import os
 import numpy as np
 import pytest
 
-from cm1view import demo
-from cm1view.core import models, run as run_mod, parcels as P
+from atmo3d import demo
+from atmo3d.core import models, run as run_mod, parcels as P
 
 needs_data = pytest.mark.skipif(demo.shipped() is None, reason="no demo_data/ (pip install)")
 
@@ -33,7 +33,7 @@ def test_copied_once_and_a_demo_run(real, monkeypatch):
     assert os.stat(os.path.join(real, "cm1out_000001.nc")).st_mtime_ns == first
     assert demo.is_demo(real)
     # finished however new its files: never "still being written"
-    monkeypatch.setenv("CM1VIEW_SETTLE_SECONDS", "100000000")
+    monkeypatch.setenv("ATMO3D_SETTLE_SECONDS", "100000000")
     files = sorted(f for f in os.listdir(real) if f.startswith("cm1out_0"))
     assert run_mod.finished(files, real) == len(files)
 
@@ -73,7 +73,7 @@ def test_opens_as_a_cm1_run(run):
     assert (run.umove, run.vmove) == (12.5, 3.0)
     assert {"th", "prs", "qv", "qr", "dbz", "uinterp", "vinterp", "winterp", "zvort",
             "th0", "prs0", "qv0", "u0", "v0", "uh", "cref", "sws"} <= set(run.vars)
-    assert not {"u", "v", "w"} & set(run.vars)  # (left out: cm1view uses uinterp...)
+    assert not {"u", "v", "w"} & set(run.vars)  # (left out: atmo3d uses uinterp...)
 
 
 @needs_data
@@ -90,7 +90,7 @@ def test_packed_fields_read_as_floats(run):
 
 @needs_data
 def test_derived_fields_stand_in_for_the_ones_left_out(real):
-    from cm1view.registry import Registry
+    from atmo3d.registry import Registry
     run, F = Registry(real, 2, 1).get(real)
     assert {"thpert", "prspert", "buoy"} <= set(F.defs)
 
