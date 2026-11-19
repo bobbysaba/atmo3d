@@ -118,7 +118,8 @@ class SoundingPanel:
         z = b["zagl"] if "zagl" in b else run.z * 1000.0  # (a terrain run's mean, m AGL)
         return thermo.analyze(z, b["pres"], b["theta"], b["qv"],
                               b["u"] + run.umove, b["v"] + run.vmove, storm=storm,
-                              custom=custom, domain=(run.umove, run.vmove))
+                              custom=custom, domain=(run.umove, run.vmove),
+                              kappa=run.catalog.kappa)
 
     @staticmethod
     def _item_storm(spec, t):
@@ -246,7 +247,8 @@ class SoundingPanel:
                 th, prs, qv, u, v = run.catalog.sounding_names()
                 r = thermo.analyze(zc, c[prs], c[th], c[qv], c[u] + run.umove,
                                    c[v] + run.vmove, storm=storm,
-                                   custom=custom, domain=(run.umove, run.vmove))
+                                   custom=custom, domain=(run.umove, run.vmove),
+                                   kappa=run.catalog.kappa)
                 r["domain"] = (run.umove, run.vmove)
                 items.append((label, POINT_COLORS[n], r))
             if not items:

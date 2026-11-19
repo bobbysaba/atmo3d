@@ -656,7 +656,7 @@ def sounding_column(run, entry, fixes, progress=None, storm=("rm", (0.0, 0.0))):
     th, prs, qv, u, v = snd
     return thermo.analyze(z, c[prs], c[th], c[qv], c[u] + run.umove,
                           c[v] + run.vmove, storm=storm[0], custom=storm[1],
-                          domain=(run.umove, run.vmove))
+                          domain=(run.umove, run.vmove), kappa=run.catalog.kappa)
 
 
 def _param(r, key):

@@ -15,10 +15,14 @@ KAPPA = RD / CP
 
 
 # ----------------------------------------------------------------- thermo
-@njit(cache=True)
-def _esat(T):
+def esat(T):
+    """Saturation vapour pressure over liquid water (Pa) at T (K): Bolton (1980) eq. 10.
+    The one copy: fields.py and the parcel code (_esat) use it."""
     Tc = T - 273.15
     return 611.2 * np.exp(17.67 * Tc / (Tc + 243.5))
+
+
+_esat = njit(cache=True)(esat)
 
 
 @njit(cache=True)
@@ -109,10 +113,12 @@ def _integrate_buoyancy(z, B, z_lcl):
         return 0.0, 0.0, np.nan, np.nan, 0.0
     lfc = max(runs[0][0], int(np.searchsorted(zf, z_lcl)))
     el = runs[-1][1] - 1
-    cape = float(np.clip(bf[lfc:el + 1], 0, None).sum() * dz)
+    # CAPE: the net area from LFC to EL, negative pockets in between subtracted (as
+    # MetPy's cape_cin); floored at 0
+    cape = max(float(bf[lfc:el + 1].sum() * dz), 0.0)
     cin = float(np.clip(bf[:lfc], None, 0).sum() * dz)
     k3 = min(el + 1, int(np.searchsorted(zf, 3000.0)))
-    cape3 = float(np.clip(bf[lfc:k3], 0, None).sum() * dz) if k3 > lfc else 0.0
+    cape3 = max(float(bf[lfc:k3].sum() * dz), 0.0) if k3 > lfc else 0.0
     return cape, cin, float(zf[lfc]), float(zf[el]), cape3
 
 
@@ -154,14 +160,15 @@ def _interp1(x, xp, fp):
 
 
 @njit(cache=True)
-def _column_parcel(z, p, th, qv, kind):
+def _column_parcel(z, p, th, qv, kind, kappa):
     """(CAPE, CIN, LCL height) of parcel kind (0 SB, 1 ML, 2 MU) of one column, as
-    analyze gives them: same parcel, lift and _integrate_buoyancy."""
+    analyze gives them: same parcel, lift and _integrate_buoyancy.  kappa: the data
+    type's Rd/cp, to get T from its θ."""
     nk = p.size
     T = np.empty(nk)
     Tv = np.empty(nk)
     for k in range(nk):
-        T[k] = th[k] * (p[k] / 1.0e5) ** KAPPA
+        T[k] = th[k] * (p[k] / 1.0e5) ** kappa
         Tv[k] = T[k] * (1.0 + qv[k] / EPS) / (1.0 + qv[k])
     k0 = 0
     if kind == 0:
@@ -180,7 +187,7 @@ def _column_parcel(z, p, th, qv, kind):
             sw += w
             st += th[k] * w
             sq += qv[k] * w
-        T0, r0 = (st / sw) * (p[0] / 1.0e5) ** KAPPA, sq / sw
+        T0, r0 = (st / sw) * (p[0] / 1.0e5) ** kappa, sq / sw
     else:  # most unstable in the lowest 300 hPa
         best = -1.0
         for k in range(nk):
@@ -228,9 +235,9 @@ def _column_parcel(z, p, th, qv, kind):
     kl = np.searchsorted(zs[0] + np.arange(nf) * dz, zl)
     lfc = max(first, kl)
     cape = cin = 0.0
-    for i in range(lfc, last + 1):
-        if bf[i] > 0.0:
-            cape += bf[i]
+    for i in range(lfc, last + 1):  # (net: negative pockets subtracted, as MetPy)
+        cape += bf[i]
+    cape = max(cape, 0.0)
     for i in range(lfc):
         if bf[i] < 0.0:
             cin += bf[i]
@@ -238,54 +245,55 @@ def _column_parcel(z, p, th, qv, kind):
 
 
 @njit(parallel=True, cache=True)
-def _columns_par(z, p, th, qv, kind):
+def _columns_par(z, p, th, qv, kind, kappa):
     n = p.shape[1]
     out = np.empty((3, n))
     for c in prange(n):
         out[0, c], out[1, c], out[2, c] = _column_parcel(
             z, np.ascontiguousarray(p[:, c]), np.ascontiguousarray(th[:, c]),
-            np.ascontiguousarray(qv[:, c]), kind)
+            np.ascontiguousarray(qv[:, c]), kind, kappa)
     return out
 
 
 @njit(cache=True)
-def _columns_one(z, p, th, qv, kind):  # (no thread pool: series reader processes)
+def _columns_one(z, p, th, qv, kind, kappa):  # (no thread pool: series reader processes)
     n = p.shape[1]
     out = np.empty((3, n))
     for c in range(n):
         out[0, c], out[1, c], out[2, c] = _column_parcel(
             z, np.ascontiguousarray(p[:, c]), np.ascontiguousarray(th[:, c]),
-            np.ascontiguousarray(qv[:, c]), kind)
+            np.ascontiguousarray(qv[:, c]), kind, kappa)
     return out
 
 
 @njit(parallel=True, cache=True)
-def _columns_par_z(z, p, th, qv, kind):  # (z: each column's own heights)
+def _columns_par_z(z, p, th, qv, kind, kappa):  # (z: each column's own heights)
     n = p.shape[1]
     out = np.empty((3, n))
     for c in prange(n):
         out[0, c], out[1, c], out[2, c] = _column_parcel(
             np.ascontiguousarray(z[:, c]), np.ascontiguousarray(p[:, c]),
-            np.ascontiguousarray(th[:, c]), np.ascontiguousarray(qv[:, c]), kind)
+            np.ascontiguousarray(th[:, c]), np.ascontiguousarray(qv[:, c]), kind, kappa)
     return out
 
 
 @njit(cache=True)
-def _columns_one_z(z, p, th, qv, kind):
+def _columns_one_z(z, p, th, qv, kind, kappa):
     n = p.shape[1]
     out = np.empty((3, n))
     for c in range(n):
         out[0, c], out[1, c], out[2, c] = _column_parcel(
             np.ascontiguousarray(z[:, c]), np.ascontiguousarray(p[:, c]),
-            np.ascontiguousarray(th[:, c]), np.ascontiguousarray(qv[:, c]), kind)
+            np.ascontiguousarray(th[:, c]), np.ascontiguousarray(qv[:, c]), kind, kappa)
     return out
 
 
-def parcel_columns(z, p, th, qv, kind="sb", threads=1):
+def parcel_columns(z, p, th, qv, kind="sb", threads=1, kappa=KAPPA):
     """CAPE (J/kg), CIN (J/kg) and LCL height (m AGL) of parcel kind ('sb', 'ml', 'mu')
     in every column, as analyze gives them for one: z (nk,) m AGL, or each column's
     own (nk, ...) (a terrain run's); p (Pa), th (K), qv (kg/kg) of shape (nk, ...).
-    Returns three arrays of shape (...); `threads` columns at a time."""
+    Returns three arrays of shape (...); `threads` columns at a time.  kappa: the data
+    type's Rd/cp (Catalog.kappa), to get T from θ."""
     import numba
     p = np.asarray(p, np.float64)
     shape = p.shape[1:]
@@ -300,10 +308,10 @@ def parcel_columns(z, p, th, qv, kind="sb", threads=1):
     else:
         one, par = _columns_one, _columns_par
     if threads == 1:
-        out = one(z, p, th, qv, kind)
+        out = one(z, p, th, qv, kind, float(kappa))
     else:
         numba.set_num_threads(threads)
-        out = par(z, p, th, qv, kind)
+        out = par(z, p, th, qv, kind, float(kappa))
     return tuple(o.reshape(shape) for o in out)
 
 
@@ -347,9 +355,11 @@ def _shear(zz, U, V, h0, h1):
 
 
 # --------------------------------------------------------------- analysis
-def analyze(z, p, th, qv, u, v, storm="rm", custom=(0.0, 0.0), domain=(0.0, 0.0)):
+def analyze(z, p, th, qv, u, v, storm="rm", custom=(0.0, 0.0), domain=(0.0, 0.0),
+            kappa=KAPPA):
     """Full analysis of one column.  z (m AGL), p (Pa), th (K), qv (kg/kg),
-    u, v ground-relative (m/s).  Returns a nested dict of results."""
+    u, v ground-relative (m/s).  kappa: the data type's Rd/cp (Catalog.kappa), to get
+    T from θ.  Returns a nested dict of results."""
     z = np.asarray(z, np.float64)
     p = np.asarray(p, np.float64)
     th = np.asarray(th, np.float64)
@@ -357,7 +367,7 @@ def analyze(z, p, th, qv, u, v, storm="rm", custom=(0.0, 0.0), domain=(0.0, 0.0)
     u = np.asarray(u, np.float64)
     v = np.asarray(v, np.float64)
 
-    T = th * (p / 1.0e5) ** KAPPA
+    T = th * (p / 1.0e5) ** kappa
     Td = dewpoint(p, qv)
     Tv = virtual_temp(T, qv)
     the = theta_e(p, T, qv)
@@ -368,7 +378,7 @@ def analyze(z, p, th, qv, u, v, storm="rm", custom=(0.0, 0.0), domain=(0.0, 0.0)
     w = np.gradient(-p)[ml_layer]
     th_ml = float(np.sum(th[ml_layer] * w) / w.sum())
     q_ml = float(np.sum(qv[ml_layer] * w) / w.sum())
-    ml = parcel(z, p, Tv, 0, p[0], th_ml * (p[0] / 1.0e5) ** KAPPA, q_ml)
+    ml = parcel(z, p, Tv, 0, p[0], th_ml * (p[0] / 1.0e5) ** kappa, q_ml)
     mu_layer = np.flatnonzero(p >= p[0] - 30000.0)
     kmu = int(mu_layer[np.argmax(the[mu_layer])])
     mu = parcel(z, p, Tv, kmu, p[kmu], T[kmu], qv[kmu])
