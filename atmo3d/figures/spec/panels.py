@@ -12,7 +12,6 @@ from .. import draw as figdraw
 from .base import npanels, tindex, storm_motion, profile_runs, entry_run, time_key
 
 LINE_COLORS = ["#1f77b4", "#d62728", "#2ca02c", "#9467bd", "#ff7f0e", "#8c564b", "k"]
-SOUNDING_VARS = ("th", "prs", "qv", "uinterp", "vinterp")
 EDITED = " (edited)"  # (after a hand-edited line's label, if Plot: "Mark edited lines" is on)
 
 
@@ -628,7 +627,10 @@ def sounding_column(run, entry, fixes, progress=None, storm=("rm", (0.0, 0.0))):
     w = entry["where"]
     kind = w.get("kind", "trk")
     # (a terrain run's columns: on their own heights above ground)
-    names = SOUNDING_VARS + (("zagl",) if run.terrain else ())
+    snd = run.catalog.sounding_names()
+    if snd is None:
+        return "this run has no sounding fields (potential temperature, pressure, vapor, winds)"
+    names = snd + (("zagl",) if run.terrain else ())
     if kind == "mean":
         c = run.mean_profiles(names, t, progress=progress)
     else:
@@ -651,8 +653,9 @@ def sounding_column(run, entry, fixes, progress=None, storm=("rm", (0.0, 0.0))):
                 a = run.read_box(v, t, i0, i1, j0, j1)
             c[v] = a.mean(axis=(1, 2), dtype=np.float64)
     z = c["zagl"] if "zagl" in c else run.z * 1000.0
-    return thermo.analyze(z, c["prs"], c["th"], c["qv"], c["uinterp"] + run.umove,
-                          c["vinterp"] + run.vmove, storm=storm[0], custom=storm[1],
+    th, prs, qv, u, v = snd
+    return thermo.analyze(z, c[prs], c[th], c[qv], c[u] + run.umove,
+                          c[v] + run.vmove, storm=storm[0], custom=storm[1],
                           domain=(run.umove, run.vmove))
 
 

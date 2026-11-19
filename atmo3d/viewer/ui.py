@@ -14,8 +14,6 @@ from bokeh.models import FixedTicker, LinearAxis
 from ..core.vectors import FRAME_SHORT  # noqa: F401  (re-exported)
 from ..theme import BG, CSS, FIGURE, GRID, MUTED, PANEL, TEXT, TOOLBAR
 
-SOUNDING_VARS = ("th", "prs", "qv", "uinterp", "vinterp")
-BASE_VARS = ("th0", "prs0", "qv0", "u0", "v0")
 LEVEL_MODES = {"Height AGL (km)": "height", "Model level (k)": "level",
                "Column max": "colmax", "Column min": "colmin"}
 # a run whose levels follow the terrain: heights above sea level too

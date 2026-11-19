@@ -46,6 +46,8 @@ PRECIP = ("qr", "qs", "qg", "qhl")
 KINEMATIC = ("u", "v", "w", "xvort", "yvort", "zvort")
 THERMO = ("theta", "pres", "qv")
 BASE = ("theta0", "pres0", "qv0", "u0", "v0")
+SOUNDING = ("theta", "pres", "qv", "u", "v")  # a sounding's inputs (thermo.analyze)
+SOUNDING_BASE = BASE
 
 class Catalog:
     def __init__(self, key, natives, roles, also=None, turbulence=(), extra_groups=None):
@@ -111,10 +113,10 @@ class Catalog:
         """Whether `name` is a reflectivity field (its colours and limits)."""
         return self.is_role(name, "refl", "cref")
 
-    def sounding_names(self):
-        """The fields a sounding reads, in order (theta, pres, qv, u, v), or None if
-        any is missing."""
-        got = self.names(("theta", "pres", "qv", "u", "v"))
+    def sounding_names(self, base=False):
+        """The fields a sounding reads, in order (theta, pres, qv, u, v; base: the base
+        state's), or None if any is missing."""
+        got = self.names(SOUNDING_BASE if base else SOUNDING)
         return None if None in got else got
 
 

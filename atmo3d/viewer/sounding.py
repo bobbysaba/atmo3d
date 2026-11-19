@@ -11,7 +11,8 @@ import panel as pn
 
 from ..core import sounding_plot as sp, thermo, track as trk
 from ..theme import POINT_COLORS, POINT_LABELS
-from .ui import BASE_VARS, SOUNDING_VARS, _svg, held
+from ..core.catalog import SOUNDING
+from .ui import _svg, held
 
 _BASE_CACHE = {}  # base-state soundings per run and time (see _base_result)
 
@@ -102,17 +103,21 @@ class SoundingPanel:
         run = self.run
         key = run.path
         if key not in _BASE_CACHE:
-            if not all(run.has(v) for v in BASE_VARS):
+            names = run.catalog.sounding_names(base=True)
+            if names is None or not all(run.has(v) for v in names):
                 return None
             # horizontally uniform: the domain mean is the column, and mean_profiles
             # reads in the reader processes (a column costs a full read anyway)
-            _BASE_CACHE[key] = {v: np.asarray(p, np.float32) for v, p in run.mean_profiles(
-                BASE_VARS + (("zagl",) if run.terrain else ()), 0).items()}
+            got = run.mean_profiles(names + (("zagl",) if run.terrain else ()), 0)
+            # (kept by role: theta, pres, qv, u, v, and zagl)
+            _BASE_CACHE[key] = {r: np.asarray(got[n], np.float32) for r, n in
+                                zip(SOUNDING + ("zagl",) * run.terrain,
+                                    names + ("zagl",) * run.terrain)}
         b = _BASE_CACHE[key]
         storm, custom = self._item_storm(spec, spec["t"])
         z = b["zagl"] if "zagl" in b else run.z * 1000.0  # (a terrain run's mean, m AGL)
-        return thermo.analyze(z, b["prs0"], b["th0"], b["qv0"],
-                              b["u0"] + run.umove, b["v0"] + run.vmove, storm=storm,
+        return thermo.analyze(z, b["pres"], b["theta"], b["qv"],
+                              b["u"] + run.umove, b["v"] + run.vmove, storm=storm,
                               custom=custom, domain=(run.umove, run.vmove))
 
     @staticmethod
@@ -156,7 +161,8 @@ class SoundingPanel:
     def _snd_fields(self):
         """The 3D fields a sounding reads (a terrain run's columns: on their own heights
         above ground)."""
-        return SOUNDING_VARS + (("zagl",) if self.run.terrain else ())
+        return (self.run.catalog.sounding_names() or ()) + (("zagl",) if self.run.terrain
+                                                             else ())
 
     def _snd_whole(self):
         """Whether live soundings read whole fields: they fit the 3D cache together."""
@@ -237,8 +243,9 @@ class SoundingPanel:
                     label = f"{POINT_LABELS[n]} domain mean {run.time_label(tt)}"
                 storm, custom = self._item_storm(spec, tt)
                 zc = c["zagl"] if "zagl" in c else z  # (a terrain run's column: its own)
-                r = thermo.analyze(zc, c["prs"], c["th"], c["qv"], c["uinterp"] + run.umove,
-                                   c["vinterp"] + run.vmove, storm=storm,
+                th, prs, qv, u, v = run.catalog.sounding_names()
+                r = thermo.analyze(zc, c[prs], c[th], c[qv], c[u] + run.umove,
+                                   c[v] + run.vmove, storm=storm,
                                    custom=custom, domain=(run.umove, run.vmove))
                 r["domain"] = (run.umove, run.vmove)
                 items.append((label, POINT_COLORS[n], r))
