@@ -106,12 +106,19 @@ Where a height is below the ground of a column, there is no value (it is left em
 Winds stay **grid-relative**; WoFS grids are centred on the projection's standard longitude,
 so the rotation to true north is small.
 
+## Field names
+
+Fields keep their WRF names (`W`, `U`, `V`, `QVAPOR`, `REFL_10CM`, ...). Two are sums WRF
+splits: `THETA` (potential temperature, `T` + 300 K) and `PRES` (pressure, `P` + `PB`).
+Staggered fields are averaged onto the mass points. Fields atmo3d derives (θ′, buoyancy,
+CAPE, ...) have the same names as for any other run.
+
 ## Base state and perturbations
 
 Derived fields that need a base state (potential temperature, pressure and moisture
 perturbations, and the like) take it from the **first time** of the run: the full 3D field of
-that time. A perturbation is the change since then, point by point. WoFS has no separate
-base-state profile, so this is the closest equivalent.
+that time (`THETA0`, `PRES0`, `QVAPOR0`, `U0`, `V0`). A perturbation is the change since then,
+point by point. WoFS has no separate base-state profile, so this is the closest equivalent.
 
 ## Trajectories
 
@@ -154,7 +161,7 @@ with the figure's data, so the exported script redraws them with numpy and matpl
 At each time every field in the files is averaged over the members that have a file there.
 The mean is read in the reader processes, so a 3D field of many members takes a little longer
 the first time and is cached after that. Meanwhile the map's status line says what is being
-read and how far along it is (*Ensemble mean: reading th · 18/36 members · 4 s*), and so do
+read and how far along it is (*Ensemble mean: reading THETA · 18/36 members · 4 s*), and so do
 cross-sections, soundings, 3D views and figure previews; moving on to another time or field
 stops the reading that is no longer needed. What it means for the fields:
 
