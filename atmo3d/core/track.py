@@ -19,14 +19,16 @@ UH_LAYER = (2.0, 5.0)  # km AGL
 
 
 def available(run):
-    return run.has("winterp")
+    return run.role("w") is not None
 
 
 def metrics(run):
     """The METRICS this run has the fields for."""
-    ok = {"w": run.has("winterp"), "uh": run.has("winterp") and run.has("zvort"),
-          "zeta": run.has("zvort"),
-          "pmin": run.has("prspert") or (run.has("prs") and run.has("prs0")),
+    w, zv = run.role("w"), run.role("zvort")
+    ok = {"w": w is not None, "uh": w is not None and zv is not None,
+          "zeta": zv is not None,
+          "pmin": run.has("prspert") or (run.role("pres") is not None
+                                         and run.role("pres0") is not None),
           "field": True}
     return {k: v for k, v in METRICS.items() if ok[v]}
 
@@ -84,9 +86,9 @@ def metric_field(run, t, metric, zkm=1.0, cancelled=None, field=None, fields=Non
         name = "prspert" if metric == "pmin" else field
         return _fields(run, fields).plane(name, t, "height", zkm), {}
     if metric == "zeta":
-        return run.read_height("zvort", t, zkm), {}
+        return run.read_height(run.role("zvort"), t, zkm), {}
     if metric == "w":
-        return run.read_height("winterp", t, zkm), {}
+        return run.read_height(run.role("w"), t, zkm), {}
     if run.terrain:  # (each column's own levels: those in 2-5 km, thickness in it)
         from .fields import column_levels_3d
         ks, dzs, _ = column_levels_3d(run.heights(t), run.heights(t, w=True), *UH_LAYER)
@@ -96,11 +98,12 @@ def metric_field(run, t, metric, zkm=1.0, cancelled=None, field=None, fields=Non
     uh = np.zeros((run.nj, run.ni), np.float32)
     wmax = np.full((run.nj, run.ni), -np.inf, np.float32)
     zmax = np.full((run.nj, run.ni), -np.inf, np.float32)
-    lv = run.read_levels(["winterp", "zvort"], t, ks, cancelled=cancelled)
+    wn, zn = run.role("w"), run.role("zvort")
+    lv = run.read_levels([wn, zn], t, ks, cancelled=cancelled)
     if lv is None:  # (cancelled)
         return None, None
     for n, k in enumerate(ks):
-        w, zeta = lv["winterp"][n], lv["zvort"][n]
+        w, zeta = lv[wn][n], lv[zn][n]
         if run.terrain:
             inside = dzs[n] > 0  # (dz 0 outside the layer)
             uh += w * zeta * dzs[n]

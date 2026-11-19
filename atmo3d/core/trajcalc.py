@@ -8,7 +8,7 @@ from Z0_KM above the lowest ground up to TOP_KM, or less where the model top is 
 the ground are missing throughout.
 
 Tracing.  Midpoint (RK2) steps of at most MAX_DT s in x, y, z (km), with the
-grid-relative winds (uinterp, vinterp, winterp) trilinear in space, each output's
+grid-relative winds (the catalog's u, v, w roles) trilinear in space, each output's
 taken at its own level heights (a terrain run's columns: run.heights(t, "msl")), and
 linear in time between two outputs.  A parcel stays between the lowest and highest
 levels of its column (sliding along them) and is missing once it leaves the domain
@@ -43,7 +43,13 @@ SEEDS_ACROSS = 60  # seeds along the longer side of the domain
 DZ_KM, Z0_KM, TOP_KM = 0.5, 0.25, 15.0  # seed heights (km above the lowest ground)
 MAX_DT = 60.0  # s, the longest step
 MISSING = -1.0e30  # (as CM1 writes parcels that left the domain)
-WINDS = ("uinterp", "vinterp", "winterp")
+NWINDS = 3  # (u, v, w)
+
+
+def winds(run):
+    """The names of the run's grid-relative u, v, w (None for one it lacks)."""
+    return run.catalog.names(("u", "v", "w"))
+
 VARS = {"x": ("x position (traced)", "m"), "y": ("y position (traced)", "m"),
         "z": ("height above sea level (traced)", "m"), "u": ("u (grid-relative)", "m/s"),
         "v": ("v (grid-relative)", "m/s"), "w": ("w", "m/s")}
@@ -60,7 +66,7 @@ def off(run):
     from .. import config
     if len(run.times) < 2:
         return "Trajectories need at least two output times; this run has one."
-    if not all(n in run.vars for n in WINDS):
+    if not all(n in run.vars for n in winds(run)):
         return "Trajectories need the 3D winds, which this run's output lacks."
     lim = config.get("traj_max_interval")
     dt = interval(run)
@@ -116,16 +122,17 @@ class _Winds:
     def __init__(self, run, t, box=None):
         self.run, self.box = run, box
         zmsl = run.terrain and "zmsl" in run.vars
-        names = list(WINDS) + (["zmsl"] if zmsl else [])
+        wn = winds(run)
+        names = list(wn) + (["zmsl"] if zmsl else [])
         if box is None:
             run.load_volumes(names, t)
-            self.U, self.V, self.W = (run.volume(n, t) for n in WINDS)
+            self.U, self.V, self.W = (run.volume(n, t) for n in wn)
             self.H = run.heights(t, "msl") if run.terrain else None
             return
         K1, J0, J1, I0, I1 = box
         rows, cols = np.arange(J0, J1), np.arange(I0, I1)
         lv = run.read_levels(names, t, range(K1), rows, cols)  # (heights read with them)
-        self.U, self.V, self.W = (lv[n] for n in WINDS)
+        self.U, self.V, self.W = (lv[n] for n in wn)
         self.H = None if not run.terrain else lv["zmsl"] / np.float32(1000.0) if zmsl \
             else part_heights(run, t, K1, rows, cols)
 
@@ -207,7 +214,7 @@ U_MIN, W_MIN = 10.0, 5.0
 
 def _in_parts(run):
     """Whether the winds of two outputs are too large for the 3D cache together."""
-    nb = 4 * run.nk * run.nj * run.ni * (len(WINDS) + bool(run.terrain))
+    nb = 4 * run.nk * run.nj * run.ni * (NWINDS + bool(run.terrain))
     return hasattr(run, "fits") and not run.fits(2 * nb)
 
 
@@ -233,7 +240,7 @@ def _bands(run, p, idx, mh, mv):
     q = p[idx]
     K1 = _box(run, q, mh, mv)[0]
     budget = max(1, min(PART_BYTES, run.cache_bytes // 8))
-    rows = budget // (2 * 4 * (len(WINDS) + bool(run.terrain)) * K1 * run.ni)
+    rows = budget // (2 * 4 * (NWINDS + bool(run.terrain)) * K1 * run.ni)
     core = max(4, int(rows - 2 * np.ceil(mh / (run.dy / 1000.0)) - 3))
     _, fj = _fij(run, q[:, 0], q[:, 1])
     band = np.floor(np.nan_to_num(fj) / core).astype(np.intp)
@@ -324,7 +331,7 @@ def trace(run, lat, progress=None, cancelled=None, span=None):
         return out
     # the next output's winds are read while a step is integrated, when three outputs'
     # winds (the two of the step and the next) fit in half the 3D cache
-    nbytes = 4 * run.nk * run.nj * run.ni * (len(WINDS) + (w0.H is not None))
+    nbytes = 4 * run.nk * run.nj * run.ni * (NWINDS + (w0.H is not None))
     fits = 3 * nbytes <= getattr(run, "cache_bytes", 0) // 2
     winds = ahead(lambda k: _Winds(run, k), range(k0 + 1, k1 + 1),
                   min(1, ahead_width(run)) if fits else 0)

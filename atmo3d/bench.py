@@ -57,7 +57,7 @@ def parser():
     ap.add_argument("--field", default=None,
                     help="map fill to start from (default: the viewer's)")
     ap.add_argument("--field2", default=None,
-                    help="field to switch to (default: one of winterp, thpert, dbz, ...)")
+                    help="field to switch to (default: vertical velocity, thpert, reflectivity, ...)")
     ap.add_argument("--time", type=int, default=None,
                     help="first output index (default: the middle of the run)")
     ap.add_argument("--steps", type=int, default=4,
@@ -303,8 +303,9 @@ class Bench:
         X0, X1, Y0, Y1 = v.extent
         xc, yc, w, h = (X0 + X1) / 2, (Y0 + Y1) / 2, X1 - X0, Y1 - Y0
         f2 = self.args.field2 or next(
-            (n for n in ("winterp", "thpert", "dbz", "uinterp", "qr", "prspert")
-             if n in F and F[n].ndim == 3 and n != v.fill_var.value), None)
+            (n for n in (F.role("w"), "thpert", F.role("refl"), F.role("u"), F.role("qr"),
+                         "prspert") if n and n in F and F[n].ndim == 3
+             and n != v.fill_var.value), None)
         self.say("\n" + self._head())
 
         # ---- the map
@@ -457,7 +458,7 @@ class Bench:
                             t_from=ta, t_to=ta + n)
                 track.track(run, ta, None, None, opts, "forward", fields=F)
             self.core(f"tracking: {n} outputs on {track.METRIC_LABEL[metric]}", follow)
-        name = next((x for x in ("uh25", "winterp", v.fill_var.value) if x in F), None)
+        name = next((x for x in ("uh25", F.role("w"), v.fill_var.value) if x and x in F), None)
         if name:
             lay = dict(field=name, mode="height", z=1.0,
                        reduce=dict(op="max", t0=float(run.times[ta]), t1=None, every=1))
@@ -476,7 +477,7 @@ class Bench:
         # trajectories traced through the winds (as for a run without parcel output),
         # the whole domain's seeding, from whole volumes and read in parts
         from .core import trajcalc
-        if all(x in run.vars for x in trajcalc.WINDS):
+        if all(x in run.vars for x in trajcalc.winds(run)):
             lat, span = trajcalc.lattice(run), (ta, ta + n)
             what = f"trajectories: {n} outputs, {lat['nx'] * lat['ny'] * lat['nz']} parcels"
             self.core(what, lambda: trajcalc.trace(run, lat, span=span))

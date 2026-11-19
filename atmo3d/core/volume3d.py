@@ -522,11 +522,11 @@ def _scene_parts(run, F, scene, stride, need_h, key, progress, cancelled):
         r, c = np.arange(J0, J1), np.arange(I0, I1)
         Hs = part_heights(run, t, run.nk, r, c) if run.terrain else None
         k1 = stream_levels(run, ztop, Hs)
-        w = run.read_levels(["uinterp", "vinterp", "winterp"], t, range(k1), r, c,
-                            cancelled=cancelled)
+        un, vn, wn = run.catalog.names(("u", "v", "w"))
+        w = run.read_levels([un, vn, wn], t, range(k1), r, c, cancelled=cancelled)
         if w is None:
             return None
-        stream = streamlines(run, w["uinterp"], w["vinterp"], w["winterp"], box, ztop,
+        stream = streamlines(run, w[un], w[vn], w[wn], box, ztop,
                              ss["z"], ss["n"], ss["length"], ss["dir"],
                              frame_offset(run, ss["frame"], scene["storm"]),
                              seed_box=ss["seed_box"], H=None if Hs is None else Hs[:k1],
@@ -554,7 +554,7 @@ def build_scene(run, F, scene, progress=None, cancelled=None, cache=None):
     Returns dict(meshes, ground, vecs, stream, notes, stride, off, terrain)."""
     t, box, ztop = scene["t"], scene["box"], scene["ztop"]
     ss = scene["stream"]
-    wind = ["uinterp", "vinterp", "winterp"]
+    wind = list(run.catalog.names(("u", "v", "w")))
     need_h = run.terrain and bool(scene["isos"] or ss["on"])
     stride = scene["res"] or auto_stride(run, box, ztop, 12e6)
     off = frame_offset(run, ss["frame"], scene["storm"])
@@ -622,10 +622,10 @@ def build_scene(run, F, scene, progress=None, cancelled=None, cache=None):
             if cache is not None:
                 cache.update(stream_key=key, stream=stream)
         else:
-            stream = streamlines(run, run.volume("uinterp", t), run.volume("vinterp", t),
-                                 run.volume("winterp", t), box, ztop, ss["z"], ss["n"],
+            u, v, w = (run.volume(n, t) for n in wind)
+            stream = streamlines(run, u, v, w, box, ztop, ss["z"], ss["n"],
                                  ss["length"], ss["dir"], off, seed_box=ss["seed_box"],
-                               H=H)
+                                 H=H)
             if cache is not None:
                 cache.update(stream_key=key, stream=stream)
         stream = dict(stream) if stream is not None else None
