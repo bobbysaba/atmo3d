@@ -330,7 +330,7 @@ def parser():
     ap = argparse.ArgumentParser(
         prog="atmo3d export",
         description="Write fields of a run to a netCDF file: any field the viewer has "
-                    "(native, derived, derivatives such as ddz.winterp, column fields), "
+                    "(native, derived, derivatives such as ddz.<field>, column fields), "
                     "in a box, on the model levels or at heights, one time after another.",
         epilog="Fields: names as in the viewer's lists (atmo3d export RUN --list); a "
                "derivative is ddx./ddy./gradh./ddz. before a field's name.  --out may "

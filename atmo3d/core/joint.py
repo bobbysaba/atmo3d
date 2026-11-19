@@ -53,8 +53,8 @@ def sample(run, F, recipe, t, storm=None, center=None):
     x = dist.values(run, F, r, r["field"], t, storm if F[r["field"]].storm else None, reg)
     y = dist.values(run, F, r, r["yfield"], t, storm if F[r["yfield"]].storm else None, reg)
     if x.shape != y.shape:
-        raise ValueError("the two fields are on different grids (pick the interpolated "
-                         "ones, e.g. winterp, not w)")
+        raise ValueError("the two fields are on different grids (pick fields on the "
+                         "scalar points, not staggered ones)")
     keep = np.isfinite(x) & np.isfinite(y)
     for a, lo, hi in ((x, r.get("lo"), r.get("hi")), (y, r.get("ylo"), r.get("yhi"))):
         if lo is not None:

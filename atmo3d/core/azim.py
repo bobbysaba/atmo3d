@@ -99,8 +99,8 @@ def at_time(run, F, recipe, t, center, ref, storm=None):
     if F.fits([d.name], t):
         vol, scale = F.raw(d.name, t, storm)
         if vol.shape[1:] != (run.nj, run.ni) or vol.shape[0] != len(run.z):
-            raise ValueError(f"{d.name} is not on the scalar grid (pick an interpolated "
-                             "field, e.g. winterp, not w)")
+            raise ValueError(f"{d.name} is not on the scalar grid (pick a field on the "
+                             "scalar points, not a staggered one)")
 
     def box(k0, k1):  # (levels k0:k1 of the box, and their factor to display units)
         if vol is not None:

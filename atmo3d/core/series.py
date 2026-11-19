@@ -3,7 +3,7 @@
 A recipe says what to compute at each time:
   field   any 3D or 2D field of the catalog (native or derived, e.g. thpert, thrhopert,
           or a column field such as uh25), or a derivative of one (fields.deriv_name,
-          e.g. ddz.winterp)
+          e.g. ddz.<field>)
   vmode   'height' (one height, km AGL), 'layer' (every model level in z0..z1) or '2d'
   region  'domain', 'box' (x0, x1, y0, y1 km) or 'track' (disc of `radius` km around
           the tracked storm, shifted by `offset` km)
@@ -484,8 +484,9 @@ def empty(run, recipe, label="", units=""):
     ds.attrs.update(
         title="atmo3d time series", description=red, recipe=json.dumps(recipe),
         run=run.path, field=recipe["field"], field_label=label, units=units,
-        perturbations="perturbations (′) are relative to the CM1 base state (th0, qv0, "
-                      "prs0 in the output)",
+        perturbations=f"perturbations (′) are relative to the {run.model_label} base state "
+                      f"({', '.join(n for n in run.catalog.names(('theta0', 'qv0', 'pres0')) if n)}"
+                      " in the output)",
         grid=f"dx = {run.dx:g} m; x/y on the model grid, which moves with "
              f"(umove, vmove) = ({run.umove:g}, {run.vmove:g}) m/s",
         created=_time.strftime("%Y-%m-%d %H:%M:%S"))
