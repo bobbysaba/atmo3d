@@ -640,6 +640,17 @@ class Run:
     def has(self, name):
         return name in self.vars
 
+    @property
+    def catalog(self):
+        """The data type's field catalog (core.catalog): its names for each role."""
+        from .catalog import of_model
+        return of_model(self.model)
+
+    def role(self, r):
+        """The field in the files playing role r (core.catalog.ROLES), or None."""
+        n = self.catalog.name(r)
+        return n if n is not None and self.has(n) else None
+
     def in_file(self, name, t):
         ts = self.var_times.get(name)
         return name in self.vars and (ts is None or t in ts)

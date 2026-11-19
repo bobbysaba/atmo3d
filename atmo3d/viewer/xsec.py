@@ -327,7 +327,7 @@ class SectionPanel:
             names += F.native_deps(n)
         for q in qs:
             names += vectors.deps(F, q)
-        shown = shown + [c for q in qs for c in vectors.fields(q)]
+        shown = shown + [c for q in qs for c in vectors.fields(F, q)]
         if self.run.terrain:  # (each column on its own heights)
             names.append("zmsl")
             shown.append("zmsl")
@@ -400,7 +400,7 @@ class SectionPanel:
                            render.sample_section(run, a, fi, fj, zq, t)
                            for a in (vectors.volumes(F, o["q"], t) if whole else [
                                c and render.section_columns(F, c, t, zq)
-                               for c in vectors.VECTORS[o["q"]].comps]))
+                               for c in vectors.comps(F, o["q"])]))
                 if vectors.VECTORS[o["q"]].framed:
                     u, v = vectors.to_frame(run, u, v, o["frame"], spec["storm"])
                 return render.section_vectors(

@@ -10,14 +10,16 @@ class VectorDef:
     key: str
     label: str
     units: str
-    comps: tuple   # field names of the x, y and vertical components (None: zero)
+    comps: tuple   # the x, y and vertical components (None: zero): roles of
+    #                core.catalog.ROLES, or the core's derived field names; comps(F, key)
+    #                gives the run's field names
     ref: float     # a typical magnitude: the default reference arrow
     framed: bool = False  # the wind: ground-, grid- or storm-relative
 
 
 # (a new one: its key arrow units in figures/draw/layers.py KEY_UNITS too)
 VECTORS = {d.key: d for d in (
-    VectorDef("wind", "Wind", "m/s", ("uinterp", "vinterp", "winterp"), 20.0, framed=True),
+    VectorDef("wind", "Wind", "m/s", ("u", "v", "w"), 20.0, framed=True),
     VectorDef("hvort", "Horizontal vorticity", "1/s", ("xvort", "yvort", "zvort"), 0.02),
     VectorDef("bgen", "Baroclinic generation", "10⁻⁴ s⁻²", ("bgen_x", "bgen_y", None), 1.0),
 )}
@@ -28,9 +30,23 @@ FRAME_SHORT = {"ground": "ground-rel", "grid": "grid-rel", "storm": "storm-rel"}
 FIG_SCALE = 12.5  # × ref: 250 for the wind
 
 
+def comps(F, key):
+    """The field names of vector `key`'s components on F's run (None: zero, or a role
+    the run's data type lacks)."""
+    from .catalog import ROLES
+    cat = getattr(F, "cat", None)
+    return tuple(None if c is None else (cat.name(c) if cat is not None else None)
+                 if c in ROLES else c for c in VECTORS[key].comps)
+
+
 def options(F):
     """{label: key} of the vectors this run has the fields for."""
-    return {d.label: k for k, d in VECTORS.items() if all(c in F for c in d.comps[:2])}
+    out = {}
+    for k, d in VECTORS.items():
+        c = comps(F, k)
+        if all(n is not None and n in F for n in c[:2]):
+            out[d.label] = k
+    return out
 
 
 FRAMES = {"Ground-relative": "ground", "Grid-relative": "grid", "Storm-relative": "storm"}
@@ -66,26 +82,25 @@ def to_frame(run, u, v, frame, storm):
 
 def plane(F, key, t, mode, level, frame="grid", storm=None):
     """(u, v) planes of vector `key` (frame and storm: for the wind)."""
-    d = VECTORS[key]
-    u = F.plane(d.comps[0], t, mode, level)
-    v = F.plane(d.comps[1], t, mode, level)
+    d, c = VECTORS[key], comps(F, key)
+    u = F.plane(c[0], t, mode, level)
+    v = F.plane(c[1], t, mode, level)
     return to_frame(F.run, u, v, frame, storm) if d.framed else (u, v)
 
 
 def volumes(F, key, t):
     """(u, v, w) volumes of vector `key`, grid-relative (w None when it has none)."""
-    d = VECTORS[key]
-    return tuple(F.volume(c, t) if c else None for c in d.comps)
+    return tuple(F.volume(c, t) if c else None for c in comps(F, key))
 
 
-def fields(key):
+def fields(F, key):
     """The names of the 3D fields vector `key` is made of."""
-    return [c for c in VECTORS[key].comps if c]
+    return [c for c in comps(F, key) if c]
 
 
 def deps(F, key):
     """The native fields vector `key` is computed from."""
-    return [n for c in VECTORS[key].comps if c for n in F.native_deps(c)]
+    return [n for c in comps(F, key) if c for n in F.native_deps(c)]
 
 
 def label(key, frame=None):

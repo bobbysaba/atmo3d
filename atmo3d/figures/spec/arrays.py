@@ -555,7 +555,7 @@ def _extract_xsec(run, F, spec, i, t, center, fixes, storm, out, progress):
     shown = [lay["field"] for lay in layers if lay.get("on", True)
              and lay["type"] in ("fill", "contour", "shade")]
     shown += [c for lay in layers if lay.get("on", True) and lay["type"] == "vectors"
-              for c in vectors.fields(lay.get("vector", "wind"))]
+              for c in vectors.fields(F, lay.get("vector", "wind"))]
     whole = F.fits(shown + (["zmsl"] if run.terrain else []), t)
     if whole:
         run.load_volumes(names, t, progress=progress)
@@ -587,7 +587,7 @@ def _extract_xsec(run, F, spec, i, t, center, fixes, storm, out, progress):
                        _strip(run, a, fi, fj, zq, across, width, t)
                        for a in (vectors.volumes(F, q, t) if whole else [
                            c and render.section_columns(F, c, t, zq)
-                           for c in vectors.VECTORS[q].comps]))
+                           for c in vectors.comps(F, q)]))
             if vectors.VECTORS[q].framed:
                 u, v = vectors.to_frame(run, u, v, lay["frame"], storm)
             if lay.get("style") == "streamlines":

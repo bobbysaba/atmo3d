@@ -15,12 +15,12 @@ cache, saved figures, exports, ?run=) tells the members apart.  <root>/mean is t
 ensemble mean (WoFSMeanRun, below).  Opening the root opens the member the
 wofs_member setting names (default 1).
 
-Fields are renamed to atmo3d's (CM1) names where there is one: T+300 -> th,
-P+PB -> prs, QVAPOR... -> qv..., REFL_10CM -> dbz, U/V/W -> uinterp/vinterp/winterp
-(averaged onto mass points on read, like CM1's staggered fields).  Every other 2D or
-3D field on the mass or a staggered grid keeps its WRF name.  The base state
-(th0, prs0, qv0, u0, v0) is the member's own 3D field at its first time, so a
-perturbation is the change since then.  Winds are grid-relative.
+Fields keep their WRF names (core.wofs_catalog says which plays each role).  Two are
+sums WRF splits: THETA = T + 300 and PRES = P + PB (SUMS; T, P and PB themselves are
+not listed).  Staggered fields (U, V, W, ...) are averaged onto mass points on read,
+like CM1's.  Every 2D or 3D field on the mass or a staggered grid is listed.  The base
+state (THETA0, PRES0, QVAPOR0, U0, V0) is the member's own 3D field at its first time,
+so a perturbation is the change since then.  Winds are grid-relative.
 
 Heights: the levels follow the terrain (Run.terrain), so every column has its own,
 changing with time: the fields zmsl and zagl (m above sea level / ground, at mass
@@ -50,28 +50,17 @@ FILE_RE = re.compile(r"^wrfout_d01_(\d{4}-\d\d-\d\d_\d\d:\d\d:\d\d)_(\d+)$")
 MEMBER_RE = re.compile(r"^mem0*(\d+)$")
 MEAN = "mean"  # <root>/mean: the ensemble mean run
 
-# atmo3d name -> (WRF fields summed, constant added)
-MAPPED = {
-    "th": (("T",), 300.0),
-    "prs": (("P", "PB"), 0.0),
-    "qv": (("QVAPOR",), 0.0),
-    "qc": (("QCLOUD",), 0.0),
-    "qr": (("QRAIN",), 0.0),
-    "qi": (("QICE",), 0.0),
-    "qs": (("QSNOW",), 0.0),
-    "qg": (("QGRAUP",), 0.0),
-    "qhl": (("QHAIL",), 0.0),
-    "dbz": (("REFL_10CM",), 0.0),
-    "uinterp": (("U",), 0.0),
-    "vinterp": (("V",), 0.0),
-    "winterp": (("W",), 0.0),
+# fields WRF splits, summed on read: name -> (WRF fields summed, constant added)
+SUMS = {
+    "THETA": (("T",), 300.0),
+    "PRES": (("P", "PB"), 0.0),
 }
-LABELS = {"th": ("potential temperature", "K"), "prs": ("pressure", "Pa"),
-          "qv": ("water vapor mixing ratio", "kg/kg"),
-          "uinterp": ("u (grid-relative)", "m/s"), "vinterp": ("v (grid-relative)", "m/s")}
-# base state: the member's own field at its first time
-BASE = {"th0": "th", "prs0": "prs", "qv0": "qv", "u0": "uinterp", "v0": "vinterp"}
-USED = {w for srcs, _ in MAPPED.values() for w in srcs}
+LABELS = {"THETA": ("potential temperature", "K"), "PRES": ("pressure", "Pa"),
+          "QVAPOR": ("water vapor mixing ratio", "kg/kg"),
+          "U": ("u (grid-relative)", "m/s"), "V": ("v (grid-relative)", "m/s")}
+# base state: the member's own field at its first time (a SUMS name or a WRF one)
+BASE = {"THETA0": "THETA", "PRES0": "PRES", "QVAPOR0": "QVAPOR", "U0": "U", "V0": "V"}
+USED = {w for srcs, _ in SUMS.values() for w in srcs}
 # heights of the levels (m), from the geopotential: name -> (above, label)
 HEIGHTS = {"zmsl": ("msl", "height above sea level"), "zagl": ("agl", "height above ground")}
 
@@ -329,7 +318,7 @@ class WRFView:
             d = self._d
             return _Height(d["PH"], d["PHB"], d["HGT"] if what == "agl" else None)
         d = self._first() if kind == "base" else self._d
-        srcs, add = MAPPED[what]
+        srcs, add = SUMS.get(what, ((what,), 0.0))
         return _Sum([d[s] for s in srcs], add)
 
     def close(self):
@@ -430,15 +419,15 @@ class WRFMeanSource:
 
 
 def table(wrfvars):
-    """{atmo3d name: (kind, what)} of a WRF file's variables: kind "mapped" (what: a
-    MAPPED name), "base" (what: the MAPPED name read at the first time), "height"
+    """{name: (kind, what)} of a WRF file's variables: kind "sum" (what: a SUMS
+    name), "base" (what: the SUMS or WRF name read at the first time), "height"
     (what: "msl" or "agl", HEIGHTS) or "wrf" (what: the WRF name)."""
     out = {}
-    for n, (srcs, _) in MAPPED.items():
+    for n, (srcs, _) in SUMS.items():
         if all(s in wrfvars for s in srcs):
-            out[n] = ("mapped", n)
+            out[n] = ("sum", n)
     for n, of in BASE.items():
-        if of in out:
+        if of in out or (of in wrfvars and of not in USED and _stag(wrfvars[of].dimensions)):
             out[n] = ("base", of)
     if all(s in wrfvars for s in ("PH", "PHB", "HGT")):
         for n, (ref, _) in HEIGHTS.items():
@@ -478,15 +467,15 @@ class WoFSRun(Run):
             for n, (kind, what) in names.items():
                 if kind == "wrf":
                     v = d[what]
-                    long_name = getattr(v, "description", what)
-                    units = getattr(v, "units", "")
+                    long_name, units = LABELS.get(what, (getattr(v, "description", what),
+                                                         getattr(v, "units", "")))
                     ndim, stag = _stag(v.dimensions)
                 elif kind == "height":
                     v = d["PH"]
                     long_name, units = HEIGHTS[n][1], "m"
                     ndim, stag = 3, "z"
                 else:
-                    src = MAPPED[what][0][0]
+                    src = SUMS[what][0][0] if what in SUMS else what
                     v = d[src]
                     long_name, units = LABELS.get(what, (getattr(v, "description", n),
                                                          getattr(v, "units", "")))
@@ -672,7 +661,7 @@ class WoFSMeanRun(WoFSRun):
         members = sum(len(p.pairs) for p in parts)
         read = 0  # member reads done, over all the fields
 
-        def tell():  # e.g. "th · 18/36 members" (or "th, qv · 40/72 member reads")
+        def tell():  # e.g. "THETA · 18/36 members" (or "THETA, QVAPOR · 40/72 member reads")
             if progress:
                 left = [n for n, _ in wants if n in got]
                 what = ", ".join(left[:3]) + (", …" if len(left) > 3 else "")

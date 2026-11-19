@@ -40,6 +40,8 @@ class AllFields:
 
     def __init__(self, fields):
         self.defs, self._some = OrderedDict(), set()
+        self._fields = list(fields)
+        self.cat = self._fields[0].cat if self._fields else None
         for F in fields:
             for name, d in F.defs.items():
                 self.defs.setdefault(name, d)
@@ -62,6 +64,10 @@ class AllFields:
         except KeyError:
             return False
         return True
+
+    def role(self, r):
+        """The field playing role r in the first run that has one, else None."""
+        return next((n for n in (F.role(r) for F in self._fields) if n), None)
 
     def groups(self, ndim=None):
         out = OrderedDict((g, OrderedDict()) for g in GROUP_ORDER)

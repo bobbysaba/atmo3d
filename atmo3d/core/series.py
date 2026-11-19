@@ -225,11 +225,13 @@ def _read(v, stag, k, j0, j1, i0, i1, ndim):
 _DEFS = {}
 
 
-def _field_def(name, avail):
-    key = (name, frozenset(avail))
+def _field_def(name, avail, model=None):
+    key = (name, frozenset(avail), model)
     if key not in _DEFS:
+        from .catalog import of_model
         from .fields import _make_fields
-        _DEFS[key] = next((d for d in _make_fields(set(avail)) if d.name == name), None)
+        _DEFS[key] = next((d for d in _make_fields(set(avail), of_model(model))
+                           if d.name == name), None)
     return _DEFS[key]
 
 
@@ -260,7 +262,7 @@ def _worker(task):
         with open_source(task["src"]) as d:
             name, info = task["field"], task["natives"]
             op = task.get("op", "")
-            fdef = None if name in info else _field_def(name, task["avail"])
+            fdef = None if name in info else _field_def(name, task["avail"], task.get("model"))
             if fdef is None and name not in info:
                 return dict(t=t, error=f"unknown field {name}")
             deps = [name] if fdef is None else list(fdef.natives)
@@ -644,7 +646,7 @@ def compute(run, F, recipe, ds, centers=None, storm=None, on_result=None, cancel
                            min(j1 + 1, run.nj)) if halo else (i0, i1, j0, j1))
         tasks.append(dict(
             t=t, src=run.source(t), field=name, op=op, natives=natives, dscale=dscale,
-            avail=sorted(run.vars), box=(i0, i1, j0, j1), halo=(e0, e1, f0, f1),
+            avail=sorted(run.vars), model=run.model, box=(i0, i1, j0, j1), halo=(e0, e1, f0, f1),
             mask=mask, ctx=c, reduce=recipe["reduce"],
             pct=recipe.get("pct", 99.0), vmode=vmode, weights=weights,
             zkm=recipe.get("z", np.nan), levels=ks,
