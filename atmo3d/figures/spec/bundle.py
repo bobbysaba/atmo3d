@@ -348,12 +348,29 @@ def load_spec(path):
     if spec.get("version") not in (1, 3):
         raise ValueError("not an atmo3d figure spec (version 1, 2 or 3)")
     check_runs(spec)
+    upgrade_names(spec)
     return spec
 
 
+def _run_paths(spec):
+    return [r.get("path") for part in spec.get("parts") or [spec]
+            for r in part.get("runs") or []]
+
+
 def check_runs(spec):
-    """ValueError when a run of the figure (or of one of its parts) is not on disk."""
-    for part in spec.get("parts") or [spec]:
-        for r in part.get("runs") or []:
-            if not os.path.isdir(r["path"]):
-                raise ValueError(f"run folder {r['path']} not found")
+    """ValueError when a run of the figure (or of one of its parts) is not on disk (a
+    run a model names inside a folder, such as a WoFS member, counts: models.exists)."""
+    from ...core import models
+    for p in _run_paths(spec):
+        if not models.exists(p):
+            raise ValueError(f"run folder {p} not found")
+
+
+def upgrade_names(spec):
+    """Rename, in place, the fields a figure saved before its runs' data type renamed
+    them names (core.catalog: WoFS's CM1-style names became WRF's).  Doing it again
+    changes nothing.  Why it was left as saved, or ""."""
+    from ...core.catalog import rename_fields, renames_for
+    table, note = renames_for(_run_paths(spec))
+    rename_fields(spec, table)
+    return note

@@ -18,6 +18,8 @@ A data type supplies one Catalog:
             role_of, never for name (optional)
   turbulence  names grouped as "Turbulence" (optional)
   extra_groups  {field name: field-list group} for fields no role places (optional)
+  renamed   {old name: name} of fields this data type's saved files (sessions,
+            figures) called otherwise before; rename_fields maps them on load
 
 The roles (ROLES below) are the inputs of the core's derived fields and defaults; a
 new data type maps the ones it has.  Display defaults per role (isosurface values,
@@ -50,7 +52,8 @@ SOUNDING = ("theta", "pres", "qv", "u", "v")  # a sounding's inputs (thermo.anal
 SOUNDING_BASE = BASE
 
 class Catalog:
-    def __init__(self, key, natives, roles, also=None, turbulence=(), extra_groups=None):
+    def __init__(self, key, natives, roles, also=None, turbulence=(), extra_groups=None,
+                 renamed=None):
         unknown = (set(roles) | set(also or {})) - set(ROLES)
         if unknown:
             raise ValueError(f"unknown roles {sorted(unknown)} (see core.catalog.ROLES)")
@@ -58,6 +61,7 @@ class Catalog:
         self.also = {r: tuple(ns) for r, ns in (also or {}).items()}
         self.turbulence = frozenset(turbulence)
         self.extra_groups = dict(extra_groups or {})  # {field name: group}
+        self.renamed = dict(renamed or {})
         self._by_name = {}
         for r, n in self.roles.items():
             self._by_name.setdefault(n, r)
@@ -139,6 +143,67 @@ class Union:
 
     def reflectivity(self, name):
         return self.is_role(name, "refl", "cref")
+
+
+# ------------------------------------------------------------------ saved files
+# keys of a saved session or figure whose values (a string or a list of them) name
+# fields: a layer's field, an isosurface's var, the 3D floor, a distribution's
+# yfield, a parcel colour variable ("@field": a field at the parcels)...  Only these
+# are renamed: a figure's panel kind "th" (time-height) or a label is never touched.
+FIELD_KEYS = frozenset(("field", "var", "yfield", "xfield", "floor", "fields", "cvar",
+                        "color", "plot_x", "plot_y"))
+
+
+def _renamed(v, table):
+    """Field name v with table applied to it, its derivative's base ("ddz.winterp")
+    or a field at the parcels ("@winterp")."""
+    from .fields import deriv_name, split_deriv
+    at = "@" if v.startswith("@") else ""
+    op, base = split_deriv(v[len(at):])
+    return at + deriv_name(op, table[base]) if base in table else v
+
+
+def rename_fields(obj, table):
+    """Rename, in place, the fields of a saved session or figure (JSON: dicts and
+    lists) by table {old: new}, under FIELD_KEYS only.  The number renamed."""
+    if not table:
+        return 0
+    n = 0
+    if isinstance(obj, dict):
+        for k, v in obj.items():
+            if k in FIELD_KEYS and isinstance(v, str):
+                new = _renamed(v, table)
+                if new != v:
+                    obj[k], n = new, n + 1
+            elif k in FIELD_KEYS and isinstance(v, list) and all(isinstance(x, str) for x in v):
+                new = [_renamed(x, table) for x in v]
+                n += sum(a != b for a, b in zip(new, v))
+                obj[k] = new
+            else:
+                n += rename_fields(v, table)
+    elif isinstance(obj, list):
+        for v in obj:
+            n += rename_fields(v, table)
+    return n
+
+
+def renames_for(paths):
+    """(table, note) for a saved file naming runs `paths`: the data type's renamed
+    table when every run is of one data type (else {}), and why not when runs of
+    several types would each want their own (""; nothing to do)."""
+    from . import models
+    keys = set()
+    for p in paths:
+        m = models.detect(p) if p else None
+        keys.add(m.key if m is not None else None)
+    keys.discard(None)
+    tables = {k: of_model(k).renamed for k in keys}
+    if len(keys) == 1:
+        return tables[keys.pop()], ""
+    if any(tables.values()):
+        return {}, ("its runs are of several data types and the field names of some "
+                    "changed (WoFS: WRF names); fields kept as saved")
+    return {}, ""
 
 
 CATALOGS = {}

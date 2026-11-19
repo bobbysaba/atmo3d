@@ -268,6 +268,7 @@ class FigureExport:
             fg.check_runs(form)
         except (KeyError, TypeError, ValueError) as e:
             return str(e)
+        fg.upgrade_names(form)  # (fields renamed since it was saved)
         if state.get("doc"):
             self.shell.open_doc(form, note, state.get("save_as"), render)
         elif not self._open_spec(form, note, state.get("save_as"), render):

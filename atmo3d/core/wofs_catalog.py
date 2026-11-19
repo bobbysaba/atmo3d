@@ -33,4 +33,13 @@ ROLES = {
     "refl": "REFL_10CM",
 }
 
-CATALOG = register(Catalog("wofs", NATIVES, ROLES))
+# what sessions and figures saved before atmo3d's catalogs called WoFS's fields (the
+# reader renamed them to CM1's): core.catalog.rename_fields maps them on load
+OLD_NAMES = {
+    "th": "THETA", "prs": "PRES", "qv": "QVAPOR", "qc": "QCLOUD", "qr": "QRAIN",
+    "qi": "QICE", "qs": "QSNOW", "qg": "QGRAUP", "qhl": "QHAIL", "dbz": "REFL_10CM",
+    "uinterp": "U", "vinterp": "V", "winterp": "W",
+    "th0": "THETA0", "prs0": "PRES0", "qv0": "QVAPOR0", "u0": "U0", "v0": "V0",
+}
+
+CATALOG = register(Catalog("wofs", NATIVES, ROLES, renamed=OLD_NAMES))

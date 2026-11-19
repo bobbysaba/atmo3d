@@ -21,7 +21,9 @@ from ..core import dist, series as ser
 from ..theme import DIALOG_DARK
 from .ui import PANELS, TOOL_OF, _html, held
 
-FORMAT = 1  # the session file's version ("atmo3d_session")
+# the session file's version ("atmo3d_session"); 2: fields by their data type's own
+# names (1: WoFS's by CM1's, renamed on load by upgrade)
+FORMAT = 2
 
 # the widgets of a layer row, in the order they are put back (a field before its
 # colours and range, a level mode before its level, a vector before its reference)
@@ -82,6 +84,21 @@ def read(path):
         s = json.load(f)
     if not isinstance(s, dict) or not ({"atmo3d_session", "cm1view_session"} & s.keys()):
         raise ValueError("not an atmo3d session file")   # files from cm1view still load
+    return s
+
+
+def upgrade(s):
+    """A session of an earlier FORMAT brought up to date, in place: version 1 named a
+    WoFS run's fields by CM1's names (core.catalog.rename_fields).  Its figure is left
+    to the figure's own upgrade (its runs may be of other data types)."""
+    from ..core.catalog import rename_fields, renames_for
+    ver = s.get("atmo3d_session", s.get("cm1view_session", 1))
+    if isinstance(ver, (int, float)) and ver < 2:
+        table, _ = renames_for([config.expand(s["run"])] if s.get("run") else [])
+        figure = s.pop("figure", None)
+        rename_fields(s, table)
+        if figure is not None:
+            s["figure"] = figure
     return s
 
 
@@ -321,6 +338,7 @@ class Sessions:
     def apply_session(self, s):
         """Put a session (session_state's dict) back.  Values this run cannot take are
         left as they are; returns their names."""
+        upgrade(s)
         skipped = []
 
         def put(w, v, name, blank=False):

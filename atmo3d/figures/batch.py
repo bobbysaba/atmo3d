@@ -67,6 +67,7 @@ def load_figure(arg):
         spec = spec["form"]
     if spec.get("version") not in (1, 3):
         raise ValueError(f"{path}: not an atmo3d figure spec (version 1, 2 or 3) or template")
+    fg.upgrade_names(spec)  # (fields renamed since it was saved)
     return spec, False, os.path.basename(saved_base(path)), path
 
 
