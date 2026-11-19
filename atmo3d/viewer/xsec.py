@@ -73,7 +73,7 @@ class SectionPanel:
         F = self.F
         g3 = F.groups(ndim=3)
         self.xs_fill = pn.widgets.Select(groups=g3,
-                                         value="dbz" if "dbz" in F else next(iter(F.defs)),
+                                         value=F.role("refl") or next(iter(F.defs)),
                                          width=220, height=32, margin=(4, 2))
         self.xs_fill_style = pn.widgets.RadioButtonGroup(
             options={"Pixels": "image", "Filled contours": "contourf"}, value="image",
@@ -171,7 +171,7 @@ class SectionPanel:
         if n >= self.FILL_MAX:
             return
         F = self.F
-        var = "winterp" if "winterp" in F else self.xs_fill.value
+        var = F.role("w") or self.xs_fill.value
         o = self._fill_widgets(F.groups(ndim=3), var)
         o["row"] = _layer_row(n, o["on"], o["var"], o["style"], o["cmap"], o["rev"],
                               o["auto"], o["vmin"], o["vmax"], o["alpha"], o["clip"],

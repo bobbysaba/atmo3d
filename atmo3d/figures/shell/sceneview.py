@@ -167,7 +167,8 @@ class SceneCards:
         ed, F = self.ed, self.shell.fields
         ws = {k: _copy(w) for k, w in ed.sc_g.items()}
         ws["var"].groups = F.groups()
-        _put(ws, sc["ground"])
+        g = sc["ground"]  # (none chosen yet: the reflectivity, as the viewer's floor)
+        _put(ws, g if g.get("var") else dict(g, var=F.role("refl") or next(iter(F.defs))))
 
         def show(*ev):
             d = F[ws["var"].value] if ws["var"].value in F else None

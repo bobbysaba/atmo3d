@@ -24,7 +24,7 @@ def new_recipe(shell):
     """A new series' recipe: max w in 0–10 km near the storm (the whole domain without a track),
     as for updraft time-height plots."""
     F = shell.fields
-    field = "winterp" if "winterp" in F else next(iter(F.defs))
+    field = F.role("w") or next(iter(F.defs))
     track = bool(shell.v.fixes) or any(r.get("track") for r in shell.doc["runs"])
     return ser.normalize(dict(field=field, vmode="layer", z0=0.0, z1=10.0,
                               region="track" if track else "domain", radius=5.0,

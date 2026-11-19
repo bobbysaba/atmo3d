@@ -32,7 +32,7 @@ class DistPanel:
         """Distribution tab: one field over a region at the shown time."""
         run, F = self.run, self.F
         ztop = float(np.floor(run.z[-1] * 10) / 10)
-        first = "winterp" if "winterp" in F else next(iter(F.defs))
+        first = F.role("w") or next(iter(F.defs))
         self.dist_field = pn.widgets.Select(name="Field", groups=F.groups(), value=first,
                                             width=230)
         self.dist_vmode = pn.widgets.Select(

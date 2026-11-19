@@ -39,7 +39,7 @@ class FigureScene:
 
     def _build_scene(self):
         F, run = self.fields, self.run
-        floor0 = "cref" if "cref" in F else ("dbz" if "dbz" in F else next(iter(F.defs)))
+        floor0 = F.role("cref") or F.role("refl") or next(iter(F.defs))
         # (keys: the spec's; scene3d, ground, stream, camera and look)
         self.sc_w = dict(
             ztop=_f("Top (km MSL)" if run.terrain else "Top (km)",

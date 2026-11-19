@@ -19,7 +19,7 @@ def has_track(shell):
 def new_dist_recipe(shell):
     """w over the whole domain at 1 km."""
     F = shell.fields
-    field = "winterp" if "winterp" in F else next(iter(F.defs))
+    field = F.role("w") or next(iter(F.defs))
     return dict(field=field, vmode="height", z=1.0, region="domain")
 
 
@@ -36,7 +36,7 @@ def new_azim_recipe(shell):
     """w around the tracked storm, else around the middle of the map's view; the whole ring out to
     20 km, 0-15 km."""
     F = shell.fields
-    field = "winterp" if "winterp" in F else next(
+    field = F.role("w") or next(
         (k for k, d in F.defs.items() if d.ndim == 3), next(iter(F.defs)))
     x0, x1, y0, y1 = (float(v) for v in shell.v.view)
     return dict(field=field, center="track" if has_track(shell) else "point",

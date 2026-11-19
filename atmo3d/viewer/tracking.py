@@ -36,8 +36,7 @@ class TrackPanel:
         groups = self.F.groups()
         self.trk_field = pn.widgets.Select(
             name="Field", groups=groups, width=200, visible=False,
-            value="winterp" if "winterp" in self.F else
-            next(iter(next(iter(groups.values())).values())))
+            value=self.F.role("w") or next(iter(next(iter(groups.values())).values())))
         self.trk_sense = pn.widgets.Select(
             name="Track the", options={"Maximum": "max", "Minimum": "min"}, value="max",
             width=110, visible=False)

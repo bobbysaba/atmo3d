@@ -220,9 +220,9 @@ class Widgets:
         if n >= self.FILL_MAX:
             return
         F = self.F
-        var = "winterp" if "winterp" in F else self.fill_var.value
+        var = F.role("w") or self.fill_var.value
         o = self._fill_widgets(F.groups(), var)
-        o["mode"], o["level"] = self._level_pair("height", 3.0 if var == "winterp" else 1.0)
+        o["mode"], o["level"] = self._level_pair("height", 3.0 if var == F.role("w") else 1.0)
         o["row"] = _layer_row(n, o["on"], o["var"], o["mode"], o["level"], o["style"],
                               o["cmap"], o["rev"], o["auto"], o["vmin"], o["vmax"],
                               o["alpha"], o["clip"], o["drop"])
@@ -289,7 +289,7 @@ class Widgets:
     def _build_widgets(self):
         run, F = self.run, self.F
         g_all, g3 = F.groups(), F.groups(ndim=3)
-        default_fill = "cref" if "cref" in F else ("dbz" if "dbz" in F else next(iter(F.defs)))
+        default_fill = F.role("cref") or F.role("refl") or next(iter(F.defs))
 
         t0 = 0
         try:  # ?t=<index> in the URL opens at that time

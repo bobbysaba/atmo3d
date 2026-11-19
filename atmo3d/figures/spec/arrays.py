@@ -83,7 +83,7 @@ def extract(run, F, spec, i, center, fixes=None, storm=None, progress=None):
 SCENE3D = dict(box=None, ztop=15.0, exag=2.0, smooth=0.75, res=0, isos=[], vecs=[],
                stream=dict(on=False, z=0.5, n=12, length=40.0, dir="forward",
                            frame="storm", color_by="z", seed_box=None),
-               ground=dict(on=False, var="dbz", z=0.0, cmap="Field default", rev=False,
+               ground=dict(on=False, var=None, z=0.0, cmap="Field default", rev=False,
                            range="data", lo=0.0, hi=0.0),
                camera={}, look={}, follow="fixed", orbit=0.0, parcels=[])
 SCENE_DATA = ("box", "ztop", "smooth", "res", "isos", "vecs", "stream", "ground")  # -> data

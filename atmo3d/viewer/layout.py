@@ -77,8 +77,8 @@ class Layout:
                                         options={"Auto": 0, "Full": 1, "1/2": 2, "1/3": 3,
                                                  "1/4": 4}, value=0, width=100)
         # the floor: a 2D field, or a 3D field at one height
-        fl0 = "cref" if "cref" in F else ("dbz" if "dbz" in F else first3d)
-        self.v3_ground = pn.widgets.Checkbox(value=fl0 in ("cref", "dbz"), width=18,
+        fl0 = F.role("cref") or F.role("refl") or first3d
+        self.v3_ground = pn.widgets.Checkbox(value=F.cat.reflectivity(fl0), width=18,
                                              margin=(14, 0, 0, 8))
         self.v3_floor = pn.widgets.Select(name="Field", groups=F.groups(), value=fl0,
                                           width=250)

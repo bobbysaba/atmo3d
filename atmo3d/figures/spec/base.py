@@ -101,12 +101,12 @@ def spread_times(nt, t, n, step=5):
 def default_spec(run, F, t=0):
     """A 2 x 3 plan-view figure in time: reflectivity at 1 km with w contours at 3 km
     and near-surface winds, centred on the tracked storm."""
-    fill = "dbz" if "dbz" in F else ("cref" if "cref" in F else next(iter(F.defs)))
+    fill = F.role("refl") or F.role("cref") or next(iter(F.defs))
     nt = len(run.times)
     layers = [layer_defaults("fill", F, fill, 1.0)]
-    if "winterp" in F:
-        layers.append(layer_defaults("contour", F, "winterp", 3.0))
-    if "uinterp" in F:
+    if F.role("w"):
+        layers.append(layer_defaults("contour", F, F.role("w"), 3.0))
+    if F.role("u"):
         layers.append(dict(layer_defaults("vectors", F), on=False))
     if getattr(run, "geo", None) is not None:  # (a run on a map: its borders on top)
         layers.append(layer_defaults("boundaries", F))

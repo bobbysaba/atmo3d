@@ -39,8 +39,8 @@ def new_layer(shell, kind):
     F = shell.fields
     field = None
     if kind in ("fill", "contour", "shade"):
-        field = {"fill": "dbz", "contour": "winterp", "shade": "winterp"}[kind]
-        if field not in F:
+        field = F.role({"fill": "refl", "contour": "w", "shade": "w"}[kind])
+        if field is None:
             field = next(iter(F.defs))
     lay = fg.layer_defaults(kind, F, field, 1.0)
     if kind == "parcels":

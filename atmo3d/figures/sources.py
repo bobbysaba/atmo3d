@@ -210,7 +210,7 @@ class FigureSources:
     def _new_recipe(self):
         """A recipe for a new series: max w in 0–10 km near the storm (whole domain
         without a track), as for updraft time-height plots."""
-        f = "winterp" if "winterp" in self.F else next(iter(self.F.defs))
+        f = self.F.role("w") or next(iter(self.F.defs))
         track = bool(self.v.fixes) or any(r.get("track") for r in self.shell.doc["runs"])
         return ser.normalize(dict(field=f, vmode="layer", z0=0.0, z1=10.0,
                                   region="track" if track else "domain", radius=5.0,
@@ -265,7 +265,7 @@ class FigureSources:
 
     def _new_dist_recipe(self):
         """A recipe for a new distribution: w over the whole domain at 1 km."""
-        f = "winterp" if "winterp" in self.F else next(iter(self.F.defs))
+        f = self.F.role("w") or next(iter(self.F.defs))
         return dict(field=f, vmode="height", z=1.0, region="domain")
 
     def tab_profiles(self):
@@ -292,7 +292,7 @@ class FigureSources:
         """A recipe for a new azimuthal mean: w (the previous one's field and sector,
         when there is one) around the tracked storm, else around the middle of the
         map's view; the whole ring out to 20 km, 0-15 km."""
-        f = "winterp" if "winterp" in self.F else next(
+        f = self.F.role("w") or next(
             (k for k, d in self.F.defs.items() if d.ndim == 3), next(iter(self.F.defs)))
         track = bool(self.v.fixes) or any(r.get("track") for r in self.shell.doc["runs"])
         x0, x1, y0, y1 = (float(v) for v in self.v.view)

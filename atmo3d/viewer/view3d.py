@@ -64,7 +64,7 @@ class View3DPanel:
         along["Speed (streamline frame)"] = "_speed"
         self.sl_field = pn.widgets.Select(
             groups={"Along the streamline": along, **F.groups(ndim=3)},
-            value="winterp" if "winterp" in F else next(iter(along.values())), width=250,
+            value=F.role("w") or next(iter(along.values())), width=250,
             height=32, margin=(4, 4))
         self.sl_clear = pn.widgets.Button(name="", icon="x", button_type="light",
                                           button_style="outline", width=34, height=32,
