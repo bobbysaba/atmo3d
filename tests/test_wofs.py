@@ -170,36 +170,37 @@ def test_member_run(wofs_root):
     assert run.dx == pytest.approx(1000.0) and run.dy == pytest.approx(1000.0)
     np.testing.assert_allclose(run.zf, 0.5 * np.arange(NK + 1), atol=1e-4)
     np.testing.assert_allclose(run.z, 0.25 + 0.5 * np.arange(NK), atol=1e-4)
-    # names: atmo3d's where there is one, else WRF's; nothing off the model grid
-    for n in ("th", "prs", "qv", "qc", "qr", "qi", "qs", "qg", "qhl", "dbz", "uinterp",
-              "vinterp", "winterp", "th0", "prs0", "qv0", "u0", "v0", "PH", "HGT",
-              "UP_HELI_MAX", "zagl", "zmsl"):
+    # names: WRF's (THETA = T + 300, PRES = P + PB summed on read; base state *0);
+    # nothing off the model grid, and not the summed parts
+    for n in ("THETA", "PRES", "QVAPOR", "QCLOUD", "QRAIN", "QICE", "QSNOW", "QGRAUP",
+              "QHAIL", "REFL_10CM", "U", "V", "W", "THETA0", "PRES0", "QVAPOR0", "U0", "V0",
+              "PH", "HGT", "UP_HELI_MAX", "zagl", "zmsl"):
         assert run.has(n), n
-    for n in ("T", "P", "PB", "QVAPOR", "U", "W", "REFL_10CM", "TSLB", "XLAT_U", "XTIME",
-              "Times"):
+    for n in ("T", "P", "PB", "TSLB", "XLAT_U", "XTIME", "Times",
+              "th", "prs", "qv", "dbz", "uinterp", "vinterp", "winterp", "th0"):
         assert not run.has(n), n
-    assert run.vars["HGT"].ndim == 2 and run.vars["th"].ndim == 3
-    assert run.vars["uinterp"].stag == "x" and run.vars["winterp"].stag == "z"
+    assert run.vars["HGT"].ndim == 2 and run.vars["THETA"].ndim == 3
+    assert run.vars["U"].stag == "x" and run.vars["W"].stag == "z"
     assert run.vars["PH"].stag == "z"
 
 
 def test_values(wofs_root):
     run = models.open_run(os.path.join(wofs_root, "mem02"), workers=1)
     m, c = 2, 1
-    np.testing.assert_allclose(run.read_level("th", c, 3), 300.0 + m + 0.1 * c + 3,
+    np.testing.assert_allclose(run.read_level("THETA", c, 3), 300.0 + m + 0.1 * c + 3,
                                rtol=1e-6)
-    np.testing.assert_allclose(run.read_level("prs", c, 2), 1.0e5 - 2000.0 + 100.0 * c)
-    u = run.read_level("uinterp", c, 0)  # averaged onto mass points
+    np.testing.assert_allclose(run.read_level("PRES", c, 2), 1.0e5 - 2000.0 + 100.0 * c)
+    u = run.read_level("U", c, 0)  # averaged onto mass points
     assert u.shape == (NJ, NI)
     np.testing.assert_allclose(u[0], np.arange(NI) + 0.5 + c + m)
-    np.testing.assert_allclose(run.read_level("vinterp", c, 0)[:, 0],
+    np.testing.assert_allclose(run.read_level("V", c, 0)[:, 0],
                                np.arange(NJ) + 0.5 - c)
-    np.testing.assert_allclose(run.read_level("winterp", c, 1), 1.5 + c)
+    np.testing.assert_allclose(run.read_level("W", c, 1), 1.5 + c)
     np.testing.assert_allclose(run.read_level("UP_HELI_MAX", 2), 2.0)
-    vol = run.volume("winterp", 2)
+    vol = run.volume("W", 2)
     assert vol.shape == (NK, NJ, NI)
     np.testing.assert_allclose(vol[:, 0, 0], np.arange(NK) + 0.5 + 2)
-    box = run.read_box("uinterp", c, 1, 3, 0, 2)
+    box = run.read_box("U", c, 1, 3, 0, 2)
     assert box.shape == (NK, 2, 2)
     np.testing.assert_allclose(box[0, 0], [1.5 + c + m, 2.5 + c + m])
 
@@ -208,15 +209,15 @@ def test_base_state_and_perturbations(wofs_root):
     run = models.open_run(os.path.join(wofs_root, "mem03"), workers=1)
     # the base state is the member's own field at its first time, at every time
     for t in range(NC):
-        np.testing.assert_allclose(run.volume("th0", t), run.volume("th", 0))
-        np.testing.assert_allclose(run.volume("u0", t), run.volume("uinterp", 0))
-    np.testing.assert_allclose(run.read_level("qv0", 2, 0), 0.01 + 0.003, rtol=1e-6)
+        np.testing.assert_allclose(run.volume("THETA0", t), run.volume("THETA", 0))
+        np.testing.assert_allclose(run.volume("U0", t), run.volume("U", 0))
+    np.testing.assert_allclose(run.read_level("QVAPOR0", 2, 0), 0.01 + 0.003, rtol=1e-6)
     F = Fields(run)
     assert "thpert" in F and "prspert" in F
     np.testing.assert_allclose(F.volume("thpert", 2), 0.2, atol=1e-4)  # 2 cycles of 0.1
     np.testing.assert_allclose(F.volume("prspert", 2), 2.0, atol=1e-4)  # hPa
     np.testing.assert_allclose(F.volume("thpert", 0), 0.0, atol=1e-6)
-    prof = run.mean_profiles(["th0"], 1)["th0"]
+    prof = run.mean_profiles(["THETA0"], 1)["THETA0"]
     np.testing.assert_allclose(prof, 303.0 + np.arange(NK), rtol=1e-6)
 
 
@@ -260,12 +261,12 @@ def test_maps_at_a_height_column_by_column(wofs_root):
     # winterp is k + 0.5 + c on mass level k, at (k + 0.5) dz in each column
     for h in (0.1, 0.6, 1.3, 5.0):
         want = np.clip(h / dz - 0.5, 0, NK - 1) + 0.5 + c  # (held beyond the levels)
-        np.testing.assert_allclose(F.plane("winterp", c, "height", h)[0], want, atol=1e-4)
-        np.testing.assert_allclose(run.read_height("winterp", c, h)[2], want, atol=1e-4)
+        np.testing.assert_allclose(F.plane("W", c, "height", h)[0], want, atol=1e-4)
+        np.testing.assert_allclose(run.read_height("W", c, h)[2], want, atol=1e-4)
     h = 0.6
     want = np.clip((h - GROUND) / dz - 0.5, 0, NK - 1) + 0.5 + c
     want[h < GROUND] = np.nan
-    msl = F.plane("winterp", c, "msl", h)
+    msl = F.plane("W", c, "msl", h)
     assert msl.shape == (NJ, NI)
     np.testing.assert_allclose(msl[0], want, atol=1e-4)
     assert np.isnan(msl[:, GROUND > h]).all() and np.isfinite(msl[:, GROUND <= h]).all()
@@ -276,16 +277,16 @@ def test_maps_at_a_height_column_by_column(wofs_root):
                                atol=1e-3)
     assert np.isfinite(F.plane("ddz.winterp", c, "height", 1.0)).all()
     # a model level is the level, whatever its height
-    np.testing.assert_allclose(F.plane("winterp", c, "level", 3), 3.5 + c, atol=1e-5)
+    np.testing.assert_allclose(F.plane("W", c, "level", 3), 3.5 + c, atol=1e-5)
 
 
 def test_reader_processes(wofs_root):
     """Reader processes open the member's files themselves (a picklable source)."""
     run = models.open_run(os.path.join(wofs_root, "mem01"), workers=2)
-    prof = run.mean_profiles(["th", "prs0"], 2)
-    np.testing.assert_allclose(prof["th"], 301.2 + np.arange(NK), rtol=1e-6)
-    np.testing.assert_allclose(prof["prs0"], 1.0e5 - 1000.0 * np.arange(NK))
-    np.testing.assert_allclose(run.read_box("winterp", 1, 0, 2, 0, 2)[:, 0, 0],
+    prof = run.mean_profiles(["THETA", "PRES0"], 2)
+    np.testing.assert_allclose(prof["THETA"], 301.2 + np.arange(NK), rtol=1e-6)
+    np.testing.assert_allclose(prof["PRES0"], 1.0e5 - 1000.0 * np.arange(NK))
+    np.testing.assert_allclose(run.read_box("W", 1, 0, 2, 0, 2)[:, 0, 0],
                                np.arange(NK) + 1.5)
 
 
@@ -296,7 +297,7 @@ def test_registry_keeps_members_apart(wofs_root):
     assert r1 is not r2 and r1.path != r2.path
     root_run, _ = reg.get(wofs_root)  # the folder itself: its first member
     assert root_run is r1
-    np.testing.assert_allclose(r2.read_level("th", 0, 0) - r1.read_level("th", 0, 0), 1.0)
+    np.testing.assert_allclose(r2.read_level("THETA", 0, 0) - r1.read_level("THETA", 0, 0), 1.0)
 
 
 def test_picker_lists_the_experiment(wofs_root, tmp_path, monkeypatch):
@@ -331,7 +332,7 @@ def test_section_on_terrain(wofs_root):
     assert (z0, top) == (0.1, 2.0)
     np.testing.assert_allclose(ground, GROUND, atol=1e-6)
     zq = np.arange(z0, top + 1e-6, 0.1)
-    a = render.sample_section(run, F.volume("winterp", c), fi, fj, zq, c)
+    a = render.sample_section(run, F.volume("W", c), fi, fj, zq, c)
     want = _w_at(zq[:, None] - GROUND[None], c)
     want[zq[:, None] < GROUND[None]] = np.nan
     np.testing.assert_allclose(a, want, atol=1e-4)
@@ -341,7 +342,7 @@ def test_section_on_terrain(wofs_root):
     from atmo3d.figures import spec as fg
     from atmo3d.figures.spec import arrays
     sp = fg.default_spec(run, F, 1)
-    sp.update(kind="xsec", layers=[fg.layer_defaults("fill", F, "winterp")])
+    sp.update(kind="xsec", layers=[fg.layer_defaults("fill", F, "W")])
     sp["sections"] = [fg.section_defaults(orient="ab", pos="fixed", a=[run.xh[0], 0.0],
                                           b=[run.xh[-1], 0.0])]
     sp["xsec"] = dict(sp["xsec"], ztop=2.0, dz=0.1)
@@ -398,11 +399,11 @@ def test_series_on_own_heights(wofs_root, monkeypatch):
         ds, skipped = ser.compute(run, F, rec, ser.empty(run, rec), workers=1)
         assert not skipped
         return ds
-    np.testing.assert_allclose(go(field="winterp", vmode="height", z=1.0)["value"],
+    np.testing.assert_allclose(go(field="W", vmode="height", z=1.0)["value"],
                                1.0 / dz0 + c, rtol=1e-5)
     np.testing.assert_allclose(go(field="ddz.winterp", vmode="height", z=1.0)["value"],
                                1.0 / dz0, rtol=1e-4)
-    ds = go(field="winterp", vmode="layer", z0=0.0, z1=1.0)
+    ds = go(field="W", vmode="layer", z0=0.0, z1=1.0)
     np.testing.assert_allclose(ds["value"], 1.5 + c, rtol=1e-6)  # (level 2 is above)
     np.testing.assert_allclose(ds["z_km"], 1.5 * dz0, rtol=1e-5)
     np.testing.assert_allclose(go(field="wmax", vmode="2d")["value"], NK - 0.5 + c)
@@ -414,7 +415,7 @@ def test_points_on_own_heights(wofs_root):
     from atmo3d.core import volume3d
     run = models.open_run(os.path.join(wofs_root, "mem02"), workers=1)
     F, c = Fields(run), 2
-    H, W = run.heights(c, "msl"), F.volume("winterp", c)
+    H, W = run.heights(c, "msl"), F.volume("W", c)
     for k in (0.0, 1.0, 2.5):
         k0, f = int(k), k - int(k)
         z = (1 - f) * H[k0, 2, 5] + f * H[min(k0 + 1, NK - 1), 2, 5]
@@ -441,9 +442,9 @@ def test_scene_on_terrain(wofs_root):
     H = run.heights(c, "msl")
     box = (float(run.xh[0]), float(run.xh[-1]), float(run.yh[0]), float(run.yh[-1]))
     scene = dict(t=c, box=box, ztop=3.0, exag=2.0, smooth=0.0, res=1,
-                 ground=dict(on=True, var="dbz", z=0.5, cmap="Field default", rev=False,
+                 ground=dict(on=True, var="REFL_10CM", z=0.5, cmap="Field default", rev=False,
                              range="data", lo=0.0, hi=1.0),
-                 isos=[dict(var="winterp", val=6.0, color="#ffffff", op=0.5)],
+                 isos=[dict(var="W", val=6.0, color="#ffffff", op=0.5)],
                  storm=(0.0, 0.0), fstorm=((0.0, 0.0), ""),
                  vecs=[dict(q="wind", level=1.0, frame="grid", density=4, ref=20.0,
                             color="#ffffff")],
@@ -488,9 +489,9 @@ def test_scene_on_terrain_read_in_parts(wofs_root, monkeypatch):
                      (2, (float(ref.xh[1]), float(ref.xh[-3]), float(ref.yh[2]),
                           float(ref.yh[-2])))):
         scene = dict(t=c, box=box, ztop=3.0, exag=2.0, smooth=0.0, res=res,
-                     ground=dict(on=False, var="dbz", z=0.5, cmap="Field default",
+                     ground=dict(on=False, var="REFL_10CM", z=0.5, cmap="Field default",
                                  rev=False, range="data", lo=0.0, hi=1.0),
-                     isos=[dict(var="winterp", val=6.0, color="#ffffff", op=0.5)],
+                     isos=[dict(var="W", val=6.0, color="#ffffff", op=0.5)],
                      storm=(0.0, 0.0), fstorm=((0.0, 0.0), ""), vecs=[],
                      stream=dict(on=True, z=0.5, n=3, length=6.0, dir="both",
                                  frame="grid", color_by="w", seed_box=[-2.0, 2.0, -1.0, 1.0]))
@@ -584,9 +585,9 @@ def test_traced_trajectories_read_in_parts(wofs_root, tmp_path, monkeypatch):
     pf = P.for_run(ref, Fields(ref))
     ps = P.select(pf, dict(box=[-3.0, 3.0, -2.0, 2.0], z=[0.0, 3.0]), "s")
     assert len(ps)
-    want_w = pf._sample(ps, "winterp")
+    want_w = pf._sample(ps, "W")
     pf.attach(Fields(run))
-    got_w = pf._sample(ps, "winterp")
+    got_w = pf._sample(ps, "W")
     assert np.isfinite(got_w).any()
     np.testing.assert_allclose(got_w, want_w, rtol=0, atol=1e-4, equal_nan=True)
 
@@ -618,11 +619,11 @@ def test_mean_values(wofs_root, workers):
     run = models.open_run(os.path.join(wofs_root, "mean"), workers=workers)
     m2 = models.open_run(os.path.join(wofs_root, "mem02"), workers=1)
     for c in range(NC):
-        for n in ("th", "prs", "qv", "uinterp", "vinterp", "winterp", "dbz", "zagl",
-                  "zmsl", "th0", "u0", "qv0"):
+        for n in ("THETA", "PRES", "QVAPOR", "U", "V", "W", "REFL_10CM", "zagl",
+                  "zmsl", "THETA0", "U0", "QVAPOR0"):
             np.testing.assert_allclose(run.volume(n, c), m2.volume(n, c), rtol=1e-6,
                                        atol=1e-5, err_msg=f"{n} at {c}")
-        np.testing.assert_allclose(run.read_level("th", c, 1), m2.read_level("th", c, 1),
+        np.testing.assert_allclose(run.read_level("THETA", c, 1), m2.read_level("THETA", c, 1),
                                    rtol=1e-6)
         np.testing.assert_allclose(run.read_level("UP_HELI_MAX", c), float(c))
         np.testing.assert_allclose(run.heights(c, "msl", w=True),
@@ -630,14 +631,14 @@ def test_mean_values(wofs_root, workers):
         np.testing.assert_allclose(run.heights(c, w=True), m2.heights(c, w=True),
                                    atol=1e-4)
     run.clear_cache()  # (columns from the files, then from the cached volume)
-    np.testing.assert_allclose(run.read_box("th", 1, 0, 2, 0, 2)[:, 0, 0],
+    np.testing.assert_allclose(run.read_box("THETA", 1, 0, 2, 0, 2)[:, 0, 0],
                                302.1 + np.arange(NK), rtol=1e-6)
-    run.volume("th", 1)
-    np.testing.assert_allclose(run.read_box("th", 1, 0, 2, 0, 2)[:, 0, 0],
+    run.volume("THETA", 1)
+    np.testing.assert_allclose(run.read_box("THETA", 1, 0, 2, 0, 2)[:, 0, 0],
                                302.1 + np.arange(NK), rtol=1e-6)
-    prof = run.mean_profiles(["th", "prs0"], 2)
-    np.testing.assert_allclose(prof["th"], 302.2 + np.arange(NK), rtol=1e-6)
-    np.testing.assert_allclose(prof["prs0"], 1.0e5 - 1000.0 * np.arange(NK))
+    prof = run.mean_profiles(["THETA", "PRES0"], 2)
+    np.testing.assert_allclose(prof["THETA"], 302.2 + np.arange(NK), rtol=1e-6)
+    np.testing.assert_allclose(prof["PRES0"], 1.0e5 - 1000.0 * np.arange(NK))
     # derived fields: from the mean state
     F, F2 = Fields(run), Fields(m2)
     for n in ("thpert", "wmax", "sbcape"):
@@ -661,7 +662,7 @@ def test_mean_series_and_trajectories(wofs_root, tmp_path, monkeypatch):
     monkeypatch.setenv("ATMO3D_TRAJ_MAX_INTERVAL", "0")
     run = models.open_run(os.path.join(wofs_root, "mean"), workers=1)
     m2 = models.open_run(os.path.join(wofs_root, "mem02"), workers=1)
-    rec = ser.normalize(dict(region="domain", reduce="max", field="uinterp",
+    rec = ser.normalize(dict(region="domain", reduce="max", field="U",
                              vmode="height", z=1.0))
     got = [ser.compute(r, Fields(r), rec, ser.empty(r, rec), workers=1)[0]["value"]
            for r in (run, m2)]
@@ -695,11 +696,11 @@ def test_demo_ensemble(tmp_path):
     assert run.terrain and len(run.times) == demo_wofs.NCYCLE
     F = Fields(run)
     t = len(run.times) - 1
-    assert F.plane("dbz", t, "level", 2).max() > 30.0
+    assert F.plane("REFL_10CM", t, "level", 2).max() > 30.0
     assert F.plane("UP_HELI_MAX", t, "level", 0).max() > 10.0
     mean = models.open_run(os.path.join(root, "mean"), workers=1)
-    a = F.plane("winterp", t, "level", 8)
-    b = Fields(mean).plane("winterp", t, "level", 8)
+    a = F.plane("W", t, "level", 8)
+    b = Fields(mean).plane("W", t, "level", 8)
     assert a.shape == b.shape and not np.allclose(a, b)
 
 
@@ -743,22 +744,22 @@ def test_mean_reports_members_and_stops_when_cancelled(wofs_root, workers):
     run = models.open_run(os.path.join(wofs_root, "mean"), workers=workers)
     seen = []
     with reporting(lambda d, n, w: seen.append((d, n, w))):
-        run.volume("th", 1)
+        run.volume("THETA", 1)
     assert seen and seen[-1][0] == 1 and seen[-1][1] == 1
     whats = [w for _, _, w in seen]
-    assert all(w.startswith("th") for w in whats)
+    assert all(w.startswith("THETA") for w in whats)
     assert any(w.endswith("members") and "/3 " in w for w in whats)
     with pytest.raises(Cancelled):
         with reporting(None, cancelled=lambda: True):
-            run.volume("qv", 2)
-    assert run.cached("qv", 2) is None
-    assert run.load_volumes(["qv"], 2, cancelled=lambda: True) is False
-    assert run.volume("qv", 2).shape == (NK, NJ, NI)  # (and then reads in full)
+            run.volume("QVAPOR", 2)
+    assert run.cached("QVAPOR", 2) is None
+    assert run.load_volumes(["QVAPOR"], 2, cancelled=lambda: True) is False
+    assert run.volume("QVAPOR", 2).shape == (NK, NJ, NI)  # (and then reads in full)
     # explicit progress and the block's both hear the reads
     mine, block = [], []
     run.clear_cache()
     with reporting(lambda *a: block.append(a)):
-        run.load_volumes(["prs"], 0, progress=lambda *a: mine.append(a))
+        run.load_volumes(["PRES"], 0, progress=lambda *a: mine.append(a))
     assert mine and all(a in block for a in mine)
 
 
@@ -772,7 +773,7 @@ def test_map_says_the_mean_is_being_read(wofs_root):
     assert "cv-maploading" in html
     assert "computing" in MapView._map_loading_html(v, None, 0.1)
     v.run = models.open_run(os.path.join(wofs_root, "mem02"), workers=1)
-    assert "Loading th · field 2/3" in MapView._map_loading_html(v, (1, 3, "th"), 0.1)
+    assert "Loading THETA · field 2/3" in MapView._map_loading_html(v, (1, 3, "THETA"), 0.1)
 
 
 def test_map_boundaries_and_lat_lon(wofs_root):

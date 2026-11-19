@@ -1,10 +1,10 @@
 """Characterization of what the viewer and figure code pick by default (field names,
 isosurfaces, layers) on the CM1 demo run and a synthetic WoFS run.
 
-These record today's behavior, before the atmo3d rebuild moves the names into per-data-type
-catalogs (docs-dev/hardcoded-names.md, sections 1-4).  A failure after a later phase means a
-default changed: fix the code if unintended, update the expected value if the phase meant it
-(Phase 2 turns the WoFS names into WRF names, so the WoFS expectations will move then)."""
+Recorded before the atmo3d rebuild moved the names into per-data-type catalogs
+(docs-dev/hardcoded-names.md, sections 1-4); since Phase 2 the code picks by role
+(core.catalog) and WoFS's fields keep their WRF names.  A failure means a default
+changed: fix the code if unintended, update the expected value if meant."""
 import pytest
 
 from atmo3d.figures import spec as fg
@@ -35,8 +35,7 @@ def test_cm1_default_figure_layers(reg):
 def test_wofs_default_figure_layers(wofs_pair):
     run, F = wofs_pair
     got = _layers(run, F)
-    assert got[0][0] == "fill" and got[0][1] in ("dbz", "cref")
-    assert ("contour", "winterp") in got or "winterp" not in F
+    assert got[:3] == [("fill", "REFL_10CM"), ("contour", "W"), ("vectors", None)]
     assert got[-1][0] == "boundaries"  # a run with a map projection
 
 
@@ -49,14 +48,35 @@ def test_next_iso_order_cm1(reg):
         isos.append(e)
 
 
-def test_next_iso_skips_names_a_run_lacks(wofs_pair):
+def test_next_iso_order_wofs(wofs_pair):
     _, F = wofs_pair
-    e = next_iso(F, [])
-    assert e["var"] in F  # whichever it picks is a field the run has
+    isos = []
+    for want in (("REFL_10CM", 30.0), ("W", 10.0), ("W", -5.0)):
+        e = next_iso(F, isos)
+        assert (e["var"], e["val"]) == want
+        isos.append(e)
 
 
-def test_default_fields_exist_in_both_catalogs(reg, wofs_pair):
-    """The names the viewer hardcodes as first choices (hardcoded-names.md sections 1-4)."""
+ROLES = ("u", "v", "w", "theta", "pres", "qv", "theta0", "pres0", "qv0", "u0", "v0", "refl")
+
+
+def test_roles_name_each_data_types_own_fields(reg, wofs_pair):
+    """The fields the viewer picks by role (hardcoded-names.md sections 1-5)."""
+    want = dict(cm1=("uinterp", "vinterp", "winterp", "th", "prs", "qv", "th0", "prs0",
+                     "qv0", "u0", "v0", "dbz"),
+                wofs=("U", "V", "W", "THETA", "PRES", "QVAPOR", "THETA0", "PRES0",
+                      "QVAPOR0", "U0", "V0", "REFL_10CM"))
     for run, F in (reg.get(), wofs_pair):
-        for name in ("winterp", "uinterp", "vinterp", "th", "prs", "qv"):
-            assert name in F or run.has(name), (run.model, name)
+        assert tuple(F.role(r) for r in ROLES) == want[run.model], run.model
+        assert tuple(run.role(r) for r in ROLES) == want[run.model], run.model
+        assert run.catalog.sounding_names() == want[run.model][3:6] + want[run.model][:2]
+
+
+def test_derived_fields_alike_in_both(reg, wofs_pair):
+    """The core's derived fields are there for WoFS too, from WRF's names."""
+    (_, F1), (_, F2) = reg.get(), wofs_pair
+    for name in ("thpert", "prspert", "buoy", "thetae", "rh", "wspd", "hdiv", "sbcape"):
+        assert name in F1 and name in F2, name
+    assert F2["thpert"].deps == ("THETA", "THETA0")
+    assert F1["thpert"].deps == ("th", "th0")
+    assert F2["okubo"].deps == ("ddx.U", "ddy.U", "ddx.V", "ddy.V")
