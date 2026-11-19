@@ -1,9 +1,46 @@
 # Phase 2b, step 2: derived-field audit
 
-Status: **prepared 2026-11-19; reviewed by Bobby 2026-11-19** (nothing open). Nothing in the code has changed for
+Status: **prepared 2026-11-19; reviewed by Bobby 2026-11-19** (step 3 done, see Step 3 status). Nothing in the code has changed for
 this step. For each field, mark **confirmed**, **corrected** (say how) or **dropped** in
 the Decision column. Step 3 fixes the corrected ones and adds a test with an analytic
 answer for each confirmed one (the "Test" lines are the proposed cases).
+
+## Step 3 status (2026-11-19)
+
+Done (commits 5fb7b71, 5dd5ec7, 4c2850c), each with a test in
+`tests/test_derived_analytic.py` (analytic answers) or an updated one:
+- F1 UH: w > 0 and ζ > 0 only; role `uh25` (CM1 `uh`, WoFS `UH`), the derived `uh25`
+  only without it; `uh01` always. `zvmax01`, `wmax` dropped.
+- F2 `buoy`: CM1's form; loads the hydrometeor roles and `Catalog.condensate` (CM1: qh,
+  qi1–qi3). `thrho` loads the same.
+- F3 `hdiv`, `bgen_*`: from the inputs' derivatives (hgrad: real spacing; terrain: F5).
+  bgen = ∂B/∂y from the linear expansion of B, checked against np.gradient of `buoy`
+  (4e-7 of 0.33).
+- F4 `zstretch`: −(ζ + f) ∇h·V. f: `Run.fcor` (CM1's f_cor, else namelist fcor when
+  icor = 1) or the `fcor` role (WoFS F). Notes on `zstretch`, `ztend` (`FieldDef.note`).
+- F5 slope correction (`fields.hgrad_level`) in every path: maps at a level or height,
+  volumes, boxes / along / strided, and the series worker. Check on synthetic WoFS:
+  ∂zmsl/∂x at constant height is 2e-10 (it is 1 along the levels' slope); paths agree
+  exactly.
+- F7 `acc_b` summed at the w levels (cm1_pdecomp 1.1). Files written by 1.0 say their
+  acc_b needs a recompute.
+- F8 one copy: `fields` uses `thermo.theta_e`, `thermo.dewpoint`, `thermo.esat`.
+- κ: `Catalog.kappa` (WoFS 2/7), in fields, parcel maps and soundings.
+- CAPE: net area LFC–EL (maps and soundings).
+- Shear, SRH, STP, SCP maps: from 10 m winds (roles `u10`, `v10`) when present.
+- WoFS: `REL_VORT` plays `zvort` (main list, label "Vertical vorticity"); `xvort`,
+  `yvort` derived from the winds; the vorticity vector uses them.
+
+Not done / differs from the decisions above (to settle):
+- **Soundings do not use the 10 m winds yet** (only the maps). A CM1 run with u10 or a
+  WoFS run shows map shear/SRH a little different from the sounding's.
+- **qc0, qi0 are not subtracted** in `buoy` (CM1 writes none for these runs).
+- CM1's beta plane (f varying in y) is not handled: f is f_cor everywhere.
+- STP, SCP: no separate analytic test (the map-vs-sounding test covers them).
+- `FieldDef.note` is not shown in the UI yet (the docs page, step 5, uses it).
+- The stand-alone copy `/glade/work/rasaba/cm1_pdecomp/` (outside this project) still
+  has the old acc_b.
+- Image baselines: `sounding.png`, `parts.png` may move (net CAPE).
 
 ## Bobby's review (2026-11-19)
 
