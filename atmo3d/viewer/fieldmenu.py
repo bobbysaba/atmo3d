@@ -79,6 +79,7 @@ class FieldSelect(JSComponent):
         if groups is None and options is not None:
             groups = {"": dict(options)}
         groups = dict(groups or {})
+        params.pop("tree", None)  # (made from groups: a clone() passes its own too)
         params.setdefault("height", 52 if params.get("name") else 32)
         params.setdefault("margin", (5, 10))  # (a widget's, as the Select's was)
         if "sizing_mode" not in params:
