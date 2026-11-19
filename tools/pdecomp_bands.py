@@ -9,8 +9,9 @@ for every model level:
 - the base state: thv0 and d(thv0)/dz (a tropopause jump shows);
 - rms over the interior of B, pgrad_b (scalar levels), acc_b, acc_l, acc_nl, acc_c, and
   of pgrad_b at the w levels before averaging;
-- acc_b_w: the candidate fix. B interpolated to the w levels (c1, c2, as the solver's
-  source term) plus pgrad_b there, then both averaged to the scalar levels together;
+- acc_b_old: B at the scalar levels + pgrad_b averaged from the w levels, the form
+  before cm1_pdecomp 1.1 (acc_b now sums the two at the w levels: the fix this script
+  found, section 5.3);
 - for each acceleration, a "banding" ratio: rms of its second difference across levels
   over rms of the field. Near 0 for smooth profiles, near 2 or more for level-to-level
   alternation.
@@ -64,9 +65,8 @@ def main():
                        else ds["w"][0, 1:], np.float32)
     s = (slice(None), slice(EDGE, -EDGE), slice(EDGE, -EDGE))
     pgw = P.pgrad_w(out["pi_b"].astype(np.float64), G, B)  # (nk + 1) w levels
-    pg_b = out["acc_b"] - out["B"]
-    accw = P.buoyancy_tendency(out["B"].astype(np.float64), G) + pgw
-    acc_bw = (0.5 * (accw[:-1] + accw[1:])).astype(np.float32)
+    pg_b = (0.5 * (pgw[:-1] + pgw[1:])).astype(np.float32)
+    acc_old = out["B"] + pg_b
 
     zh, zf = G["zh"], G["zf"]
     dz = np.diff(zf)
@@ -74,7 +74,7 @@ def main():
     thv0 = B["thv0"]
     dthv = np.gradient(thv0, zh)
     acc = {k: out[k][s] for k in ("acc_b", "acc_l", "acc_nl", "acc_c")}
-    acc["acc_b_w"] = acc_bw[s]
+    acc["acc_b_old"] = acc_old[s]
     cols = {"B": rms(out["B"][s]), "pgrad_b": rms(pg_b[s]),
             **{k: rms(v) for k, v in acc.items()}}
     bands = {k: banding(v) for k, v in acc.items()}
@@ -117,7 +117,7 @@ def main():
     ax[1, 0].legend(); ax[1, 0].set_title("banding ratio")
     x = np.arange(G["ni"]) * G["dx"] / 1e3
     for axx, (lab, fld, zz) in zip(ax[1, 1:], (("acc_b", out["acc_b"][:, j], zk),
-                                             ("acc_b_w (B at w levels)", acc_bw[:, j], zk),
+                                             ("acc_b_old (B + averaged pgrad_b)", acc_old[:, j], zk),
                                              ("B", out["B"][:, j], zk))):
         lim = np.nanpercentile(np.abs(fld), 99.5) or 1.0
         m = axx.pcolormesh(x, zz, fld, cmap="RdBu_r", vmin=-lim, vmax=lim, shading="auto")

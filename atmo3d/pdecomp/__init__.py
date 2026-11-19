@@ -144,7 +144,12 @@ def source(run, t, block=True):
                                 f"output file")
         return "computed", f"computed here with {script_name()} (in memory only)"
     if kind == "file-fixed":
-        return kind, f"from the output file ({_version_cache[(run.path, t)]})"
+        ver = _version_cache[(run.path, t)]
+        if ver.startswith("cm1_pdecomp 1.0"):  # (acc_b only: B added after averaging)
+            return kind, (f"from the output file ({ver}); its acc_b shows horizontal "
+                          "bands where B is layered (the stratosphere): recompute for "
+                          "the fixed acc_b")
+        return kind, f"from the output file ({ver})"
     if kind == "file-old":
         ver = _version_cache[(run.path, t)]
         return kind, ("from the output file, written by an older method "

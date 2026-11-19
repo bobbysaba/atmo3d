@@ -24,9 +24,12 @@ The nonlinear part holds the second copy of the linear term (div(rho0 U0.grad u'
 rho0 dU0/dz dw/dx by continuity), as in CM1.
 
 Outputs (Pa and m/s^2, on scalar points): p_b, p_l, p_nl, p_c and the vertical
-accelerations acc_b = B + pgrad_b, acc_l, acc_nl, acc_c, where pgrad_x = -cp thv0
-d(pi_x)/dz as CM1 writes it (pgradb, pgraddl, pgraddn, pgradc), averaged from the w
-levels. pi is only defined up to a constant; these accelerations do not depend on it.
+accelerations acc_b, acc_l, acc_nl, acc_c, where pgrad_x = -cp thv0 d(pi_x)/dz as CM1
+writes it (pgradb, pgraddl, pgraddn, pgradc), averaged from the w levels.  acc_b is
+B + pgrad_b summed at the w levels (B there as the solver's source, c1/c2) and then
+averaged: adding the scalar-level B to the averaged pgrad_b instead leaves B's
+level-to-level structure as horizontal bands where the two nearly cancel (the
+stratosphere; docs-dev/derived-fields.md section 5.3). pi is only defined up to a constant; these accelerations do not depend on it.
 Mean pressure as CM1: each part's top-level mean is zero, except p_b, whose top level
 carries the mean of the model's pi' there.
 
@@ -64,7 +67,7 @@ import numpy as np
 import netCDF4 as nc
 from scipy.fft import fftn, ifftn, dctn, idctn
 
-VERSION = 'cm1_pdecomp 1.0 (CM1 pdcomp.F method)'
+VERSION = 'cm1_pdecomp 1.1 (CM1 pdcomp.F method; acc_b summed at the w levels)'
 NAMES = ('p_b', 'p_l', 'p_nl', 'p_c', 'acc_b', 'acc_l', 'acc_nl', 'acc_c')
 LONG_NAMES = {
     'p_b': ('pressure perturbation: buoyancy part', 'Pa'),
@@ -631,7 +634,8 @@ def decompose(path, periodic, t0_path=None, t=0, scheme=None, threads=None, log=
     """CM1's decomposition of one output time. Returns float32 (z, y, x) fields:
     pi_b, pi_l, pi_nl, pi_c (Exner parts; pi_c absent when f = 0), p_b ... (Pa, from
     the parts as atmo3d converts its own) and acc_b ... (m/s^2, scalar levels: CM1's
-    pgrad -cp thv0 d(pi)/dz averaged from the w levels, plus B for acc_b), with 'B' (scalar-level buoyancy) and 'info'.
+    pgrad -cp thv0 d(pi)/dz averaged from the w levels; acc_b: B + pgrad_b at the w
+    levels, averaged), with 'B' (scalar-level buoyancy) and 'info'.
 
     Mean pressure as CM1: each part's top-level mean set to zero, except p_b whose top
     level carries the mean of the model's pi' there.
@@ -675,9 +679,11 @@ def decompose(path, periodic, t0_path=None, t=0, scheme=None, threads=None, log=
         """float32 outputs of one part, made as soon as it is solved (memory)"""
         out['pi_' + k] = pk.astype(np.float32)
         out['p_' + k] = (p00 * (pi0 + pk) ** (cp / Rd) - p_t0).astype(np.float32)
-        acc = pgrad_scalar(pk, G, B)
-        if k == 'b':
-            acc += Bz
+        if k == 'b':  # (B and pgrad_b added at the w levels, then averaged together)
+            acc = pgrad_w(pk, G, B) + buoyancy_tendency(Bz, G)
+            acc = 0.5 * (acc[:-1] + acc[1:])
+        else:
+            acc = pgrad_scalar(pk, G, B)
         out['acc_' + k] = acc.astype(np.float32)
 
     log("  buoyancy part...")

@@ -233,13 +233,23 @@ def test_cm1_acceleration_does_not_depend_on_the_constant():
 
 
 def test_cm1_buoyancy_part_balances_uniform_buoyancy():
-    """Horizontally uniform B: its pressure gradient takes it all (acc_b ~ 0)."""
+    """Horizontally uniform B: its pressure gradient takes it all (acc_b ~ 0), also for
+    a B that alternates level by level (the bands of section 5.3: acc_b is B + pgrad_b
+    summed at the w levels, then averaged)."""
     M, G, B = _grid()
-    Bz = (0.03 * np.exp(-G['zh'] / 3000))[:, None, None] * np.ones((1, G['nj'], G['ni']))
+    one = np.ones((1, G['nj'], G['ni']))
     s = M.setup_solver(G, B, True)
-    pi = M.solve_pressure_equation(M.forcing(G, B, wten=M.buoyancy_tendency(Bz, G)), s, 1)
-    acc = Bz + M.pgrad_scalar(pi, G, B)
-    assert np.abs(acc[1:-1]).max() < 0.01 * np.abs(Bz).max()
+    smooth = 0.03 * np.exp(-G['zh'] / 3000)
+    for prof in (smooth, smooth * (1 + 0.5 * (-1.0) ** np.arange(G['nk']))):
+        Bz = prof[:, None, None] * one
+        pi = M.solve_pressure_equation(M.forcing(G, B, wten=M.buoyancy_tendency(Bz, G)),
+                                       s, 1)
+        aw = M.pgrad_w(pi, G, B) + M.buoyancy_tendency(Bz, G)
+        acc = 0.5 * (aw[:-1] + aw[1:])
+        assert np.abs(acc[1:-1]).max() < 0.01 * np.abs(Bz).max()
+    # (the older form, B + averaged pgrad_b, leaves the alternation)
+    old = Bz + M.pgrad_scalar(pi, G, B)
+    assert np.abs(old[1:-1]).max() > 0.1 * np.abs(Bz).max()
 
 
 def test_old_method_values_in_a_file_are_flagged(copy_run):
