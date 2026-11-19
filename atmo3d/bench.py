@@ -348,7 +348,8 @@ class Bench:
                 self._set(v.fill_mode, was)
                 _wait_idle(v)
         shown = v.fill_var.value
-        for name, what in (("wmax", "column-max w"), ("sbcape", "surface-based CAPE")):
+        for name, what in (("uh01", "0-1 km updraft helicity"),
+                           ("sbcape", "surface-based CAPE")):
             if name in F and name != shown:
                 self.act(f"map: {what} ({name})", "map",
                          lambda name=name: self._set(v.fill_var, name), cold=True)

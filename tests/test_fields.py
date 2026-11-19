@@ -150,7 +150,8 @@ def test_vorticity_tendencies(reg):
     run, F = reg.get()
     T, K = 4, 5
     assert F["zstretch"].group == "Vorticity tendencies"
-    assert sorted(F.native_deps("ztend")) == ["winterp", "xvort", "yvort", "zvort"]
+    assert sorted(F.native_deps("ztend")) == ["uinterp", "vinterp", "winterp", "xvort",
+                                              "yvort", "zvort"]
     assert F.native_deps("okubo") == ["uinterp", "vinterp"]
     assert not F["ztilt"].pointwise and F["ztilt"].units == "10⁻⁴ s⁻²"
     assert "Derived · Vorticity tendencies" in F.groups()
@@ -159,12 +160,12 @@ def test_vorticity_tendencies(reg):
     wz = np.gradient(v["winterp"], run.z, axis=0) * 1e-3  # 1/s (per m)
     wx = np.gradient(v["winterp"], run.xh, axis=-1) * 1e-3
     wy = np.gradient(v["winterp"], run.yh, axis=-2) * 1e-3
-    ref = {"zstretch": 1e4 * v["zvort"] * wz,
-           "ztilt": 1e4 * (v["xvort"] * wx + v["yvort"] * wy)}
-    ref["ztend"] = ref["zstretch"] + ref["ztilt"]
     g = {(c, a): np.gradient(v[c + "interp"], x, axis=a) * 1e-3
          for c in "uv" for a, x in ((-1, run.xh), (-2, run.yh))}
     ux, uy, vx, vy = g["u", -1], g["u", -2], g["v", -1], g["v", -2]
+    ref = {"zstretch": -1e4 * (v["zvort"] + run.fcor) * (ux + vy),  # −(ζ + f) ∇h·V
+           "ztilt": 1e4 * (v["xvort"] * wx + v["yvort"] * wy)}
+    ref["ztend"] = ref["zstretch"] + ref["ztilt"]
     ref["okubo"] = 1e4 * ((ux - vy) ** 2 + (vx + uy) ** 2 - (vx - uy) ** 2)
     for n, r in ref.items():
         tol = 1e-3 * max(1.0, np.abs(r).max())
@@ -173,19 +174,20 @@ def test_vorticity_tendencies(reg):
         assert np.allclose(F.plane(n, T, "colmax", 0), r.max(axis=0), atol=tol), n
     # at a height: the inputs' planes there (∂w/∂z between the levels' values)
     a = F.plane("zstretch", T, "height", 1.0)
-    b = 1e4 * F.plane("zvort", T, "height", 1.0) * F.plane("ddz.winterp", T, "height", 1.0)
+    b = -1e4 * (F.plane("zvort", T, "height", 1.0) + run.fcor) * (
+        F.plane("ddx.uinterp", T, "height", 1.0) + F.plane("ddy.vinterp", T, "height", 1.0))
     assert np.allclose(a, b, atol=1e-5)
     # and a derivative of one: ∂/∂z of stretching
     dref = np.gradient(ref["zstretch"], 1000.0 * run.z, axis=0)
     assert np.abs(F.volume("ddz.zstretch", T) - dref).max() < 1e-2 * np.abs(dref).max()
-    F.forget(T, ["winterp"])
+    F.forget(T, ["uinterp"])
     assert run.cached("~zstretch", T) is None and run.cached("~ddz.zstretch", T) is None
 
 
 def test_column_fields(reg):
-    """Updraft helicity integrates w ζ over exactly its layer (cells between the zf levels,
-    clipped to it); the maxima are over the levels whose cells reach into the layer; the
-    fields are 2D and have horizontal derivatives."""
+    """Updraft helicity integrates w ζ where w > 0 and ζ > 0 (as CM1's uh) over exactly
+    its layer (cells between the zf levels, clipped to it); the fields are 2D and have
+    horizontal derivatives."""
     from atmo3d.core.fields import column_levels
     run, F = reg.get()
     T = 4
@@ -200,15 +202,15 @@ def test_column_fields(reg):
     assert ks_all == list(range(run.nk)) and abs(dz_all.sum() - 1000 * run.zf[-1]) < 1e-6
     w = np.asarray(F.volume("winterp", T), np.float64)
     z = np.asarray(F.volume("zvort", T), np.float64)
-    ref = np.tensordot(dz, w[ks] * z[ks], axes=1)
+    wz = np.where((w > 0) & (z > 0), w * z, 0.0)
+    ref = np.tensordot(dz, wz[ks], axes=1)
+    assert ref.min() >= 0.0
     a = F.plane("uh25", T)
     assert a.shape == (run.nj, run.ni)
     assert np.abs(a - ref).max() < 1e-4 * max(1.0, np.abs(ref).max())
     assert np.allclose(F.plane("uh25", T, "level", 7), a)  # (2D: no level)
     assert np.array_equal(F.volume("uh25", T), a)
-    k1, _ = column_levels(run.z, run.zf, 0.0, 1.0)
-    assert np.allclose(F.plane("zvmax01", T), z[k1].max(axis=0), atol=1e-6)
-    assert np.allclose(F.plane("wmax", T), w.max(axis=0), atol=1e-5)
+    assert "zvmax01" not in F and "wmax" not in F  # (dropped, 2026-11-19)
     ax = np.gradient(a, 1000.0 * run.xh, axis=-1)
     assert np.allclose(F.plane("ddx.uh25", T), ax, atol=1e-3 * max(np.abs(ax).max(), 1e-12))
 

@@ -15,7 +15,8 @@ except ImportError:  # pragma: no cover
 from .catalog import CLOUD, HYDRO, PRECIP
 
 G = 9.81
-EPS = 287.04 / 461.5
+RD, RV = 287.04, 461.5
+EPS = RD / RV
 KAPPA = 287.04 / 1005.7
 
 # --------------------------------------------------------------- colormaps
@@ -82,8 +83,12 @@ def mpl_cmap(name, reverse=False):
 class FieldDef:
     def __init__(self, name, label, units, group, ndim=3, scale=1.0, cmap="viridis",
                  vrange=None, diverging=False, deps=(), func=None, pointwise=True,
-                 storm=False, layer=None, edges=False, costly=False, tier="main"):
+                 storm=False, layer=None, edges=False, costly=False, tier="main",
+                 note=""):
         self.name, self.label, self.units, self.group = name, label, units, group
+        # note: what the field leaves out or assumes, in a sentence or two (the
+        # derived-field docs page, a tooltip)
+        self.note = note
         # tier: where the field lists put it: "main", "other" (under Other) or
         # "hidden" (only with the show_hidden_fields setting): core.catalog.Catalog.tier
         self.tier = tier
@@ -137,34 +142,35 @@ PDECOMP = ("p_b", "p_l", "p_nl", "p_c", "acc_b", "acc_l", "acc_nl", "acc_c")
 
 # ---- derived fields: f(name) fetches a native field (raw units) on the same
 # plane/volume, c is a context dict (dx, dy in m; umove, vmove in m/s)
+# (temperature, dewpoint, θe and es: thermo's, the copies the soundings use)
 def _tempk(f, c):
-    return f("theta") * (f("pres") / 1.0e5) ** KAPPA
+    """T (K) from θ with the data type's κ (Catalog.kappa: the model's own θ)."""
+    return f("theta") * (f("pres") / 1.0e5) ** c.get("kappa", KAPPA)
+
+
+def _qv(f):
+    return np.maximum(f("qv"), 1e-10)
 
 
 def _vap(f):
-    q = np.maximum(f("qv"), 1e-10)
+    q = _qv(f)
     return f("pres") * q / (EPS + q)
 
 
 def _dewc(f, c):
-    lne = np.log(_vap(f) / 611.2)
-    return 243.5 * lne / (17.67 - lne)
+    from . import thermo
+    return thermo.dewpoint(f("pres"), _qv(f)) - 273.15
 
 
 def _thetae(f, c):
-    """Bolton (1980) eq. 43 equivalent potential temperature."""
-    T = _tempk(f, c)
-    r = np.maximum(f("qv"), 1e-10)
-    Td = _dewc(f, c) + 273.15
-    TL = 1.0 / (1.0 / (Td - 56.0) + np.log(T / Td) / 800.0) + 56.0
-    th = T * (1.0e5 / f("pres")) ** (0.2854 * (1.0 - 0.28 * r))
-    return th * np.exp((3.376 / TL - 0.00254) * 1000.0 * r * (1.0 + 0.81 * r))
+    """Bolton (1980) eq. 43 equivalent potential temperature (thermo.theta_e)."""
+    from . import thermo
+    return thermo.theta_e(f("pres"), _tempk(f, c), _qv(f))
 
 
 def _rh(f, c):
-    T = _tempk(f, c) - 273.15
-    es = 611.2 * np.exp(17.67 * T / (T + 243.5))
-    return 100.0 * _vap(f) / es
+    from . import thermo
+    return 100.0 * _vap(f) / thermo.esat(_tempk(f, c))
 
 
 def _bind(d, cat):
@@ -204,35 +210,62 @@ def _make_fields(avail, cat):
                       vrange=(-4, 4), diverging=True, deps=("pres", "pres0"),
                       func=lambda f, c: 0.01 * (f("pres") - f("pres0"))))
 
-    def buoy(f, c):
-        load = sum(f(n) for n in hyd) if hyd else 0.0
-        thr = f("theta") * (1.0 + f("qv") / EPS) / (1.0 + f("qv") + load)
-        thr0 = f("theta0") * (1.0 + f("qv0") / EPS) / (1.0 + f("qv0"))
-        return G * (thr - thr0) / thr0
+    # every condensate the model's buoyancy loads: the hydrometeor roles, and the data
+    # type's other liquid and ice species present (Catalog.condensate)
+    cond = hyd + [n for n in getattr(cat, "condensate", ()) if n in avail]
+    rvrd = RV / RD - 1.0
 
-    D.append(FieldDef("buoy", "Buoyancy (θρ′, with loading)", "m/s²", "Thermodynamics",
+    def buoy(f, c):  # CM1's (pdcomp.F, solve2.F): g [θ′/θ0 + (Rv/Rd − 1) qv′ − Σ q_cond]
+        load = sum(f(n) for n in cond) if cond else 0.0
+        return G * ((f("theta") - f("theta0")) / f("theta0")
+                    + rvrd * (f("qv") - f("qv0")) - load)
+
+    bdeps = ("theta", "qv", "theta0", "qv0", *cond)
+    D.append(FieldDef("buoy", "Buoyancy", "m/s²", "Thermodynamics",
                       cmap="RdBu_r", vrange=(-0.3, 0.3), diverging=True,
-                      deps=("theta", "qv", "theta0", "qv0", *hyd), func=buoy))
+                      deps=bdeps, func=buoy))
+
     # baroclinic generation of horizontal vorticity, ∇ × (B k) = (∂B/∂y, −∂B/∂x): the
-    # components of the "Baroclinic generation" vector (core/vectors.py)
-    bdeps = ("theta", "qv", "theta0", "qv0", *hyd)
+    # components of the "Baroclinic generation" vector (core/vectors.py).  ∂B/∂x from
+    # the inputs' derivatives (B is linear in them), so it is the derivative every
+    # other field gets (hgrad: the real grid spacing; terrain: at constant height).
+    # Those come in the inputs' display units (qv: g/kg), hence the scales.
+    def dbuoy(op):
+        def func(f, c):
+            th0 = f("theta0")
+            out = f(op + ".theta") / th0 - f("theta") * f(op + ".theta0") / th0 ** 2
+            out = out + rvrd * (f(op + ".qv") - f(op + ".qv0")) / qs
+            for n in cond:
+                out = out - f(op + "." + n) / sc[n]
+            return G * out
+        return func
+
+    def scale(r):  # (a role's or native's display scale: its derivative comes so)
+        return float(cat.look(cat.name(r) or r)[2] or 1.0)
+
+    qs, sc = scale("qv"), {n: scale(n) for n in cond}
+
+    def ddeps(op):
+        return ("theta", "theta0", op + ".theta", op + ".theta0", op + ".qv", op + ".qv0",
+                *(op + "." + n for n in cond))
+
     D.append(FieldDef("bgen_x", "Baroclinic x-vorticity generation (∂B/∂y)", "10⁻⁴ s⁻²",
-                      "Kinematics", cmap="RdBu_r", vrange=(-2, 2), diverging=True, deps=bdeps,
-                      func=lambda f, c: 1.0e4 * np.gradient(buoy(f, c), c["dy"], axis=-2),
-                      pointwise=False))
+                      "Kinematics", cmap="RdBu_r", vrange=(-2, 2), diverging=True,
+                      deps=ddeps("ddy"),
+                      func=lambda f, c, g=dbuoy("ddy"): 1.0e4 * g(f, c)))
     D.append(FieldDef("bgen_y", "Baroclinic y-vorticity generation (−∂B/∂x)", "10⁻⁴ s⁻²",
-                      "Kinematics", cmap="RdBu_r", vrange=(-2, 2), diverging=True, deps=bdeps,
-                      func=lambda f, c: -1.0e4 * np.gradient(buoy(f, c), c["dx"], axis=-1),
-                      pointwise=False))
+                      "Kinematics", cmap="RdBu_r", vrange=(-2, 2), diverging=True,
+                      deps=ddeps("ddx"),
+                      func=lambda f, c, g=dbuoy("ddx"): -1.0e4 * g(f, c)))
     # density potential temperature (θ including the vapour and condensate loading)
     def thrho(f, c):
-        load = sum(f(n) for n in hyd) if hyd else 0.0
+        load = sum(f(n) for n in cond) if cond else 0.0
         return f("theta") * (1.0 + f("qv") / EPS) / (1.0 + f("qv") + load)
 
     D.append(FieldDef("thrho", "θρ", "K", "Thermodynamics", cmap="cmo.thermal",
-                      deps=("theta", "qv", *hyd), func=thrho))
+                      deps=("theta", "qv", *cond), func=thrho))
     D.append(FieldDef("thrhopert", "θρ′", "K", "Thermodynamics", cmap="RdBu_r",
-                      vrange=(-6, 6), diverging=True, deps=("theta", "qv", "theta0", "qv0", *hyd),
+                      vrange=(-6, 6), diverging=True, deps=("theta", "qv", "theta0", "qv0", *cond),
                       func=lambda f, c: thrho(f, c) - f("theta0") * (1.0 + f("qv0") / EPS)
                       / (1.0 + f("qv0"))))
     D.append(FieldDef("thetae", "θe", "K", "Thermodynamics", cmap="Spectral_r",
@@ -248,17 +281,23 @@ def _make_fields(avail, cat):
                       func=lambda f, c: np.hypot(f("u") + c["umove"],
                                                  f("v") + c["vmove"])))
 
-    def hdiv(f, c):
-        du = np.gradient(f("u"), c["dx"], axis=-1)
-        dv = np.gradient(f("v"), c["dy"], axis=-2)
-        return 1.0e3 * (du + dv)
-
     D.append(FieldDef("hdiv", "Horizontal divergence", "10⁻³ s⁻¹", "Kinematics",
                       cmap="PuOr_r", vrange=(-10, 10), diverging=True,
-                      deps=("u", "v"), func=hdiv, pointwise=False))
+                      deps=("ddx.u", "ddy.v"),
+                      func=lambda f, c: 1.0e3 * (f("ddx.u") + f("ddy.v"))))
+    # ξ, η: the files' (CM1), or from the winds where a data type writes none (WoFS):
+    # ξ = ∂w/∂y − ∂v/∂z, η = ∂u/∂z − ∂w/∂x, listed as xvort / yvort
+    xi, eta, xdeps, ydeps = horizontal_vorticity(cat, avail)
+    if cat.name("xvort") not in avail and set(xdeps) - {"xvort"}:
+        D.append(FieldDef("xvort", "x vorticity (∂w/∂y − ∂v/∂z)", "1/s", "Kinematics",
+                          cmap="RdBu_r", vrange=(-0.05, 0.05), diverging=True,
+                          deps=xdeps, func=lambda f, c: xi(f)))
+        D.append(FieldDef("yvort", "y vorticity (∂u/∂z − ∂w/∂x)", "1/s", "Kinematics",
+                          cmap="RdBu_r", vrange=(-0.05, 0.05), diverging=True,
+                          deps=ydeps, func=lambda f, c: eta(f)))
     D.append(FieldDef("hvort", "Horizontal vorticity magnitude", "1/s", "Kinematics",
-                      cmap="magma", vrange=(0, 0.1), deps=("xvort", "yvort"),
-                      func=lambda f, c: np.hypot(f("xvort"), f("yvort"))))
+                      cmap="magma", vrange=(0, 0.1), deps=xdeps + ydeps,
+                      func=lambda f, c: np.hypot(xi(f), eta(f))))
 
     # horizontal vorticity along / across the storm-relative horizontal wind; c["storm"]
     # is the storm motion (ground-relative), the grid winds are relative to (umove, vmove)
@@ -270,13 +309,13 @@ def _make_fields(avail, cat):
 
     def wstream(f, c):
         sx, sy = sr_unit(f, c)
-        return f("xvort") * sx + f("yvort") * sy
+        return xi(f) * sx + eta(f) * sy
 
     def wcross(f, c):  # positive: vorticity to the left of the storm-relative wind
         sx, sy = sr_unit(f, c)
-        return -f("xvort") * sy + f("yvort") * sx
+        return -xi(f) * sy + eta(f) * sx
 
-    vdeps = ("xvort", "yvort", "u", "v")
+    vdeps = tuple(dict.fromkeys(xdeps + ydeps + ("u", "v")))
     D.append(FieldDef("wstream", "Streamwise vorticity", "1/s", "Kinematics", cmap="RdBu_r",
                       vrange=(-0.05, 0.05), diverging=True, deps=vdeps, func=wstream,
                       storm=True))
@@ -305,22 +344,38 @@ def _make_fields(avail, cat):
             D.append(FieldDef("qprecip", "Precipitation (qr+qs+qg+qhl)", "g/kg",
                               "Microphysics", cmap="cmo.rain", vrange=(0, 8), deps=pr,
                               func=lambda f, c: 1000.0 * sum(f(n) for n in pr)))
-    D += _vort_tendencies()
-    D += _columns()
-    D += _sounding_kinematics()
-    D += _sounding_thermo()
+    D += _vort_tendencies(cat, avail, xi, eta, xdeps, ydeps)
+    D += _columns(cat, avail)
+    D += _sounding_kinematics(cat, avail)
+    D += _sounding_thermo(cat, avail)
     D = [_bind(d, cat) for d in D]
     return [d for d in D if d is not None and all(x in avail for x in d.natives)]
 
 
-def _vort_tendencies():
+def horizontal_vorticity(cat, avail):
+    """(xi(f), eta(f), xi's deps, eta's deps): ξ and η as the files have them, or from
+    the winds' derivatives (per m: 1/s) for a data type without them."""
+    if cat.name("xvort") in avail and cat.name("yvort") in avail:
+        return (lambda f: f("xvort")), (lambda f: f("yvort")), ("xvort",), ("yvort",)
+    return ((lambda f: f("ddy.w") - f("ddz.v")), (lambda f: f("ddz.u") - f("ddx.w")),
+            ("ddy.w", "ddz.v"), ("ddz.u", "ddx.w"))
+
+
+def _vort_tendencies(cat, avail, xi, eta, xdeps, ydeps):
     """Vertical-vorticity tendencies and the Okubo–Weiss parameter, in 10⁻⁴ s⁻².  Their
-    deps' derivatives are per m (m/s per m = 1/s)."""
-    def stretch(f, c):  # ζ ∂w/∂z
-        return 1.0e4 * f("zvort") * f("ddz.w")
+    deps' derivatives are per m (m/s per m = 1/s).  Stretching acts on the absolute
+    vorticity ζ + f, with f the fcor role where the data type has it (WoFS's F), else
+    the run's one f (c["f"]: Run.fcor; 0 for none)."""
+    has_f = cat.name("fcor") in avail
+
+    def fcor(f, c):
+        return f("fcor") if has_f else c.get("f", 0.0)
+
+    def stretch(f, c):  # −(ζ + f) ∇h·V (anelastic)
+        return -1.0e4 * (f("zvort") + fcor(f, c)) * (f("ddx.u") + f("ddy.v"))
 
     def tilt(f, c):  # ξ ∂w/∂x + η ∂w/∂y
-        return 1.0e4 * (f("xvort") * f("ddx.w") + f("yvort") * f("ddy.w"))
+        return 1.0e4 * (xi(f) * f("ddx.w") + eta(f) * f("ddy.w"))
 
     def okubo(f, c):  # W = s_n² + s_s² − ω² (strain dominates > 0, rotation < 0)
         ux, uy, vx, vy = (f("ddx.u"), f("ddy.u"), f("ddx.v"),
@@ -328,41 +383,42 @@ def _vort_tendencies():
         return 1.0e4 * ((ux - vy) ** 2 + (vx + uy) ** 2 - (vx - uy) ** 2)
 
     g, kw = "Vorticity tendencies", dict(cmap="RdBu_r", vrange=(-5, 5), diverging=True)
-    sdeps = ("zvort", "ddz.w")
-    tdeps = ("xvort", "yvort", "ddx.w", "ddy.w")
+    sdeps = ("zvort", "ddx.u", "ddy.v") + (("fcor",) if has_f else ())
+    tdeps = tuple(dict.fromkeys(xdeps + ydeps + ("ddx.w", "ddy.w")))
+    left_out = "Advection, mixing and the baroclinic and solenoidal terms are left out."
     return [
-        FieldDef("zstretch", "ζ stretching (ζ ∂w/∂z)", "10⁻⁴ s⁻²", g, deps=sdeps,
-                 func=stretch, **kw),
+        FieldDef("zstretch", "ζ stretching (−(ζ + f) ∇h·V)", "10⁻⁴ s⁻²", g, deps=sdeps,
+                 func=stretch, note="Anelastic form; f is the run's Coriolis parameter.",
+                 **kw),
         FieldDef("ztilt", "ζ tilting (ξ ∂w/∂x + η ∂w/∂y)", "10⁻⁴ s⁻²", g, deps=tdeps,
                  func=tilt, **kw),
-        FieldDef("ztend", "ζ stretching + tilting", "10⁻⁴ s⁻²", g, deps=sdeps + tdeps,
-                 func=lambda f, c: stretch(f, c) + tilt(f, c), **kw),
+        FieldDef("ztend", "ζ stretching + tilting", "10⁻⁴ s⁻²", g,
+                 deps=tuple(dict.fromkeys(sdeps + tdeps)),
+                 func=lambda f, c: stretch(f, c) + tilt(f, c),
+                 note="Not the full ζ tendency: " + left_out, **kw),
         FieldDef("okubo", "Okubo–Weiss (s_n² + s_s² − ω²)", "10⁻⁴ s⁻²", g,
                  deps=("ddx.u", "ddy.u", "ddx.v", "ddy.v"),
                  func=okubo, **kw),
     ]
 
 
-def _columns():
-    """Column fields (2D from 3D): updraft helicity and layer maxima."""
-    def uh(f, c):  # ∫ w ζ dz
-        return layer_sum(c["dz"], f("w") * f("zvort"))
-
-    def top(n):
-        return lambda f, c: in_layer(f(n), c["dz"], -np.inf).max(axis=0)
+def _columns(cat, avail):
+    """Column fields (2D from 3D): updraft helicity, summed where w > 0 and ζ > 0 (as
+    CM1's own uh).  2–5 km only for a data type whose files have none (the uh25 role:
+    CM1's uh, WoFS's UH)."""
+    def uh(f, c):  # ∫ w ζ dz over the updraft's cyclonic part
+        w, z = f("w"), f("zvort")
+        return layer_sum(c["dz"], np.where((w > 0) & (z > 0), w * z, 0.0))
 
     g = "Column fields"
-    return [
-        FieldDef("uh25", "Updraft helicity 2–5 km (∫ w ζ dz)", "m²/s²", g, cmap="magma",
-                 vrange=(0, 300), deps=("w", "zvort"), func=uh, layer=(2.0, 5.0)),
-        FieldDef("uh01", "Updraft helicity 0–1 km (∫ w ζ dz)", "m²/s²", g, cmap="magma",
-                 vrange=(0, 50), deps=("w", "zvort"), func=uh, layer=(0.0, 1.0)),
-        FieldDef("zvmax01", "Max vertical vorticity 0–1 km", "1/s", g, cmap="magma",
-                 vrange=(0, 0.05), deps=("zvort",), func=top("zvort"), layer=(0.0, 1.0)),
-        FieldDef("wmax", "Column max vertical velocity", "m/s", g, cmap="turbo",
-                 vrange=(0, 50), deps=("w",), func=top("w"),
-                 layer=(0.0, None)),
-    ]
+    out = [FieldDef("uh01", "Updraft helicity 0–1 km", "m²/s²", g, cmap="magma",
+                    vrange=(0, 50), deps=("w", "zvort"), func=uh, layer=(0.0, 1.0),
+                    note="∫ w ζ dz where w > 0 and ζ > 0.")]
+    if cat.name("uh25") not in avail:
+        out.insert(0, FieldDef("uh25", "Updraft helicity 2–5 km", "m²/s²", g, cmap="magma",
+                               vrange=(0, 300), deps=("w", "zvort"), func=uh,
+                               layer=(2.0, 5.0), note="∫ w ζ dz where w > 0 and ζ > 0."))
+    return out
 
 
 def _wind(f, c):  # ground-relative
@@ -398,17 +454,37 @@ def _helicity_columns(u, v, zk, top):
     return out + np.where(nb > 0, ut * vl - ul * vt, 0.0)
 
 
-def _sounding_kinematics():
+def wind_profile(f, c, sfc):
+    """(u, v, zk) ground-relative winds of a column field's levels, starting with the
+    10 m winds (u10, v10 roles) when sfc and the lowest level is above 10 m."""
+    u, v = _wind(f, c)
+    zk = c["zk"]
+    if not sfc or np.min(zk[0]) <= 0.01:
+        return u, v, zk
+    u10 = f("u10")[0] + c["umove"]  # (2D: a column field gets it as one level)
+    v10 = f("v10")[0] + c["vmove"]
+    z10 = np.full_like(np.asarray(zk[:1], np.float64), 0.01)
+    return (np.concatenate([np.broadcast_to(u10, u.shape[1:])[None], u]),
+            np.concatenate([np.broadcast_to(v10, v.shape[1:])[None], v]),
+            np.concatenate([z10, np.asarray(zk, np.float64)]))
+
+
+def _sounding_kinematics(cat=None, avail=()):
     """Bulk shear and storm-relative helicity of every column, as the soundings give
-    them (thermo.analyze): from the lowest model level up to the layer top, the winds
-    linearly interpolated between the levels."""
+    them (thermo.analyze): from the 10 m winds where the data type has them (u10,
+    v10), else the lowest model level, up to the layer top, the winds linearly
+    interpolated between the levels."""
+    sfc = cat is not None and cat.name("u10") in avail and cat.name("v10") in avail
+
     def shear(f, c):
-        return bulk_shear(*_wind(f, c), c["zk"], c["top"])
+        u, v, zk = wind_profile(f, c, sfc)
+        return bulk_shear(u, v, zk, c["top"])
 
     def srh(f, c):
-        return helicity(*_wind(f, c), c["zk"], c["top"], c["storm"])
+        u, v, zk = wind_profile(f, c, sfc)
+        return helicity(u, v, zk, c["top"], c["storm"])
 
-    g, deps = "Sounding parameters", ("u", "v")
+    g, deps = "Sounding parameters", ("u", "v") + (("u10", "v10") if sfc else ())
     kw = dict(deps=deps, edges=True)
     # (name, label of the layer, top km, starting range top): shear, then SRH
     shears = (("shear0250", "0–250 m", 0.25, 15), ("shear0500", "0–500 m", 0.5, 20),
@@ -433,13 +509,14 @@ def _parcel(f, c, kind):
         return memo[kind]
     from . import thermo
     out = thermo.parcel_columns(1000.0 * np.asarray(c["zk"], np.float64), f("pres"),
-                                f("theta"), f("qv"), kind, c.get("threads", 1))
+                                f("theta"), f("qv"), kind, c.get("threads", 1),
+                                c.get("kappa", KAPPA))
     if memo is not None:
         memo[kind] = out
     return out
 
 
-def _sounding_thermo():
+def _sounding_thermo(cat=None, avail=()):
     """CAPE, CIN and LCL of surface-based, 100 hPa mixed-layer and most-unstable
     parcels in every column, and fixed-layer STP and SCP: as the soundings compute
     them (thermo.analyze), on every column_stride-th column."""
@@ -459,10 +536,11 @@ def _sounding_thermo():
                      vrange=(0, 3000), deps=deps, func=pick(2), **kw),
         ]
 
+    sfc = cat is not None and cat.name("u10") in avail and cat.name("v10") in avail
+
     def stp(f, c):  # (SBCAPE/1500)(SBLCL term)(0–1 km SRH/150)(0–6 km shear term)
         cape, _, lcl = _parcel(f, c, "sb")
-        u, v = _wind(f, c)
-        zk = c["zk"]
+        u, v, zk = wind_profile(f, c, sfc)
         bwd = bulk_shear(u, v, zk, 6.0)
         return ((cape / 1500.0) * np.clip((2000.0 - lcl) / 1000.0, 0.0, 1.0)
                 * (helicity(u, v, zk, 1.0, c["storm"]) / 150.0)
@@ -470,14 +548,13 @@ def _sounding_thermo():
 
     def scp(f, c):  # (MUCAPE/1000)(0–3 km SRH/50)(0–6 km shear term)(MUCIN term)
         cape, cin, _ = _parcel(f, c, "mu")
-        u, v = _wind(f, c)
-        zk = c["zk"]
+        u, v, zk = wind_profile(f, c, sfc)
         bwd = bulk_shear(u, v, zk, 6.0)
         return ((cape / 1000.0) * (helicity(u, v, zk, 3.0, c["storm"]) / 50.0)
                 * np.where(bwd < 10.0, 0.0, np.minimum(bwd, 20.0) / 20.0)
                 * np.where(cin > -40.0, 1.0, -40.0 / np.minimum(cin, -40.0)))
 
-    wdeps = deps + ("u", "v")
+    wdeps = deps + ("u", "v") + (("u10", "v10") if sfc else ())
     ckw = dict(cmap="RdBu_r", diverging=True, deps=wdeps, storm=True, **kw)
     D += [
         FieldDef("stp", "Significant tornado parameter (fixed layer)", "", g,
@@ -752,6 +829,18 @@ def hgrad(op, a, xkm, ykm):
     return np.hypot(d(-1, xkm), d(-2, ykm))
 
 
+def hgrad_level(op, a, zmsl, xkm, ykm, dadz):
+    """Horizontal derivative op ('ddx', 'ddy', 'gradh') at constant height of a
+    (..., ny, nx) on terrain-following levels whose heights are zmsl (km above sea
+    level, same shape): along the levels, less the levels' slope times ∂a/∂z (dadz,
+    per m):  ∂a/∂x|z = ∂a/∂x|level − (∂z/∂x|level) ∂a/∂z.  Per m."""
+    def one(o):
+        return hgrad(o, a, xkm, ykm) - 1000.0 * hgrad(o, zmsl, xkm, ykm) * dadz
+    if op == "gradh":
+        return np.hypot(one("ddx"), one("ddy"))
+    return one(op)
+
+
 def once(fetch):
     """fetch(name), each name fetched once: a derived field asks for its inputs several
     times (θe: prs three times), and each ask of a plane not cached is a read."""
@@ -821,7 +910,8 @@ class Fields:
         pdecomp.register(run)  # decomposition fields, computable where no file has them
         self.run = run
         self.cat = cat = run.catalog  # (the data type's names: core.catalog)
-        self.ctx = dict(dx=run.dx, dy=run.dy, umove=run.umove, vmove=run.vmove)
+        self.ctx = dict(dx=run.dx, dy=run.dy, umove=run.umove, vmove=run.vmove,
+                        kappa=getattr(cat, "kappa", KAPPA), f=getattr(run, "fcor", 0.0))
         self.defs = OrderedDict()
         for name, info in run.vars.items():
             label, units, scale, cmap, vr, div = cat.look(name, info.long_name, info.units)
@@ -990,8 +1080,12 @@ class Fields:
         got = {}  # (the inputs' levels, read together when the first is asked for)
 
         def layers(n, rows=None, cols=None):
+            if run.vars[n].ndim == 2:  # (a 2D input, u10: as one level)
+                a = run.read_level(n, t)
+                return (a if rows is None else a[np.ix_(rows, cols)])[None]
             if n not in got:
-                got.update(run.read_levels(_batch(d, n, got), t, ks, rows, cols))
+                got.update(run.read_levels([m for m in _batch(d, n, got)
+                                            if run.vars[m].ndim == 3], t, ks, rows, cols))
             return got[n]
 
         if not d.costly:
@@ -1020,12 +1114,27 @@ class Fields:
         if op != "ddz":
             if self.defs[base].ndim == 2:
                 mode, value = "2d", 0
+            elif self.run.terrain:  # (at constant height: hgrad_level, then to the plane)
+                def level(k):
+                    return self._hgrad_level(op, base, t, k, storm)
+                if mode == "level":
+                    return level(int(value))
+                return self.run.interp_height(level, t, float(value),
+                                              "msl" if mode == "msl" else "agl")
             return hgrad(op, self.plane(base, t, mode, value, storm), self.run.xh,
                          self.run.yh)
         if mode == "level":
             return self._ddz_level(base, t, int(value), storm)
         return self.run.interp_height(lambda k: self._ddz_level(base, t, k, storm), t,
                                       float(value), "msl" if mode == "msl" else "agl")
+
+    def _hgrad_level(self, op, base, t, k, storm):
+        """Horizontal derivative op (per m) of field base at constant height, on model
+        level k of a terrain run (hgrad_level)."""
+        run = self.run
+        return hgrad_level(op, self.plane(base, t, "level", k, storm),
+                           run.heights(t, "msl")[k], run.xh, run.yh,
+                           self._ddz_level(base, t, k, storm))
 
     def _ddz_level(self, base, t, k, storm):
         """∂/∂z (per m) of field base on model level k (ddz_level)."""
@@ -1097,13 +1206,21 @@ class Fields:
         def levels(k0, k1):  # (in display units: a slab's copy, not the volume's)
             return b[k0:k1] if scale == 1.0 else b[k0:k1] * scale
 
-        def part(k0, k1):
-            if op != "ddz":
-                return hgrad(op, levels(k0, k1), run.xh, run.yh)
+        zmsl = np.asarray(run.heights(t, "msl")) if run.terrain and op != "ddz" else None
+
+        def dz(k0, k1):  # (∂/∂z of levels k0:k1, from them and the level beyond each end)
             lo, hi = max(k0 - 1, 0), min(k1 + 1, nk)
             if hi - lo < 2:  # (a single level: no ∂/∂z)
-                return 0.0
+                return np.zeros((k1 - k0,) + b.shape[1:], np.float32)
             return ddz_volume(levels(lo, hi), z[lo:hi])[k0 - lo:k1 - lo]
+
+        def part(k0, k1):
+            if op == "ddz":
+                return dz(k0, k1)
+            if zmsl is not None:  # (terrain: at constant height)
+                return hgrad_level(op, levels(k0, k1), zmsl[k0:k1], run.xh, run.yh,
+                                   dz(k0, k1))
+            return hgrad(op, levels(k0, k1), run.xh, run.yh)
 
         return by_slabs(b.shape, part, self._threads())
 
@@ -1170,7 +1287,11 @@ class Fields:
         if op:
             b = self._region(base, t, reg, storm, got)
             k0, k1, j0, j1, i0, i1 = reg
-            if op != "ddz":
+            if op != "ddz" and run.terrain and b.ndim == 3 and k1 - k0 >= 2:
+                a = hgrad_level(op, b, run.heights(t, "msl")[k0:k1, j0:j1, i0:i1],
+                                run.xh[i0:i1], run.yh[j0:j1],
+                                ddz_volume(b, run.heights(t)[k0:k1, j0:j1, i0:i1]))
+            elif op != "ddz":
                 a = hgrad(op, b, run.xh[i0:i1], run.yh[j0:j1])
             elif k1 - k0 < 2:  # (a single level: no ∂/∂z)
                 a = np.zeros_like(b)

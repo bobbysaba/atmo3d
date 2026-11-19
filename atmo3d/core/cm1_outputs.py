@@ -51,7 +51,7 @@ OUTPUTS = {
     "sus2": _f("Max w at 5 km (translated)", "m/s", 1, "turbo", (0, 60)),
     "shs": _f("Max updraft helicity", "m²/s²", 1, "magma", (0, 500)),
     "shs2": _f("Max updraft helicity (translated)", "m²/s²", 1, "magma", (0, 500)),
-    "uh": _f("Updraft helicity 2–5 km (CM1's)", "m²/s²", 1, "magma", (0, 300)),
+    "uh": _f("Updraft helicity 2–5 km", "m²/s²", 1, "magma", (0, 300)),
     # output_coldpool
     "cpc": _f("Cold pool intensity C", "m/s", 1, "viridis", (0, 30)),
     "cph": _f("Cold pool depth", "m AGL", 1, "cividis", (0, 3000)),

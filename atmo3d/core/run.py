@@ -600,6 +600,9 @@ class Run:
         self.files, self.attrs, self.nml = [], {}, {}
         self.vars, self.var_times = {}, {}
         self.umove = self.vmove = 0.0
+        # Coriolis parameter (1/s) of a run with one f (CM1's f-plane); a data type whose
+        # f varies maps the fcor role instead (WoFS: F).  0: none
+        self.fcor = 0.0
         # fields computed here (not in the files), consulted before the files:
         # (name, t) -> float32 (nk, nj, ni); never evicted by the cache
         self.extra = OrderedDict()
@@ -1381,9 +1384,16 @@ class CM1Run(Run):
                 info = _var_info(name, v)
                 if info is not None:
                     self.vars[name] = info
+            f_cor = (float(np.ravel(d["f_cor"][:])[0]) if "f_cor" in d.variables
+                     else None)
 
         self._grid_done()
         self.nml = parse_namelist(os.path.join(self.path, "namelist.input"))
+        # f: the file's f_cor (CM1 writes it), else the namelist's fcor when icor = 1
+        if f_cor is None:
+            f_cor = float(self.nml.get("fcor", 0.0)) if int(self.nml.get("icor", 0)) == 1 \
+                else 0.0
+        self.fcor = f_cor
         moving = int(self.nml.get("imove", 0)) == 1
         # CM1 writes winds relative to the (possibly translating) grid.
         self.umove = float(self.nml.get("umove", 0.0)) if moving else 0.0

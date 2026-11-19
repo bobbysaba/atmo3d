@@ -26,6 +26,7 @@ ROLES = {
     "theta0": "th0", "pres0": "prs0", "qv0": "qv0", "u0": "u0", "v0": "v0",
     "qc": "qc", "qi": "qi", "qr": "qr", "qs": "qs", "qg": "qg", "qhl": "qhl",
     "refl": "dbz", "cref": "cref",
+    "u10": "u10", "v10": "v10", "uh25": "uh",
 }
 
 _SWATHS = ("sws", "svs", "sps", "srs", "sgs", "sus", "shs")
@@ -41,4 +42,7 @@ CATALOG = register(Catalog(
     file_first=("thpert", "prspert"),
     other=OTHER, other_groups=OTHER_GROUPS,
     # the staggered winds go under Other when the run has the interpolated ones
-    other_if={"u": "uinterp", "v": "vinterp", "w": "winterp"}))
+    other_if={"u": "uinterp", "v": "vinterp", "w": "winterp"},
+    # the rest of what CM1's own buoyancy loads (pdcomp.F, solve2.F: every liquid and
+    # ice species), beyond the hydrometeor roles
+    condensate=("qh", "qi1", "qi2", "qi3")))

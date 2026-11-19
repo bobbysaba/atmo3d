@@ -45,7 +45,7 @@ OUTPUTS = {
     "U": _signed("u (grid-relative)", "m/s", 1, (-30, 30), KIN),
     "V": _signed("v (grid-relative)", "m/s", 1, (-30, 30), KIN),
     "W": _signed("Vertical velocity", "m/s", 1, (-20, 20), KIN),
-    "REL_VORT": _signed("Relative vertical vorticity (WRF's)", "1/s", 1, (-0.05, 0.05), KIN),
+    "REL_VORT": _signed("Vertical vorticity", "1/s", 1, (-0.05, 0.05), KIN),
     "REFL_10CM": _f("Reflectivity", "dBZ", 1, "reflectivity", (0, 75), group="Radar"),
     "QCLOUD": _f("Cloud water", "g/kg", 1000, "cmo.ice", (0, 3), group=MP),
     "QRAIN": _f("Rain", "g/kg", 1000, "cmo.rain", (0, 5), group=MP),

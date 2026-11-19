@@ -205,17 +205,20 @@ def test_cm1_tiers():
 
 def test_wofs_tiers():
     """WoFS: the audit's Other rows, the hidden blocks, and WRF fields the catalog does
-    not name hidden too; REL_VORT is not the vertical-vorticity role."""
+    not name hidden too; REL_VORT is the vertical-vorticity role (2026-11-19)."""
     cat = C.of_model("wofs")
-    for n in ("REL_VORT", "H_DIABATIC", "QNDROP", "PH", "REFD_MAX", "UP_HELI_MAX",
+    for n in ("H_DIABATIC", "QNDROP", "PH", "REFD_MAX", "UP_HELI_MAX",
               "W_UP_MAX", "T2", "PSFC", "RAINNC", "PBLH", "RSCGHIS_2D"):
         assert cat.tier(n, "") == "other", n
     for n in ("XLAT", "MU", "RAINC", "SNOWH", "COSZEN", "NCI_W", "WSPD10UMAX",
               "SOME_NEW_WRF_FIELD"):
         assert cat.tier(n, "") == "hidden", n
-    for n in ("THETA", "W", "REFL_10CM", "COMPOSITE_REFL_10CM", "UH", "HGT", "zagl"):
+    for n in ("THETA", "W", "REFL_10CM", "COMPOSITE_REFL_10CM", "UH", "HGT", "zagl",
+              "REL_VORT"):
         assert cat.tier(n, "") == "main", n
-    assert cat.name("zvort") is None and cat.name("cref") == "COMPOSITE_REFL_10CM"
+    assert cat.name("zvort") == "REL_VORT" and cat.name("cref") == "COMPOSITE_REFL_10CM"
+    assert (cat.name("fcor"), cat.name("u10"), cat.name("uh25")) == ("F", "U10", "UH")
+    assert cat.kappa == 2.0 / 7.0 and C.of_model("cm1").kappa == 287.04 / 1005.7
     # CM1 lists a field it does not name (its namelist chose it)
     assert C.of_model("cm1").tier("some_new_field", "Other model fields") == "main"
 
@@ -226,12 +229,12 @@ def test_field_lists_by_tier(monkeypatch):
     draws it) and the fields are ordered main, Other, hidden."""
     from atmo3d import config
     from atmo3d.core import fields as FF
-    F = _fake_fields("wofs", ("THETA", "W", "REL_VORT", "XLAT", "UH"))
+    F = _fake_fields("wofs", ("THETA", "W", "H_DIABATIC", "XLAT", "UH"))
     monkeypatch.setattr(FF, "show_hidden", lambda: False)
     g = F.groups()
     names = {n for v in g.values() for n in v.values()}
     assert "XLAT" not in names and "XLAT" in F and F["XLAT"].tier == "hidden"
-    assert any(k.startswith(FF.OTHER_PREFIX) and "REL_VORT" in v.values()
+    assert any(k.startswith(FF.OTHER_PREFIX) and "H_DIABATIC" in v.values()
                for k, v in g.items())
     assert not any(k.startswith(FF.HIDDEN_PREFIX) for k in g)
     keys = list(g)

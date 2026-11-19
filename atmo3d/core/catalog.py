@@ -58,6 +58,10 @@ ROLES = {
     "qhl": "hail",
     # radar: 3D reflectivity, and the composite (2D) when the files have one (dBZ)
     "refl": "reflectivity", "cref": "composite reflectivity",
+    # 2D: the Coriolis parameter where it varies (1/s; a run with one f: Run.fcor),
+    # winds at 10 m (grid-relative, as u, v), the model's own 2–5 km updraft helicity
+    "fcor": "Coriolis parameter", "u10": "10 m x wind", "v10": "10 m y wind",
+    "uh25": "updraft helicity 2-5 km",
 }
 
 HYDRO = ("qc", "qr", "qi", "qs", "qg", "qhl")
@@ -69,10 +73,14 @@ BASE = ("theta0", "pres0", "qv0", "u0", "v0")
 SOUNDING = ("theta", "pres", "qv", "u", "v")  # a sounding's inputs (thermo.analyze)
 SOUNDING_BASE = BASE
 
+KAPPA_CM1 = 287.04 / 1005.7
+
+
 class Catalog:
     def __init__(self, key, natives, roles, also=None, turbulence=(), extra_groups=None,
                  renamed=None, describe=None, file_first=(), other=(), other_groups=(),
-                 other_if=None, hidden=(), unknown_hidden=False):
+                 other_if=None, hidden=(), unknown_hidden=False, kappa=None,
+                 condensate=()):
         unknown = (set(roles) | set(also or {})) - set(ROLES)
         if unknown:
             raise ValueError(f"unknown roles {sorted(unknown)} (see core.catalog.ROLES)")
@@ -97,6 +105,12 @@ class Catalog:
         self.other, self.other_groups = frozenset(other), frozenset(other_groups)
         self.other_if = dict(other_if or {})
         self.hidden, self.unknown_hidden = frozenset(hidden), bool(unknown_hidden)
+        # kappa: Rd/cp of the model's own θ definition, to get T back from θ exactly
+        # (CM1: 287.04/1005.7; WRF: 2/7, as MetPy)
+        self.kappa = float(kappa) if kappa is not None else KAPPA_CM1
+        # condensate: native names of liquid or ice mass mixing ratios (kg/kg) besides
+        # the hydrometeor roles, that buoyancy and θρ load too (CM1's qh, P3's qi1...)
+        self.condensate = tuple(condensate)
         self._resolved = {}
         self._index()
 

@@ -35,8 +35,11 @@ def comps(F, key):
     the run's data type lacks)."""
     from .catalog import ROLES
     cat = getattr(F, "cat", None)
-    return tuple(None if c is None else (cat.name(c) if cat is not None else None)
-                 if c in ROLES else c for c in VECTORS[key].comps)
+    def name(c):  # (a role the data type lacks: a derived field of that name, if any:
+        got = cat.name(c) if cat is not None else None  # WoFS's ξ, η from the winds)
+        return got if got is not None or c not in getattr(F, "defs", {}) else c
+    return tuple(None if c is None else name(c) if c in ROLES else c
+                 for c in VECTORS[key].comps)
 
 
 def options(F):

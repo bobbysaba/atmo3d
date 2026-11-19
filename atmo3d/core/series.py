@@ -254,7 +254,8 @@ def _worker(task):
     npts) or dict(t, error).  A derivative (task "op", of field task "field") and
     derived fields that are not pointwise are computed on the region plus a one-point
     border (task "halo"), so their values at its edge are those of the map."""
-    from .fields import column_levels_3d, ddz_level, hgrad, split_deriv, stride_cols
+    from .fields import (column_levels_3d, ddz_level, hgrad, hgrad_level, split_deriv,
+                         stride_cols)
     from .run import open_source
 
     t = task["t"]
@@ -278,13 +279,15 @@ def _worker(task):
             zname = task.get("zname")  # (a terrain run's: heights of the cell faces, m AGL)
             zboxes = {}
 
-            def heights(r0, r1, c0, c1):
-                """(levels, faces) heights (km AGL) of a terrain run's columns."""
-                if (r0, r1, c0, c1) not in zboxes:
-                    zf = np.stack([_read(d[zname], None, k, r0, r1, c0, c1, 3)
+            def heights(r0, r1, c0, c1, zn=None):
+                """(levels, faces) heights (km AGL; zn "zmsl": above sea level) of a
+                terrain run's columns."""
+                zn = zn or zname
+                if (zn, r0, r1, c0, c1) not in zboxes:
+                    zf = np.stack([_read(d[zn], None, k, r0, r1, c0, c1, 3)
                                    for k in range(task["nk"] + 1)]) / np.float32(1000.0)
-                    zboxes[r0, r1, c0, c1] = (0.5 * (zf[:-1] + zf[1:]), zf)
-                return zboxes[r0, r1, c0, c1]
+                    zboxes[zn, r0, r1, c0, c1] = (0.5 * (zf[:-1] + zf[1:]), zf)
+                return zboxes[zn, r0, r1, c0, c1]
 
             def base(fetch):
                 """The field (not yet differentiated) on the box read."""
@@ -313,9 +316,9 @@ def _worker(task):
                 return (np.asarray(fdef.func(fetch, ctx), dtype=np.float32)
                         if fdef is not None else fetch(name) * np.float32(info[name][1]))
 
-            def finish(a):
+            def finish(a, grad=True):
                 """Horizontal derivative (on the box read), cut to the region, masked."""
-                if op in ("ddx", "ddy", "gradh"):
+                if grad and op in ("ddx", "ddy", "gradh"):
                     a = hgrad(op, a, task["xe"], task["ye"])
                 a = np.asarray(a, dtype=np.float32)[crop]
                 if mask is not None:
@@ -323,8 +326,11 @@ def _worker(task):
                 return a
 
             zfull = task.get("zfull")
+            zmsl = None  # (a terrain run's levels above sea level: their slope, hgrad_level)
             if zname and task["vmode"] != "2d":  # (each column's, on the box read)
                 zfull = heights(f0, f1, e0, e1)[0]
+                if task.get("zmname"):
+                    zmsl = heights(f0, f1, e0, e1, task["zmname"])[0]
             raw = {}  # (native, level) -> plane on the box read; ∂/∂z inputs reuse them
 
             def read(n, k):
@@ -345,6 +351,10 @@ def _worker(task):
                         sc = np.float32(task.get("dscale", {}).get(dn, 1.0))
                         if dop == "ddz":
                             memo[n] = sc * ddz_level(lambda kk: read(dn, kk), zfull, k)
+                        elif dop and zmsl is not None and info[dn][2] == 3:
+                            memo[n] = sc * hgrad_level(  # (terrain: at constant height)
+                                dop, read(dn, k), zmsl[k], task["xe"], task["ye"],
+                                ddz_level(lambda kk: read(dn, kk), zfull, k))
                         elif dop:
                             memo[n] = sc * hgrad(dop, read(dn, k), task["xe"], task["ye"])
                         else:
@@ -365,6 +375,10 @@ def _worker(task):
                 """The final field on model level k, cut to the region and masked."""
                 if op == "ddz":
                     return finish(ddz_level(level_base, zfull, k))
+                if op and zmsl is not None:  # (terrain: at constant height)
+                    return finish(hgrad_level(op, level_base(k), zmsl[k], task["xe"],
+                                              task["ye"], ddz_level(level_base, zfull, k)),
+                                  grad=False)
                 return finish(base(fetcher(k)))
 
             how, pct = task["reduce"], task.get("pct", 99.0)
@@ -378,7 +392,7 @@ def _worker(task):
                     kset = [int(k) for k in np.union1d(k0, k1[w > 0])]
                     wk = {k: ((1.0 - w) * (k0 == k) + w * (k1 == k)).astype(np.float32)
                           for k in kset}
-                    if op == "ddz":
+                    if op == "ddz" or (op and zmsl is not None):
                         a = sum(wk[k][crop] * level(k) for k in kset)
                     else:
                         gs = {k: fetcher(k) for k in kset}
@@ -626,7 +640,8 @@ def compute(run, F, recipe, ds, centers=None, storm=None, on_result=None, cancel
     weights = run.level_weights(recipe["z"]) if vmode == "height" else None
     ks = levels(run, recipe) if vmode == "layer" else None
     # a terrain run's columns on their own heights: the worker reads them (zagl)
-    terrain = dict(zname="zagl", nk=run.nk, layer=(recipe.get("z0"), recipe.get("z1"))) \
+    terrain = dict(zname="zagl", nk=run.nk, layer=(recipe.get("z0"), recipe.get("z1")),
+                   zmname="zmsl" if "zmsl" in run.vars else None) \
         if run.terrain and "zagl" in run.vars else {}
     t_done = ds["computed"].values
     for t in range(len(run.times)) if times is None else sorted(set(times)):

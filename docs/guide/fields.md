@@ -49,17 +49,17 @@ components. Vectors can be shown ground-, grid- or storm-relative
 |---|---|---|
 | `thpert` | θ′ (K) | `th − th0` (the base state `th0` is in the output) |
 | `prspert` | p′ (hPa) | `prs − prs0` |
-| `buoy` | Buoyancy (m/s²) | `g (θρ − θρ0) / θρ0` with θρ including the loading of all hydrometeors |
+| `buoy` | Buoyancy (m/s²) | CM1's: `g [θ′/θ0 + (Rv/Rd − 1) qv′ − Σ q]`, loading every liquid and ice species in the output |
 | `thrho`, `thrhopert` | θρ and θρ′ (K) | density potential temperature, and its departure from the base state |
-| `thetae` | θe (K) | Bolton (1980) eq. 43 |
-| `tempc`, `dewc` | Temperature and dewpoint (°C) | from θ, p and q<sub>v</sub> |
+| `thetae` | θe (K) | Bolton (1980) eq. 43, as the soundings |
+| `tempc`, `dewc` | Temperature and dewpoint (°C) | from θ, p and q<sub>v</sub> (T with the model's own R/c<sub>p</sub>: CM1's, or WRF's 2/7 for WoFS) |
 | `rh` | Relative humidity (%) | with respect to liquid water |
 | `wspd3d` | Wind speed (m/s) | ground-relative, on every level (CM1's own `wspd` is the 2D surface-layer one) |
 | `hdiv` | Horizontal divergence (10⁻³ s⁻¹) | ∂u/∂x + ∂v/∂y |
 | `hvort` | Horizontal vorticity magnitude (1/s) | √(ξ² + η²) |
 | `wstream`, `wcross` | Streamwise and crosswise vorticity (1/s) | the horizontal vorticity along and across the storm-relative horizontal wind (below) |
 | `bgen_x`, `bgen_y` | Baroclinic generation of horizontal vorticity (10⁻⁴ s⁻²) | (∂B/∂y, −∂B/∂x): the buoyancy torque, also drawn as the *Baroclinic generation* vector |
-| `zstretch`, `ztilt`, `ztend` | Vertical-vorticity stretching, tilting and their sum (10⁻⁴ s⁻²) | ζ ∂w/∂z, ξ ∂w/∂x + η ∂w/∂y (below) |
+| `zstretch`, `ztilt`, `ztend` | Vertical-vorticity stretching, tilting and their sum (10⁻⁴ s⁻²) | −(ζ + f) ∇h·V, ξ ∂w/∂x + η ∂w/∂y (below) |
 | `okubo` | Okubo–Weiss parameter (10⁻⁴ s⁻²) | s<sub>n</sub>² + s<sub>s</sub>² − ω² (below) |
 | `qcloud`, `qprecip` | Cloud and precipitation condensate (g/kg) | qc + qi, and qr + qs + qg + qhl, where those are in the output |
 | `p_dyn`, `acc_dyn`, `acc_tot` | Pressure decomposition sums (with the Coriolis part) | see below |
@@ -76,7 +76,7 @@ profile cards) plots a derivative of that field instead, per metre:
 | Derivative | Name | What |
 |---|---|---|
 | ∂/∂z | `ddz.<field>` | on each model level, centred between the levels above and below (one-sided at the bottom and top), on the stretched levels; at a height, interpolated between the two levels' values. 3-D fields only. |
-| ∂/∂x, ∂/∂y | `ddx.<field>`, `ddy.<field>` | centred differences on the grid's x and y (stretched grids too), at the level shown |
+| ∂/∂x, ∂/∂y | `ddx.<field>`, `ddy.<field>` | centred differences on the grid's x and y (stretched grids too). On terrain-following levels (WoFS), at constant height: along the level, less the level's slope times ∂/∂z |
 | \|∇h\| | `gradh.<field>` | √((∂/∂x)² + (∂/∂y)²) |
 
 Units are the field's per metre: a wind's (m/s per m) read 1/s, so ∂w/∂z of 0.005 is
@@ -97,12 +97,14 @@ make or concentrate ζ, in 10⁻⁴ s⁻² (a ζ of 0.02 s⁻¹ in ∂w/∂z of 
 
 | Name | Term |
 |---|---|
-| `zstretch` | stretching, ζ ∂w/∂z |
+| `zstretch` | stretching of the absolute vorticity, −(ζ + f)(∂u/∂x + ∂v/∂y), with f the run's Coriolis parameter |
 | `ztilt` | tilting of horizontal vorticity into the vertical, ξ ∂w/∂x + η ∂w/∂y |
-| `ztend` | stretching + tilting |
+| `ztend` | stretching + tilting (not the full ζ tendency: advection and mixing are left out) |
 | `okubo` | Okubo–Weiss, W = s<sub>n</sub>² + s<sub>s</sub>² − ω², with s<sub>n</sub> = ∂u/∂x − ∂v/∂y, s<sub>s</sub> = ∂v/∂x + ∂u/∂y and ω = ∂v/∂x − ∂u/∂y: negative where rotation dominates the strain (a vortex), positive where strain dominates |
 
-ζ, ξ and η are CM1's `zvort`, `xvort` and `yvort`; the derivatives are those of the
+ζ, ξ and η are CM1's `zvort`, `xvort` and `yvort`; for WoFS, ζ is WRF's `REL_VORT`
+and ξ, η come from the winds (ξ = ∂w/∂y − ∂v/∂z, η = ∂u/∂z − ∂w/∂x, listed as `xvort`,
+`yvort`). The derivatives are those of the
 **Derivative** select (below), so ∂w/∂z is centred on the stretched levels and the
 horizontal ones on the grid, and Okubo–Weiss uses the winds on the scalar points. Like
 the other fields they work on the map, cross-sections, column max / min, 3D, series and
@@ -117,16 +119,14 @@ figures), and a series of one reads only the levels of its layer in the region:
 
 | Name | What | Layer |
 |---|---|---|
-| `uh25` | Updraft helicity, ∫ w ζ dz (m²/s²) | 2–5 km AGL |
-| `uh01` | Updraft helicity, ∫ w ζ dz (m²/s²) | 0–1 km AGL |
-| `zvmax01` | Maximum ζ (1/s) | 0–1 km AGL |
-| `wmax` | Maximum w (m/s) | the whole column |
+| `uh25` | Updraft helicity, ∫ w ζ dz where w > 0 and ζ > 0 (m²/s²) | 2–5 km AGL |
+| `uh01` | Updraft helicity, ∫ w ζ dz where w > 0 and ζ > 0 (m²/s²) | 0–1 km AGL |
 
 The integral is over the layer exactly: each model level counts with the part of its grid
-cell (between the `zf` levels) inside the layer. A maximum is over the model levels whose
-cells reach into the layer. w and ζ are `winterp` and `zvort`; updraft helicity is that of
-Kain et al. (2008), so it is negative in an anticyclonic updraft or a cyclonic downdraft
-(CM1's own `shs` swath is its running maximum). The layers are fixed for now.
+cell (between the `zf` levels) inside the layer. w and ζ are `winterp` and `zvort`; only
+cyclonic updrafts count, as in CM1's own `uh`. When the output has its own 2–5 km updraft
+helicity (CM1's `uh`, WoFS's `UH`), that is listed as *Updraft helicity 2–5 km* and
+`uh25` is not computed. The layers are fixed for now.
 
 ### Sounding parameters
 
@@ -145,7 +145,8 @@ on the map, series, distributions and figures):
 
 They are computed as the [Soundings](soundings.md#what-is-computed) tab computes them:
 from the lowest model level up to the layer top, with the wind linearly interpolated
-between the levels (to the layer top exactly, where the sounding's 10 m grid can stop a
+between the levels. When the output has 10 m winds (CM1's `u10`, `v10`; WoFS's `U10`,
+`V10`), the maps start from those at 10 m instead (the soundings do not yet) (to the layer top exactly, where the sounding's 10 m grid can stop a
 few metres short, so SRH may differ from the sounding's by about 1%). Helicity is
 relative to the **tracked storm motion** at that time when the track has a fix there,
 and otherwise to the domain motion, as for streamwise vorticity (below); the map title
@@ -190,8 +191,10 @@ to the left of the storm-relative wind.
 
 ## Parcels
 
-Parcel calculations are pseudoadiabatic with a virtual-temperature correction. They were
-checked against MetPy: CAPE agrees within about 3%. The definitions of the SB, ML and MU
+Parcel calculations are pseudoadiabatic with a virtual-temperature correction and no
+condensate loading (as SHARPpy). CAPE is the net area between the LFC and the EL: negative
+pockets in between are subtracted (as MetPy). They were checked against MetPy: CAPE agrees
+within about 3%. The definitions of the SB, ML and MU
 parcels and the other sounding parameters are on the [Soundings](soundings.md#what-is-computed)
 page.
 
@@ -203,7 +206,10 @@ CM1's `output_pdcomp`, `pdcomp.F`):
 - the pressure perturbation split into a buoyancy part `p_b`, a linear dynamic part `p_l`,
   a nonlinear dynamic part `p_nl` and a Coriolis part `p_c` (zero when f = 0);
 - the matching vertical accelerations `acc_b` (B − cp θv0 ∂π_b/∂z), `acc_l`, `acc_nl` and
-  `acc_c` (−cp θv0 ∂π/∂z of each part, as CM1 writes its `pgrad*` fields);
+  `acc_c` (−cp θv0 ∂π/∂z of each part, as CM1 writes its `pgrad*` fields, on the w
+  levels and averaged to the scalar levels; for `acc_b`, B and the pressure gradient are
+  added on the w levels first, as in CM1's w equation, so the two cancel where B is
+  horizontally uniform);
 - `p_dyn` = p_l + p_nl + p_c, `acc_dyn` = acc_l + acc_nl + acc_c, and `acc_tot` = acc_b +
   acc_dyn.
 

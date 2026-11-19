@@ -18,14 +18,16 @@ ROLES = {
     "qc": "QCLOUD", "qi": "QICE", "qr": "QRAIN", "qs": "QSNOW", "qg": "QGRAUP",
     "qhl": "QHAIL",
     "refl": "REFL_10CM", "cref": "COMPOSITE_REFL_10CM",
-    # (no zvort: REL_VORT is not the ζ of the file's own U and V at the grid scale,
-    # field audit 2026-11-18; it stays a file field under Other)
+    # ζ: WRF's REL_VORT (the dataset's creator, 2026-11-19); ξ and η are derived from the
+    # winds (core.fields)
+    "zvort": "REL_VORT",
+    "fcor": "F", "u10": "U10", "v10": "V10", "uh25": "UH",
 }
 
 # Phase 2b field audit (2026-11-18): under "Other" ...
 OTHER = (
     # 3D
-    "REL_VORT", "H_DIABATIC", "QV_DIABATIC", "QC_DIABATIC",
+    "H_DIABATIC", "QV_DIABATIC", "QC_DIABATIC",
     "QNDROP", "QNRAIN", "QNICE", "QNSNOW", "QNGRAUPEL", "QNHAIL", "QNCCN",
     "QVGRAUPEL", "QVHAIL", "QNWFA", "QNIFA", "CLDFRA",
     "NONINDUC", "NONINDUCN", "NONINDUCP", "P_HYD", "PH", "PHB", "WW",
@@ -80,4 +82,5 @@ OLD_NAMES = {
 }
 
 CATALOG = register(Catalog("wofs", NATIVES, ROLES, renamed=OLD_NAMES, other=OTHER,
-                           hidden=HIDDEN, unknown_hidden=True))
+                           hidden=HIDDEN, unknown_hidden=True,
+                           kappa=2.0 / 7.0))  # (WRF: Rd = 287, cp = 7 Rd / 2)
