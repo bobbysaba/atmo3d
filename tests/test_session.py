@@ -5,6 +5,7 @@ import os
 
 import pytest
 
+from atmo3d.viewer.session import FORMAT
 from conftest import wait
 
 
@@ -38,7 +39,7 @@ def test_session_round_trip(viewer, reg, tmp_path):
     v = viewer
     _set_up(v)
     s1 = v.session_state()
-    assert s1["atmo3d_session"] == 1 and s1["run"] == os.path.abspath(v.run.path)
+    assert s1["atmo3d_session"] == FORMAT and s1["run"] == os.path.abspath(v.run.path)
     assert s1["track"]["fixes"][0][1]["value"] is None  # NaN as JSON null
     path = str(tmp_path / "s" / "session.json")
     v._save_session(path)

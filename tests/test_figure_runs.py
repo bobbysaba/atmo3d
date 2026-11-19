@@ -5,10 +5,13 @@ import numpy as np
 
 
 def test_field_lists_cover_every_run():
+    from atmo3d.core import catalog as C
     from atmo3d.core.fields import FieldDef
     from atmo3d.figures.runs import AllFields
 
     class F:
+        cat = C.of_model("cm1")
+
         def __init__(self, *names):
             self.defs = {n: FieldDef(n, n.upper(), "", "Winds") for n in names}
 

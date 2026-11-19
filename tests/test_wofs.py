@@ -270,9 +270,9 @@ def test_maps_at_a_height_column_by_column(wofs_root):
     assert msl.shape == (NJ, NI)
     np.testing.assert_allclose(msl[0], want, atol=1e-4)
     assert np.isnan(msl[:, GROUND > h]).all() and np.isfinite(msl[:, GROUND <= h]).all()
-    np.testing.assert_allclose(F.plane("zagl", c, "height", 1.0), 1000.0, atol=0.1)
+    np.testing.assert_allclose(F.plane("zagl", c, "height", 1.0), 1.0, atol=1e-4)  # (km)
     inside = GROUND + 0.5 * dz < 1.0  # (columns whose lowest level is below 1 km MSL)
-    np.testing.assert_allclose(F.plane("zmsl", c, "msl", 1.0)[:, inside], 1000.0, atol=0.1)
+    np.testing.assert_allclose(F.plane("zmsl", c, "msl", 1.0)[:, inside], 1.0, atol=1e-4)
     np.testing.assert_allclose(F.plane("thpert", c, "msl", 1.0)[:, GROUND < 1.0], 0.2,
                                atol=1e-3)
     assert np.isfinite(F.plane("ddz.W", c, "height", 1.0)).all()
@@ -373,7 +373,6 @@ def test_column_fields_and_ddz_on_own_heights(wofs_root):
     np.testing.assert_allclose(th[0], 1000.0 * np.broadcast_to(dz, (NJ, NI)), atol=0.01)
     np.testing.assert_allclose(th[1], 1000.0 * np.broadcast_to(1.0 - dz, (NJ, NI)), atol=0.01)
     np.testing.assert_allclose(zk, run.heights(c)[:2])
-    np.testing.assert_allclose(F.plane("wmax", c), NK - 0.5 + c)
     # ∂w/∂z = 1 / dz per km (dz km), so 1e-3 / dz per m, on a level, at a height and
     # as a volume
     np.testing.assert_allclose(F.plane("ddz.W", c, "level", 2)[0], 1e-3 / dz,
@@ -403,11 +402,12 @@ def test_series_on_own_heights(wofs_root, monkeypatch):
     np.testing.assert_allclose(go(field="W", vmode="height", z=1.0)["value"],
                                1.0 / dz0 + c, rtol=1e-5)
     np.testing.assert_allclose(go(field="ddz.W", vmode="height", z=1.0)["value"],
-                               1.0 / dz0, rtol=1e-4)
+                               1e-3 / dz0, rtol=1e-4)  # (per m)
     ds = go(field="W", vmode="layer", z0=0.0, z1=1.0)
     np.testing.assert_allclose(ds["value"], 1.5 + c, rtol=1e-6)  # (level 2 is above)
     np.testing.assert_allclose(ds["z_km"], 1.5 * dz0, rtol=1e-5)
-    np.testing.assert_allclose(go(field="wmax", vmode="2d")["value"], NK - 0.5 + c)
+    np.testing.assert_allclose(go(field="shear06", vmode="2d")["value"],
+                               [np.nanmax(F.plane("shear06", k)) for k in c], rtol=1e-5)
 
 
 def test_points_on_own_heights(wofs_root):
@@ -642,7 +642,7 @@ def test_mean_values(wofs_root, workers):
     np.testing.assert_allclose(prof["PRES0"], 1.0e5 - 1000.0 * np.arange(NK))
     # derived fields: from the mean state
     F, F2 = Fields(run), Fields(m2)
-    for n in ("thpert", "wmax", "sbcape"):
+    for n in ("thpert", "shear06", "sbcape"):
         np.testing.assert_allclose(F.plane(n, 2), F2.plane(n, 2), rtol=1e-5, atol=1e-5)
 
 

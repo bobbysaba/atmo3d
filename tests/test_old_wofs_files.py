@@ -13,7 +13,7 @@ import os
 
 import pytest
 
-from atmo3d.core.catalog import FIELD_KEYS, rename_fields, renames_for
+from atmo3d.core.catalog import FIELD_KEYS, FIELD_NAMES, rename_fields, renames_for
 from atmo3d.core.wofs_catalog import OLD_NAMES
 from atmo3d.figures import spec as fg
 from atmo3d.registry import Registry
@@ -95,7 +95,8 @@ def test_old_cm1_figures_load_unchanged(reg, name):
     doc = _load(name, run.path)
     was = copy.deepcopy(doc)
     fg.check_runs(doc)
-    assert fg.upgrade_names(doc) == "" and doc == was
+    assert fg.upgrade_names(doc) == ""
+    assert doc == dict(was, field_names=FIELD_NAMES)  # (stamped with today's names)
 
 
 def test_old_cm1_session_loads_unchanged(reg):
@@ -103,7 +104,7 @@ def test_old_cm1_session_loads_unchanged(reg):
     s = _load("cm1_session_v1", run.path)
     assert s["atmo3d_session"] == 1
     was = copy.deepcopy(s)
-    assert ses.upgrade(s) == was
+    assert ses.upgrade(s) == dict(was, field_names=FIELD_NAMES)
 
 
 def test_old_cm1_session_applies(viewer):

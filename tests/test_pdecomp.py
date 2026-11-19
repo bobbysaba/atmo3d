@@ -205,7 +205,8 @@ def test_cm1_solver_satisfies_its_equation(periodic):
     M, G, B = _grid()
     rng = np.random.default_rng(1)
     F = rng.standard_normal((G['nk'], G['nj'], G['ni']))
-    F -= F.mean()   # (a solution needs no net source)
+    dz = 1.0 / G['rdzl']   # (a solution needs no net source: the dz-weighted mean)
+    F -= np.sum(F.mean(axis=(1, 2)) * dz) / dz.sum()
     s = M.setup_solver(G, B, periodic)
     pi = M.solve_pressure_equation(F, s, threads=1)
     mode = 'wrap' if periodic else 'edge'

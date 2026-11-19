@@ -51,9 +51,10 @@ def test_model_levels_match_the_volumes(reg, tmp_path):
                 ref = F.volume(n, 2)[p["ks"], j0:j1, i0:i1]
                 assert np.array_equal(v[1], ref), n
         assert d["ddz_winterp"].units == "1/s"
-        assert d["ddz_winterp"].units_shown == "1/s"
+        assert "units_shown" not in d["ddz_winterp"].ncattrs()  # (UDUNITS already)
         if "srh03" in names:
             assert "storm_u" in d.variables and d["srh03"].storm_relative
+            assert d["srh03"].units == "m2/s2" and d["srh03"].units_shown == "m²/s²"
 
 
 def test_heights_match_the_map(reg, tmp_path):

@@ -171,6 +171,7 @@ def _fake_fields(model, names):
 
     class FakeRun:
         dx, dy, umove, vmove, storm_relative = 1000.0, 1000.0, 0.0, 0.0, True
+        var_times = {}  # (pdecomp.register adds its fields here)
 
         def __init__(self):
             self.model = model

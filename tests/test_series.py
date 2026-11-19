@@ -126,8 +126,8 @@ def test_column_field_series_match_the_map(reg):
     x, y = float(run.xh[i]), float(run.yh[j])
     box = (x - 7.3, x + 6.1, y - 5.2, y + 8.4)
     for field, region, how in (("uh25", "domain", "max"), ("uh25", "box", "mean"),
-                               ("uh01", "box", "min"), ("zvmax01", "box", "max"),
-                               ("wmax", "domain", "pct"), ("gradh.uh25", "box", "max"),
+                               ("uh01", "box", "min"), ("srh01", "box", "max"),
+                               ("shear06", "domain", "pct"), ("gradh.uh25", "box", "max"),
                                ("srh03", "box", "max"), ("shear06", "domain", "mean"),
                                ("sbcin", "box", "min"), ("stp", "box", "max"),
                                ("ddx.mucape", "box", "max")):
@@ -168,7 +168,10 @@ def test_vorticity_tendency_series_match_the_map(reg):
             prof = np.array([{"max": np.nanmax, "min": np.nanmin}[how](b) for b in a])
             assert np.allclose(ds.profile.values[t], prof, rtol=1e-5, atol=1e-7), field
         ref = {"max": np.nanmax, "min": np.nanmin, "mean": np.nanmean}[how](a)
-        assert abs(ds.value.values[t] - ref) <= 1e-5 * max(abs(ref), 1e-3), field
+        # (ζ ∇·V: ∂u/∂x from differences of ~20 m/s winds in float32, interpolated to
+        # the height before (series) or after (map) differencing: ~2e-5 apart)
+        tol = 5e-5 if field == "zstretch" else 1e-5
+        assert abs(ds.value.values[t] - ref) <= tol * max(abs(ref), 1e-3), field
 
 
 def test_second_session_reads_the_cache(viewer, reg):

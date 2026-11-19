@@ -6,7 +6,7 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from atmo3d.core import volume3d
+from atmo3d.core import catalog as C, volume3d
 
 X1 = np.arange(0.25, 40.0, 0.5)  # km, dx = 500 m
 Z = np.concatenate([np.arange(0.05, 1.0, 0.1), np.arange(1.2, 10.0, 0.4)])
@@ -115,6 +115,7 @@ class _Run(SimpleNamespace):
     """RUN with what build_scene needs: volumes kept in a dict, loading counted."""
 
     terrain = False  # (a flat run, as Run)
+    catalog = C.of_model("cm1")  # (winds by role: uinterp, vinterp, winterp)
 
     def ij(self, x, y):
         return (int(np.clip(np.rint((x - X1[0]) * 2), 0, len(X1) - 1)),
