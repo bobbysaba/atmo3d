@@ -1,9 +1,66 @@
 # Phase 2b, step 2: derived-field audit
 
-Status: **prepared 2026-11-19, for Bobby's review.** Nothing in the code has changed for
+Status: **prepared 2026-11-19; reviewed by Bobby 2026-11-19** (open: WoFS base state, F4, F5, κ, F7). Nothing in the code has changed for
 this step. For each field, mark **confirmed**, **corrected** (say how) or **dropped** in
 the Decision column. Step 3 fixes the corrected ones and adds a test with an analytic
 answer for each confirmed one (the "Test" lines are the proposed cases).
+
+## Bobby's review (2026-11-19)
+
+Every entry not listed here: **confirmed** as written (with the decisions in the next
+section).
+
+- 1.3 `buoy`: CM1's form, checked against CM1's source (r21.1 `pdcomp.F` line 104, and
+  the model's own buoyancy in `solve2.F` line 404):
+  B = g [θ′/θ0 + (Rv/Rd − 1)(qv − qv0) − (Σ q_liquid+ice − qc0 − qi0)].
+  qc0, qi0 are subtracted when the file has them (CM1 writes them only for some base
+  states; normally 0).
+- 1.3, WoFS base state: **open.** Bobby is not sure the first time is the right
+  reference. Options (they also set θ′, p′, θρ′ for WoFS):
+  - (a) now: the member's first time. B includes the diurnal and synoptic change since
+    then, and any storm already there at the first time.
+  - (b) proposed: the member's horizontal mean on each model level at the same time.
+    Removes the domain-wide trend. Near the ground the levels follow the terrain
+    (HGT 852–1427 m here), so the mean mixes heights; above ~3 km the levels are nearly
+    flat.
+  - (c) as (b), on constant-height (MSL) surfaces. More correct with terrain, but needs
+    an interpolation, and the lowest surfaces are partly below ground.
+  - (d) as (b) or (c), leaving out cloudy and precipitating points (an "environment"
+    mean).
+- 1.4 `thrho`: the same formula as Bobby's `phd_scripts/funcs.py` `theta_rho`
+  (θ (1 + qv/ε) / (1 + qv + Σ hyd)). ε differs in the 5th digit (Rv 461.51 there,
+  461.5 here). Confirmed.
+- 1.5–1.7 θe, T, Td, and 1.8 RH, against MetPy 1.7 at four (p, θ, r) points
+  (scratch `metpy_check.py`):
+  - Td: equal to 0.001 K.
+  - θe: within 0.03 K up to 500 hPa; 0.15 K at 250 hPa, which is the κ difference in T.
+  - T: equal at 1000 hPa, 0.09 K off at 250 hPa. MetPy uses κ = 2/7 (the κ question).
+  - RH: within 0.3 % (MetPy uses a different es formula).
+  Confirmed.
+- 2.2 `hdiv` (and `bgen_*`): never the mean spacing. `hgrad` handles grids whose x and y
+  are 1-D (uniform or stretched, CM1 and WoFS). A lat/lon or other curvilinear grid
+  (spacing that varies in both directions, plus the spherical term −v tan φ / a in
+  ∇·V) needs a per-point spacing from the data type. No data type has such a grid yet:
+  noted for the registration API (Phase 3), so a new reader supplies it.
+- 3.3 `ztend`: say what is left out (advection, f, mixing) in the field's description and
+  on the docs page. The label stays "ζ stretching + tilting".
+- 4.1, WoFS's `UH`: taken as correct; no check of WRF's sum.
+- 4.2 `zvmax01`, `wmax`: **dropped.**
+- 4.5 CAPE, CIN, LCL against MetPy 1.7 (`surface_based_`, `mixed_layer_`,
+  `most_unstable_cape_cin`, `lcl`) on Weisman–Klemp soundings, qv0 = 11, 14, 16 g/kg:
+  - CAPE: ours 1–3 % higher (SB 529/1893/3066 against 513/1861/3030; ML and MU alike).
+    The κ and constant differences account for this size.
+  - CIN: SB and MU within 1.6 J/kg.
+  - ML CIN: ours −85/−23/−6.5, MetPy's −94/−31/−11. MetPy's `mixed_layer_cape_cin`
+    drops the environment inside the mixed layer. MetPy's own ML parcel over the full
+    environment gives −79/−16/0, so ours sits between MetPy's two ways.
+  - LCL: within 3 m.
+  Confirmed. Step 3 still adds the negative-pocket subtraction.
+- §8 WoFS vorticity: **`REL_VORT` is ζ** (the dataset's creator confirmed it). Map it to
+  the `zvort` role (this reverses the step 1 note in `field-audit.md`). ξ and η are
+  derived from the winds. Whether they get the slope correction is F5.
+- Later (plan): a published docs page listing every derived field and the equation used
+  (no references).
 
 ## Decisions so far (2026-11-19)
 

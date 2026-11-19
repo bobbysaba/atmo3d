@@ -193,6 +193,10 @@ agent prepares the lists and does not decide alone.
    exists in the run (the input check already exists in `_make_fields`). While the audit
    is under way, unconfirmed fields are listed marked "unverified"; once it is done they
    are hidden. Say beforehand if this moves any image baseline in `tests/baseline/`.
+5. **Derived-field docs page** (Bobby, 2026-11-19; after step 3, so the equations are the
+   final ones). A page under `docs/guide/` listing every derived field: what it is, the
+   equation as coded, units, sign convention, inputs, and what it leaves out (e.g. `ztend`
+   has no advection, f or mixing). No literature references. Link it from `fields.md`.
 
 Done when: both lists reviewed by Bobby; catalogs and derived fields match them; tests
 pass. The radar variable audit (Phase 6, step 1) follows the same template.
