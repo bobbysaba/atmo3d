@@ -70,7 +70,7 @@ def test_rename_fields_only_under_field_keys():
                        dict(type="contour", field="ddz.winterp", color="k")],
                isos=[dict(var="winterp", color="#ffffff")], look=dict(color="@th"),
                fields=["qv", "thpert"], series=[dict(recipe=dict(field="th", op=""))])
-    assert rename_fields(doc, OLD_NAMES) == 7
+    assert rename_fields(doc, OLD_NAMES) == 6
     assert doc["kind"] == "th" and doc["label"] == "dbz and winterp" and doc["title"] == "th"
     assert [x["field"] for x in doc["layers"]] == ["REFL_10CM", "ddz.W"]
     assert doc["layers"][1]["color"] == "k"

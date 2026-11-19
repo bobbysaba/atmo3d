@@ -258,7 +258,7 @@ def test_maps_at_a_height_column_by_column(wofs_root):
     run = models.open_run(os.path.join(wofs_root, "mem02"), workers=1)
     F = Fields(run)
     c, dz = 2, _dz(2)
-    # winterp is k + 0.5 + c on mass level k, at (k + 0.5) dz in each column
+    # W is k + 0.5 + c on mass level k, at (k + 0.5) dz in each column
     for h in (0.1, 0.6, 1.3, 5.0):
         want = np.clip(h / dz - 0.5, 0, NK - 1) + 0.5 + c  # (held beyond the levels)
         np.testing.assert_allclose(F.plane("W", c, "height", h)[0], want, atol=1e-4)
@@ -275,7 +275,7 @@ def test_maps_at_a_height_column_by_column(wofs_root):
     np.testing.assert_allclose(F.plane("zmsl", c, "msl", 1.0)[:, inside], 1000.0, atol=0.1)
     np.testing.assert_allclose(F.plane("thpert", c, "msl", 1.0)[:, GROUND < 1.0], 0.2,
                                atol=1e-3)
-    assert np.isfinite(F.plane("ddz.winterp", c, "height", 1.0)).all()
+    assert np.isfinite(F.plane("ddz.W", c, "height", 1.0)).all()
     # a model level is the level, whatever its height
     np.testing.assert_allclose(F.plane("W", c, "level", 3), 3.5 + c, atol=1e-5)
 
@@ -315,7 +315,7 @@ def test_picker_lists_the_experiment(wofs_root, tmp_path, monkeypatch):
 
 
 # ------------------------------------------------------------- W3: sections, soundings,
-# column fields and series on each column's own heights (winterp = level + 0.5 + c, so
+# column fields and series on each column's own heights (W = level + 0.5 + c, so
 # at a height h above ground it is h / dz + c between the lowest and highest level)
 def _w_at(h_agl, c):
     return np.clip(h_agl / _dz(c), 0.5, NK - 0.5) + c
@@ -375,11 +375,11 @@ def test_column_fields_and_ddz_on_own_heights(wofs_root):
     np.testing.assert_allclose(zk, run.heights(c)[:2])
     np.testing.assert_allclose(F.plane("wmax", c), NK - 0.5 + c)
     # ∂w/∂z = 1 / dz per km, on a level, at a height and as a volume
-    np.testing.assert_allclose(F.plane("ddz.winterp", c, "level", 2)[0], 1.0 / dz,
+    np.testing.assert_allclose(F.plane("ddz.W", c, "level", 2)[0], 1.0 / dz,
                                atol=1e-4)
-    np.testing.assert_allclose(F.plane("ddz.winterp", c, "height", 1.0)[0], 1.0 / dz,
+    np.testing.assert_allclose(F.plane("ddz.W", c, "height", 1.0)[0], 1.0 / dz,
                                atol=1e-4)
-    np.testing.assert_allclose(F.volume("ddz.winterp", c)[:, 0], np.broadcast_to(
+    np.testing.assert_allclose(F.volume("ddz.W", c)[:, 0], np.broadcast_to(
         1.0 / dz, (NK, NI)), atol=1e-4)
     assert np.isfinite(F.plane("sbcape", c)).all()
 
@@ -401,7 +401,7 @@ def test_series_on_own_heights(wofs_root, monkeypatch):
         return ds
     np.testing.assert_allclose(go(field="W", vmode="height", z=1.0)["value"],
                                1.0 / dz0 + c, rtol=1e-5)
-    np.testing.assert_allclose(go(field="ddz.winterp", vmode="height", z=1.0)["value"],
+    np.testing.assert_allclose(go(field="ddz.W", vmode="height", z=1.0)["value"],
                                1.0 / dz0, rtol=1e-4)
     ds = go(field="W", vmode="layer", z0=0.0, z1=1.0)
     np.testing.assert_allclose(ds["value"], 1.5 + c, rtol=1e-6)  # (level 2 is above)
@@ -529,9 +529,9 @@ def test_traced_trajectories(wofs_root, tmp_path, monkeypatch):
     assert pf.n == pf.lat["nx"] * pf.lat["ny"] * pf.lat["nz"] and set(pf.vars) == set(trajcalc.VARS)
     ps = P.select(pf, dict(box=[-3.0, 3.0, -2.0, 2.0], z=[0.0, 3.0]), "s")
     assert pf.traced and len(ps)
-    tr = pf.trajectories(ps, ("x", "y", "z", "w", "@winterp"))
+    tr = pf.trajectories(ps, ("x", "y", "z", "w", "@W"))
     assert tr["z"].shape == (NC, len(ps))
-    np.testing.assert_allclose(tr["w"], tr["@winterp"], atol=1e-4, equal_nan=True)
+    np.testing.assert_allclose(tr["w"], tr["@W"], atol=1e-4, equal_nan=True)
     for k in range(NC):
         ok = np.isfinite(tr["z"][k])
         low = volume3d.columns(run.heights(k, "msl"), *volume3d._fij(
