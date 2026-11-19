@@ -77,7 +77,8 @@ section).
   left out, and said so.
 - F6: keep the default; the motion used is always shown, the default too ("domain motion
   (0, 0), none chosen"). Check that the figure editor draws the note.
-- F7: waiting for a node. Script `tools/pdecomp_bands.py` (tested on the demo).
+- F7: cause found (§5.3): B and pgrad_b on different vertical filters. Candidate fix
+  `acc_b_w` waits for one more node run.
 - F8: one copy. `fields.py` calls `thermo`'s θe, dewpoint and es.
 - RH (1.8): over liquid, as now.
 - CAPE (4.5):
@@ -530,7 +531,31 @@ Possible causes, to test in this order:
 All of these need one decomposed time of a real run (~2 min, 4 CPUs, ~35 GB): a batch
 job. I'll write the script and show you the `qsub` before anything runs.
 
-- Decision (how to proceed):
+**Result (2026-11-19, `tools/pdecomp_bands.py` on rm_tor_125m cm1out_000034, Bobby's
+node; output `/glade/derecho/scratch/rasaba/pdecomp_bands/`):**
+- The bands are in **acc_b only**. Banding ratio above 12 km: acc_b 1.3–3.0, while acc_l,
+  acc_c ≤ 0.1, acc_nl ~0.5, pgrad_b ~0.3, B ~0.4–1.1.
+- **B itself is layered across the whole domain above the tropopause** (θ′ stripes
+  0.04–0.08 m/s² at ~12.5–15 km, far from the storm too). That is in the model output:
+  the stratosphere's mean θ has moved away from th0 in thin layers.
+- B and pgrad_b nearly cancel there (rms 2.0e-2 each, acc_b 4–5e-3). acc_b is the small
+  difference of two large terms.
+- Cause 1 (stretching) is unlikely: dz is constant (280 m) above 11.9 km; the ratio only
+  goes from 1.012 to 1.000. Cause 3 (tropopause) sets *where* B is layered
+  (dθv0/dz jumps from 3–4 to 8–19 K/km at 11.6–12.4 km), not the numerics.
+- **Cause 2 fits.** The solver's source is B interpolated to the w levels (c1, c2), so at
+  the w levels pgrad_b balances that interpolated B. acc_b then adds the *scalar-level*
+  B to pgrad_b averaged back from the w levels. The two parts see different vertical
+  filters: for a horizontally uniform B, acc_b = B − ½(B_w,k + B_w,k+1), which is
+  B's level-to-level (2Δz) structure. Thin domain-wide layers in B show up as bands.
+- Candidate fix: acc_b = ½ [(B_w + pgrad_b,w)_k + (…)_k+1], both at the w levels, then
+  averaged together (CM1's own w equation uses B at the w levels the same way).
+  A horizontally uniform B then gives 0. Added to the script as `acc_b_w`. On the demo
+  it lowers the banding of acc_b (e.g. 0.14 → 0.07 at 13 km); the real run needs one
+  more node run.
+- Cause 4 (CM1's own `pgradb`) is not needed if the rerun confirms: CM1 writes pgradb
+  at the w levels, with no B added, so it has no such mismatch.
+- Decision (how to proceed): rerun, then take `acc_b_w` as acc_b if the bands go.
 
 ---
 
