@@ -1,6 +1,6 @@
 # Phase 2b, step 2: derived-field audit
 
-Status: **prepared 2026-11-19; reviewed by Bobby 2026-11-19** (open: f in F4, F7). Nothing in the code has changed for
+Status: **prepared 2026-11-19; reviewed by Bobby 2026-11-19** (open: F7). Nothing in the code has changed for
 this step. For each field, mark **confirmed**, **corrected** (say how) or **dropped** in
 the Decision column. Step 3 fixes the corrected ones and adds a test with an analytic
 answer for each confirmed one (the "Test" lines are the proposed cases).
@@ -71,8 +71,8 @@ section).
 - F2: `buoy` in CM1's form, g [θ′/θ0 + (Rv/Rd − 1) qv′ − Σ q_cond], with CM1's condensate
   list, so acc_b = buoy + pgrad_b.
 - F3: `hdiv`, `bgen_*` use the real x, y spacing (`hgrad`). Identical on uniform grids.
-- F4: anelastic form −ζ ∇h·V (2026-11-19). Whether to add f is still open: CM1's
-  namelist has fcor (8e-5 in rm_tor_125m), WoFS files have `F`.
+- F4: −(ζ + f) ∇h·V (2026-11-19). f from the run: CM1's namelist `fcor` (8e-5 in
+  rm_tor_125m, 0 when icor = 0), WoFS's `F` field; 0 when a run has neither.
 - F5: **slope correction** for WoFS ∂/∂x, ∂/∂y (and §8 choice B for ξ, η). Map factor
   left out, and said so.
 - F6: keep the default; the motion used is always shown, the default too ("domain motion
