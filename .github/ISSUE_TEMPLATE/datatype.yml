@@ -1,0 +1,36 @@
+name: New data type
+description: Ask for (or offer to write) a reader for another model's or instrument's output
+labels: [data type]
+body:
+  - type: input
+    id: source
+    attributes:
+      label: Model or instrument
+      placeholder: e.g. MPAS, a lidar, WRF outside WoFS
+    validations:
+      required: true
+  - type: textarea
+    id: files
+    attributes:
+      label: What the files look like
+      description: Format (netCDF, CfRadial, ...), one time per file or many, the grid (regular, staggered, unstructured, polar), and the variable names you would want to see. The output of `ncdump -h` on one file is ideal.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: views
+    attributes:
+      label: What you want to do with it
+      description: Which views matter (map, sections, soundings, 3D, series, figures).
+  - type: input
+    id: sample
+    attributes:
+      label: Sample data
+      description: Where a small sample can be found, if it can be shared.
+  - type: checkboxes
+    id: offer
+    attributes:
+      label: Writing it
+      options:
+        - label: I would like to write it myself (see "Adding a data type" in docs/developing.md)
+        - label: I could be its owner and review changes to it

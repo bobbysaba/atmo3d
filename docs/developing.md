@@ -295,8 +295,9 @@ the viewer.
 
 ## Building the documentation
 
-The site is built by MkDocs (Material theme) from `README.md` (the home page, through
-`docs/hooks/readme.py`) and `docs/`, with the pages listed under `nav` in `mkdocs.yml`:
+The site is built by MkDocs (Material theme) from `README.md` and `CONTRIBUTING.md` (the
+home page and *Contributing*, made by `docs/hooks/readme.py`, so each has one source) and
+`docs/`, with the pages listed under `nav` in `mkdocs.yml`:
 
 ```bash
 pip install "mkdocs>=1.6,<2" "mkdocs-material>=9.5,<10"
@@ -308,13 +309,65 @@ mkdocs build --strict  # what the GitHub Actions workflow runs
 `nav`, fails the build. A new page needs an entry in `nav`. Link between pages with
 relative paths (`soundings.md#comparing-places-and-times`); anchors are the lower-case,
 hyphenated headings. The workflow in `.github/workflows/docs.yml` publishes on a push that
-changes `README.md`, `docs/` or `mkdocs.yml`.
+changes `README.md`, `CONTRIBUTING.md`, `docs/` or `mkdocs.yml`.
 
 When behaviour changes, change the page that describes it in the same commit, and add a
 line to [Changes](changelog.md).
 
-## Releases
+## Maintaining the repository
 
-Versions follow `MAJOR.MINOR.PATCH` in `pyproject.toml` and `atmo3d/__init__.py`, with a
-matching git tag (`v0.3.0`). Move the *Unreleased* heading of [Changes](changelog.md) to the
-new version and date when you tag.
+How a contributor works is in [Contributing](contributing.md). This section is the
+maintainer's side: who can do what on GitHub, and how a release is made.
+
+### Branch protection
+
+`master` is protected: a change needs a pull request, the `test` check (the job of
+`.github/workflows/tests.yml`) passing, and a code owner's approval. When a pull request
+changes nothing the path filter tracks (docs only, say), the `test` job is skipped, and
+GitHub counts a skipped required check as passed.
+
+GitHub never lets the author of a pull request approve it, so while the maintainer is the
+only code owner, their own pull requests can merge only by the admin bypass. Leave
+*Do not allow bypassing the above settings* (`enforce_admins`) off until there is a second
+code owner, then turn it on, so the maintainer's changes are reviewed too.
+
+### Adding a collaborator
+
+Contributors do not need any access: they fork, and open pull requests from the fork.
+Give someone access to the repository only when they will **review**, as the owner of a
+data-type package:
+
+1. *Settings → Collaborators → Add people*, role **Write**. GitHub accepts a code owner's
+   approval only from someone with write access.
+2. Add them to that package's line in `.github/CODEOWNERS`, after the maintainer:
+
+        /packages/<name>/          @bobbysaba @their-github-name
+
+   Any one owner on the line can approve a change there. Later lines win, so a package's
+   line must come after the `*` line, and a change that also touches `packages/core`
+   still needs the core owner. Their package's test list (`tests/<name>-tests.txt`) can
+   have a line of its own the same way.
+3. Make that change by pull request, like any other.
+
+### Protecting release tags
+
+Tags are not protected yet. Before a second person has write access, add a tag ruleset,
+so that only the maintainer can create, move or delete a release tag: *Settings → Rules →
+Rulesets → New ruleset → New tag ruleset*, target `v*`, enforcement *Active*, rules
+*Restrict creations*, *Restrict updates* and *Restrict deletions*, and the maintainer
+(the *Repository admin* role) in the bypass list.
+
+### Releases
+
+Versions follow `MAJOR.MINOR.PATCH`, the same in every package, with a matching git tag
+(`v1.0.0`). To release:
+
+1. On a branch, set the version in `pyproject.toml`, `packages/*/pyproject.toml` (all
+   four) and `__version__` in `packages/core/src/atmo3d/__init__.py`.
+2. Move the *Unreleased* heading of [Changes](changelog.md) to the new version and date.
+3. Run the full suite (`pytest`, on a compute node), merge the pull request, then tag the
+   merge commit on `master` and push the tag:
+
+        git switch master && git pull
+        git tag v1.1.0
+        git push origin v1.1.0

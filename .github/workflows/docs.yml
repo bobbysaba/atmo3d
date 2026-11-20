@@ -3,7 +3,7 @@ name: docs
 on:
   push:
     branches: [master]
-    paths: [README.md, docs/**, mkdocs.yml, .github/workflows/docs.yml]
+    paths: [README.md, CONTRIBUTING.md, docs/**, mkdocs.yml, .github/workflows/docs.yml]
   workflow_dispatch:
 
 permissions:

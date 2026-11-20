@@ -1,0 +1,51 @@
+name: Bug
+description: Something does not work, or gives a wrong answer
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected, and what you got instead.
+      placeholder: |
+        1. Opened a CM1 run, chose the map field ...
+        2. ...
+        Expected: ...
+        Got: ...
+    validations:
+      required: true
+  - type: dropdown
+    id: datatype
+    attributes:
+      label: Kind of run
+      options:
+        - CM1
+        - WoFS / WRF
+        - Radar (native sweeps)
+        - Radar (regridded)
+        - The demo (atmo3d --demo)
+        - Other, or not tied to a run
+    validations:
+      required: true
+  - type: textarea
+    id: versions
+    attributes:
+      label: Versions
+      description: The output of `pip list | grep -i atmo3d`, and the operating system and browser.
+      placeholder: |
+        atmo3d-core 1.0.0 ...
+        Linux (Casper), Firefox 140
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: Error or log
+      description: Any traceback from the terminal atmo3d runs in, or the browser console. Leave out paths or data you cannot share.
+      render: text
+  - type: textarea
+    id: data
+    attributes:
+      label: Can it be reproduced on the demo?
+      description: If it happens with `atmo3d --demo`, say so. If it needs your own output, describe the run (grid size, output settings).

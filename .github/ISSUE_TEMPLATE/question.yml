@@ -1,0 +1,9 @@
+name: Question or idea
+description: Ask something, or propose a change before writing code for it
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: Your question or idea
+    validations:
+      required: true

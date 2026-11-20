@@ -69,6 +69,7 @@ in `docs/`:
   soundings, tracking, sections, 3D, series and distributions, figures, and notes on the
   fields
 - [Settings](docs/settings.md): the config file and every setting
+- [Contributing](CONTRIBUTING.md): fork, change, test and open a pull request
 - [Developing](docs/developing.md): tests, code layout, adding derived fields and vectors,
   building these pages
 - [Changes](docs/changelog.md): what is new in each release

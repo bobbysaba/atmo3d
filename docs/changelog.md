@@ -3,6 +3,13 @@
 What changed in each release, newest first. The version is in `pyproject.toml`; a release
 has a matching git tag.
 
+## Unreleased
+
+- **Contributing**: a new page for first-time contributors (fork, set up, test, open a
+  pull request, what review looks for), [Contributing](contributing.md); pull request and
+  issue templates; the maintainer's side (collaborators, code owners, tag protection,
+  releases) in [Developing](developing.md#maintaining-the-repository).
+
 ## 1.0.0 (2026-11-19)
 
 One core with a data type per package (CM1, WoFS and radar under `packages/`), and a

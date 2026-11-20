@@ -63,5 +63,6 @@ nav:
       - Troubleshooting: guide/troubleshooting.md
       - Glossary: guide/glossary.md
   - Settings: settings.md
+  - Contributing: contributing.md
   - Developing: developing.md
   - Changes: changelog.md

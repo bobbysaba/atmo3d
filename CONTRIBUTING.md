@@ -1,31 +1,146 @@
 # Contributing to atmo3d
 
-atmo3d is a monorepo: `packages/core` (the viewer, figures, caching, and the data-type
-registry) and one package per data type (`packages/cm1`, `packages/wofs`, ...).
+Thank you for helping. This page takes you from nothing to a merged pull request: set
+up, change, test, open the pull request, and what review looks for. It is also on the
+documentation site as *Contributing*.
+
+## Before you start
+
+- **Ask first for anything big.** Open an [issue](https://github.com/bobbysaba/atmo3d/issues)
+  for a bug, a new data type, or a change that touches many files, and say what you have
+  in mind. A short conversation first saves a pull request that has to be redone. Small
+  fixes (a typo, a wrong label, a clear bug with a one-line cause) can go straight to a
+  pull request.
+- **Questions** go in an issue too; there is a blank template for them.
+- **Licence.** atmo3d is GPL-3.0-or-later ([LICENSE](LICENSE)). By opening a pull
+  request you agree that your contribution is licensed under the same terms.
+
+## How the repository is laid out
+
+A monorepo: `packages/core` (import name `atmo3d`: the viewer, figures, caching and the
+data-type registry) and one package per data type: `packages/cm1` (`atmo3d_cm1`),
+`packages/wofs` (`atmo3d_wofs`) and `packages/radar` (`atmo3d_radar`). `tests/`, `docs/`
+and `tools/` are shared. The core never imports a data-type package; a data type plugs
+in through an entry point. The file-by-file layout is in
+[Developing](docs/developing.md#layout).
 
 ## Set up
 
-    conda env create -f environment.yml && conda activate atmo3d
-    pip install --no-deps -e packages/core -e packages/cm1 -e packages/wofs -e packages/radar
+1. **Fork** the repository on GitHub (the *Fork* button), then clone your fork and add
+   this repository as `upstream`, so you can stay current with it:
 
-## Branch and pull request
+        git clone https://github.com/<you>/atmo3d.git
+        cd atmo3d
+        git remote add upstream https://github.com/bobbysaba/atmo3d.git
 
-1. Branch from `master` (`git switch -c my-change`); keep commits small, one step each.
-2. Push the branch and open a pull request into `master`. Nobody pushes to `master`
-   directly: it needs a pull request and the review of the code owners (`.github/CODEOWNERS`).
-3. A change to `packages/core` is reviewed by the core owner; a change inside a data-type
-   package by that package's owners.
+2. **Make the environment.** It pins the versions atmo3d is tested with and installs the
+   four packages editable, so your changes take effect without reinstalling:
 
-## Which tests to run
+        conda env create -f environment.yml
+        conda activate atmo3d
 
-- Changed a data-type package: run its tests, e.g. `pytest tests/test_wofs.py` for WoFS
-  (the files each package owns are listed in `tests/<package>-tests.txt`).
-- Changed the core, `tests/conftest.py` or `tests/synthetic.py`: run everything, `pytest`.
-- CI repeats this: a core change runs all tests, a package change only its own.
-- Image tests (`tests/test_images.py`) compare against `tests/baseline/`; do not rewrite
-  baselines unless the change is meant to move them.
+   After `environment.yml` changes: `conda env update -f environment.yml --prune`.
+
+3. **Check it works:** `atmo3d --demo` opens a real CM1 supercell, and
+   `pytest tests/test_settings.py` should pass in well under a minute.
+
+## Make a change
+
+1. Start from an up-to-date `master` and branch:
+
+        git switch master
+        git pull upstream master
+        git switch -c short-name-of-change
+
+2. Keep each commit to one step that works on its own. A pull request may hold several.
+3. **Change the documentation with the code.** If what the user sees changes, change the
+   page in `docs/` that describes it in the same commit, and add a line under
+   *Unreleased* in [Changes](docs/changelog.md).
+4. If your branch falls behind `master`, rebase it (`git pull --rebase upstream master`)
+   rather than merging `master` into it.
+
+### Commit messages
+
+The subject says what changed, in plain words, starting with the area when that helps:
+
+    Radar: receiver fields described by rule, so a second receiver is listed like the first
+    Field menus show a field's note as its tooltip
+
+No full stop at the end. Add a body (after a blank line) when the reason is not obvious
+from the subject.
+
+## Test
+
+The suite runs on synthetic data written by `tests/synthetic.py` and
+`tests/synthetic_radar.py`, whose answers are known in advance; it needs no data of
+your own. What to run depends on what you changed:
+
+| You changed | Run locally |
+|---|---|
+| one data-type package | its tests, listed in `tests/<package>-tests.txt`, e.g. `pytest $(cat tests/wofs-tests.txt)` |
+| a test you are writing | that file, `pytest tests/test_x.py -k name` |
+| `packages/core`, `tests/conftest.py`, `tests/synthetic*.py` | the tests near your change; CI runs the whole suite |
+
+CI (GitHub Actions) repeats this on every pull request: a core change runs every test,
+a package change runs that package's list. The check is called `test`, and it must pass
+before a pull request can merge. You can run the whole suite yourself with `pytest`.
+
+- **On a shared cluster** (NSF NCAR's Derecho or Casper, for example), run the tests on
+  a compute node, not a login node: they start reader processes and draw figures. Use an
+  interactive job (`qinteractive` on NCAR systems) or a batch command such as
+  `qcmd -A <project> -- pytest`.
+- **Image tests** (`tests/test_images.py`) compare figures with the PNGs in
+  `tests/baseline/`. Do not rewrite baselines unless your change is meant to move a
+  figure; when it is, say so in the pull request. How to rewrite them is in
+  [Developing](docs/developing.md#tests).
+- **A new feature needs a test**, and a fix a test that failed before it. For a derived
+  field, the test checks it against an answer worked out by hand (see
+  `tests/test_derived_analytic.py`).
+
+## Open a pull request
+
+1. Push the branch to your fork: `git push -u origin short-name-of-change`.
+2. On GitHub, open a pull request from it into `bobbysaba/atmo3d` `master`. The form asks
+   what changed, which tests you ran, and whether image baselines moved.
+3. Nobody pushes to `master` directly, maintainers included: every change arrives by pull
+   request, with the `test` check passing and a code owner's approval.
+
+### Who reviews
+
+`.github/CODEOWNERS` names who must approve a change to each part of the repository.
+GitHub requests their review automatically when the pull request opens. Today the
+maintainer, Bobby Saba (@bobbysaba), owns everything; a data-type package can gain
+owners of its own, who then review changes inside it.
+
+### What review looks for
+
+- **It is right.** Physics and numbers are checked against a source (an equation with a
+  reference, a hand-worked case, a test with a known answer). Say where yours come from.
+- **It is tested** as above, and the existing tests still pass.
+- **It stays in its place.** Core code does not import a data-type package; a data type
+  adds itself through the registration API
+  ([Developing](docs/developing.md#the-registration-api)) instead of editing the core.
+- **The documentation matches**, and the changelog has a line for anything a user notices.
+- **It is no bigger than it needs to be.** Unrelated clean-ups go in a pull request of
+  their own.
+
+### How long it takes
+
+atmo3d has one maintainer, and reviews happen as time allows. If a pull request has had
+no response after a week, add a comment to it as a reminder. Expect questions or requests
+for changes; push new commits to the same branch to answer them, and the pull request
+updates itself.
+
+### When it is done
+
+A pull request is ready to merge when the `test` check passes, the code owners have
+approved it, and every review comment is answered. The maintainer merges it.
 
 ## Adding a data type
 
-Add a folder `packages/<name>/` with its own `pyproject.toml` and an entry point in the
-`atmo3d.datatypes` group (see `docs/developing.md`); no core file changes.
+A data type (a reader for another model's or instrument's output) is a package of its
+own under `packages/<name>/`, with a `pyproject.toml` and an entry point in the
+`atmo3d.datatypes` group; no core file changes. CM1, WoFS and radar are the three
+examples. See [Developing](docs/developing.md#adding-a-data-type). When you contribute
+one, also add `tests/<name>-tests.txt`, its entry in `.github/workflows/tests.yml`, and
+yourself as its owner in `.github/CODEOWNERS`.
