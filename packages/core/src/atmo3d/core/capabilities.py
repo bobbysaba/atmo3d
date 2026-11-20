@@ -24,7 +24,7 @@ CAPS = {
                       "motion",
     "terrain": "flag: levels follow the terrain (heights vary in space and time)",
     "geo": "flag: the grid sits on a map projection (run.geo)",
-    "native_polar": "a native polar (PPI) view (radar; no data type offers it yet)",
+    "native_polar": "a native polar (PPI) view of single sweeps (radar: PolarRun)",
 }
 
 FLAGS = ("terrain", "geo", "storm_relative", "traced_parcels")

@@ -14,6 +14,7 @@ jobs:
       all: ${{ steps.f.outputs.all }}
       cm1: ${{ steps.f.outputs.cm1 }}
       wofs: ${{ steps.f.outputs.wofs }}
+      radar: ${{ steps.f.outputs.radar }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -32,10 +33,13 @@ jobs:
               - 'packages/cm1/**'
             wofs:
               - 'packages/wofs/**'
+            radar:
+              - 'packages/radar/**'
+              - 'tests/synthetic_radar.py'
 
   test:
     needs: changes
-    if: needs.changes.outputs.all == 'true' || needs.changes.outputs.cm1 == 'true' || needs.changes.outputs.wofs == 'true'
+    if: needs.changes.outputs.all == 'true' || needs.changes.outputs.cm1 == 'true' || needs.changes.outputs.wofs == 'true' || needs.changes.outputs.radar == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -45,7 +49,7 @@ jobs:
           activate-environment: atmo3d
       - name: Install the packages (editable)
         shell: bash -el {0}
-        run: pip install --no-deps -e packages/core -e packages/cm1 -e packages/wofs
+        run: pip install --no-deps -e packages/core -e packages/cm1 -e packages/wofs -e packages/radar
       - name: Pick the tests
         id: pick
         shell: bash
@@ -56,6 +60,7 @@ jobs:
             p=""
             [ "${{ needs.changes.outputs.cm1 }}" = "true" ] && p="$p $(cat tests/cm1-tests.txt)"
             [ "${{ needs.changes.outputs.wofs }}" = "true" ] && p="$p $(cat tests/wofs-tests.txt)"
+            [ "${{ needs.changes.outputs.radar }}" = "true" ] && p="$p $(cat tests/radar-tests.txt)"
             echo "paths=$p" >> "$GITHUB_OUTPUT"
           fi
       - name: pytest

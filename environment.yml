@@ -34,3 +34,4 @@ dependencies:
       - -e ./packages/core
       - -e ./packages/cm1
       - -e ./packages/wofs
+      - -e ./packages/radar

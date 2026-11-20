@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "atmo3d-radar"
+version = "0.6.0"
+description = "atmo3d data type: radar volumes (CfRadial), in native polar geometry"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [{ name = "Bobby Saba", email = "bobbysabawx@gmail.com" }]
+license = { text = "GPL-3.0-or-later" }
+dependencies = ["atmo3d-core", "netCDF4>=1.7", "numpy>=1.26"]
+
+[project.entry-points."atmo3d.datatypes"]
+radar = "atmo3d_radar:register"
+
+[tool.setuptools.packages.find]
+where = ["src"]

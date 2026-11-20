@@ -7,3 +7,4 @@
 # Data-type packages: add each package's owners after Bobby (a collaborator's GitHub name)
 /packages/cm1/             @bobbysaba
 /packages/wofs/            @bobbysaba
+/packages/radar/           @bobbysaba

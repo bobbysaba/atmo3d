@@ -78,9 +78,10 @@ processes and renders figures.
 
 A monorepo: `packages/core` (import name `atmo3d`: everything below except the data-type
 parts), `packages/cm1` (`atmo3d_cm1`: the CM1 reader, field catalog, parcels, trajectory
-tracing, pressure decomposition and the Parcels panel) and `packages/wofs` (`atmo3d_wofs`:
-the WoFS reader, catalog and demo). `tests/`, `docs/` and `tools/` stay at the top. Install
-the three editable (`pip install -e packages/core -e packages/cm1 -e packages/wofs`; the
+tracing, pressure decomposition and the Parcels panel), `packages/wofs` (`atmo3d_wofs`:
+the WoFS reader, catalog and demo) and `packages/radar` (`atmo3d_radar`: the CfRadial
+reader and catalog). `tests/`, `docs/` and `tools/` stay at the top. Install the four
+editable (`pip install -e packages/core -e packages/cm1 -e packages/wofs -e packages/radar`; the
 conda environment does it). The paths below are relative to `packages/core/src/` unless
 they name a data-type package.
 

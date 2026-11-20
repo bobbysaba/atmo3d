@@ -37,7 +37,7 @@ def pytest_configure(config):
     if len(entry_points(group="atmo3d.datatypes")) < 2:
         pytest.exit("atmo3d's data-type packages are not installed; once, run:\n"
                     "  pip install --no-deps --no-build-isolation -e packages/core "
-                    "-e packages/cm1 -e packages/wofs", returncode=3)
+                    "-e packages/cm1 -e packages/wofs -e packages/radar", returncode=3)
     # before atmo3d.config is imported anywhere; spawned readers inherit these
     cfg = tempfile.mkdtemp(prefix="atmo3d-testcfg-")
     os.environ["ATMO3D_CONFIG"] = os.path.join(cfg, "config.toml")

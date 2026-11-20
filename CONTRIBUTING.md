@@ -6,7 +6,7 @@ registry) and one package per data type (`packages/cm1`, `packages/wofs`, ...).
 ## Set up
 
     conda env create -f environment.yml && conda activate atmo3d
-    pip install --no-deps -e packages/core -e packages/cm1 -e packages/wofs
+    pip install --no-deps -e packages/core -e packages/cm1 -e packages/wofs -e packages/radar
 
 ## Branch and pull request
 
