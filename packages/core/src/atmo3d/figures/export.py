@@ -48,6 +48,13 @@ def saved_list(own, root, extra=""):
     return out
 
 
+def _user_notes():
+    """The notes of the user fields a figure just opened brought (core.userfields.adopt),
+    as text to add to its "Loaded" note."""
+    from ..core import userfields
+    return "".join(f". <b>Note:</b> {_html.escape(n)}" for n in userfields.take_notes())
+
+
 def saved_base(spec_path):
     """The "Save as" of a saved figure's spec: <folder>/_src/<name>_spec.json was saved
     as <folder>/<name> (a spec elsewhere: its path without _spec.json)."""
@@ -230,6 +237,7 @@ class FigureExport:
         note = f"Loaded <code>{path}</code>" + "".join(
             f". <b>Note:</b> the namelist.input of <code>{p}</code> changed since "
             "the figure was saved, so its data may differ" for p in fg.changed_runs(spec))
+        note += _user_notes()
         if fg.is_doc(spec):
             self.quick.hide()
             self.shell.open_doc(spec, note, saved_base(path))
@@ -269,6 +277,7 @@ class FigureExport:
         except (KeyError, TypeError, ValueError) as e:
             return str(e)
         fg.upgrade_names(form)  # (fields renamed since it was saved)
+        note = (note or "") + _user_notes()
         if state.get("doc"):
             self.shell.open_doc(form, note, state.get("save_as"), render)
         elif not self._open_spec(form, note, state.get("save_as"), render):

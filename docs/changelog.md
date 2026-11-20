@@ -26,6 +26,15 @@ has a matching git tag.
 - [A playbook for a coding agent](agents/add-datatype.md) that adds a data type: what to
   ask, how to inspect the files without loading them, when to stop and ask, and what to
   report. `AGENTS.md` at the top of the repository points agents to it.
+- **Your own derived fields**: write a field as an expression in `fields.toml` (beside the
+  settings file, or the `fields_file` setting), for example `expr = "tempc * 9/5 + 32"`,
+  over the fields as the viewer shows them (display units), the built-in derived fields
+  and derivatives such as `ddz.w`. They are listed under *User* in the field menus,
+  marked as user-defined and not reviewed; one a run cannot compute is greyed out with the
+  reason. Figures and sessions record the definitions they use, and reopen with them
+  where the field is not defined (the figure's own wins where yours differs); data exports
+  record the expression. Installed packages can add fields the same way
+  (`atmo3d.fields` entry points).
 
 ## 1.0.0 (2026-11-19)
 

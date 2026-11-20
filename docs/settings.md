@@ -14,6 +14,7 @@ edits the file itself). They are saved in `~/.config/atmo3d/config.toml`
 | `exports_dir` | `~/atmo3d/exports` | saved series / tracks / sessions / data exports / parcel sets go to `<this>/<parent>_<run>/series`, `/tracks`, `/sessions`, `/data`, `/parcels` |
 | `cache_dir` | `~/.cache/atmo3d` | throwaway files (computed series, time-window swaths, parcel trajectories) |
 | `pdecomp_script` | none | your own pressure-decomposition script instead of atmo3d's solver |
+| `fields_file` | `fields.toml` beside the settings file | your own derived fields, as expressions (read when atmo3d starts) |
 | `track_dirs` | `storm_tracks` | where storm track files are found (a plain name: that folder in the run folder or up to 4 above it) |
 | `track_patterns` | `{parent}_{name}.csv`, `{name}.csv`, … | track file names tried in each folder |
 | `track_motion_window` | auto | minutes of track a storm motion is fitted over (0: centred differences; auto: 0 for CM1, 30 for WoFS) |

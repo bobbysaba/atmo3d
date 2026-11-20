@@ -269,6 +269,13 @@ def _header(ds, run, F, p, any3, stormy, compress):
             a["storm_relative"] = "relative to storm_u, storm_v"
         if split_deriv(name)[1] in COSTLY:
             a["column_stride"] = np.int32(column_stride(run))
+        u = F[base].user  # (a user field, or a derivative of one: core.userfields)
+        if u is not None:
+            from .userfields import compile_expr
+            a["atmo3d_expr"] = u["expr"]
+            a["atmo3d_inputs"] = " ".join(compile_expr(u["expr"])[1])
+            a["comment"] = ((a["comment"] + "; ") if "comment" in a else "") + \
+                f"user-defined field {base}, not reviewed"
         v.setncatts(a)
     ds.setncatts({
         "Conventions": "CF-1.8",

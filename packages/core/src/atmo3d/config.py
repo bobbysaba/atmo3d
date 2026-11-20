@@ -45,6 +45,10 @@ KEYS = [
         "Optional: your own script for times whose files lack the decomposition, with "
         "cm1_pdecomp's run_decomposition (or the older pdecomp_solver.py functions). "
         "Empty: CM1's method (cm1_pdecomp.py), built in.", kind="file"),
+    Key("fields_file", "paths", "", "Your own derived fields",
+        "Optional: a TOML file of your own derived fields ([fields.<name>] tables with an "
+        "expr). Empty: fields.toml beside this settings file, if there is one. Read when "
+        "atmo3d starts.", kind="file", restart=True),
     Key("track_dirs", "tracks", ["storm_tracks"], "Track folders",
         "Where storm track files are looked for. A plain name (storm_tracks) is a "
         "folder of that name in the run folder or up to 4 folders above it; a full "

@@ -263,9 +263,13 @@ class FigureShell:
 
     def state(self):
         """What a session or the autosave keeps of the figure."""
+        from ...core import userfields
         from ...core.catalog import FIELD_NAMES
-        return dict(doc=dict(fg.plain_copy(self.doc), field_names=FIELD_NAMES),
-                    save_as=self.ed.path.value)
+        doc = dict(fg.plain_copy(self.doc), field_names=FIELD_NAMES)
+        rec = userfields.record(doc)
+        if rec:
+            doc["user_fields"] = rec
+        return dict(doc=doc, save_as=self.ed.path.value)
 
     def _keep_figure(self):
         """The autosave: this figure for the next page on this run, if it has changed and is more

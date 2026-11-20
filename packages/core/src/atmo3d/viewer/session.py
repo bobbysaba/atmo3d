@@ -5,6 +5,7 @@ saved to JSON and put back, from the Session dialog or with ?session=/path/to/fi
 
 A mixin of the Viewer (atmo3d/viewer/app.py): its methods use the Viewer's widgets and state."""
 
+import html
 import io
 import json
 import math
@@ -99,8 +100,11 @@ def upgrade(s):
     """A session of an earlier FORMAT brought up to date, in place: version 1 named a
     WoFS run's fields by CM1's names (core.catalog.rename_fields); and derived fields
     renamed since it was saved (its "field_names": core.catalog.derived_renames).  Its
-    figure is left to the figure's own upgrade (its runs may be of other data types)."""
+    figure is left to the figure's own upgrade (its runs may be of other data types).
+    The user fields it recorded are taken in (core.userfields.adopt)."""
+    from ..core import userfields
     from ..core.catalog import FIELD_NAMES, derived_renames, rename_fields, renames_for
+    userfields.adopt(s)  # (before the figure is set aside: renames reach it too)
     ver = s.get("atmo3d_session", s.get("cm1view_session", 1))
     figure = s.pop("figure", None)
     rename_fields(s, derived_renames(s))
@@ -242,6 +246,10 @@ class Sessions:
         figure = self._figure_state()
         if figure is not None:
             s["figure"] = figure
+        from ..core import userfields
+        rec = userfields.record(s)
+        if rec:  # (the user fields it shows, so it opens where they are not defined)
+            s["user_fields"] = rec
         return _plain(s)
 
     def _figure_state(self):
@@ -345,6 +353,9 @@ class Sessions:
         note = f"Loaded <code>{path}</code>"
         if skipped:
             note += f" · not in this run: {', '.join(skipped)}"
+        from ..core import userfields
+        for n in userfields.take_notes():
+            note += f" · {html.escape(n)}"
         self._ses_note(note)
 
     # ------------------------------------------------------------ put back

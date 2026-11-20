@@ -44,6 +44,8 @@ class AllFields:
         from ..core.catalog import Union
         self.cat = Union(F.cat for F in self._fields)
         for F in fields:
+            if hasattr(F, "sync_user"):  # (user fields a figure brought: core.userfields)
+                F.sync_user()
             for name, d in F.defs.items():
                 self.defs.setdefault(name, d)
         for name in self.defs:
@@ -74,7 +76,14 @@ class AllFields:
         def label(d):
             some = " · not in every run" if d.name in self._some else ""
             return f"{d.label} [{d.name}]{some}"
-        return group_options(self.defs.values(), ndim, label)
+        # (user fields no run can compute: greyed out, with the first run's reason)
+        off, seen = [], set(self.defs)
+        for F in self._fields:
+            for u, why in getattr(F, "user_off", ()):
+                if u["name"] not in seen:
+                    seen.add(u["name"])
+                    off.append((u, why))
+        return group_options(self.defs.values(), ndim, label, off=off)
 
 
 class FigureRuns:

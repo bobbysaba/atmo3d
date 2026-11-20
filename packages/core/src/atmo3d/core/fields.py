@@ -117,6 +117,8 @@ class FieldDef:
         self.pointwise = pointwise and not any(split_deriv(n)[0] for n in self.deps)
         # storm: depends on the storm motion, c["storm"] = ground-relative (u, v) m/s
         self.storm = storm
+        # user: a user-defined field's definition (core.userfields), None for the rest
+        self.user = None
 
     @property
     def derived(self):
@@ -806,9 +808,11 @@ GROUP_ORDER = ["Radar", "Kinematics", "Vorticity tendencies", "Column fields",
                "Other model fields", "Base state"]
 
 
-# group-name prefixes of the field lists: derived fields, Other, hidden (group_options;
-# viewer.fieldmenu nests them under entries of their own)
+# group-name prefixes of the field lists: derived fields, Other, hidden, user-defined
+# (group_options; viewer.fieldmenu nests them under entries of their own)
 DERIVED_PREFIX, OTHER_PREFIX, HIDDEN_PREFIX = "Derived · ", "Other · ", "Hidden · "
+USER_PREFIX = "User · "
+USER_GROUP = "User"  # (a user field's group when its definition names none)
 
 
 def show_hidden():
@@ -825,30 +829,50 @@ def listed(d):
 
 class Groups(OrderedDict):
     """group_options' {group: {label: name}}, with .tips: {name: the field's note} for
-    the pickers' tooltips (a copy made of it by hand just goes without tips)."""
+    the pickers' tooltips (a copy made of it by hand just goes without tips), and .off:
+    [(group, label, why)] of user fields this run cannot compute (shown greyed out)."""
     tips = {}
+    off = ()
 
 
-def group_options(defs, ndim=None, label=None):
+def user_group(group):
+    """The field-list group of a user field of group `group` ("User · <group>"; the
+    default group: "User · ", listed straight under User)."""
+    return USER_PREFIX + ("" if group in ("", USER_GROUP) else group)
+
+
+def group_options(defs, ndim=None, label=None, off=()):
     """{group: {label: name}} of FieldDefs `defs` for the field pickers
     (viewer.fieldmenu; grouped Selects too): the fields in the files by group
     (GROUP_ORDER), then the derived ones ("Derived · <group>"), then those under Other
     ("Other · <group>"), then the hidden ones ("Hidden · <group>") only with the
-    show_hidden_fields setting.  label(d): an option's text (default
-    "<label> [<name>]")."""
+    show_hidden_fields setting, then user-defined ones ("User · <group>", labels marked
+    " (user)").  label(d): an option's text (default "<label> [<name>]").  off:
+    [(definition, why)] of user fields that cannot be computed (Groups.off)."""
+    from . import userfields
     shown = show_hidden()
     kinds = ("main", "derived", "other", "hidden")
     tiers = {t: OrderedDict((g, OrderedDict()) for g in GROUP_ORDER) for t in kinds}
+    user = OrderedDict()
     for d in defs:
         if (ndim is not None and d.ndim != ndim) or (d.tier == "hidden" and not shown):
             continue
-        kind = "derived" if d.tier == "main" and d.derived else d.tier
         text = label(d) if label else f"{d.label} [{d.name}]"
+        if d.user is not None:
+            mark = userfields.FIGURE_MARK if d.user["source"] == "figure" else ""
+            user.setdefault(user_group(d.group), OrderedDict())[
+                text + userfields.USER_MARK + mark] = d.name
+            continue
+        kind = "derived" if d.tier == "main" and d.derived else d.tier
         tiers[kind].setdefault(d.group, OrderedDict())[text] = d.name
     out = Groups()
     for kind, prefix in zip(kinds, ("", DERIVED_PREFIX, OTHER_PREFIX, HIDDEN_PREFIX)):
         out.update((prefix + g, v) for g, v in tiers[kind].items() if v)
-    out.tips = {d.name: d.note for d in defs if d.note}
+    out.update(user)
+    out.tips = {d.name: (userfields.describe(d) if d.user is not None else d.note)
+                for d in defs if d.note or d.user is not None}
+    out.off = [(user_group(u["group"]), f"{u['label']} [{u['name']}]", why)
+               for u, why in off]
     return out
 
 
@@ -1028,7 +1052,8 @@ class Fields:
             self.defs[name] = FieldDef(name, label, units, group, ndim=info.ndim,
                                        scale=scale, cmap=cmap, vrange=vr, diverging=div,
                                        tier=cat.tier(name, group, run.vars))
-        for d in _make_fields(run.vars, cat):
+        self._builtins = _make_fields(run.vars, cat)
+        for d in self._builtins:
             if d.storm and not getattr(run, "storm_relative", True):
                 continue  # (no storm motion for this run: see Run.storm_relative)
             if not grid and (not d.pointwise or d.column):
@@ -1045,10 +1070,50 @@ class Fields:
         self._lock = threading.Lock()
         self._derivs = {}  # (derivative name -> its FieldDef, built when first asked)
         self._memo = OrderedDict()  # (t, stride) -> costly column fields' shared results
+        # user-defined fields (core.userfields): bound now, and again when a figure or
+        # session brings definitions of its own (sync_user)
+        self.user_off, self._user_key = [], None
+        self.sync_user()
+
+    # ---- user-defined fields
+    def sync_user(self):
+        """Bind the user-defined fields in use (userfields.current()) if they changed
+        since last time: the ones this run can compute join defs (after the rest), the
+        others go to user_off [(definition, why)]."""
+        from . import userfields
+        specs = userfields.current()
+        key = tuple((d["name"], d["expr"], d["units"], d["error"]) for d in specs)
+        if key == self._user_key:
+            return
+        natives = {n: d for n, d in self.defs.items() if not d.derived and d.user is None}
+        made, off = userfields.bind(specs, self.run.vars, self.cat, self._builtins,
+                                    scales={n: d.scale for n, d in natives.items()},
+                                    ndims={n: d.ndim for n, d in natives.items()})
+        defs = OrderedDict((n, d) for n, d in self.defs.items() if d.user is None)
+        grid = getattr(self.run, "grid", True)
+        for d in made:
+            if d.storm and not getattr(self.run, "storm_relative", True):
+                off.append((d.user, "needs a storm motion, which this run has none"))
+            elif not grid and not d.pointwise:
+                off.append((d.user, "uses derivatives, which need a grid this run lacks"))
+            else:
+                defs[d.name] = d
+        self.defs, self.user_off, self._user_key = defs, off, key
+
+    def user_task(self):
+        """What the series worker needs to bind this run's user fields (it is its own
+        process: core.series): their definitions, the natives' scales and ndims."""
+        specs = [d.user for d in self.defs.values() if d.user is not None]
+        natives = {n: d for n, d in self.defs.items() if not d.derived and d.user is None}
+        return dict(defs=specs, scales={n: d.scale for n, d in natives.items()},
+                    ndims={n: d.ndim for n, d in natives.items()})
 
     # ---- catalog helpers
     def __getitem__(self, name):
         d = self.defs.get(name) if isinstance(name, str) else None
+        if d is None and isinstance(name, str):
+            self.sync_user()  # (a figure's own definitions, taken in since)
+            d = self.defs.get(name)
         if d is None:
             d = self._deriv(name)
             if d is None:
@@ -1056,6 +1121,8 @@ class Fields:
         return d
 
     def __contains__(self, name):
+        if isinstance(name, str) and name not in self.defs:
+            self.sync_user()  # (a figure's own definitions, taken in since)
         return (isinstance(name, str) and name in self.defs) or self._deriv(name) is not None
 
     def _deriv(self, name):
@@ -1072,7 +1139,8 @@ class Fields:
 
     def groups(self, ndim=None):
         """{group: {label: name}} for grouped Select widgets (group_options)."""
-        return group_options(self.defs.values(), ndim)
+        self.sync_user()
+        return group_options(self.defs.values(), ndim, off=self.user_off)
 
     def role(self, r):
         """The field playing role r (core.catalog.ROLES) if this run has it, else None."""

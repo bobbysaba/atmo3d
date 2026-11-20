@@ -12,6 +12,8 @@ clicking it opens a short menu of the sections, each opening its fields on hover
     ───────────
     Derived        ▸  → Thermodynamics ▸ → θ′, p′, ...
     Other          ▸  → Turbulence ▸ → ...
+    User           ▸  → your own fields (core.userfields), and greyed out the ones
+                        this run cannot compute, why as their tooltip
 
 A search box at the top lists every field whose label matches what is typed (Enter
 takes the first, Escape closes).
@@ -25,12 +27,13 @@ the button shows its name."""
 import param
 from panel.custom import JSComponent
 
-from ..core.fields import DERIVED_PREFIX, HIDDEN_PREFIX, OTHER_PREFIX, Groups
+from ..core.fields import DERIVED_PREFIX, HIDDEN_PREFIX, OTHER_PREFIX, USER_PREFIX, Groups
 from ..theme import ACCENT, GRID, HOVER_LINE, MUTED, RAISED, TEXT
 
 # the entries that open sections of their own, in the menu's order after the plain
 # sections: (prefix of their groups, entry label)
-NESTED = ((DERIVED_PREFIX, "Derived"), (OTHER_PREFIX, "Other"), (HIDDEN_PREFIX, "Hidden"))
+NESTED = ((DERIVED_PREFIX, "Derived"), (OTHER_PREFIX, "Other"), (HIDDEN_PREFIX, "Hidden"),
+          (USER_PREFIX, "User"))
 
 
 def derived_docs_link():
@@ -44,10 +47,14 @@ def derived_docs_link():
 def menu_tree(groups):
     """The menu of grouped options {group: {label: value}}: a list of nodes
     {"l": label, "c": [children]} (a section) or {"l": label, "v": value} (a field),
-    and {"sep": True} between the plain sections and Derived / Other / Hidden.  A field
-    with a note (groups.tips, from fields.group_options) has it as "t": its tooltip."""
+    and {"sep": True} between the plain sections and Derived / Other / Hidden / User.  A
+    field with a note (groups.tips, from fields.group_options) has it as "t": its
+    tooltip.  User fields a run cannot compute (groups.off) are {"l": label, "off": why}:
+    shown greyed out, not chosen.  The user fields of no group of their own ("User · ")
+    are listed straight under User."""
     tips = getattr(groups, "tips", {})
     plain, nested = [], {p: [] for p, _ in NESTED}
+    sections = {}
     for g, opts in (groups or {}).items():
         if not opts:
             continue
@@ -59,8 +66,21 @@ def menu_tree(groups):
                 plain.append({"l": str(g), "c": leaves})
             else:  # (options outside any group: on the top level itself)
                 plain.extend(leaves)
+        elif str(g) == prefix:  # (straight under its entry)
+            nested[prefix].extend(leaves)
         else:
-            nested[prefix].append({"l": str(g)[len(prefix):], "c": leaves})
+            node = {"l": str(g)[len(prefix):], "c": leaves}
+            sections[str(g)] = node
+            nested[prefix].append(node)
+    for g, lab, why in getattr(groups, "off", ()) or ():
+        leaf = {"l": str(lab), "off": str(why)}
+        if g == USER_PREFIX:
+            nested[USER_PREFIX].append(leaf)
+        elif g in sections:
+            sections[g]["c"].append(leaf)
+        else:
+            sections[g] = {"l": g[len(USER_PREFIX):], "c": [leaf]}
+            nested[USER_PREFIX].append(sections[g])
     tail = [{"l": lab, "c": nested[p]} for p, lab in NESTED if nested[p]]
     return plain + ([{"sep": True}] if plain and tail else []) + tail
 
@@ -90,9 +110,9 @@ class FieldSelect(JSComponent):
     def __init__(self, groups=None, options=None, **params):
         if groups is None and options is not None:
             groups = {"": dict(options)}
-        tips = getattr(groups, "tips", {})
+        tips, off = getattr(groups, "tips", {}), getattr(groups, "off", ())
         groups = Groups(groups or {})  # (a copy that keeps the notes)
-        groups.tips = tips
+        groups.tips, groups.off = tips, off
         params.pop("tree", None)  # (made from groups: a clone() passes its own too)
         params.setdefault("docs_link", derived_docs_link())
         params.setdefault("height", 52 if params.get("name") else 32)
@@ -146,6 +166,8 @@ class FieldSelect(JSComponent):
   color: {ACCENT}; text-decoration: none; }}
 .fs-docs:hover {{ text-decoration: underline; }}
 .fs-none {{ padding: 4px 10px; color: {MUTED}; }}
+.fs-item.fs-off {{ color: {MUTED}; opacity: .6; cursor: default; font-style: italic; }}
+.fs-item.fs-off:hover {{ background: none; }}
 """]
 
     _esm = """
@@ -174,7 +196,7 @@ export function render({ model, el }) {
   }
   function leaves(nodes, path, out) {
     for (const n of nodes) {
-      if (n.sep) continue
+      if (n.sep || n.off !== undefined) continue
       if (n.c) leaves(n.c, path.concat([n.l]), out)
       else out.push([n, path])
     }
@@ -215,7 +237,11 @@ export function render({ model, el }) {
       const it = document.createElement('div'); it.className = 'fs-item'
       it.textContent = n.l; it.title = n.t ? n.l + '\\n\\n' + n.t : n.l
       if (hasCur(n)) it.classList.add('fs-cur')
-      if (n.c) {
+      if (n.off !== undefined) {
+        it.classList.add('fs-off')
+        it.title = n.l + '\\n\\nNot available: ' + n.off
+        it.addEventListener('mouseenter', () => closeFrom(level))
+      } else if (n.c) {
         it.classList.add('fs-sec')
         it.addEventListener('mouseenter', () => openSub(it, n.c, level + 1))
         it.addEventListener('click', (e) => { e.stopPropagation(); openSub(it, n.c, level + 1) })

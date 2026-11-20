@@ -153,8 +153,13 @@ def changed_runs(spec):
 
 def write_spec(form, v2, path):
     """A saved figure's spec: version 2, with the editor's settings that made it under
-    "form" (load_spec opens those)."""
+    "form" (load_spec opens those), and the definitions of the user fields it uses
+    ("user_fields": core.userfields.record)."""
+    from ...core import userfields
     from ...core.catalog import FIELD_NAMES
+    rec = userfields.record(form)
+    if rec:
+        form, v2 = dict(form, user_fields=rec), dict(v2, user_fields=rec)
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w") as f:
         json.dump(dict(v2, form=dict(form, field_names=FIELD_NAMES)), f, indent=1,
@@ -373,7 +378,9 @@ def upgrade_names(spec):
     them names (core.catalog: WoFS's CM1-style names became WRF's), and derived fields
     renamed since it was saved (its "field_names": core.catalog.derived_renames).
     Doing it again changes nothing.  Why it was left as saved, or ""."""
+    from ...core import userfields
     from ...core.catalog import FIELD_NAMES, derived_renames, rename_fields, renames_for
+    userfields.adopt(spec)  # (its user fields' definitions: userfields.take_notes)
     rename_fields(spec, derived_renames(spec))  # (every data type's derived fields)
     spec["field_names"] = FIELD_NAMES
     table, note = renames_for(_run_paths(spec))

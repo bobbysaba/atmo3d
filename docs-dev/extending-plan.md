@@ -18,7 +18,13 @@ Choices made without asking (Bobby may overrule):
 Phase C (2026-11-20): decisions 1 = TOML expressions, 4 = own User section, 5 = figures
 and exports record and reuse the definition (the figure's wins when the local one
 differs). C1 spike done: docs-dev/user-fields-spike.md (design, C2 work list, choices
-made without asking). Next: C2, at Bobby's checkpoint on the spike.
+made without asking). Bobby: fine, go. C2 done (core/userfields.py, tests/test_user_fields.py);
+found while building it: and/or/not/if-else refused (they fail on arrays: & | ~ and where);
+numbers bound as hidden float64 names (Python's float power raises on overflow); only
+definitions a run bound are recorded (a shadowing one is not); the series cache key
+includes the definition chain. Limit: a session from someone else opens its adopted
+fields in the figure, but the viewer's own menus only show them after a page reload.
+Next: C3 (the user page and the repo-level derived-field checklist).
 
 ## Goal
 

@@ -225,13 +225,22 @@ def _read(v, stag, k, j0, j1, i0, i1, ndim):
 _DEFS = {}
 
 
-def _field_def(name, avail, model=None):
-    key = (name, frozenset(avail), model)
+def _field_def(name, avail, model=None, user=None):
+    """The derived FieldDef `name` of a run with fields `avail` of data type `model`;
+    user: Fields.user_task() when it is a user-defined field (core.userfields)."""
+    import json
+    key = (name, frozenset(avail), model,
+           json.dumps(user, sort_keys=True, default=str) if user else None)
     if key not in _DEFS:
         from .catalog import of_model
         from .fields import _make_fields
-        _DEFS[key] = next((d for d in _make_fields(set(avail), of_model(model))
-                           if d.name == name), None)
+        cat = of_model(model)
+        defs = _make_fields(set(avail), cat)
+        if user:
+            from . import userfields
+            defs = defs + userfields.bind(user["defs"], set(avail), cat, defs,
+                                          user["scales"], user["ndims"])[0]
+        _DEFS[key] = next((d for d in defs if d.name == name), None)
     return _DEFS[key]
 
 
@@ -263,7 +272,8 @@ def _worker(task):
         with open_source(task["src"]) as d:
             name, info = task["field"], task["natives"]
             op = task.get("op", "")
-            fdef = None if name in info else _field_def(name, task["avail"], task.get("model"))
+            fdef = None if name in info else _field_def(name, task["avail"], task.get("model"),
+                                                        task.get("user"))
             if fdef is None and name not in info:
                 return dict(t=t, error=f"unknown field {name}")
             deps = [name] if fdef is None else list(fdef.natives)
@@ -512,6 +522,10 @@ def _cache_path(run, recipe):
     key = [run.path, recipe]
     if split_deriv(recipe["field"])[1] in COSTLY:  # (its values depend on the stride)
         key.append(column_stride(run))
+    from .userfields import chain_digest
+    user = chain_digest(split_deriv(recipe["field"])[1])
+    if user:  # (a user field: its definition, which the user may change)
+        key.append(user)
     key = hashlib.sha1(json.dumps(key, sort_keys=True).encode())
     return os.path.join(cache_dir(), key.hexdigest()[:20] + ".nc")
 
@@ -635,6 +649,7 @@ def compute(run, F, recipe, ds, centers=None, storm=None, on_result=None, cancel
         ks_c, dz_c = b.levels(run.z, run.zf)
         column = (ks_c, dz_c, run.z[ks_c], layer_top(b, run))
     ctx = dict(F.ctx)
+    user = F.user_task() if b.user is not None else None  # (the worker binds it itself)
     skipped, tasks = {}, []
     vmode = recipe["vmode"] if d.ndim == 3 else "2d"
     weights = run.level_weights(recipe["z"]) if vmode == "height" else None
@@ -669,7 +684,7 @@ def compute(run, F, recipe, ds, centers=None, storm=None, on_result=None, cancel
             zlev=None if ks is None else run.z[ks], xh=run.xh[i0:i1], yh=run.yh[j0:j1],
             xe=run.xh[e0:e1], ye=run.yh[f0:f1], zfull=np.asarray(run.z),
             column=column, stride=column_stride(run) if b.costly else 1, ni=run.ni,
-            nj=run.nj, center=cen, **terrain))
+            nj=run.nj, center=cen, user=user, **terrain))
     total, done = len(tasks), 0
     if not tasks:
         return ds, skipped

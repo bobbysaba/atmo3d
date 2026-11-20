@@ -319,6 +319,30 @@ def _renamed(v, table):
     return at + deriv_name(op, table[base]) if base in table else v
 
 
+def field_names_in(obj):
+    """The fields a saved session or figure (JSON: dicts and lists) names under
+    FIELD_KEYS, as base names (a derivative's or a parcel field's own field)."""
+    from .fields import split_deriv
+    out = set()
+
+    def add(v):
+        out.add(split_deriv(v[1:] if v.startswith("@") else v)[1])
+
+    if isinstance(obj, dict):
+        for k, v in obj.items():
+            if k in FIELD_KEYS and isinstance(v, str):
+                add(v)
+            elif k in FIELD_KEYS and isinstance(v, list) and all(isinstance(x, str) for x in v):
+                for x in v:
+                    add(x)
+            else:
+                out |= field_names_in(v)
+    elif isinstance(obj, list):
+        for v in obj:
+            out |= field_names_in(v)
+    return out
+
+
 def rename_fields(obj, table):
     """Rename, in place, the fields of a saved session or figure (JSON: dicts and
     lists) by table {old: new}, under FIELD_KEYS only.  The number renamed."""
