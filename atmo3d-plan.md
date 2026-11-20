@@ -338,11 +338,17 @@ and 3D, and regrid with confirmed settings. **CHECKPOINT** after steps 1, 3, and
 
 ## 7. Open items
 
-- Receiver locations for the bistatic geometry: decided 2026-11-20 (Bobby): one receiver,
-  at the NWC, today; keep the code open to more receivers later (do not hardcode one).
-- `w` (decided 2026-11-20, Bobby): real in the `w` files. A dual-Doppler `w` can be derived
-  wherever there are at least two radars, poles or receivers. (Phase 4: `w` is nonzero in
-  files 1-18; `w_direct` is zero in all 19. See `docs-dev/radar-spike.md`.)
+- Receivers (decided 2026-11-20, Bobby): one receiver, at the NWC, today; more later.
+  Done: the reader takes every (time, range) field, and the radar catalog describes the
+  receiver network's fields by rule (`<quantity>_<site>`: `atmo3d_radar.catalog.
+  receiver_field`), so a second receiver's fields are labelled "(SITE)", grouped and
+  listed like the NWC's; `tests/test_radar_receivers.py` adds a second receiver to the
+  synthetic volumes. Not in the files, so not handled: receiver positions (atmo3d draws
+  monostatic beam geometry only).
+- `w` (Bobby, 2026-11-20): already derived in the files (`w`; with two or more receivers
+  it comes from the dual-Doppler retrieval); atmo3d never derives it, only shows it.
+  (Phase 4: `w` is nonzero in files 1-18; `w_direct` is zero in all 19. See
+  `docs-dev/radar-spike.md`.)
 - Depth of the upgrade path (figures only, or sessions too). Plan assumes both.
 - Whether the radar collaborators get write access or work through forks and PRs
   (Phase 5 sets up CODEOWNERS either way).

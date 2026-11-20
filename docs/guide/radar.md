@@ -27,7 +27,9 @@ The picker lists the folder as *N volumes*. Times are the files' times, in UTC.
   box. Points the sweeps do not cover are left empty.
 - **Fields** are the files' own, in groups: *Moments* (reflectivity, radial velocity, ZDR,
   ρhv, spectrum width), *Bistatic*, *Retrieved winds* (`u`, `v`, `w`) and *Bistatic QC*
-  (shown as the files give them; their meanings are not yet confirmed). Wind speed is derived
+  (shown as the files give them; their meanings are not yet confirmed). Each receiver's
+  bistatic fields carry its site as a suffix in the file (`beta_nwc`), and show it in the
+  field's name ("Bistatic velocity (NWC)"): a file with more receivers lists each one's. Wind speed is derived
   from the retrieved `u` and `v`.
 
 Off on a native radar run: Series and Distribution, 3D vectors and streamlines, the Figure

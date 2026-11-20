@@ -83,7 +83,7 @@ class Catalog:
     def __init__(self, key, natives, roles, also=None, turbulence=(), extra_groups=None,
                  renamed=None, describe=None, file_first=(), other=(), other_groups=(),
                  other_if=None, hidden=(), unknown_hidden=False, kappa=None,
-                 condensate=()):
+                 condensate=(), other_match=None):
         unknown = (set(roles) | set(also or {})) - set(ROLES)
         if unknown:
             raise ValueError(f"unknown roles {sorted(unknown)} (see core.catalog.ROLES)")
@@ -106,6 +106,9 @@ class Catalog:
         # lists the file's, not the derived one
         self.file_first = frozenset(file_first)
         self.other, self.other_groups = frozenset(other), frozenset(other_groups)
+        # other_match(name): whether a field named by a pattern goes under Other (as
+        # `other` does the fields named one by one)
+        self.other_match = other_match
         self.other_if = dict(other_if or {})
         self.hidden, self.unknown_hidden = frozenset(hidden), bool(unknown_hidden)
         # kappa: Rd/cp of the model's own θ definition, to get T back from θ exactly
@@ -158,7 +161,8 @@ class Catalog:
                 (self._describe is None or self._describe(name) is None):
             return "hidden"
         if name in self.other or group in self.other_groups or \
-                self.other_if.get(name, "\0") in names:
+                self.other_if.get(name, "\0") in names or \
+                (self.other_match is not None and self.other_match(name)):
             return "other"
         return "main"
 
