@@ -1,5 +1,6 @@
-"""Data access for model output: the model-neutral Run, and CM1Run (a directory of CM1
-netCDF output, one time per file).  Other models' readers subclass Run (core.models).
+"""Data access for model output: Source (what every data type's reader shares) and
+Run(Source), the regular-grid reader CM1's and WoFS's subclass (core.models).  A data
+type with another geometry (radar: native polar volumes) subclasses Source.
 
 Everything returned from here is on the scalar (xh, yh, z) grid: staggered
 fields (u, v, w, ...) are averaged onto scalar points on read.
@@ -555,21 +556,22 @@ class VarInfo:
         return f"VarInfo({self.name}, {self.ndim}D, stag={self.stag})"
 
 
-class Run:
-    """Output of one model run: times, a grid and fields, read one time at a time.
+class Source:
+    """What every data type's reader shares, whatever its geometry: times, fields,
+    the field catalog and capabilities, the cache of whole fields, open files.
 
-    Everything model-neutral lives here (the 3D cache, reader processes, level and
-    height reads, columns, mean profiles).  A model's reader (a subclass) finds the
-    files and sets, before calling _grid_done():
+    A data type's reader (a subclass: Run for regular grids, a radar's PolarRun for
+    native polar volumes) finds the files and sets, besides what the subclass needs:
       path    the run's folder (also the cache key and where exports go)
       files   one output file per time (their stat says when a time changed)
-      times   simulation time (s) of each time index
-      xh, yh  scalar-point x, y (km); z, zf scalar and staggered heights (km)
-      vars    {name: VarInfo} of the fields in the files, by atmo3d's names
+      times   seconds of each time index since the first
+      vars    {name: VarInfo} of the fields in the files, by the data type's names
       var_times  {name: frozenset of time indices} for fields only at some times
-      attrs   global attributes; nml the run's namelist ({} if none)
-      umove, vmove  grid motion (m/s) added to the winds for ground-relative ones
-    and may override source(t) (what reader processes open for time t)."""
+      attrs   global attributes
+    and may override source(t) (what reader processes open for time t).  volume(name,
+    t) is the field's native array at time t, whatever its shape; the four neutral
+    facts (extent, ztop, size_label, field_bytes) describe the run to the viewer
+    without naming a grid."""
 
     model = None  # key in core.models.MODELS
     model_label = "model"
@@ -607,13 +609,13 @@ class Run:
         # f varies maps the fcor role instead (WoFS: F).  0: none
         self.fcor = 0.0
         # fields computed here (not in the files), consulted before the files:
-        # (name, t) -> float32 (nk, nj, ni); never evicted by the cache
+        # (name, t) -> float32 native array (Run: nk, nj, ni); never evicted by the cache
         self.extra = OrderedDict()
         self._writing = set()  # times whose file is being written: no reads meanwhile
         # output files left out because the model is still writing them (newest last)
         self.busy = []
 
-        # full 3D volumes (float32, nk x nj x ni), possibly shared with other runs
+        # whole native fields (float32; Run: nk x nj x ni), possibly shared with other runs
         self._vc = cache if cache is not None else VolumeCache(cache_gb)
         self._cache_lock = threading.Lock()  # guards self.extra
         self._inflight = {}  # (name, t) -> Event: being read by some job right now
@@ -626,12 +628,6 @@ class Run:
         self._pool_uses = 0  # times this run went to the reader processes
         self._means = {}  # (name, tindex) -> domain-mean profile (nk,)
         self._shm = "/dev/shm" if os.path.isdir("/dev/shm") else None
-
-    def _grid_done(self):
-        """Sizes and spacing from xh, yh, z (call once they are set)."""
-        self.ni, self.nj, self.nk = len(self.xh), len(self.yh), len(self.z)
-        self.dx = float(np.mean(np.diff(self.xh))) * 1000.0  # m
-        self.dy = float(np.mean(np.diff(self.yh))) * 1000.0
 
     # ------------------------------------------------------------------ meta
     @property
@@ -727,6 +723,105 @@ class Run:
         names = set(names)
         self._vc.drop(lambda k: k[0] == self.path and k[2] == t
                       and (k[1] in names or k[1].split("@")[0].lstrip("~") in names))
+
+    def fits(self, nbytes):
+        """Whether volumes of nbytes together belong in the 3D cache: within 1 /
+        FIT_SHARE of its budget.  A larger request reads only the part of each field
+        it needs (read_levels with rows and columns, reduce_levels)."""
+        return nbytes <= self.cache_bytes // FIT_SHARE
+
+    def _insert(self, name, t, vol, protect=()):
+        self._vc.put((self.path, name, t), vol, {(self.path, n, t) for n in protect})
+
+    def cache_info(self):
+        """(GB used, GB budget, fields) of the 3D cache (shared by the open runs)."""
+        used, n = self._vc.info()
+        return used / 1024**3, self.cache_bytes / 1024**3, n
+
+    def clear_cache(self):
+        """Free this run's cached volumes."""
+        self._vc.drop(lambda k: k[0] == self.path)
+
+    def trim_cache(self, nbytes):
+        """Evict least-recently-used cached volumes (of any run) until `nbytes` are
+        freed (or the cache is empty).  Returns the bytes freed."""
+        return self._vc.trim(nbytes)
+
+    # ------------------------------------------------------------------ neutral facts
+    def _read_volume_local(self, name, t):
+        """A field's native array at time t, read in this process (a subclass's)."""
+        raise NotImplementedError
+
+    def volume(self, name, t):
+        """The native array of a field at time t (cached)."""
+        vol = self.cached(name, t)
+        if vol is None:
+            self._check(name, t)
+            self._not_writing(t)
+            vol = self._read_volume_local(name, t)
+            self._insert(name, t, vol)
+        return vol
+
+    @property
+    def extent(self):
+        """(x0, x1, y0, y1) km: the horizontal box the data covers."""
+        raise NotImplementedError
+
+    @property
+    def ztop(self):
+        """Top of the data (km above the run's height reference)."""
+        raise NotImplementedError
+
+    @property
+    def size_label(self):
+        """The size of one 3D field in words, for run details (e.g. "200 × 200 × 80")."""
+        raise NotImplementedError
+
+    @property
+    def field_bytes(self):
+        """Bytes of one 3D field at one time in memory (float32)."""
+        raise NotImplementedError
+
+
+class Run(Source):
+    """Output of one model run on a regular grid: times, a grid and fields, read one
+    time at a time.
+
+    What only a grid needs lives here (reader processes, level and height reads,
+    columns, mean profiles); the rest is Source's.  A model's reader (a subclass)
+    finds the files and sets, before calling _grid_done():
+      path    the run's folder (also the cache key and where exports go)
+      files   one output file per time (their stat says when a time changed)
+      times   simulation time (s) of each time index
+      xh, yh  scalar-point x, y (km); z, zf scalar and staggered heights (km)
+      vars    {name: VarInfo} of the fields in the files, by atmo3d's names
+      var_times  {name: frozenset of time indices} for fields only at some times
+      attrs   global attributes; nml the run's namelist ({} if none)
+      umove, vmove  grid motion (m/s) added to the winds for ground-relative ones
+    and may override source(t) (what reader processes open for time t)."""
+
+    def _grid_done(self):
+        """Sizes and spacing from xh, yh, z (call once they are set)."""
+        self.ni, self.nj, self.nk = len(self.xh), len(self.yh), len(self.z)
+        self.dx = float(np.mean(np.diff(self.xh))) * 1000.0  # m
+        self.dy = float(np.mean(np.diff(self.yh))) * 1000.0
+
+    # ------------------------------------------------------------------ neutral facts
+    @property
+    def extent(self):
+        return float(self.xh[0]), float(self.xh[-1]), float(self.yh[0]), float(self.yh[-1])
+
+    @property
+    def ztop(self):
+        return float(self.z[-1])
+
+    @property
+    def size_label(self):
+        return f"{self.ni} × {self.nj} × {self.nk}"
+
+    @property
+    def field_bytes(self):
+        return 4 * self.ni * self.nj * self.nk
 
     def read_level(self, name, t, k=0):
         """One horizontal level of a native field (2D fields ignore k)."""
@@ -1028,11 +1123,6 @@ class Run:
                 fut.cancel()
             sv.discard()
 
-    def fits(self, nbytes):
-        """Whether volumes of nbytes together belong in the 3D cache: within 1 /
-        FIT_SHARE of its budget.  A larger request reads only the part of each field
-        it needs (read_levels with rows and columns, reduce_levels)."""
-        return nbytes <= self.cache_bytes // FIT_SHARE
 
     def read_box(self, name, t, i0, i1, j0, j1):
         """Columns [j0:j1, i0:i1] of a 3D field without populating the cache.  With
@@ -1060,9 +1150,6 @@ class Run:
         with ThreadPoolExecutor(len(names)) as ex:  # (each just waits on its process)
             futs = {n: ex.submit(self.read_box, n, t, i0, i1, j0, j1) for n in names}
             return {n: f.result() for n, f in futs.items()}
-
-    def _insert(self, name, t, vol, protect=()):
-        self._vc.put((self.path, name, t), vol, {(self.path, n, t) for n in protect})
 
     def _read_volume_local(self, name, t):
         info = self.vars[name]
@@ -1253,20 +1340,6 @@ class Run:
         return out
 
     # ------------------------------------------------------------------ misc
-    def cache_info(self):
-        """(GB used, GB budget, fields) of the 3D cache (shared by the open runs)."""
-        used, n = self._vc.info()
-        return used / 1024**3, self.cache_bytes / 1024**3, n
-
-    def clear_cache(self):
-        """Free this run's cached volumes."""
-        self._vc.drop(lambda k: k[0] == self.path)
-
-    def trim_cache(self, nbytes):
-        """Evict least-recently-used cached volumes (of any run) until `nbytes` are
-        freed (or the cache is empty).  Returns the bytes freed."""
-        return self._vc.trim(nbytes)
-
     def ij(self, x, y):
         """Nearest scalar-grid indices for a position in km."""
         i = int(np.clip(np.rint((x - self.xh[0]) * 1000.0 / self.dx), 0, self.ni - 1))
