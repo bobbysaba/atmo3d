@@ -74,7 +74,7 @@ def need_gb(run, parallel):
 
 def can_compute(run):
     sp = script()
-    if run.model != "cm1" or sp is None or not all(run.has(n) for n in NEEDS):
+    if not run.offers("pdecomp") or sp is None or not all(run.has(n) for n in NEEDS):
         return False
     if not new_interface(sp):  # pdecomp_solver.py's interface: what it reads
         return all(run.has(n) for n in ("pi", "rho", "prs")) and \

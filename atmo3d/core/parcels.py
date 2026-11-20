@@ -108,7 +108,10 @@ _open = {}  # run path -> ParcelFile
 def offered(run):
     """Whether the run has parcels to choose: parcel output files, or (a model that
     writes none: run.traced_parcels) trajectories atmo3d traces itself, which may be
-    turned off for the run (trajcalc.off says why; for_run is then None)."""
+    turned off for the run (trajcalc.off says why; for_run is then None).  None of it
+    for a data type that does not offer parcels (core.capabilities)."""
+    if not run.offers("parcels"):
+        return False
     return getattr(run, "traced_parcels", False) or bool(find_files(run.path))
 
 
@@ -117,7 +120,9 @@ def for_run(run, fields=None):
     A run whose model writes no parcels (run.traced_parcels) gets trajectories traced
     through its 3D winds (trajcalc.Traced) unless they are turned off for it
     (trajcalc.off).  fields: the run's Fields (for "@<field>" variables; made when first
-    needed if not given)."""
+    needed if not given).  None for a data type that does not offer parcels."""
+    if not run.offers("parcels"):
+        return None
     traced = getattr(run, "traced_parcels", False)
     files = [] if traced else find_files(run.path)
     if traced:

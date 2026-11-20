@@ -444,6 +444,9 @@ class WoFSRun(Run):
 
     model = "wofs"
     model_label = "WoFS"
+    # (no pdecomp: CM1's method; no parcels, Bobby 2026-11-19: the traced trajectories
+    # of core.trajcalc are not offered for WoFS)
+    OFFERS = frozenset({"soundings", "tracking"})
     terrain = True
     traced_parcels = True  # (WoFS has no parcel output: core.trajcalc)
     storm_relative = False  # (how to get the storm motion is still to be decided)

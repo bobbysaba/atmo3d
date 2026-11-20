@@ -573,6 +573,9 @@ class Run:
 
     model = None  # key in core.models.MODELS
     model_label = "model"
+    # the features this data type offers (core.capabilities.CAPS keys, besides the four
+    # flags below); ask run.can(name) / run.offers(name), not this set
+    OFFERS = frozenset()
     # levels that follow the terrain, their heights varying in space and time (heights());
     # z, zf are then one representative profile.  False: flat, z and zf everywhere.
     terrain = False
@@ -639,6 +642,16 @@ class Run:
     def time_label(self, t):
         s = int(round(self.times[t]))
         return f"{s // 3600:d}:{(s % 3600) // 60:02d}:{s % 60:02d}"
+
+    def offers(self, cap):
+        """Whether this data type offers capability `cap` (core.capabilities.CAPS)."""
+        from . import capabilities
+        return capabilities.offers(self, cap)
+
+    def can(self, cap):
+        """Whether this data type offers `cap` and this run has what it needs."""
+        from . import capabilities
+        return capabilities.can(self, cap)
 
     def has(self, name):
         return name in self.vars
@@ -1355,6 +1368,7 @@ class CM1Run(Run):
 
     model = "cm1"
     model_label = "CM1"
+    OFFERS = frozenset({"soundings", "parcels", "pdecomp", "tracking"})
 
     def __init__(self, path, cache_gb=12.0, workers=None, cache=None):
         super().__init__(path, cache_gb, workers, cache)

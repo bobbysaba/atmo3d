@@ -627,7 +627,7 @@ def sounding_column(run, entry, fixes, progress=None, storm=("rm", (0.0, 0.0))):
     w = entry["where"]
     kind = w.get("kind", "trk")
     # (a terrain run's columns: on their own heights above ground)
-    snd = run.catalog.sounding_names()
+    snd = run.catalog.sounding_names() if run.offers("soundings") else None
     if snd is None:
         return "this run has no sounding fields (potential temperature, pressure, vapor, winds)"
     names = snd + (("zagl",) if run.terrain else ())

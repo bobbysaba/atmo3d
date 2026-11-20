@@ -19,7 +19,7 @@ edits the file itself). They are saved in `~/.config/atmo3d/config.toml`
 | `track_motion_window` | auto | minutes of track a storm motion is fitted over (0: centred differences; auto: 0 for CM1, 30 for WoFS) |
 | `output_glob` | `cm1out_[0-9]*.nc` | which files are CM1 output |
 | `parcel_glob` | `cm1out_pdata*.nc` | which files hold parcel (trajectory) output; several are joined by time |
-| `traj_max_interval` | `300` | runs without parcel output (WoFS) get trajectories traced through the 3D winds; turned off when the output comes less often than this many seconds (0: never) |
+| `traj_max_interval` | `300` | runs without parcel output get trajectories traced through the 3D winds (no data type uses this now: WoFS has no parcels); turned off when the output comes less often than this many seconds (0: never) |
 | `settle_seconds` | `60` | a run still going opens without the file being written: the newest file is left out while it changed within this many seconds or will not open (0: only files that will not open); Reload run adds files finished since |
 | `allow_writes_to_output` | off | lets the pressure decomposition write into output files |
 | `show_hidden_fields` | off | lists the hidden fields (WoFS's static, land-surface, radiation and time-step fields, and WRF fields atmo3d does not know) under "Hidden" at the end of the field lists |

@@ -521,6 +521,8 @@ def test_traced_trajectories(wofs_root, tmp_path, monkeypatch):
     off when the output is less often than the setting."""
     from atmo3d.core import parcels as P, trajcalc, volume3d
     monkeypatch.setattr(P, "CACHE_DIR", str(tmp_path / "parcels"))
+    # (WoFS does not offer parcels; the traced trajectories stay tested on its terrain)
+    monkeypatch.setattr(wofs.WoFSRun, "OFFERS", wofs.WoFSRun.OFFERS | {"parcels"})
     monkeypatch.delenv("ATMO3D_TRAJ_MAX_INTERVAL", raising=False)
     run = models.open_run(os.path.join(wofs_root, "mem02"), workers=1)
     F = Fields(run)
@@ -557,6 +559,8 @@ def test_traced_trajectories_read_in_parts(wofs_root, tmp_path, monkeypatch):
     from atmo3d.core import fields as fmod, parcels as P, trajcalc
     from test_parcels import _spy_parts
     monkeypatch.setattr(P, "CACHE_DIR", str(tmp_path / "parcels"))
+    # (WoFS does not offer parcels; the traced trajectories stay tested on its terrain)
+    monkeypatch.setattr(wofs.WoFSRun, "OFFERS", wofs.WoFSRun.OFFERS | {"parcels"})
     path = os.path.join(wofs_root, "mem02")
     ref, run = models.open_run(path, workers=1), models.open_run(path, workers=1)
     monkeypatch.setattr(run, "fits", lambda nbytes: False)
@@ -660,6 +664,8 @@ def test_mean_series_and_trajectories(wofs_root, tmp_path, monkeypatch):
     from atmo3d.core import parcels as P, series as ser, trajcalc
     monkeypatch.setattr(ser, "store", lambda *a, **k: None)
     monkeypatch.setattr(P, "CACHE_DIR", str(tmp_path / "parcels"))
+    # (WoFS does not offer parcels; the traced trajectories stay tested on its terrain)
+    monkeypatch.setattr(wofs.WoFSRun, "OFFERS", wofs.WoFSRun.OFFERS | {"parcels"})
     monkeypatch.setenv("ATMO3D_TRAJ_MAX_INTERVAL", "0")
     run = models.open_run(os.path.join(wofs_root, "mean"), workers=1)
     m2 = models.open_run(os.path.join(wofs_root, "mem02"), workers=1)

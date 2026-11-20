@@ -122,16 +122,8 @@ point by point. WoFS has no separate base-state profile, so this is the closest 
 
 ## Trajectories
 
-WoFS writes no parcel files, so atmo3d **traces** trajectories itself, through the 3D winds
-of the run: a lattice of parcels seeded at the first time, carried by the grid-relative winds
-with the true heights of each column, and kept at the output times. The result is stored in the
-cache folder and reused, so each run is traced once. They then appear everywhere CM1 parcels do
-([Parcels](parcels.md)).
-
-Tracing needs outputs close together: between outputs far apart the winds' blend is a poor
-guess. The `traj_max_interval` [setting](../settings.md) (default 300 s) says how long an
-output interval is still accepted; a run whose output comes less often gets no trajectories,
-and the Parcels tool says why. Set it to 0 to never turn them off.
+WoFS writes no parcel files, and atmo3d offers no parcels for WoFS runs: the Parcels tool
+is not on the rail.
 
 ## On the map
 

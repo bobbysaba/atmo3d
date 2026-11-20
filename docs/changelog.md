@@ -5,6 +5,10 @@ has a matching git tag.
 
 ## Unreleased
 
+### WoFS: no parcels
+- WoFS runs no longer offer parcels: the Parcels tool is gone from their rail, and no
+  trajectories are traced through their winds.
+
 ### Derived fields: audited, documented
 - Every derived field's equation was reviewed (Phase 2b). A new **Derived fields** page
   in the guide lists each one: the equation as coded, units, sign, inputs and what it
