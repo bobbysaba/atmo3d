@@ -10,9 +10,10 @@ import numpy as np
 import pytest
 
 from atmo3d import config, registry
-from atmo3d.core import models, wofs
+from atmo3d.core import models
+from atmo3d_wofs import run as wofs
 from atmo3d.core.fields import Fields
-from atmo3d.demo_wofs import PROJ
+from atmo3d_wofs.demo import PROJ
 from conftest import txt
 
 NI, NJ, NK, NC = 8, 6, 5, 3  # mass points, levels, cycles (every 3 minutes)
@@ -694,7 +695,8 @@ def test_registry_and_figures_open_the_mean(wofs_root):
 def test_demo_ensemble(tmp_path):
     """The synthetic demo (atmo3d --demo wofs): found as a root, opens, has terrain, and a
     storm that shows in reflectivity and updraft helicity; the mean differs from a member."""
-    from atmo3d import demo, demo_wofs
+    from atmo3d import demo
+    from atmo3d_wofs import demo as demo_wofs
     root = demo_wofs.make(str(tmp_path))
     assert demo_wofs.make(str(tmp_path)) == root  # (up to date: not rewritten)
     assert wofs.members(root) == [1, 2, 3]

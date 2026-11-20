@@ -1,7 +1,7 @@
 """Every field a WoFS WRF file holds, and how each one shows (WRF's own names).
 
 Taken from a WoFS member's wrfout_d01 (DART-cycled WRF, 2022).  The reader lists every
-2D or 3D field a file has (core.wofs.table), so a field another WoFS version writes is
+2D or 3D field a file has (atmo3d_wofs.run.table), so a field another WoFS version writes is
 listed too: core.catalog.tidy gives it a label and units from the file's description.
 
 OUTPUTS = {name: (label, units, scale, cmap, range, diverging, group)}, as
@@ -25,7 +25,7 @@ def _signed(label, units="", scale=1, vr=None, group=SFC, cmap=DIV):
 
 OUTPUTS = {
     # ---- 3D (fields the reader makes: THETA = T + 300, PRES = P + PB, the base
-    # state at the first time, heights from the geopotential: core.wofs)
+    # state at the first time, heights from the geopotential: atmo3d_wofs.run)
     # (WRF's T is θ − 300 K: "perturbation potential temperature (theta-t0)", K;
     # PRES: P "perturbation pressure" + PB "BASE STATE PRESSURE", both Pa)
     "THETA": _f("Potential temperature", "K", 1, "cmo.thermal", group=TH),

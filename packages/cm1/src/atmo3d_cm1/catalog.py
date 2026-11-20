@@ -1,10 +1,11 @@
 """CM1's field catalog (core.catalog): its output's names and how they show."""
 
-from .catalog import Catalog, register
-from .cm1_outputs import OUTPUTS, describe
+from atmo3d.core.catalog import Catalog, register
+
+from .outputs import OUTPUTS, describe
 
 # display defaults (label, units, scale, cmap, range, diverging, group): every field
-# CM1 can write (core.cm1_outputs), and the pressure decomposition atmo3d computes
+# CM1 can write (atmo3d_cm1.outputs), and the pressure decomposition atmo3d computes
 NATIVES = {
     **OUTPUTS,
     # pressure decomposition, CM1's method (from the files, or computed: atmo3d.pdecomp)

@@ -10,13 +10,14 @@ import numpy as np
 
 from atmo3d.core import pool
 from atmo3d.core import run as R
+from atmo3d_cm1.run import CM1Run
 
 
 def test_runs_share_one_pool(demo_run):
     """Two runs read in the same processes, and what they read is what a read in this
     process gives; a pool is replaced only by a larger one."""
-    a = R.CM1Run(demo_run, cache_gb=1, workers=2)
-    b = R.CM1Run(demo_run, cache_gb=1, workers=2)
+    a = CM1Run(demo_run, cache_gb=1, workers=2)
+    b = CM1Run(demo_run, cache_gb=1, workers=2)
     assert a._get_pool() is b._get_pool()
     ex = pool.get(2)
     assert pool.get(1) is ex and pool.size() >= 2
@@ -41,7 +42,7 @@ def test_reader_keeps_files_open(demo_run, monkeypatch, tmp_path):
     that changed anew, and close_kept() closes them; elsewhere it closes at once."""
     import shutil
     files = []
-    for i, f in enumerate(R.CM1Run(demo_run, workers=1).files[:3]):
+    for i, f in enumerate(CM1Run(demo_run, workers=1).files[:3]):
         files.append(shutil.copy(f, tmp_path / f"f{i}.nc"))
     with R.opened(files[0]) as d:
         pass
@@ -105,7 +106,7 @@ def test_spread_keeps_to_its_width():
 
 def test_scan_in_readers_matches(demo_run, monkeypatch):
     """The first scan of a run's files gives the same shared out over the readers."""
-    files = R.CM1Run(demo_run, workers=1).files
+    files = CM1Run(demo_run, workers=1).files
     here = R.scan_files(files, 1)
     monkeypatch.setattr(R, "SCAN_POOL", 1)
     assert R.scan_files(files, 2) == here
@@ -149,7 +150,7 @@ def test_ahead_keeps_order_and_width(demo_run):
     except ZeroDivisionError:
         pass
 
-    run = R.CM1Run(demo_run, cache_gb=1, workers=2)
+    run = CM1Run(demo_run, cache_gb=1, workers=2)
     assert R.ahead_width(SimpleNamespace()) == 0 and R.ahead_width(run) == 2
     assert R.ahead_width(run, 10**12) == 1 and R.ahead_width(run, 0, cap=1) == 1
 
@@ -186,7 +187,7 @@ def test_tracking_ahead_matches_in_turn(reg, monkeypatch):
 def test_close_stops_the_readers_and_the_next_read_starts_new(demo_run):
     """pool.close() (a program about to end) leaves no pool; a read after it starts
     another and gives the same values."""
-    run = R.CM1Run(demo_run, cache_gb=1, workers=2)
+    run = CM1Run(demo_run, cache_gb=1, workers=2)
     assert run.load_volumes(["th", "w"], 2)
     old = pool.get(2)
     pool.close()

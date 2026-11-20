@@ -20,7 +20,21 @@ import hashlib
 import os
 import shutil
 
-DATA = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "demo_data")
+
+
+def _data_dir():
+    """demo_data/ at the top of a source checkout (a few folders above this file), or the
+    place it would be (a pip install does not ship it)."""
+    here = os.path.dirname(os.path.abspath(__file__))
+    d = here
+    for _ in range(5):
+        d = os.path.dirname(d)
+        if os.path.isdir(os.path.join(d, "demo_data")):
+            return os.path.join(d, "demo_data")
+    return os.path.join(here, "demo_data")
+
+
+DATA = _data_dir()
 RUN = "supercell"
 STAMP = ".atmo3d-demo"
 REPO = "https://github.com/bobbysaba/atmo3d"
@@ -75,10 +89,10 @@ def make(root, force=False):
 
 def is_demo(run_path):
     """A demo run: this one (its stamp file is one folder up), a synthetic test run
-    (tests/synthetic.py: two folders up), or the WoFS demo's."""
+    (tests/synthetic.py: two folders up), or one a data type wrote (Model.is_demo)."""
     run = os.path.abspath(run_path)
     for root in (os.path.dirname(run), os.path.dirname(os.path.dirname(run))):
         if os.path.exists(os.path.join(root, STAMP)):
             return True
-    from . import demo_wofs
-    return demo_wofs.is_demo(run_path)
+    from .core import models
+    return any(m.is_demo(run_path) for m in models.MODELS.values())

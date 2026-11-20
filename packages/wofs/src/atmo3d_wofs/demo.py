@@ -1,4 +1,4 @@
-"""Synthetic WoFS output for demos and tests:  python -m atmo3d.demo_wofs OUTDIR
+"""Synthetic WoFS output for demos and tests:  python -m atmo3d_wofs.demo OUTDIR
 
 Writes a small ensemble in WoFS's layout under OUTDIR/wofs/: one folder per cycle
 (YYYYMMDDHHMM, five minutes apart), each with one wrfout_d01_<time>_<member> file for
@@ -104,7 +104,7 @@ def fields(member, c):
 
 def latlon():
     """XLAT, XLONG of the mass points (degrees, NJ x NI)."""
-    from .core import geo
+    from atmo3d.core import geo
     xh = (np.arange(NI) - (NI - 1) / 2) * DX / 1000.0
     yh = (np.arange(NJ) - (NJ - 1) / 2) * DX / 1000.0
     g = geo.from_wrf(PROJ, xh, yh)
@@ -187,7 +187,7 @@ def is_demo(run_path):
 
 
 def main(argv=None):
-    ap = argparse.ArgumentParser(prog="python -m atmo3d.demo_wofs", description=__doc__,
+    ap = argparse.ArgumentParser(prog="python -m atmo3d_wofs.demo", description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("outdir", help="folder to write wofs/ into")
     ap.add_argument("--force", action="store_true", help="rewrite even if up to date")

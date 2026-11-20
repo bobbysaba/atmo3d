@@ -1,10 +1,11 @@
-"""The field tables (core.cm1_outputs, core.wofs_outputs) and the catalog's look for
+"""The field tables (atmo3d_cm1.outputs, atmo3d_wofs.outputs) and the catalog's look for
 fields no table names (Phase 2b, step 1)."""
 
 import pytest
 
 from atmo3d.core import catalog as C
-from atmo3d.core import cm1_outputs, wofs_outputs
+from atmo3d_cm1 import outputs as cm1_outputs
+from atmo3d_wofs import outputs as wofs_outputs
 from atmo3d.core.fields import CMAPS, GROUP_ORDER
 
 

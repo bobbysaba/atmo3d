@@ -5,7 +5,7 @@ format 1; figures as the editor holds them, a plan figure and a time-height one)
 the demo CM1 run and a synthetic WoFS run, with the run's path replaced by @RUN@ and
 track files left out.  Then, WoFS's fields were renamed to CM1's names on read
 (winterp, dbz, th, ...); now they keep their WRF names (W, REFL_10CM, THETA, ...), and
-loading maps the old names through core.wofs_catalog.OLD_NAMES.  CM1 files load
+loading maps the old names through atmo3d_wofs.catalog.OLD_NAMES.  CM1 files load
 unchanged."""
 import copy
 import json
@@ -14,7 +14,7 @@ import os
 import pytest
 
 from atmo3d.core.catalog import FIELD_KEYS, FIELD_NAMES, rename_fields, renames_for
-from atmo3d.core.wofs_catalog import OLD_NAMES
+from atmo3d_wofs.catalog import OLD_NAMES
 from atmo3d.figures import spec as fg
 from atmo3d.registry import Registry
 from atmo3d.viewer import session as ses

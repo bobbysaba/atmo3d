@@ -44,7 +44,7 @@ import numpy as np
 import shapefile
 
 Q = 1e4  # quantisation: points per degree
-OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "atmo3d", "data",
+OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "packages", "core", "src", "atmo3d", "data",
                    "boundaries.npz")
 
 

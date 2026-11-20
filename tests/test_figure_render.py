@@ -114,8 +114,9 @@ def test_render_module_needs_no_panel():
     code = ("import sys; import atmo3d.figures.render; "
             "sys.exit(int(any(m in sys.modules for m in ('panel', 'bokeh'))))")
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    env = dict(os.environ, PYTHONPATH=os.pathsep.join(p for p in sys.path if p))
     r = subprocess.run([sys.executable, "-c", code], cwd=root, capture_output=True,
-                       text=True, timeout=300)
+                       text=True, timeout=300, env=env)
     assert r.returncode == 0, r.stderr or "Panel or Bokeh imported"
 
 

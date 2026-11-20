@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "atmo3d-cm1"
+version = "0.6.0"
+description = "atmo3d data type: CM1 output"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [{ name = "Bobby Saba", email = "bobbysabawx@gmail.com" }]
+license = { text = "GPL-3.0-or-later" }
+dependencies = ["atmo3d-core", "netCDF4>=1.7", "numpy>=1.26"]
+
+[project.entry-points."atmo3d.datatypes"]
+cm1 = "atmo3d_cm1:register"
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -100,13 +100,13 @@ def provenance():
     if _PROVENANCE is None:
         import subprocess
         from ... import __version__
-        here = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        here = os.path.dirname(os.path.abspath(__file__))  # (git finds the checkout above)
         commit = ""
         try:
             git = ["git", "-C", here]
             commit = subprocess.run(git + ["rev-parse", "--short", "HEAD"], text=True,
                                     capture_output=True, timeout=10).stdout.strip()
-            if commit and subprocess.run(git + ["status", "--porcelain", "--", "."],
+            if commit and subprocess.run(git + ["status", "--porcelain"],
                                          text=True, capture_output=True,
                                          timeout=10).stdout.strip():
                 commit += "+changes"

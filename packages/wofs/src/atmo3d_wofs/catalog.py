@@ -1,14 +1,15 @@
 """WoFS's field catalog (core.catalog): WRF's own names.
 
-Two fields are sums the reader makes (core.wofs.SUMS), since WRF splits them:
+Two fields are sums the reader makes (atmo3d_wofs.run.SUMS), since WRF splits them:
 THETA = T + 300 (potential temperature) and PRES = P + PB (pressure).  The base state
-is each field at the member's first time: THETA0, PRES0, QVAPOR0, U0, V0 (core.wofs.BASE).
+is each field at the member's first time: THETA0, PRES0, QVAPOR0, U0, V0 (atmo3d_wofs.run.BASE).
 U, V, W are averaged onto the mass points on read."""
 
-from .catalog import Catalog, register
-from .wofs_outputs import OUTPUTS
+from atmo3d.core.catalog import Catalog, register
 
-# display defaults: every field of WoFS's files (core.wofs_outputs)
+from .outputs import OUTPUTS
+
+# display defaults: every field of WoFS's files (atmo3d_wofs.outputs)
 NATIVES = OUTPUTS
 
 ROLES = {

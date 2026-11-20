@@ -8,5 +8,12 @@ if ! python -c "import panel, netCDF4, metpy, numba, plotly" >/dev/null 2>&1; th
     echo "then run:  conda activate atmo3d" >&2
     exit 1
 fi
-export PYTHONPATH="$HERE${PYTHONPATH:+:$PYTHONPATH}"
+# the packages run from source; each must also be pip-installed once (editable) so atmo3d
+# finds the data types they register:
+#   pip install -e packages/core -e packages/cm1 -e packages/wofs
+if ! python -c "import atmo3d, atmo3d_cm1, atmo3d_wofs" >/dev/null 2>&1; then
+    echo "atmo3d: its packages are not installed. Once, in this environment, run:" >&2
+    echo "  pip install --no-deps -e $HERE/packages/core -e $HERE/packages/cm1 -e $HERE/packages/wofs" >&2
+    exit 1
+fi
 exec python -m atmo3d "$@"

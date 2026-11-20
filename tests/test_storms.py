@@ -132,8 +132,9 @@ def test_motion_window_follows_the_setting_and_the_run(window):
 
 
 def test_wofs_runs_fit_motion_over_30_min():
-    from atmo3d.core.run import CM1Run, Run
-    from atmo3d.core.wofs import WoFSRun
+    from atmo3d.core.run import Run
+    from atmo3d_cm1.run import CM1Run
+    from atmo3d_wofs.run import WoFSRun
     assert Run.track_window == 0.0 and CM1Run.track_window == 0.0
     assert WoFSRun.track_window == 1800.0
 

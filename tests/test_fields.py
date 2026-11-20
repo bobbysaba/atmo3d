@@ -381,10 +381,11 @@ def test_levels_read_together_match_single_levels(demo_run, monkeypatch):
     fields, levels out of order, a subset of the columns, a cached field; and
     read_heights what read_height gives."""
     from atmo3d.core import run as R
+    from atmo3d_cm1.run import CM1Run
     T, ks = 4, [3, 4, 5, 9, 2]
     names = ["th", "u", "v", "w"]
     rows, cols = np.array([0, 5, 6, 20]), np.array([1, 2, 30])
-    run = R.CM1Run(demo_run, cache_gb=1, workers=2)
+    run = CM1Run(demo_run, cache_gb=1, workers=2)
     ref = {n: np.stack([run.read_level(n, T, k) for k in ks]) for n in names}
     for least in (R.BLOCK_BYTES, 0):  # (read here; then in the reader processes)
         monkeypatch.setattr(R, "BLOCK_BYTES", least)
@@ -471,8 +472,9 @@ def test_parts_of_fields_match_their_volumes(reg, demo_run, monkeypatch):
     reads small enough to stay in this process, then in the reader processes."""
     from scipy.ndimage import map_coordinates
     from atmo3d.core import fields as FF, render, run as R
+    from atmo3d_cm1.run import CM1Run
     T, G = 2, reg.get()[1]
-    run = R.CM1Run(demo_run, cache_gb=1, workers=2)
+    run = CM1Run(demo_run, cache_gb=1, workers=2)
     F = FF.Fields(run)
     assert F.fits(["thetae", "ddz.zstretch"], T) and run.fits(run.cache_bytes // 2)
     monkeypatch.setattr(run, "fits", lambda nbytes: False)
@@ -522,8 +524,9 @@ def test_3d_scene_read_in_parts_matches(reg, demo_run, monkeypatch):
     isosurfaces and streamlines, and fields along a streamline are the whole-volume
     ones, and no volume enters the cache."""
     from atmo3d.core import fields as FF, run as R, volume3d
+    from atmo3d_cm1.run import CM1Run
     T, (ref, G) = 2, reg.get()
-    run = R.CM1Run(demo_run, cache_gb=1, workers=2)
+    run = CM1Run(demo_run, cache_gb=1, workers=2)
     F = FF.Fields(run)
     monkeypatch.setattr(run, "fits", lambda nbytes: False)
     for part in (FF.PART_BYTES, 1):  # (1: a field with gradients a band per stride)
@@ -577,8 +580,9 @@ def test_work_too_large_for_the_cache_matches(reg, demo_run, monkeypatch):
     """An azimuthal mean, a distribution and an export of fields that do not fit the
     3D cache are the ones made from their volumes."""
     from atmo3d.core import azim, dist, export, fields as FF, run as R
+    from atmo3d_cm1.run import CM1Run
     T, (ref, G) = 2, reg.get()
-    run = R.CM1Run(demo_run, cache_gb=1, workers=2)
+    run = CM1Run(demo_run, cache_gb=1, workers=2)
     F = FF.Fields(run)
     monkeypatch.setattr(run, "fits", lambda nbytes: False)
     c = (float(run.xh[40]), float(run.yh[50]))

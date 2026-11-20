@@ -126,7 +126,7 @@ def test_lines_round_the_pole_and_across_180():
 
 
 def test_wofs_run_has_geo_cm1_run_none(tmp_path):
-    from atmo3d import demo_wofs
+    from atmo3d_wofs import demo as demo_wofs
     from atmo3d.core import models
     root = demo_wofs.make(str(tmp_path))
     run = models.open_run(os.path.join(root, "mem01"), workers=1)

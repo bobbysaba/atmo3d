@@ -388,5 +388,5 @@ def of_model(key):
 
 
 def _load():
-    if "cm1" not in CATALOGS:
-        from . import cm1_catalog, wofs_catalog  # noqa: F401  (they register)
+    from . import models
+    models.load()  # (each data-type package registers its catalog)

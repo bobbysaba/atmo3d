@@ -32,6 +32,7 @@ def main(argv=None):
     ap.add_argument("run", nargs="?", default=None,
                     help="directory containing model output (default: the "
                          "default_run setting, else pick one in the browser)")
+    from .core import models
     from .core.models import AUTO, MODELS
     ap.add_argument("--model", default=AUTO, choices=[AUTO, *MODELS],
                     help="the model whose output RUN holds (default: auto, detected "
@@ -52,10 +53,10 @@ def main(argv=None):
     ap.add_argument("--pdecomp-script", default=None,
                     help="pressure-decomposition script run for times whose files lack "
                          "p_b/p_l/p_nl (default: the pdecomp_script setting)")
-    ap.add_argument("--demo", nargs="?", const="cm1", choices=("cm1", "wofs"), metavar="MODEL",
-                    help="open a demo run: a real CM1 supercell (the default; it ships with "
-                         "the repository) or a synthetic wofs ensemble (written once to the "
-                         "cache folder)")
+    ap.add_argument("--demo", nargs="?", const="cm1", choices=models.demo_keys(), metavar="MODEL",
+                    help="open a demo run of a data type: CM1 (the default: a real "
+                         "supercell that ships with the repository) or WoFS (a synthetic "
+                         "ensemble written once to the cache folder)")
     ap.add_argument("--address", default="127.0.0.1",
                     help="bind address (127.0.0.1 is right for JupyterHub and SSH tunnels)")
     ap.add_argument("--timing", nargs="?", const="auto", default=None, metavar="FILE",
@@ -74,20 +75,15 @@ def main(argv=None):
         if val is not None:
             config.override(name, val, flag)
     if args.demo:
-        from . import demo, demo_wofs
         root = os.path.join(config.expand(config.get("cache_dir")), "demo")
-        if args.demo == "wofs":
-            print(f"atmo3d: demo runs in {root}", flush=True)
-            args.run = demo_wofs.make(root)
-            config.override("runs_root", [args.run], "--demo")
-        else:
-            root = os.path.join(root, "cm1")
-            try:
-                args.run = demo.make(root)
-            except FileNotFoundError as e:
-                raise SystemExit(f"atmo3d: {e}")
-            print(f"atmo3d: demo run in {args.run}", flush=True)
-            config.override("runs_root", [root], "--demo")
+        try:
+            args.run = models.make_demo(args.demo, root)
+        except FileNotFoundError as e:
+            raise SystemExit(f"atmo3d: {e}")
+        print(f"atmo3d: demo run in {args.run}", flush=True)
+        # (a run folder holding several runs, e.g. WoFS members: itself, else its folder)
+        config.override("runs_root", [args.run if models.parts(args.run)
+                                      else os.path.dirname(args.run)], "--demo")
     if config.read_error():
         print(f"atmo3d: could not read the settings ({config.read_error()}); "
               "using defaults until they are saved again", flush=True)

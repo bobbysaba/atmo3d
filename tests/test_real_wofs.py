@@ -20,7 +20,8 @@ def root():
 
 
 def test_lists_members(root):
-    from atmo3d.core import models, wofs
+    from atmo3d.core import models
+from atmo3d_wofs import run as wofs
     mem = wofs.members(root)
     assert mem and mem == sorted(mem)
     assert models.detect(os.path.join(root, f"mem{mem[0]:02d}")).key == "wofs"
@@ -28,7 +29,8 @@ def test_lists_members(root):
 
 
 def test_opens_member_one_and_reads_a_2d_field(root):
-    from atmo3d.core import models, wofs
+    from atmo3d.core import models
+from atmo3d_wofs import run as wofs
     from atmo3d.core.fields import Fields
     mem = wofs.members(root)[0]
     run = models.open_run(os.path.join(root, f"mem{mem:02d}"), workers=1)
@@ -45,7 +47,8 @@ def test_opens_member_one_and_reads_a_2d_field(root):
 def test_grid_sits_on_the_map(root):
     """The grid's projection (core.geo) places every point within a tenth of a grid
     spacing of the file's XLAT, XLONG, and finds some boundary lines over it."""
-    from atmo3d.core import geo, models, wofs
+    from atmo3d.core import geo, models
+    from atmo3d_wofs import run as wofs
     mem = wofs.members(root)[0]
     run = models.open_run(os.path.join(root, f"mem{mem:02d}"), workers=1)
     try:

@@ -10,6 +10,7 @@ The demo data is written once to $ATMO3D_TEST_DATA (default: <tmp>/atmo3d-demo-$
 and rewritten only when tests/synthetic.py changes.  (atmo3d --demo opens a real
 run instead, demo_data/: test_real_demo.py.)
 """
+import glob
 import os
 import re
 import sys
@@ -19,8 +20,11 @@ import time
 import pytest
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.dirname(HERE))
 sys.path.insert(0, HERE)
+# the packages are imported from source (a pip install -e of each also registers their data
+# types: the "atmo3d.datatypes" entry points)
+for _src in sorted(glob.glob(os.path.join(os.path.dirname(HERE), "packages", "*", "src"))):
+    sys.path.insert(0, _src)
 
 
 def pytest_addoption(parser):
@@ -29,6 +33,11 @@ def pytest_addoption(parser):
 
 
 def pytest_configure(config):
+    from importlib.metadata import entry_points
+    if len(entry_points(group="atmo3d.datatypes")) < 2:
+        pytest.exit("atmo3d's data-type packages are not installed; once, run:\n"
+                    "  pip install --no-deps --no-build-isolation -e packages/core "
+                    "-e packages/cm1 -e packages/wofs", returncode=3)
     # before atmo3d.config is imported anywhere; spawned readers inherit these
     cfg = tempfile.mkdtemp(prefix="atmo3d-testcfg-")
     os.environ["ATMO3D_CONFIG"] = os.path.join(cfg, "config.toml")

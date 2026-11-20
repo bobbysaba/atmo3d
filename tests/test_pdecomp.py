@@ -80,7 +80,7 @@ def test_one_at_a_time(copy_run):
 
 def test_write_and_read_back(copy_run):
     from atmo3d.core.fields import Fields
-    from atmo3d.core.run import CM1Run
+    from atmo3d_cm1.run import CM1Run
     run, _, _ = copy_run
     r = pdecomp.compute(run, 1, write=True)
     assert r["wrote"], r.get("write_error")
@@ -256,7 +256,7 @@ def test_cm1_buoyancy_part_balances_uniform_buoyancy():
 def test_old_method_values_in_a_file_are_flagged(copy_run):
     """Values written by the older solver show, flagged, and need a recompute for p_c."""
     from atmo3d.core.fields import Fields
-    from atmo3d.core.run import CM1Run
+    from atmo3d_cm1.run import CM1Run
     run, _, _ = copy_run
     with netCDF4.Dataset(run.files[1], "a") as d:
         for n in pdecomp.CORE:

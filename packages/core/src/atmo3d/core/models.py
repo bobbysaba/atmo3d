@@ -1,6 +1,6 @@
 """The models atmo3d can read, and which one a folder holds.
 
-Each model names its reader (a core.run.Run subclass) and how its output is found:
+Each model (a data-type package registers its own: see register()) names its reader (a core.run.Run subclass) and how its output is found:
 count(path) is the number of output times in a folder, and looks(entries) says from
 one folder listing (os.scandir entries, no further reads) whether it is a run of the
 model, which keeps the search for runs cheap.  "auto" picks the first model whose
@@ -56,83 +56,105 @@ class Model:
     def open(self, path, **kw):
         return self.run_class(path, **kw)
 
+    def make_demo(self, root):
+        """Write (or find) this data type's demo run under `root`: its run path, or None
+        if the data type has no demo (atmo3d --demo MODEL, core.models.demo_keys)."""
+        return None
 
-class CM1(Model):
-    key, label = "cm1", "CM1"
-
-    @property
-    def run_class(self):
-        from .run import CM1Run
-        return CM1Run
-
-    def count(self, path):
-        from .. import config
-        return len(glob.glob(os.path.join(path, config.get("output_glob"))))
-
-    def looks(self, entries):
-        from .. import config
-        return any(_is_file(e) and config.is_output(e.name) for e in entries)
+    def is_demo(self, path):
+        """Is `path` a demo run this data type wrote (make_demo)?"""
+        return False
 
 
-class WoFS(Model):
-    """WoFS (DART-cycled WRF): an experiment folder of date folders of cycle folders of
-    member wrfouts.  The experiment is one run; its members (and their mean) are read
-    as runs of their own (parts)."""
-    key, label = "wofs", "WoFS"
-
-    @property
-    def run_class(self):
-        from .wofs import WoFSRun
-        return WoFSRun
-
-    def count(self, path):
-        from . import wofs
-        return wofs.count(path)
-
-    def looks(self, entries):
-        from . import wofs
-        entries = list(entries)
-        # (one or two more listings: the first date folder, the first cycle folder)
-        return bool(entries) and bool(wofs.members(os.path.dirname(entries[0].path), entries))
-
-    def runs(self, path, entries):
-        return [path]  # (the experiment: one run)
-
-    def parts(self, path, entries=None):
-        from . import wofs
-        return wofs.run_paths(path, entries)
-
-    def summary(self, path):
-        from . import wofs
-        root = path if os.path.isdir(path) else (wofs.mean_of(path)
-                                                 or (wofs.member_of(path) or ("",))[0])
-        n = len(wofs.members(root)) if root else 0
-        return f"{n} member{'s' * (n != 1)}" if n else ""
-
-    def part_label(self, path):
-        from . import wofs
-        rm = wofs.member_of(path)
-        return f"Member {rm[1]}" if rm else "Ensemble mean"
-
-    def virtual(self, path):
-        from . import wofs
-        return wofs.is_member(path) or wofs.is_mean(path)
-
-    def open(self, path, **kw):
-        from . import wofs
-        return wofs.open_run(path, **kw)
-
-    def canonical(self, path):
-        from . import wofs
-        return wofs.open_path(path) if os.path.isdir(path) else path
+GROUP = "atmo3d.datatypes"
 
 
-MODELS = {m.key: m for m in (CM1(), WoFS())}
+class _Models(dict):
+    """{key: Model} of the registered data types.  The first read loads the data-type
+    packages that are installed (load()), so importing this module needs none of them."""
+
+    def _ensure(self):
+        if not _LOADED:
+            load()
+
+    def __getitem__(self, k):
+        self._ensure()
+        return super().__getitem__(k)
+
+    def __iter__(self):
+        self._ensure()
+        return super().__iter__()
+
+    def __len__(self):
+        self._ensure()
+        return super().__len__()
+
+    def __contains__(self, k):
+        self._ensure()
+        return super().__contains__(k)
+
+    def get(self, k, default=None):
+        self._ensure()
+        return super().get(k, default)
+
+    def keys(self):
+        self._ensure()
+        return super().keys()
+
+    def values(self):
+        self._ensure()
+        return super().values()
+
+    def items(self):
+        self._ensure()
+        return super().items()
+
+
+MODELS = _Models()
+_LOADED = False
+
+
+def register(model):
+    """Add a data type (a Model instance).  A data-type package calls this from the function
+    its entry point names:
+
+        [project.entry-points."atmo3d.datatypes"]
+        cm1 = "atmo3d_cm1:register"
+
+    A key registered again replaces the old entry in its place."""
+    dict.__setitem__(MODELS, model.key, model)
+    return model
+
+
+def load():
+    """Import every installed data-type package: call the function each entry point of the
+    group names.  Packages load in the alphabetical order of their entry-point names, which
+    is the order "auto" tries their models in.  Called once, on first use."""
+    global _LOADED
+    if _LOADED:
+        return
+    _LOADED = True  # (set first: a package's register() may read MODELS)
+    from importlib.metadata import entry_points
+    for ep in sorted(entry_points(group=GROUP), key=lambda e: e.name):
+        ep.load()()
 
 
 def choices():
     """{label: key} for a model picker, auto-detect first."""
     return {"Auto-detect": AUTO, **{m.label: k for k, m in MODELS.items()}}
+
+
+def demo_keys():
+    """Keys of the data types that have a demo run, in registration order."""
+    return [k for k, m in MODELS.items() if type(m).make_demo is not Model.make_demo]
+
+
+def make_demo(key, root):
+    """The demo run of data type `key`, written under `root` if need be."""
+    path = get(key).make_demo(root)
+    if path is None:
+        raise ValueError(f"{key!r} has no demo run (one of: {', '.join(demo_keys())})")
+    return path
 
 
 def get(key):
@@ -242,7 +264,7 @@ def open_run(path, key=None, **kw):
     return resolve(path, key).open(path, **kw)
 
 
-def _is_file(entry):
+def is_file(entry):
     try:
         return entry.is_file()
     except OSError:

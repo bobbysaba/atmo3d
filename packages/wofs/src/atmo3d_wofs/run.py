@@ -15,7 +15,7 @@ cache, saved figures, exports, ?run=) tells the members apart.  <root>/mean is t
 ensemble mean (WoFSMeanRun, below).  Opening the root opens the member the
 wofs_member setting names (default 1).
 
-Fields keep their WRF names (core.wofs_catalog says which plays each role).  Two are
+Fields keep their WRF names (atmo3d_wofs.catalog says which plays each role).  Two are
 sums WRF splits: THETA = T + 300 and PRES = P + PB (SUMS; T, P and PB themselves are
 not listed).  Staggered fields (U, V, W, ...) are averaged onto mass points on read,
 like CM1's.  Every 2D or 3D field on the mass or a staggered grid is listed.  The base
@@ -38,8 +38,8 @@ from collections import OrderedDict
 import netCDF4
 import numpy as np
 
-from . import geo
-from .run import (IO_LOCK, Run, VarInfo, _drop_pending, _read_volume_worker,
+from atmo3d.core import geo
+from atmo3d.core.run import (IO_LOCK, Run, VarInfo, _drop_pending, _read_volume_worker,
                   check_cancelled, finished, in_progress, report, settle_seconds)
 
 G = 9.81  # m/s^2, as WRF
@@ -132,7 +132,7 @@ def cycles(root, entries=None, first=False):
 def default_member(ms):
     """The member the wofs_member setting names, of members ms (else the first); None:
     the mean."""
-    from .. import config
+    from atmo3d import config
     want = str(config.get("wofs_member")).strip().lower()
     if want == MEAN and len(ms) > 1:
         return None
@@ -345,7 +345,7 @@ class WRFSource:
 
     def key(self):
         """What a reader process keeps this source open under (core.run.opened)."""
-        from .run import file_key
+        from atmo3d.core.run import file_key
         return file_key(self.path) + (self.path0,)
 
 
@@ -564,7 +564,7 @@ MEAN_NOTE = ("Ensemble mean of {n} members. Fields in the files (winds, potentia
 
 
 def _is_demo(path):
-    from .. import demo
+    from atmo3d import demo
     return demo.is_demo(path)
 
 

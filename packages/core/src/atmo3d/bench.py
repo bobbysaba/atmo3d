@@ -39,15 +39,20 @@ import param
 from . import config
 
 
+def _demo_keys():
+    from .core import models
+    return models.demo_keys()
+
+
 def parser():
     ap = argparse.ArgumentParser(prog="atmo3d bench", description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("run", nargs="?", default=None, help="directory containing model output")
     ap.add_argument("--report", metavar="FILE",
                     help="print the summary of a viewer timing log instead")
-    ap.add_argument("--demo", nargs="?", const="cm1", choices=("cm1", "wofs"),
-                    metavar="MODEL", help="use a demo run: the real CM1 supercell (the "
-                                          "default) or the synthetic wofs ensemble")
+    ap.add_argument("--demo", nargs="?", const="cm1", choices=_demo_keys(),
+                    metavar="MODEL", help="use a demo run of a data type (default: CM1's "
+                                          "real supercell)")
     from .core.models import AUTO, MODELS
     ap.add_argument("--model", default=AUTO, choices=[AUTO, *MODELS])
     ap.add_argument("--config", default=None, help="settings file")
@@ -84,10 +89,9 @@ def main(argv=None):
         if getattr(args, name) is not None:
             config.override(name, getattr(args, name), flag)
     if args.demo:
-        from . import demo, demo_wofs
+        from .core import models
         root = os.path.join(config.expand(config.get("cache_dir")), "demo")
-        args.run = demo_wofs.make(root) if args.demo == "wofs" else \
-            demo.make(os.path.join(root, "cm1"))
+        args.run = models.make_demo(args.demo, root)
     if not args.run:
         parser().error("give a run folder (or --demo, or --report FILE)")
     out = args.out or config.cache_dir("timing", time.strftime("bench-%Y%m%d-%H%M%S.json"))
