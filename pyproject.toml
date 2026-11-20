@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "atmo3d"
 version = "1.0.0"
-description = "Interactive web viewer for 3D atmospheric data (CM1, WoFS)"
+description = "Interactive web viewer for 3D atmospheric data (CM1, WoFS, radar)"
 readme = "README.md"
 requires-python = ">=3.11"
 authors = [{ name = "Bobby Saba", email = "bobbysabawx@gmail.com" }]
@@ -16,8 +16,8 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Atmospheric Science",
 ]
 # The app is the core plus every data-type package in packages/.  (For development, install
-# each one editable: pip install -e packages/core -e packages/cm1 -e packages/wofs.)
-dependencies = ["atmo3d-core", "atmo3d-cm1", "atmo3d-wofs"]
+# each one editable: pip install -e packages/core -e packages/cm1 -e packages/wofs -e packages/radar.)
+dependencies = ["atmo3d-core", "atmo3d-cm1", "atmo3d-wofs", "atmo3d-radar"]
 
 [project.optional-dependencies]
 test = ["pytest>=8", "websocket-client>=1.8"]

@@ -94,8 +94,38 @@ through B2, with two clear paths: *contribute it to this repo* (CODEOWNERS, CI l
 Include what each existing type teaches: CM1 (a grid, many fields), WoFS (ensemble
 members as virtual runs), radar (no grid, sampling, optional regrid).
 
+**B5. A playbook for an AI agent that adds a data type** (Bobby's idea, 2026-11-20).
+A markdown file shipped in the repo (proposed `docs/agents/add-datatype.md`, linked from
+B4's page and from a short top-level `AGENTS.md` that agents read by convention). The user
+tells their coding agent "follow this playbook for the files in `<path>`, name `<name>`",
+and the agent builds the package and its tests the way core needs them. Written after
+B1-B3, because it drives their tools rather than re-describing the code. Contents:
+- **Inputs it asks for**: the data path, the package name, contribute here or out-of-tree,
+  and which views matter.
+- **Inspect, read-only and bounded**: headers only (`ncdump -h`, one or two files), never a
+  whole file in memory; list times, dims, staggering, units, coordinates. On shared
+  clusters, follow the site's rules (no recursive walks of big trees, heavy work on a
+  compute node). It writes what it found to a short `NOTES.md` in the package.
+- **Classify**: gridded (`Run`) or not (`Source` plus the hooks), which `CAPS` it can
+  claim, and which existing type it is closest to (CM1, WoFS or radar).
+- **Build**: run `tools/new_datatype.py`, then fill in `Model.looks`, the `Catalog` (native
+  fields, the `refl`/`u`/`v`/`w` roles) and the reads, following the comments in
+  `packages/example`. Write a synthetic generator that has the real files' layout (from
+  the header, with no real values copied into the repo), and add a `-m real` test that reads the
+  user's path.
+- **Done** means `check_datatype` passes on the synthetic data and on the real path, the
+  package's tests pass, and nothing in `packages/core` changed.
+- **Stop and ask** on ambiguous units, staggering or vertical coordinate, role mapping,
+  anything that seems to need a core change (report it, do not make it), and before any
+  batch job.
+- **Report at the end**: every assumption, with the header line it came from, so a
+  reviewer can check them; the PR template filled in.
+Test it once for real: have an agent follow it on a type we don't have yet (say a
+plain gridded netCDF or MPAS sample) and fix the playbook where the agent went wrong.
+
 Done when: a new package passes `check_datatype` in under a day's work for the gridded
-case, from the docs alone, and CI fails if core breaks the example.
+case, from the docs alone, and CI fails if core breaks the example. For B5: an agent given
+only the playbook and a data path produces a package that passes, without core edits.
 
 ## Phase C: derived fields at the user level
 
@@ -133,6 +163,7 @@ a figure made with it records its definition.
 | A (collaboration docs) | small | nothing; do first |
 | B1 contract + conformance check + API_VERSION | medium | decision 3 |
 | B2 example package, B3 scaffold, B4 docs | medium | B1 |
+| B5 agent playbook, and one trial run of it | small | B2, B3 |
 | C1 spike | small | decisions 1, 4, 5 |
 | C2 implement, C3 docs | medium | C1 |
 
