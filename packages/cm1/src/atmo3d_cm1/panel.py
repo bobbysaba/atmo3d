@@ -1,11 +1,11 @@
 """Parcels: the Parcels panel (choosing parcels, named sets, saving and loading them,
 a plot of their values) and their trajectories on the map, the cross-section and in
 the 3D view, with heads at the shown time; a set's trajectories exported to netCDF or
-CSV (core/parcels.py, export_set; in the "pexp" pool, with progress and Stop).
+CSV (atmo3d_cm1/parcels.py, export_set; in the "pexp" pool, with progress and Stop).
 
 Parcels are chosen on the map at one parcel time (the shown time or the first one): a
 click picks those within a radius, a dragged box those inside it; a height range,
-a value range of a parcel variable and a cap apply to both (core/parcels.py, select).
+a value range of a parcel variable and a cap apply to both (atmo3d_cm1/parcels.py, select).
 Each choice is a named set, drawn in its own colour or coloured by a parcel variable;
 trajectories over all parcel times, up to the shown time or the last minutes of it,
 and heads where the parcels are at the shown time (between parcel times: interpolated).
@@ -13,7 +13,7 @@ On the cross-section: the parcels within a distance of its line, projected onto 
 (the parts of their tails near it, or the whole tails of those near it now), at the
 section's own time.  In the 3D view: their tails and heads inside the 3D region, at the
 scene's time.  Tails can be seen from a frame moving with the tracked storm or at a set
-motion (core/parcels.py, frame_shift), the same as the grid at the time drawn.  The
+motion (atmo3d_cm1/parcels.py, frame_shift), the same as the grid at the time drawn.  The
 plot: a variable over the parcel times (each parcel, the mean or median, a band), two
 variables against each other at the shown time, or the picked set's w budget (rates or
 integrated since the set's time).
@@ -34,13 +34,14 @@ from bokeh.models import (ColorBar, ColumnDataSource, HoverTool, Legend, LegendI
 from bokeh.plotting import figure
 from bokeh.transform import transform
 
-from .. import config
-from ..core import export as ex, parcels as P, series as ser
-from ..core.fields import palette
-from ..core.volume3d import floor_colorscale
-from ..theme import BG, GRID, MUTED, TEXT
-from .numinput import FloatInput
-from .ui import _bokeh, _html, style_fig
+from atmo3d import config
+from atmo3d.core import export as ex, series as ser
+from . import parcels as P
+from atmo3d.core.fields import palette
+from atmo3d.core.volume3d import floor_colorscale
+from atmo3d.theme import BG, GRID, MUTED, TEXT
+from atmo3d.viewer.numinput import FloatInput
+from atmo3d.viewer.ui import _bokeh, _html, style_fig
 
 SET_COLORS = ("#f472b6", "#a3e635", "#38bdf8", "#fb923c", "#c084fc", "#facc15")
 MAX_SEGMENTS = 200_000  # per redraw: longer windows are drawn at every n-th parcel time
@@ -250,7 +251,7 @@ class ParcelsPanel:
         pf = self.pf
         if pf is None:
             if getattr(self.run, "traced_parcels", False):  # (turned off: why)
-                from ..core import trajcalc
+                from . import trajcalc
                 return f'<div class="cv-hint">{trajcalc.off(self.run)}</div>'
             return ('<div class="cv-hint">This run has no parcel output (files named like '
                     'the <code>parcel_glob</code> setting, cm1out_pdata*.nc).</div>')

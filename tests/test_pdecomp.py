@@ -11,7 +11,7 @@ import netCDF4
 import numpy as np
 import pytest
 
-from atmo3d import pdecomp
+from atmo3d_cm1 import pdecomp
 from atmo3d.registry import Registry
 from conftest import txt, wait
 
@@ -124,7 +124,7 @@ def test_failed_write_keeps_the_result(copy_run):
 def test_solver_satisfies_the_pressure_equation(demo_run):
     """The solved Exner perturbation, put back into the discrete operator, gives the
     forcing (open lateral boundaries: zero-gradient images)."""
-    from atmo3d.pdecomp import pdecomp_solver as P
+    from atmo3d_cm1.pdecomp import pdecomp_solver as P
     files = sorted(f for f in os.listdir(demo_run) if f.startswith("cm1out_"))
     with netCDF4.Dataset(os.path.join(demo_run, files[0])) as d0:
         dom, base = P.domain_info(d0), P.compute_base_state(d0)
@@ -152,7 +152,7 @@ def test_solver_satisfies_the_pressure_equation(demo_run):
 
 # ---- CM1's method (cm1_pdecomp.py), the built-in since 2026-11-18 -----------------
 def _grid(nk=20, n=32, dx=500.0):
-    from atmo3d.pdecomp import cm1_pdecomp as M
+    from atmo3d_cm1.pdecomp import cm1_pdecomp as M
     zf = np.concatenate([[0.0], np.cumsum(np.linspace(100.0, 400.0, nk))])
     zh = 0.5 * (zf[1:] + zf[:-1])
     c2 = np.zeros(nk + 1)

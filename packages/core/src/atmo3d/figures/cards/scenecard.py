@@ -3,7 +3,8 @@ parcel set."""
 
 import panel as pn
 
-from ...core import parcels as P, vectors
+from ...core import vectors
+from ...core.services import parcels as P
 from ...core.fields import CMAPS
 from .base import _GRID_N, PAR_MOVING, PAR_TAILS, _BTN, _f, _grid, _hex, cmap_select
 from .layercard import parcel_pick, parcel_sets

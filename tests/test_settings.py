@@ -112,7 +112,7 @@ def test_runs_tracks_and_save_folders(fresh, demo_root):
 
 def test_viewer_follows_saved_settings(fresh, reg, demo_root):
     from atmo3d.viewer import app as A
-    from atmo3d import pdecomp
+    from atmo3d_cm1 import pdecomp
     C = config
     out = fresh / "out"
     C.save(dict(runs_root=[demo_root], figures_dir=f"{out}/figs", exports_dir=f"{out}/data"))

@@ -29,9 +29,9 @@ from concurrent.futures import ProcessPoolExecutor, TimeoutError as FutTimeout
 
 import numpy as np
 
-from .. import config
-from ..core import pool as readers
-from ..core.run import IO_LOCK, VarInfo
+from atmo3d import config
+from atmo3d.core import pool as readers
+from atmo3d.core.run import IO_LOCK, VarInfo
 
 NAMES = ("p_b", "p_l", "p_nl", "p_c", "acc_b", "acc_l", "acc_nl", "acc_c")
 CORE = ("p_b", "p_l", "p_nl", "acc_b", "acc_l", "acc_nl")   # (what every script gives)
@@ -121,7 +121,7 @@ def source(run, t, block=True):
     'file-old' | 'busy' | 'pending' | None, description).  block=False (from the
     page-updating thread) never waits for the file lock: 'pending' if the file's
     version tag has not been read yet (the background jobs read it)."""
-    from ..core.run import FileBusy
+    from atmo3d.core.run import FileBusy
 
     kind = None
     if run.in_file("p_b", t):

@@ -970,7 +970,7 @@ def _batch(d, n, got):
 
 class Fields:
     def __init__(self, run):
-        from .. import pdecomp
+        from .services import pdecomp
         pdecomp.register(run)  # decomposition fields, computable where no file has them
         self.run = run
         self.cat = cat = run.catalog  # (the data type's names: core.catalog)

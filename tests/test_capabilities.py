@@ -7,8 +7,8 @@ import os
 
 import pytest
 
-from atmo3d import pdecomp
-from atmo3d.core import parcels
+from atmo3d_cm1 import pdecomp
+from atmo3d_cm1 import parcels
 from atmo3d.registry import Registry
 from test_wofs import make_wofs
 

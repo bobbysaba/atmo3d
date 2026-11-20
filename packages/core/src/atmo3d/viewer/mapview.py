@@ -17,7 +17,7 @@ from bokeh.models import (
 from bokeh.plotting import figure
 from bokeh.transform import transform
 
-from .. import pdecomp
+from ..core.services import pdecomp
 from ..core import render, track as trk, vectors
 from ..core.run import Cancelled, FileBusy, MissingAtTime, reporting
 from ..core.fields import deriv_name, palette

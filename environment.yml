@@ -31,4 +31,6 @@ dependencies:
   - pytest=8.4.1           # tests/
   - pip
   - pip:
-      - -e .
+      - -e ./packages/core
+      - -e ./packages/cm1
+      - -e ./packages/wofs

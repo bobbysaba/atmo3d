@@ -5,7 +5,8 @@ figures/render.py.)
 A mixin of the FigureEditor (figures/editor.py)."""
 
 from . import spec as fg
-from ..core import parcels as P, render, series as ser, vectors
+from ..core import render, series as ser, vectors
+from ..core.services import parcels as P
 from .cards import TERRAIN_LEVEL_MODES, _dark, parcel_source
 from .kinds import KINDS
 

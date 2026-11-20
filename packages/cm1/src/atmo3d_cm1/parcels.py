@@ -42,7 +42,7 @@ the grid's z, which are the same without terrain; on a terrain run against the l
 heights of the parcel's column at that 3D time (z above sea level).
 
 Traced trajectories.  A model that writes no parcel output (WoFS: run.traced_parcels)
-gets parcels atmo3d traces itself through the 3D winds (core.trajcalc), written in
+gets parcels atmo3d traces itself through the 3D winds (atmo3d_cm1.trajcalc), written in
 this same layout to the cache folder and read by the same code (trajcalc.Traced).
 
 The w budget.  Along a parcel, Dw/Dt = b + vpg + the rest (subgrid mixing, numerical
@@ -65,7 +65,7 @@ from collections import OrderedDict
 import numpy as np
 import netCDF4
 
-from .run import IO_LOCK, ahead, ahead_width, temp_name
+from atmo3d.core.run import IO_LOCK, ahead, ahead_width, temp_name
 
 CACHE_DIR = None  # None: <cache_dir setting>/parcels (tests point this elsewhere)
 GAP = 1 << 20  # parcels: read through gaps between wanted IDs shorter than this
@@ -89,15 +89,15 @@ _lock = threading.Lock()
 def cache_dir():
     if CACHE_DIR:
         return CACHE_DIR
-    from .. import config
+    from atmo3d import config
     return config.cache_dir("parcels")
 
 
 def find_files(run_path, pattern=None):
     """The parcel output files of a run folder (Settings: parcel_glob).  (A run whose
-    model writes none, run.traced_parcels, gets them traced instead: core.trajcalc.)"""
+    model writes none, run.traced_parcels, gets them traced instead: atmo3d_cm1.trajcalc.)"""
     if pattern is None:
-        from .. import config
+        from atmo3d import config
         pattern = config.get("parcel_glob")
     return sorted(glob.glob(os.path.join(run_path, pattern)))
 
@@ -246,7 +246,7 @@ class ParcelFile:
     @property
     def fields(self):
         if self._fields is None and self._run is not None:
-            from .fields import Fields
+            from atmo3d.core.fields import Fields
             self._fields = Fields(self._run)
         return self._fields
 
@@ -296,7 +296,7 @@ class ParcelFile:
         F = self.fields
         if F is None:
             return {}
-        from .fields import listed
+        from atmo3d.core.fields import listed
         return {f"{d.label} [{d.name}]": GRID + d.name for d in F.defs.values()
                 if d.ndim == 3 and not d.column and listed(d)}
 
@@ -519,7 +519,7 @@ class ParcelFile:
 
     def _sample(self, pset, field, progress=None):
         """(nt, len(pset)) of 3D field `field` at the parcels' positions (module doc)."""
-        from .volume3d import point_index, sample_points
+        from atmo3d.core.volume3d import point_index, sample_points
         F = self.fields
         run = F.run
         tr = self.trajectories(pset, POS)
@@ -647,7 +647,7 @@ class ParcelSet:
 
 
 def sets_dir(run_path):
-    from .. import config
+    from atmo3d import config
     return config.exports_dir(run_path, "parcels")
 
 
@@ -1053,7 +1053,7 @@ def export_names(pf, names=None):
 def export_column(name):
     """The netCDF variable / CSV column of a parcel variable ('@thpert' ->
     'thpert_at_parcels')."""
-    from .export import var_name
+    from atmo3d.core.export import var_name
     f = grid_field(name)
     return var_name(f) + "_at_parcels" if f else var_name(name)
 
@@ -1098,7 +1098,7 @@ def export_set(pf, pset, path, names=None, times=None, compress=True, progress=N
     over all parcel times, to write x_sr, y_sr too (x, y in that moving frame; frame:
     what it is, frame_label's, and its reference time).  Returns dict(path, format,
     parcels, times, cancelled)."""
-    from .. import config
+    from atmo3d import config
     fmt = export_format(path)
     names = export_names(pf, names)
     cols_out = names + (list(SR) if shift is not None else [])
@@ -1237,8 +1237,8 @@ def _export_notes(pf, pset, names, ti, frame=""):
 def _export_header(ds, pf, pset, names, ti, compress, shift=None, frame=""):
     """Dimensions, coordinates, global attributes and the (empty) variables."""
     import datetime
-    from .. import __version__
-    from .export import cf_units
+    from atmo3d import __version__
+    from atmo3d.core.export import cf_units
     run = pf._run
     nt, n = len(ti), len(pset)
     ds.createDimension("time", nt)

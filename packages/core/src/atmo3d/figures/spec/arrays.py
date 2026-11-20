@@ -4,8 +4,8 @@ import json
 
 import numpy as np
 
-from ...core import (azim, geo, parcels as P, render, series as ser, swath, track as trk, vectors,
-                     volume3d)
+from ...core import azim, geo, render, series as ser, swath, track as trk, vectors, volume3d
+from ...core.services import parcels as P
 from .. import draw as figdraw
 from ...core.run import FileBusy, MissingAtTime
 from .base import panel_ref, tindex, storm_motion

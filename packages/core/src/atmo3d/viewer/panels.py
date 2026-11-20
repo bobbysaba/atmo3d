@@ -16,7 +16,7 @@ holds (default: run.can(needs), i.e. the run has the inputs too).
 
 A panel's place in the registry (index()) is what a saved session records as its open
 tab, so the built-in panels keep the order they had before the registry (0 Sounding to
-5 Parcels); register new ones after them.
+5 Parcels, which the CM1 package registers before "3D region"); register new ones after them.
 """
 from dataclasses import dataclass, field
 from typing import Callable, Optional
@@ -58,14 +58,16 @@ class Tool:
 _TOOLS = []
 
 
-def register(tool):
-    """Add a tool (after those already registered); a key registered again replaces
-    the old entry in its place."""
+def register(tool, before=None):
+    """Add a tool (after those already registered, or before the one keyed `before`: the
+    rail's order; the panels' order, which a saved session's tab number follows, is the
+    same); a key registered again replaces the old entry in its place."""
     for i, t in enumerate(_TOOLS):
         if t.key == tool.key:
             _TOOLS[i] = tool
             return tool
-    _TOOLS.append(tool)
+    j = next((i for i, t in enumerate(_TOOLS) if t.key == before), len(_TOOLS))
+    _TOOLS.insert(j, tool)
     return tool
 
 
@@ -129,10 +131,6 @@ def _builtins():
     register(Tool("Distribution", "Distrib.", "chart-histogram",
                   "Distribution of a field over a region at one time: histogram, box, "
                   "violin, cumulative", layout=lambda v: v._dist_layout()))
-    register(Tool("Parcels", "Parcels", "grain",
-                  "Parcels: click the map (or drag a box) to choose parcels and draw their "
-                  "trajectories", layout=lambda v: v._par_layout(), modes=("Parcel box",),
-                  needs="parcels"))
     register(Tool("3D region", "3D box", "cube", "Drag a box on the map to view it in 3D",
                   modes=("Seed box",)))
 

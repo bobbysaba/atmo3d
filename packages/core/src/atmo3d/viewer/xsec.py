@@ -14,7 +14,7 @@ from bokeh.models import (
 from bokeh.plotting import figure
 from bokeh.transform import transform
 
-from .. import pdecomp
+from ..core.services import pdecomp
 from ..core import render, vectors
 from ..core.run import FileBusy, MissingAtTime, carry
 from ..core.fields import CMAPS, palette

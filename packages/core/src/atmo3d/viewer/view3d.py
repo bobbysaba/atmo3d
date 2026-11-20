@@ -13,7 +13,8 @@ from bokeh.events import MouseLeave, MouseMove
 from bokeh.models import ColumnDataSource, CustomJS, HoverTool, LinearAxis, Range1d, Span
 from bokeh.plotting import figure
 
-from .. import config, pdecomp
+from .. import config
+from ..core.services import pdecomp
 from ..core import vectors, volume3d
 from ..core.run import FileBusy, MissingAtTime
 from ..theme import GRID, MUTED

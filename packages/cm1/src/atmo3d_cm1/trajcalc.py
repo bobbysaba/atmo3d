@@ -35,8 +35,8 @@ import numpy as np
 from scipy.ndimage import map_coordinates
 
 from . import parcels as P
-from .run import IO_LOCK, ahead, ahead_width, temp_name
-from .volume3d import _fij, columns, frac_level, part_heights
+from atmo3d.core.run import IO_LOCK, ahead, ahead_width, temp_name
+from atmo3d.core.volume3d import _fij, columns, frac_level, part_heights
 
 VERSION = 1  # (part of the file's name: bump when tracing changes)
 SEEDS_ACROSS = 60  # seeds along the longer side of the domain
@@ -63,7 +63,7 @@ def interval(run):
 
 def off(run):
     """Why the run gets no traced trajectories ("" when it does)."""
-    from .. import config
+    from atmo3d import config
     if len(run.times) < 2:
         return "Trajectories need at least two output times; this run has one."
     if not all(n in run.vars for n in winds(run)):
@@ -234,7 +234,7 @@ def _box(run, p, mh, mv):
 def _bands(run, p, idx, mh, mv):
     """idx (parcels) in bands of rows whose boxes, read at two outputs, keep within
     a part's share of the 3D cache."""
-    from .fields import PART_BYTES
+    from atmo3d.core.fields import PART_BYTES
     if not len(idx):
         return []
     q = p[idx]

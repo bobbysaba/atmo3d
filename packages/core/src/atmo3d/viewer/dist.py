@@ -16,7 +16,7 @@ from bokeh.plotting import figure
 
 from ..core import dist, series as ser
 from ..figures import draw as figdraw
-from .. import pdecomp
+from ..core.services import pdecomp
 from ..core.fields import palette
 from ..theme import GRID, MUTED, POINT_COLORS, TEXT
 from .numinput import FloatInput

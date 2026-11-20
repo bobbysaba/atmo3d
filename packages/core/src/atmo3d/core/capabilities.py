@@ -63,12 +63,12 @@ def _soundings(run):
 
 
 def _parcels(run):
-    from . import parcels
+    from .services import parcels
     return parcels.offered(run)
 
 
 def _pdecomp(run):
-    from .. import pdecomp
+    from .services import pdecomp
     return pdecomp.can_compute(run)
 
 

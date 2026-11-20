@@ -15,7 +15,8 @@ from functools import partial
 
 import panel as pn
 
-from .. import config, pdecomp
+from .. import config
+from ..core.services import pdecomp
 from ..figures import editor as figui
 from .picker import RunPicker
 from .settings import Settings
@@ -38,14 +39,14 @@ from .session import Sessions
 from .session import read as read_session
 from .swap import RunSwap
 from . import timing
-from .parcels import ParcelsPanel
+from .ext import NoParcels, viewer_class
 from .tracking import TrackPanel
 from .view3d import View3DPanel
 from .xsec import SectionPanel
 
 
-class Viewer(Widgets, MapView, MapLines, Layout, Events, SoundingPanel, TrackPanel, SeriesPanel,
-             DistPanel, ParcelsPanel, SectionPanel, View3DPanel, ItemsTray, Differences,
+class BaseViewer(Widgets, MapView, MapLines, Layout, Events, SoundingPanel, TrackPanel, SeriesPanel,
+             DistPanel, NoParcels, SectionPanel, View3DPanel, ItemsTray, Differences,
              Sessions, DataExport, RunSwap):
     def __init__(self, run, fields, maxpix=900, error="", reg=None):
         self.run, self.F = run, fields
@@ -486,7 +487,7 @@ def create_app(reg, maxpix=None):
     if run is None:
         body, settings = _landing(error.strip())
     else:
-        v = Viewer(run, fields, maxpix=maxpix, error=error.strip(), reg=reg)
+        v = viewer_class()(run, fields, maxpix=maxpix, error=error.strip(), reg=reg)
         pn.state.on_session_destroyed(lambda ctx: v.close())
         if timing.LOG:  # (atmo3d --timing)
             timing.attach(v, t_session)
@@ -531,3 +532,10 @@ def _landing(error=""):
                              "border-radius": "12px", "padding": "14px 16px 20px 16px"})
     return pn.Column(card, settings.modal, sizing_mode="stretch_both",
                      styles={"overflow-y": "auto"}), settings
+
+
+def __getattr__(name):
+    # A.Viewer: the viewer with the data types' mixins (ext.viewer_class), built on first use
+    if name == "Viewer":
+        return viewer_class()
+    raise AttributeError(name)

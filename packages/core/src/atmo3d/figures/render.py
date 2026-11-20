@@ -21,7 +21,8 @@ import traceback
 from collections import OrderedDict
 
 from . import draw as figdraw, spec as fg
-from ..core import parcels as P, series as ser, track as trk
+from ..core import series as ser, track as trk
+from ..core.services import parcels as P
 from ..core.fields import Fields
 from ..core import models
 from ..core.run import FileBusy, MissingAtTime

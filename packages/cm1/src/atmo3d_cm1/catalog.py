@@ -8,7 +8,7 @@ from .outputs import OUTPUTS, describe
 # CM1 can write (atmo3d_cm1.outputs), and the pressure decomposition atmo3d computes
 NATIVES = {
     **OUTPUTS,
-    # pressure decomposition, CM1's method (from the files, or computed: atmo3d.pdecomp)
+    # pressure decomposition, CM1's method (from the files, or computed: atmo3d_cm1.pdecomp)
     "p_b": ("p′ buoyancy (p_b)", "Pa", 1, "PuOr_r", None, True),
     "p_l": ("p′ linear dynamic (p_l)", "Pa", 1, "PuOr_r", None, True),
     "p_nl": ("p′ nonlinear dynamic (p_nl)", "Pa", 1, "PuOr_r", None, True),

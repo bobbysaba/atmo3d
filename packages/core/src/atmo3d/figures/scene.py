@@ -7,7 +7,8 @@ import numpy as np
 import panel as pn
 
 from . import draw as figdraw, spec as fg
-from ..core import parcels as P, vectors, volume3d
+from ..core import vectors, volume3d
+from ..core.services import parcels as P
 from ..viewer.numinput import FloatInput
 from .cards import (SCENE_ARROWS, SCENE_BARS, SCENE_BG, SCENE_FLOOR_CMAPS,
                     SCENE_FLOOR_RANGE, SCENE_LIGHTS, SCENE_PROJ, SCENE_RES, SCENE_STREAM_BY,

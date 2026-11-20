@@ -103,6 +103,9 @@ def test_file_field_wins_over_same_derived():
         model, dx, dy, umove, vmove, storm_relative = "cm1", 1000.0, 1000.0, 0.0, 0.0, True
         catalog = C.of_model("cm1")
 
+        def offers(self, name):  # (the data type offers no tools: pdecomp adds no fields)
+            return False
+
         def __init__(self, names):
             self.vars = {n: VarInfo(n, n, "", 3, None) for n in names}
 
@@ -173,6 +176,9 @@ def _fake_fields(model, names):
     class FakeRun:
         dx, dy, umove, vmove, storm_relative = 1000.0, 1000.0, 0.0, 0.0, True
         var_times = {}  # (pdecomp.register adds its fields here)
+
+        def offers(self, name):
+            return False
 
         def __init__(self):
             self.model = model

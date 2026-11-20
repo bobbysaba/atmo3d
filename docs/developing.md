@@ -76,6 +76,14 @@ processes and renders figures.
 
 ## Layout
 
+A monorepo: `packages/core` (import name `atmo3d`: everything below except the data-type
+parts), `packages/cm1` (`atmo3d_cm1`: the CM1 reader, field catalog, parcels, trajectory
+tracing, pressure decomposition and the Parcels panel) and `packages/wofs` (`atmo3d_wofs`:
+the WoFS reader, catalog and demo). `tests/`, `docs/` and `tools/` stay at the top. Install
+the three editable (`pip install -e packages/core -e packages/cm1 -e packages/wofs`; the
+conda environment does it). The paths below are relative to `packages/core/src/` unless
+they name a data-type package.
+
 ```
 atmo3d/                  config.py (settings: file, precedence, save folders, run search),
                           registry.py (open runs shared by sessions, run discovery),
@@ -100,14 +108,13 @@ core/                     model output, no UI
   series.py               time series of reduced fields: compute, cache, files
   dist.py                 distributions: a field's values over a region, their summary
   swath.py                time-window reductions (swaths, storm-following composites)
-  parcels.py              parcel output: reads grouped by parcel ID, selections, saved
-                          sets, trajectory cache, heads between parcel times
+  services.py             tools only some data types bring (parcels, pdecomp, trajcalc):
+                          shared code calls them through it; the package provides them
   export.py               netCDF export of fields (box, times, model levels or heights,
                           streamed per time) and `atmo3d export`
 
-pdecomp/                  pressure decomposition
-  __init__.py             file fields, computing one time on request
-  pdecomp_solver.py       the solver (runs in its own process; usable alone)
+(atmo3d_cm1/pdecomp/     pressure decomposition: file fields, computing one time on
+                          request, and the solver (runs in its own process))
 
 viewer/                   the interactive page (Panel / Bokeh)
   app.py                  the Viewer (built from the mixins below), wiring; the page
@@ -209,6 +216,25 @@ docs/                     these pages
 A mixin's methods run as the Viewer's (or the editor's) own: they use its widgets and
 state through `self`. New features go in the mixin they belong to, or a new one added to
 the class's bases.
+
+## Adding a data type
+
+A data type is a package of its own under `packages/`; nothing in the core changes. Give it
+a `pyproject.toml` that depends on `atmo3d-core` and names a registration function in the
+`atmo3d.datatypes` entry-point group (the one line that registers it):
+
+```toml
+[project.entry-points."atmo3d.datatypes"]
+mytype = "atmo3d_mytype:register"
+```
+
+`register()` builds a `core.models.Model` (its `key`, `label`, `count`, `looks`, the Run
+class it opens; optionally `make_demo` for `atmo3d --demo`) and passes it to
+`models.register()`, then registers its field catalog (`core.catalog.register`). To add
+panels, call `viewer.panels.register(Tool(...))` and, when the panel is a Viewer mixin,
+`viewer.ext.register_mixin(...)`; tools shared code must reach (as CM1's parcels) go
+through `core.services.provide()`. Packages load in the alphabetical order of their entry-point
+names, which is the order "auto" tries their models in. See `atmo3d_cm1/__init__.py`.
 
 ## Adding a derived field
 

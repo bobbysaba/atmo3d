@@ -8,7 +8,8 @@ import numpy as np
 import pytest
 
 from atmo3d import demo
-from atmo3d.core import models, run as run_mod, parcels as P
+from atmo3d.core import models, run as run_mod
+from atmo3d_cm1 import parcels as P
 
 needs_data = pytest.mark.skipif(demo.shipped() is None, reason="no demo_data/ (pip install)")
 

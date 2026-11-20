@@ -1,4 +1,4 @@
-"""Parcels (core/parcels.py): the demo's parcel output (every 60 s, the 3D output every
+"""Parcels (atmo3d_cm1/parcels.py): the demo's parcel output (every 60 s, the 3D output every
 300 s), missing values, the seeding lattice, grouped reads, selections, saved sets,
 trajectory caching, heads between parcel times, periodic wrap breaks, several files
 joined by time; and the viewer's Parcels panel (map, cross-section, 3D view, plot)."""
@@ -9,7 +9,7 @@ import numpy as np
 import pytest
 
 import synthetic as demo
-from atmo3d.core import parcels as P
+from atmo3d_cm1 import parcels as P
 
 
 @pytest.fixture
@@ -246,7 +246,7 @@ def test_parcel_tails_heads_and_colours(pviewer):
     v.par_color.value = "w"  # read in the pool, then drawn
     wait(lambda: v.par_cbar.visible, msg="coloured by w")
     tr = v.pf.trajectories(ps, ("w",))["w"]
-    from atmo3d.core import parcels as PP
+    from atmo3d_cm1 import parcels as PP
     np.testing.assert_allclose(np.sort(v.par_head_src.data["val"]),
                                np.sort(PP.at_time(v.pf, tr, 4800.0)[np.isfinite(
                                    PP.heads(v.pf, v.pf.trajectories(ps), 4800.0)[0])]))
@@ -1095,7 +1095,8 @@ def test_traced_through_winds_read_in_parts(demo_run, monkeypatch):
     """Winds too large for the 3D cache: trajectories traced in boxes around bands of
     parcels (traced again in a wider box when their path leaves it) are the
     whole-volume ones to the bit, with the default margins and with none at all."""
-    from atmo3d.core import fields as fmod, models, trajcalc
+    from atmo3d.core import fields as fmod, models
+    from atmo3d_cm1 import trajcalc
     ref = models.open_run(demo_run, workers=1)
     run = models.open_run(demo_run, workers=1)
     monkeypatch.setattr(run, "fits", lambda nbytes: False)

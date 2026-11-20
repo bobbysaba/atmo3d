@@ -16,7 +16,8 @@ import numpy as np
 import panel as pn
 from panel.widgets.select import SingleSelectBase
 
-from .. import config, pdecomp
+from .. import config
+from ..core.services import pdecomp
 from ..core import dist, series as ser
 from ..theme import DIALOG_DARK
 from . import panels

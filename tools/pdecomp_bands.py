@@ -1,7 +1,7 @@
 """Where do the horizontal bands in the decomposition's accelerations above ~12 km come
 from?  (Phase 2b step 2, docs-dev/derived-fields.md §5.3.)
 
-Runs CM1's decomposition (atmo3d.pdecomp.cm1_pdecomp) on one output file, then writes,
+Runs CM1's decomposition (atmo3d_cm1.pdecomp.cm1_pdecomp) on one output file, then writes,
 for every model level:
 
 - the grid: zh, dz, and how fast dz changes (dz_k / dz_k-1), so a kink in the stretching
@@ -31,7 +31,7 @@ import sys
 import numpy as np
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
-from atmo3d.pdecomp import cm1_pdecomp as P  # noqa: E402
+from atmo3d_cm1.pdecomp import cm1_pdecomp as P  # noqa: E402
 
 EDGE = 10  # points left out next to the lateral boundaries (as compare_pdecomp.py)
 

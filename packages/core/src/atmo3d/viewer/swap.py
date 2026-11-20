@@ -10,7 +10,7 @@ import os
 import numpy as np
 
 from .. import config
-from ..core import parcels as P
+from ..core.services import parcels as P
 from ..figures.runs import AllFields
 
 

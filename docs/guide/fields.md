@@ -223,7 +223,7 @@ are read from there (any file subset). Values written by atmo3d's older solver s
 with a note in the map title: they split the pressure differently (see below) and have
 no Coriolis part, so the sums that need `p_c` ask for a recompute. Elsewhere, a
 **Compute pressure decomposition** button (under the map or section) computes that time
-in a separate process (`atmo3d/pdecomp/cm1_pdecomp.py`).
+in a separate process (`packages/cm1/src/atmo3d_cm1/pdecomp/cm1_pdecomp.py`).
 
 ### What it does
 

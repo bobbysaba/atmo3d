@@ -10,7 +10,8 @@ import os
 import numpy as np
 import panel as pn
 
-from .. import config, pdecomp
+from .. import config
+from ..core.services import pdecomp
 from ..core import models, sounding_plot as sp, vectors
 from ..core.run import busy_note
 from ..core.fields import CMAPS, deriv_options

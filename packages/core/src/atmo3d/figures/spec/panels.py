@@ -6,8 +6,8 @@ import re
 
 import numpy as np
 
-from ...core import azim, dist, joint, parcels as par, series as ser, thermo, \
-    track as trk
+from ...core import azim, dist, joint, series as ser, thermo, track as trk
+from ...core.services import parcels as par
 from .. import draw as figdraw
 from .base import npanels, tindex, storm_motion, profile_runs, entry_run, time_key
 

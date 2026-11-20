@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """Compare atmo3d's pressure decomposition (pdecomp_solver.py: p_nl as the residual)
-with CM1's own method redone in numpy (atmo3d/pdecomp/cm1_pdecomp.py: p_nl solved
+with CM1's own method redone in numpy (packages/cm1/src/atmo3d_cm1/pdecomp/cm1_pdecomp.py: p_nl solved
 directly from CM1's advection, plus a Coriolis part) on one CM1 output file.
 
     python tools/compare_pdecomp.py RUN/cm1out_000034.nc [--heights 1 3] [--out DIR]
@@ -47,8 +47,8 @@ import numpy as np
 import netCDF4 as nc
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from atmo3d.pdecomp import cm1_pdecomp as M          # noqa: E402
-from atmo3d.pdecomp import pdecomp_solver as S      # noqa: E402
+from atmo3d_cm1.pdecomp import cm1_pdecomp as M          # noqa: E402
+from atmo3d_cm1.pdecomp import pdecomp_solver as S      # noqa: E402
 
 PARTS = ('b', 'l', 'nl')
 

@@ -7,7 +7,8 @@ import panel as pn
 from .. import spec as fg
 import os
 
-from ...core import geo, parcels as P, vectors
+from ...core import geo, vectors
+from ...core.services import parcels as P
 from ...core.fields import deriv_name, split_deriv
 from .base import (
     LEVEL_MODES, TERRAIN_LEVEL_MODES, HATCHES, REDUCE, GRIDS, AZ_REFS, AZ_CENTERS,

@@ -157,7 +157,7 @@ class Bench:
         from bokeh.document import Document
         from .viewer import app as A, timing
         t0 = time.perf_counter()
-        self.v = v = A.Viewer(self.run, self.F, maxpix=config.get("maxpix"), reg=self.reg)
+        self.v = v = A.viewer_class()(self.run, self.F, maxpix=config.get("maxpix"), reg=self.reg)
         t1 = time.perf_counter()
         doc = Document()
         doc.add_root(v.main().get_root(doc))
@@ -481,7 +481,7 @@ class Bench:
                 shutil.rmtree(tmp, ignore_errors=True)
         # trajectories traced through the winds (as for a run without parcel output),
         # the whole domain's seeding, from whole volumes and read in parts
-        from .core import trajcalc
+        from .core.services import trajcalc
         if all(x in run.vars for x in trajcalc.winds(run)):
             lat, span = trajcalc.lattice(run), (ta, ta + n)
             what = f"trajectories: {n} outputs, {lat['nx'] * lat['ny'] * lat['nz']} parcels"

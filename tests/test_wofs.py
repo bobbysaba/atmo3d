@@ -1,4 +1,4 @@
-"""WoFS reader (core/wofs.py): one member of a tiny synthetic WoFS run (cycle folders of
+"""WoFS reader (atmo3d_wofs/run.py): one member of a tiny synthetic WoFS run (cycle folders of
 wrfout_d01_<time>_<member> files beside DART files that are ignored), its names, grid,
 times, base state and perturbations, its terrain-following heights and maps at a height
 above ground or sea level, and how runs are found and opened; the ensemble mean (<root>/mean)."""
@@ -520,7 +520,8 @@ def test_traced_trajectories(wofs_root, tmp_path, monkeypatch):
     """No parcel output: trajectories traced through the 3D winds (once, to the cache),
     above sea level, never under their column's lowest level, read like CM1's; turned
     off when the output is less often than the setting."""
-    from atmo3d.core import parcels as P, trajcalc, volume3d
+    from atmo3d.core import volume3d
+    from atmo3d_cm1 import parcels as P, trajcalc
     monkeypatch.setattr(P, "CACHE_DIR", str(tmp_path / "parcels"))
     # (WoFS does not offer parcels; the traced trajectories stay tested on its terrain)
     monkeypatch.setattr(wofs.WoFSRun, "OFFERS", wofs.WoFSRun.OFFERS | {"parcels"})
@@ -557,7 +558,8 @@ def test_traced_trajectories_read_in_parts(wofs_root, tmp_path, monkeypatch):
     every band has to be traced again in a wider box; and a field sampled along them
     from the columns around the parcels on those columns' own heights is the one
     sampled from its volume."""
-    from atmo3d.core import fields as fmod, parcels as P, trajcalc
+    from atmo3d.core import fields as fmod
+    from atmo3d_cm1 import parcels as P, trajcalc
     from test_parcels import _spy_parts
     monkeypatch.setattr(P, "CACHE_DIR", str(tmp_path / "parcels"))
     # (WoFS does not offer parcels; the traced trajectories stay tested on its terrain)
@@ -662,7 +664,8 @@ def test_mean_source_split():
 def test_mean_series_and_trajectories(wofs_root, tmp_path, monkeypatch):
     """Series read the mean in reader processes; trajectories follow the mean winds,
     traced to their own file (not a member's)."""
-    from atmo3d.core import parcels as P, series as ser, trajcalc
+    from atmo3d.core import series as ser
+    from atmo3d_cm1 import parcels as P, trajcalc
     monkeypatch.setattr(ser, "store", lambda *a, **k: None)
     monkeypatch.setattr(P, "CACHE_DIR", str(tmp_path / "parcels"))
     # (WoFS does not offer parcels; the traced trajectories stay tested on its terrain)

@@ -2,7 +2,7 @@
 viewer shows (native, derived, derivatives, column fields) on the model levels or at
 heights, written one time after another to a CF-style file.  Used by the viewer's
 Export data dialog and by `atmo3d export` (no Panel / Bokeh here).  `atmo3d export
-RUN --parcels SET` writes a saved parcel set instead (core/parcels.py, export_set)."""
+RUN --parcels SET` writes a saved parcel set instead (atmo3d_cm1/parcels.py, export_set)."""
 
 import datetime
 import os
@@ -474,7 +474,8 @@ def main(argv=None):
 
 def _parcel_frame(run, pf, args):
     """(shift, frame text) of --relative: moving at --storm, else with the --track."""
-    from . import parcels as P, track as trk
+    from . import track as trk
+    from .services import parcels as P
     t_ref = 60.0 * float(args.relative)
     if args.storm is not None:
         how, motion, fixes = "motion", tuple(_floats(args.storm, 2, "--storm")), None
@@ -495,7 +496,7 @@ def _parcels_main(args, run, F, fail):
     """atmo3d export RUN --parcels SET: a saved parcel set to netCDF / CSV."""
     import sys
     import time as _time
-    from . import parcels as P
+    from .services import parcels as P
     pf = P.for_run(run, F)
     if pf is None:
         return fail(f"no parcel output in {run.path} (parcel_glob setting)")

@@ -36,7 +36,8 @@ Into an existing environment (Python 3.11 or newer):
 
 ```bash
 git clone https://github.com/bobbysaba/atmo3d.git
-pip install -e ./atmo3d            # add [test] for pytest and the browser tests
+pip install -e ./atmo3d/packages/core -e ./atmo3d/packages/cm1 -e ./atmo3d/packages/wofs
+pip install pytest websocket-client   # for the tests and the browser tests
 ```
 
 The versions in `pyproject.toml` are looser than the pins in `environment.yml`. If

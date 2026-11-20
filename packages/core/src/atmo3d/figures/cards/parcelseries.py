@@ -6,7 +6,7 @@ over the parcels and, if you like, the lines of some of them; nothing computed."
 import panel as pn
 
 from .. import spec as fg
-from ...core import parcels as P
+from ...core.services import parcels as P
 from .base import (
     _hex, _f, _grid, _hint, _retired, ENS_BANDS, ENS_MIDS, LINE_STYLES, band_opacity, card_body,
     label_widget, look_values, look_widgets, run_widget,
