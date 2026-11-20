@@ -315,6 +315,12 @@ branch protection.
    `parts_tip`; `_ext_modals`; grid isosurfaces treat empty (NaN) points as outside.)
 6. Tests: a small synthetic radar generator (like `tests/synthetic.py`) with analytic
    answers; reader, sampler and regrid tests.
+   (2026-11-19: done. `tests/synthetic_radar.py` (steps 2-4); `test_radar_reader.py`,
+   `test_radar_ppi.py`, `test_radar_sampler.py`, `test_radar_regrid.py`, and
+   `test_radar_analytic.py` (hand-worked answers: across north, the half-weight rule
+   at a missing gate, a missing sector, sweeps with different ray counts, a volume cut
+   short, the regrid's grid points): 65 tests, in `tests/radar-tests.txt` for CI.
+   `test_real_radar.py` checks your own folder: ATMO3D_RADAR_ROOT=... pytest -m real.)
 
 Done when: Bobby can open the 19-file folder, scrub through times, see PPIs, cross-sections
 and 3D, and regrid with confirmed settings. **CHECKPOINT** after steps 1, 3, and 5.

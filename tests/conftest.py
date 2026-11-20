@@ -3,6 +3,7 @@ one Registry for the whole session.
 
   pytest                 tests on the demo data (the default)
   pytest -m real         checks on your own run: ATMO3D_TEST_RUN=/path/to/run (slow)
+                         (WoFS: ATMO3D_WOFS_ROOT; radar: ATMO3D_RADAR_ROOT)
   pytest -m browser      the viewer in headless Firefox, with screenshots (slow)
   pytest --make-baselines   rewrite the PNGs in tests/baseline (test_images.py)
 
