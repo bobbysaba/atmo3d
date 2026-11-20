@@ -43,7 +43,7 @@ it, not editing the core.
 - Do not change behavior for CM1 or WoFS unless the phase says to. Image baselines in
   `tests/baseline/` must stay unchanged unless a phase says they will move.
 - Stop at every **CHECKPOINT** and wait for Bobby.
-- Radar data lives on the HPC at: `<path to be filled in by Bobby>`. Never commit it.
+- Radar data lives on the HPC at: `/glade/derecho/scratch/rasaba/20260403_20260404_results`. Never commit it.
 
 ## 4. Facts about the current code (found in the survey)
 
@@ -288,7 +288,7 @@ and 3D, and regrid with confirmed settings. **CHECKPOINT** after steps 1, 3, and
 ## 7. Open items
 
 - Receiver locations for the bistatic geometry: where do they come from?
-- Real `w` data in other files, or always zero?
+- Real `w` data in other files, or always zero? (Phase 4: `w` is nonzero in files 1-18; `w_direct` is zero in all 19. See `docs-dev/radar-spike.md`.)
 - Depth of the upgrade path (figures only, or sessions too). Plan assumes both.
 - Whether the radar collaborators get write access or work through forks and PRs
   (Phase 5 sets up CODEOWNERS either way).

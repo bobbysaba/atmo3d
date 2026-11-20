@@ -1,0 +1,75 @@
+numba threads: 4  files: 19
+
+== A. field contents per file (valid rays only)
+file  rays  read_s/field  w!=0  w_direct!=0  u_valid  dd==2  dd_values  dbz_max
+   0  10080     0.52         0         0      1712     1712  [2.0]  67.5
+      file 0 (finite, finite & nonzero): {'w': (0, 0), 'w_direct': (1712, 0), 'u': (1712, 1712), 'doppler_degree': (1712, 1712), 'reflectivity': (3171221, 3141584)}
+   1  10080     0.54       609         0      1756     1756  [2.0]  65.5
+   2  10080     0.54      2038         0      5695     5695  [2.0]  68.5
+   3  10080     0.53      7805         0     30383    30383  [2.0]  66.5
+   4  10080     0.54     29807         0     71922    71922  [2.0]  68.0
+   5  10080     0.54     89685         0    142697   142697  [2.0]  66.5
+   6  10080     0.54    140701         0    180185   180185  [2.0]  66.5
+   7  10080     0.54    166380         0    204582   204582  [2.0]  68.5
+   8  10080     0.53    215895         0    275540   275540  [2.0]  68.5
+   9  10080     0.54    297853         0    367709   367709  [2.0]  67.5
+  10  10080     0.56    373348         0    416927   416927  [2.0]  73.0
+  11  10080     0.54    340588         0    387986   387986  [2.0]  69.0
+  12  10080     0.55    364383         0    420889   420889  [2.0]  76.0
+  13  10080     0.54    334146         0    388042   388042  [2.0]  74.0
+  14  10080     0.54    333242         0    380556   380556  [2.0]  66.5
+  15  10080     0.56    235564         0    300201   300201  [2.0]  67.5
+  16  10080     0.55    223124         0    276150   276150  [2.0]  65.5
+  17  10080     0.54    146326         0    191706   191706  [2.0]  64.0
+  18   9360     0.49     39720         0     86717    86717  [2.0]  65.5
+
+== B. volume used below: combined_radar_object_advcor_9_20260404_020040.nc
+read all 21 (time, range) fields of one file: 14.0 s (0.67 s/field); peak RSS 1017 MB
+Volume.from_cfradial(reflectivity): 0.52 s, (14, 720, 1832), 74 MB in memory (float32), peak RSS 927 MB
+sweep elevations (median measured): [0.48, 0.88, 1.27, 1.85, 2.42, 3.12, 3.96, 5.14, 6.46, 8.04, 10.02, 12.48, 15.62, 19.56]
+one sweep only: 0.05 s
+storm centre (2 km CAPPI max): x -28 km, y 19 km, range 34 km
+
+-- sampler cost (median of 3; first call excluded)
+cross-section 150 km x 18 km at 250 m x 100 m (108781 pts, linear): 11 ms, 0.61 finite
+cross-section 150 km x 18 km at 250 m x 100 m (108781 pts, nearest): 9 ms, 0.61 finite
+column 0-18 km at 50 m (361 pts): 0.07 ms
+CAPPI 3 km, 300 x 300 km at 500 m (361201 pts): 38 ms
+CAPPI 3 km, full 920 x 920 km at 500 m (3389281 pts): 200 ms
+
+-- regrid of one field (sampler at every grid point; 0-20 km)
+full 920 km, 1 km: grid (21, 921, 921) = 18 M pts, 1.4 s, 71 MB, peak RSS +0 MB; save 0.1 s, load 0.0 s
+full 920 km, 500 m: grid (41, 1841, 1841) = 139 M pts, 10.8 s, 556 MB, peak RSS +776 MB; save 0.6 s, load 0.1 s
+300 km box, 500 m: grid (41, 601, 601) = 15 M pts, 1.4 s, 59 MB, peak RSS +0 MB; save 0.1 s, load 0.0 s
+300 km box, 250 m h / 250 m v: grid (81, 1201, 1201) = 117 M pts, 10.6 s, 467 MB, peak RSS +530 MB; save 0.4 s, load 0.1 s
+
+== C. 3D isosurfaces of 40 dBZ (whole volume)
+sweep grid (gate stride 1): 18.5 M pts, build 0.8 s; contour 0.2 s, 456474 triangles; peak RSS 3974 MB
+sweep grid (gate stride 2): 9.2 M pts, build 0.4 s; contour 0.1 s, 247175 triangles; peak RSS 4154 MB
+regridded (full 920 km, 1 km): marching_cubes 0.2 s, 48132 triangles
+regridded (300 km box, 500 m): marching_cubes 0.2 s, 183026 triangles
+
+-- vertical gap between neighbouring sweeps (km) vs beam depth (0.95 deg)
+pair               50km    100km    150km    200km    300km
+ 0.48- 0.88        0.35     0.69     1.03     1.38     2.07
+ 0.88- 1.27        0.35     0.69     1.03     1.38     2.07
+ 1.27- 1.85        0.50     1.00     1.49     1.99     2.99
+ 1.85- 2.42        0.50     1.00     1.49     1.99     2.98
+ 2.42- 3.12        0.61     1.22     1.84     2.45     3.67
+ 3.12- 3.96        0.73     1.45     2.18     2.90     4.35
+ 3.96- 5.14        1.03     2.06     3.09     4.12     6.17
+ 5.14- 6.46        1.14     2.29     3.43     4.57     6.84
+ 6.46- 8.04        1.37     2.73     4.10     5.46     8.18
+ 8.04-10.02        1.70     3.40     5.10     6.79    10.16
+10.02-12.48        2.10     4.20     6.30     8.38    12.54
+12.48-15.62        2.65     5.30     7.94    10.57    15.81
+15.62-19.56        3.27     6.52     9.76    12.99    19.42
+beam depth         0.83     1.66     2.49     3.32     4.97
+height of  0.48 deg     0.57     1.43     2.59     4.04     7.82
+height of 19.56 deg    16.87    33.99    51.38    69.02   105.06
+
+== D. figures
+wrote sampler_views.png
+wrote iso_compare.png
+
+done; final RSS (2887.0078125, 4153.5625)
