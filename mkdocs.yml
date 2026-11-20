@@ -50,6 +50,7 @@ nav:
       - Series and distributions: guide/series.md
       - Parcels: guide/parcels.md
       - WoFS and WRF ensembles: guide/wofs.md
+      - Radar volumes: guide/radar.md
       - Figures: guide/figures.md
       - Figure panels: guide/figures-panels.md
       - Figure layers: guide/figures-layers.md

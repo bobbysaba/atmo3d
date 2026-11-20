@@ -73,6 +73,8 @@ processes and renders figures.
 | `test_settings.py`, `test_picker.py`, `test_ui.py` | Settings, the run picker, layout logic |
 | `test_browser.py` | The viewer in headless Firefox (marker `browser`) |
 | `test_real.py` | Your own output (marker `real`) |
+| `test_radar_*.py` | Radar, on `tests/synthetic_radar.py` (analytic answers): reader, PPI, sampler, regrid, hand-worked cases; `tests/radar-tests.txt` lists them for CI |
+| `test_real_radar.py` | Your own radar folder: `ATMO3D_RADAR_ROOT=... pytest -m real` |
 
 ## Layout
 
@@ -236,6 +238,29 @@ panels, call `viewer.panels.register(Tool(...))` and, when the panel is a Viewer
 `viewer.ext.register_mixin(...)`; tools shared code must reach (as CM1's parcels) go
 through `core.services.provide()`. Packages load in the alphabetical order of their entry-point
 names, which is the order "auto" tries their models in. See `atmo3d_cm1/__init__.py`.
+
+### The registration API
+
+Everything a data type adds goes through `register()`; the core never imports a data-type
+package.
+
+| Call | Adds |
+|---|---|
+| `core.models.register(Model())` | the data type: `key`, `label`, `run_class`, `count`, `looks` (is this folder yours?), `open`, `summary`; optionally `make_demo`, and the toolbar's parts switch (`parts`, `parts_of`, `part_label`, `folder_label`, `parts_tip`, `virtual`) as radar's Native / Regridded |
+| `core.catalog.register(Catalog(...))` | the field catalog: native fields (label, units, colormap, range, group), the `refl` / `u` / `v` / `w` roles, "other" and hidden fields |
+| `viewer.panels.register(Tool(...))` | a rail button and its panel; `needs=` names a capability, `click=` handles map clicks while the tool is on |
+| `viewer.ext.register_mixin(cls)` | methods added to the Viewer (or the editor) |
+| `core.services.provide(name, impl)` | a service shared code reaches without importing you (CM1's parcels) |
+
+What a run can do is a *capability* (`run.can(name)`; the list is `CAPS` in
+`core/capabilities.py`). Among them, `grid` (a regular `xh`/`yh`/`z` grid: series and
+distributions need it), `sampled` (the views can sample any x, y, z: sections, constant-height
+maps and 3D; a grid run has it too) and `native_polar` (radar sweeps). A run without a grid
+answers those views through hooks on the run (`map_plane`, `section_points`,
+`sample_section`, `build_scene`); the grid code paths are unchanged. Radar's
+`RegriddedRun(Run)` is the pattern for a data type that also offers a grid version of itself:
+its path names its settings, so sessions, figures and exports keep them. See
+`atmo3d_radar/__init__.py` and [Radar volumes](guide/radar.md).
 
 ## Adding a derived field
 

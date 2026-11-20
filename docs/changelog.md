@@ -3,7 +3,23 @@
 What changed in each release, newest first. The version is in `pyproject.toml`; a release
 has a matching git tag.
 
-## Unreleased
+## 1.0.0 (2026-11-19)
+
+One core with a data type per package (CM1, WoFS and radar under `packages/`), and a
+registration API for more ([Developing](developing.md#the-registration-api)).
+
+### Radar volumes
+- A folder of CfRadial volumes (the bistatic KTLX files) opens as a run, read in native
+  polar geometry. The map draws a sweep, a constant height or the column max / min; the PPI
+  tool lists the sweeps and gives the gate and column under a click; cross-sections and 3D
+  sample the volumes. New settings: `radar_sampling`, `radar_max_gap_km`. See
+  [Radar volumes](guide/radar.md).
+- **Optional regrid**, off unless chosen: the toolbar's *Native sweeps | Regridded* switch
+  opens a dialog that confirms the settings (`radar_regrid_*`) before opening a regular-grid
+  run, so series, figures, sessions and derived wind fields work on radar. Views are labelled
+  "regridded: method, spacing"; the settings are in the run's name and so in sessions,
+  figures and exports.
+- Radar tests on a synthetic radar with hand-worked answers (`tests/radar-tests.txt`).
 
 ### WoFS: no parcels
 - WoFS runs no longer offer parcels: the Parcels tool is gone from their rail, and no

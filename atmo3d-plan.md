@@ -332,6 +332,10 @@ and 3D, and regrid with confirmed settings. **CHECKPOINT** after steps 1, 3, and
 2. Changelog; version to **1.0.0**.
 3. Final full-suite run by Bobby.
 
+(2026-11-19: steps 1-2 done on `phase7-finish`: `docs/guide/radar.md`, the registration API in
+`docs/developing.md`, changelog 1.0.0, versions 1.0.0 in all five `pyproject.toml` and
+`atmo3d.__version__`. Step 3 is Bobby's.)
+
 ## 7. Open items
 
 - Receiver locations for the bistatic geometry: where do they come from?
