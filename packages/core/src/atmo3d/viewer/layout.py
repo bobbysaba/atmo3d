@@ -64,7 +64,7 @@ class Layout:
                 op=pn.widgets.FloatSlider(name="Opacity", start=0.05, end=1.0, step=0.05,
                                           value=op, width=130),
             ))
-        ztop = float(np.floor(run.ztop))
+        ztop = max(2.0, float(np.floor(run.ztop)))  # (a radar's can be low: not under 2)
         # (a terrain run's scene is above sea level: its top over the highest ground)
         z3top = float(np.floor(volume3d.top_height(run))) if run.terrain else ztop
         self.v3_ztop = pn.widgets.FloatSlider(name="Top (km MSL)" if run.terrain else
@@ -402,7 +402,9 @@ class Layout:
         for b in (self.v3_pick, self.v3_view, self.v3_render):
             b.param.update(height=32, margin=(4, 2))
         d.panel.styles = dict(d.panel.styles, **DRAWER)
-        bar = _bar(_group(iso, fl, sv, st, scene),
+        # (a run with no grid draws no 3D vectors or streamlines yet: a radar's)
+        bar = _bar(_group(iso, fl, sv, st, scene) if self.run.grid else
+                   _group(iso, fl, scene),
                    _group(self.v3_region, self.v3_pick, self.v3_view, self.v3_render))
         return pn.Column(bar, d.panel, styles=BAR, margin=0, sizing_mode="stretch_width")
 

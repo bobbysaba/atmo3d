@@ -173,14 +173,12 @@ class Events:
             box = self.box
             txt = "Region"
         x0, x1, y0, y1 = box
-        # (3D on a run with no grid comes with its sampler: Phase 6 step 4)
+        # (a run with no grid: its own, run.scene_stride)
         stride = volume3d.auto_stride(self.run, box, self.v3_ztop.value, 12e6) \
-            if self.run.grid else 1
-        res = (f' · auto res {"full" if stride == 1 else f"1/{stride}"}'
-               if self.run.grid else "")
+            if self.run.grid else self.run.scene_stride(box, self.t)
         self.v3_region.object = (
             f'<div class="cv-hint" style="margin:0 8px;white-space:nowrap">{txt} {x1 - x0:.1f} × {y1 - y0:.1f} '
-            f'km{res}</div>')
+            f'km · auto res {"full" if stride == 1 else f"1/{stride}"}</div>')
 
     def _update_3d_labels(self):
         n = sum(o["on"].value for o in self.isos)

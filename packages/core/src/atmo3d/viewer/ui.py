@@ -21,8 +21,10 @@ LEVEL_MODES = {"Height AGL (km)": "height", "Model level (k)": "level",
 TERRAIN_LEVEL_MODES = {"Height AGL (km)": "height", "Height MSL (km)": "msl",
                        "Model level (k)": "level", "Column max": "colmax",
                        "Column min": "colmin"}
-# a radar run (no grid): its map shows one sweep at a time (Fields.plane's "sweep" mode)
-SWEEP_MODES = {"Sweep": "sweep"}
+# a radar run (no grid): its map shows one sweep (Fields.plane's "sweep" mode), a height
+# through its sampler, or the most / least of the sweeps over each point
+SWEEP_MODES = {"Sweep": "sweep", "Height (km)": "height", "Column max": "colmax",
+               "Column min": "colmin"}
 FRAMES = {"Ground-relative": "ground", "Grid-relative": "grid", "Storm-relative": "storm"}
 EMPTY_LINES = dict(xs=[], ys=[])
 EMPTY_VEC = dict(x0=[], y0=[], x1=[], y1=[], angle=[])

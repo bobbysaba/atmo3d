@@ -95,6 +95,15 @@ KEYS = [
         "y (each n x n block shows its middle column). auto = as few as keep them to "
         "about 250 000 columns (every column up to 500 x 500 points).",
         kind="auto_int", advanced=True),
+    Key("radar_max_gap_km", "data", "auto", "Radar: widest gap bridged between sweeps (km)",
+        "Radar views that are not one sweep (constant-height maps, cross-sections, "
+        "columns, 3D) take values between two sweeps linearly in elevation. Where the "
+        "two sweeps around a point are further apart than this (vertically, at its "
+        "range) the point is left empty instead. auto: every gap is bridged.",
+        kind="auto_float"),
+    Key("radar_sampling", "data", "linear", "Radar: sampling within a sweep",
+        "linear: between the two nearest rays and gates; nearest: the nearest gate. "
+        "Between sweeps it is always linear in elevation.", advanced=True),
     Key("cache_gb", "server", "auto", "3D cache (GB)",
         "Memory for cached 3D fields. auto = a share of this job's memory, leaving "
         "room for the pressure decomposition.", kind="auto_float", restart=True,

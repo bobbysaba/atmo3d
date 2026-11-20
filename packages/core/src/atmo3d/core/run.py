@@ -573,19 +573,26 @@ class Source:
     facts (extent, ztop, size_label, field_bytes) describe the run to the viewer
     without naming a grid.
 
-    A reader with no grid (grid False: a radar's PolarRun) also gives the map what the
-    grid's index window gives it (core.render.view_window, _crop):
+    A reader with no grid (grid False: a radar's PolarRun) also gives the views what
+    the grid's indices give them (core.render, core.volume3d):
       map_window(view, maxpix)             the map's pixels for a view (win[4]: stride)
-      map_crop(a, win, t, mode, level)     x, y, (ny, nx) of a plane on those pixels
+      map_plane(F, name, t, mode, level, win, storm)
+                                           x, y, (ny, nx) of a field on those pixels
       level_text(t, mode, level)           the map title's level (" @ 0.5° sweep")
+      section_points(A, B)                 s, x, y, direction of a section's points
+      sample_section(vol, t, x, y, zq)     (nz, n) of a volume along them
+      build_scene(F, scene, ...)           a 3D scene (volume3d.build_scene's dict)
     and the level mode its planes take (Fields.plane: "sweep")."""
 
     model = None  # key in core.models.MODELS
     model_label = "model"
     # a regular grid (Run: xh, yh, z, dx, levels).  False (a radar's PolarRun): only
-    # what needs no grid works on it (pointwise fields, the map through map_window /
-    # map_crop, which say what a map of the view looks like)
+    # what needs no grid works on it (pointwise fields; the map, sections and 3D through
+    # the hooks above, when the data type samples itself: `sampled`)
     grid = False
+    # the views sample the data at any x, y, z: a grid does, a data type with no grid
+    # when it brings a sampler (a radar's)
+    sampled = False
     # the features this data type offers (core.capabilities.CAPS keys, besides the four
     # flags below); ask run.can(name) / run.offers(name), not this set
     OFFERS = frozenset()
@@ -608,6 +615,8 @@ class Source:
     # a plain-language note on how this run's fields come about ("" for none), shown
     # with the run's details
     note = ""
+    # what heights are above, for axis labels (a radar's: the radar)
+    height_units = "km AGL"
     # output times kept open in this process (a model's source may open many files)
     open_max = 6
 
@@ -773,6 +782,11 @@ class Source:
             self._insert(name, t, vol)
         return vol
 
+    def view_note(self):
+        """How views off the data's own points come about, for their titles ("": said
+        nowhere; a radar's: sampled natively between sweeps)."""
+        return ""
+
     @property
     def extent(self):
         """(x0, x1, y0, y1) km: the horizontal box the data covers."""
@@ -812,6 +826,7 @@ class Run(Source):
     and may override source(t) (what reader processes open for time t)."""
 
     grid = True
+    sampled = True
 
     def _grid_done(self):
         """Sizes and spacing from xh, yh, z (call once they are set)."""

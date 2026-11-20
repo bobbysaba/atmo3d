@@ -120,7 +120,7 @@ def at(i):
 
 
 # ---- the built-in tools (their panels are the viewer's own mixins, viewer/*.py); those
-# that sample a grid need one ("grid": a radar run gets them with its sampler, step 4)
+# that sample the data need a grid or a sampler ("sampled"), the region reductions a grid
 def _builtins():
     register(Tool("Sounding", "Sounding", "balloon",
                   "Soundings: click the map (or drag a box for an area mean)",
@@ -130,7 +130,7 @@ def _builtins():
                   shown=lambda run: True))
     register(Tool("Cross-section", "Section", "slice",
                   "Vertical cross-section: click A, then B",
-                  layout=lambda v: v._xs_layout(), needs="grid"))
+                  layout=lambda v: v._xs_layout(), needs="sampled"))
     register(Tool("Track", "Track", "route",
                   "Storm track: click a storm to follow it through time",
                   layout=lambda v: v._trk_layout(), title="Storm track", needs="tracking"))
@@ -140,7 +140,7 @@ def _builtins():
                   "Distribution of a field over a region at one time: histogram, box, "
                   "violin, cumulative", layout=lambda v: v._dist_layout(), needs="grid"))
     register(Tool("3D region", "3D box", "cube", "Drag a box on the map to view it in 3D",
-                  modes=("Seed box",), needs="grid"))
+                  modes=("Seed box",), needs="sampled"))
 
 
 _builtins()

@@ -551,7 +551,10 @@ def build_scene(run, F, scene, progress=None, cancelled=None, cache=None):
     On a terrain run everything is above sea level (module notes) and `terrain` is the
     ground's surface (terrain_surface; None on a flat run).
 
-    Returns dict(meshes, ground, vecs, stream, notes, stride, off, terrain)."""
+    Returns dict(meshes, ground, vecs, stream, notes, stride, off, terrain).
+    A run with no grid builds its own (run.build_scene: a radar's, natively)."""
+    if not run.grid:
+        return run.build_scene(F, scene, progress, cancelled, cache)
     t, box, ztop = scene["t"], scene["box"], scene["ztop"]
     ss = scene["stream"]
     wind = list(run.catalog.names(("u", "v", "w")))

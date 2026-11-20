@@ -45,11 +45,9 @@ def view_window(run, view, maxpix):
     return i0, i1, j0, j1, s
 
 
-def _crop(run, a, win, t=None, mode=None, level=None):
-    """x, y, a in the window (a run with no grid: a, a native plane, on its map pixels,
-    run.map_crop, which needs the plane's time, mode and level)."""
-    if not run.grid:
-        return run.map_crop(a, win, t, mode, level)
+def _crop(run, a, win):
+    """x, y, a in the window (a regular grid's; a run with no grid draws its fields
+    straight onto the map's pixels: run.map_plane)."""
     i0, i1, j0, j1, s = win
     return run.xh[i0:i1:s], run.yh[j0:j1:s], a[j0:j1:s, i0:i1:s]
 
@@ -182,10 +180,10 @@ def fill_palette(spec):
 
 
 def _map_fill(F, f, t, win, fstorm):
-    a = F.plane(f["var"], t, f["mode"], f["level"], storm=fstorm)
     m = f.get("minus")  # (a difference: {F, t} of the other run / time)
-    if not F.run.grid:  # (native planes: each on the map's pixels first)
-        return _map_fill_native(F, f, t, win, a, m, fstorm)
+    if not F.run.grid:  # (no grid: each straight onto the map's pixels)
+        return _map_fill_native(F, f, t, win, m, fstorm)
+    a = F.plane(f["var"], t, f["mode"], f["level"], storm=fstorm)
     if m:
         a = a - minus_plane(F, m["F"], f["var"], m["t"], f["mode"], f["level"], fstorm)
         lo, hi = diff_range(a) if f["auto"] else (f["vmin"], f["vmax"])
@@ -193,23 +191,24 @@ def _map_fill(F, f, t, win, fstorm):
         lo, hi = F.auto_range(f["var"], a) if f["auto"] else (f["vmin"], f["vmax"])
     if hi <= lo:
         hi = lo + 1e-6
-    x, y, ac = _crop(F.run, a, win, t, f["mode"], f["level"])
+    x, y, ac = _crop(F.run, a, win)
     return fill_bands(x, y, ac, lo, hi, f, codes=True)
 
 
-def _map_fill_native(F, f, t, win, a, m, fstorm):
-    """_map_fill on a run with no grid (a radar's sweeps): a difference is taken on the
-    map's pixels, as the other time's rays lie elsewhere (the same run only, for now)."""
+def _map_fill_native(F, f, t, win, m, fstorm):
+    """_map_fill on a run with no grid (a radar's): the field on the map's pixels
+    (run.map_plane: a sweep, a height through its sampler, a column extreme); a
+    difference is taken on those pixels (the same run only, for now)."""
     run = F.run
-    x, y, ac = _crop(run, a, win, t, f["mode"], f["level"])
+    x, y, ac = run.map_plane(F, f["var"], t, f["mode"], f["level"], win, fstorm)
     if m:
         if m["F"].run is not run:
             raise ValueError("differences between two radar runs come later (Phase 6)")
-        b = m["F"].plane(f["var"], m["t"], f["mode"], f["level"], storm=fstorm)
-        ac = ac - _crop(run, b, win, m["t"], f["mode"], f["level"])[2]
+        ac = ac - run.map_plane(m["F"], f["var"], m["t"], f["mode"], f["level"], win,
+                                fstorm)[2]
         lo, hi = diff_range(ac) if f["auto"] else (f["vmin"], f["vmax"])
     else:
-        lo, hi = F.auto_range(f["var"], a) if f["auto"] else (f["vmin"], f["vmax"])
+        lo, hi = F.auto_range(f["var"], ac) if f["auto"] else (f["vmin"], f["vmax"])
     if hi <= lo:
         hi = lo + 1e-6
     return fill_bands(x, y, ac, lo, hi, f, codes=True)
@@ -234,12 +233,26 @@ def fill_bands(x, y, a, lo, hi, f, codes=False):
 
 def _map_vectors(F, o, t, win, storm):
     """{"vec": arrows} or {"stream": (lines, heads)} of map vector layer o."""
-    u, v = vectors_mod.plane(F, o["q"], t, "height", o["level"], o["frame"], storm)
-    x, y, uc = _crop(F.run, u, win)
-    _, _, vc = _crop(F.run, v, win)
+    if F.run.grid:
+        u, v = vectors_mod.plane(F, o["q"], t, "height", o["level"], o["frame"], storm)
+        x, y, uc = _crop(F.run, u, win)
+        _, _, vc = _crop(F.run, v, win)
+    else:  # (no grid: its components at the height on the map's pixels)
+        x, y, uc, vc = _native_vectors(F, o, t, win, storm)
     if o["style"] == "streamlines":
         return dict(stream=streamlines(x, y, uc, vc, o["density"] / 20.0))
     return dict(vec=vectors(x, y, uc, vc, o["density"], o["ref"])[0])
+
+
+def _native_vectors(F, o, t, win, storm):
+    """x, y, u, v of map vector layer o on a run with no grid (run.map_plane at the
+    layer's height), in its frame."""
+    run, c = F.run, vectors_mod.comps(F, o["q"])
+    x, y, u = run.map_plane(F, c[0], t, "height", o["level"], win)
+    v = run.map_plane(F, c[1], t, "height", o["level"], win)[2]
+    if vectors_mod.VECTORS[o["q"]].framed:
+        u, v = vectors_mod.to_frame(run, u, v, o["frame"], storm)
+    return x, y, u, v
 
 
 def compute_map(F, spec):
@@ -258,17 +271,21 @@ def compute_map(F, spec):
         if not o["on"] or not o["var"]:
             out["ov"].append(None)
             continue
-        a = F.plane(o["var"], t, o["mode"], o["level"], storm=spec.get("fstorm"))
+        if run.grid:
+            a = F.plane(o["var"], t, o["mode"], o["level"], storm=spec.get("fstorm"))
+            x, y, ac = _crop(run, a, win)
+        else:  # (straight onto the map's pixels)
+            x, y, ac = run.map_plane(F, o["var"], t, o["mode"], o["level"], win,
+                                     spec.get("fstorm"))
+            a = ac
         lo, hi = F.auto_range(o["var"], a)
         levels = parse_levels(o["levels"], lo, hi)
-        x, y, ac = _crop(run, a, win, t, o["mode"], o["level"])
         out["ov"].append(dict(pos=contour_lines(x, y, ac, levels[levels >= 0]),
                               neg=contour_lines(x, y, ac, levels[levels < 0])))
 
     # vector layers: arrows or streamlines each
-    # (none on a run with no grid yet: they need winds on a height, Phase 6 step 4)
-    out["vecs"] = [_map_vectors(F, o, t, win, spec["storm"]) if o["on"] and run.grid
-                   else None for o in spec["vecs"]]
+    out["vecs"] = [_map_vectors(F, o, t, win, spec["storm"]) if o["on"] else None
+                   for o in spec["vecs"]]
     return out
 
 
@@ -319,6 +336,11 @@ def minus_section(F, F2, name, t2, A, B, s, zq, fstorm=None):
     else only its columns along the line are read (section_field)."""
     _other_has(F, F2, name)
     r2 = F2.run
+    if not r2.grid:  # (no grid: the same run's section points)
+        if r2 is not F.run:
+            raise ValueError("differences between two radar runs come later (Phase 6)")
+        _, x, y, _ = section_coords(r2, A, B)
+        return section_field(F2, name, t2, x, y, zq, fstorm)
     s2, fi, fj, _ = section_coords(r2, A, B)
     b = section_field(F2, name, t2, fi, fj, zq, fstorm, F2.fits([name], t2))
     out = (fi < -0.5) | (fi > r2.ni - 0.5) | (fj < -0.5) | (fj > r2.nj - 0.5)
@@ -330,6 +352,12 @@ def minus_section(F, F2, name, t2, A, B, s, zq, fstorm=None):
 
 # ------------------------------------------------------------ cross-section
 def section_coords(run, A, B, max_pts=1200):
+    """(s, fi, fj, (ex, ey)): distances along the section A-B (km), its points as
+    fractional grid indices, and its direction.  A run with no grid gives its own
+    points (run.section_points) as x, y km in place of fi, fj, which only the functions
+    here (sample_section, section_field) take."""
+    if not run.grid:
+        return run.section_points(A, B, max_pts)
     (xa, ya), (xb, yb) = A, B
     L = math.hypot(xb - xa, yb - ya)
     n = int(min(max_pts, max(2, math.ceil(L / (run.dx / 1000.0)) + 1)))
@@ -368,7 +396,11 @@ def sample_section(run, vol, fi, fj, zq, t=None):
     run with t: each column on its own heights at time t, zq above sea level, NaN under
     the ground (between the ground and the lowest level: the lowest level's value).
     vol: the field's volume, or a function (fi, fj) -> its (nk, n) columns at those
-    points, bilinear (section_columns: a field too large for the 3D cache)."""
+    points, bilinear (section_columns: a field too large for the 3D cache).
+    A run with no grid: fi, fj are x, y km (section_coords), vol its native volume at
+    time t, sampled by the run (run.sample_section)."""
+    if not run.grid:
+        return run.sample_section(vol, t, fi, fj, zq)
     lazy = callable(vol)
     sec = np.asarray(vol(fi, fj)) if lazy else None
     nk = sec.shape[0] if lazy else vol.shape[0]
@@ -414,7 +446,7 @@ def section_field(F, name, t, fi, fj, zq, storm=None, whole=True):
     fit the 3D cache with the rest it draws (Fields.fits); else from the columns
     along the line only (section_columns)."""
     run = F.run
-    if whole:
+    if whole or not run.grid:  # (no grid: its volumes, never columns)
         return F.take(name, t, lambda v: sample_section(run, v, fi, fj, zq, t), storm)
     return sample_section(run, section_columns(F, name, t, zq, storm), fi, fj, zq, t)
 

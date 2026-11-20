@@ -1338,7 +1338,7 @@ class Fields:
             more += bool(op) + bool(d.derived)
         if not natives and not more:  # (2D fields only: no volume to fit)
             return True
-        return run.fits(4 * run.nk * run.nj * run.ni * (len(natives) + more))
+        return run.fits(run.field_bytes * (len(natives) + more))
 
     def _halo(self, name):
         """Grid points beyond a part of the grid that 3D field `name` there depends

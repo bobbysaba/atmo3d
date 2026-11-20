@@ -34,7 +34,7 @@ class SectionPanel:
                      tools="box_zoom,wheel_zoom,pan,reset,save", active_drag="box_zoom",
                      toolbar_location="above", x_axis_label="Distance from A toward B (km)",
                      y_axis_label="Height (km MSL)" if self.run.terrain else
-                     "Height (km AGL)", x_range=Range1d(0, 1),
+                     f"Height ({self.run.height_units})", x_range=Range1d(0, 1),
                      y_range=Range1d(0, 15))
         style_fig(fig)
         self.xs_mapper = LinearColorMapper(palette=palette("reflectivity"), low=0, high=75,
@@ -108,8 +108,8 @@ class SectionPanel:
         self._xs_add_contour(on=bool(F.role("w")))
         self._xs_add_vec()
         # (a terrain run's section is above sea level: its top over the highest ground)
-        zend = float(np.floor(self.run.ztop + (float(self.run.terrain_height().max())
-                                                if self.run.terrain else 0.0)))
+        zend = max(1.0, float(np.floor(self.run.ztop + (
+            float(self.run.terrain_height().max()) if self.run.terrain else 0.0))))
         self.xs_ztop = pn.widgets.FloatSlider(name="Top (km MSL)" if self.run.terrain else
                                               "Top (km)", start=1.0, end=zend, step=0.5,
                                               value=min(15.0, zend), width=150)
@@ -510,6 +510,7 @@ class SectionPanel:
             + " · ".join(parts)
             + f' · A ({xa:.1f}, {ya:.1f}) → B ({xb:.1f}, {yb:.1f}) km, {s[-1]:.1f} km long'
             + (f' · storm-relative vorticity {spec["fnote"][2]}' if spec["fnote"] else "")
+            + (f' · {self.run.view_note()}' if self.run.view_note() else "")
             + (f' · pressure decomposition '
                f'{pdecomp.source(self.run, spec["t"], block=False)[1]}'
                if any(pdecomp.is_pdecomp(F, n) for n in names) else "")

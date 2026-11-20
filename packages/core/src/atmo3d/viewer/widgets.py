@@ -296,19 +296,38 @@ class Widgets:
         return mode_w, lvl
 
     def _sweep_pair(self, compact=False):
-        """_level_pair of a radar run: the one mode "sweep", and the sweep's number
-        (0: the lowest; a volume's sweeps by elevation, atmo3d_radar.cfradial)."""
-        n = max(1, int(getattr(self.run, "nsweeps", 1)))
+        """_level_pair of a radar run: a sweep's number (0: the lowest; a volume's
+        sweeps by elevation, atmo3d_radar.cfradial), a height above the radar (km,
+        through its sampler), or the column max / min of the sweeps."""
+        run = self.run
+        n = max(1, int(getattr(run, "nsweeps", 1)))
+        ztop = float(np.floor(run.ztop * 10) / 10)
         if compact:
             mode_w = pn.widgets.Select(options=SWEEP_MODES, value="sweep", width=140,
                                        height=32, margin=(4, 2))
             lvl = FloatInput(start=0, end=n - 1, step=1, value=0, width=70, height=32,
                              margin=(4, 4))
+            hstep, names = 0.25, ("", "")
         else:
             mode_w = pn.widgets.Select(name="Level", options=SWEEP_MODES, value="sweep",
                                        width=150)
             lvl = pn.widgets.FloatSlider(name="Sweep (0: lowest)", start=0, end=n - 1,
                                          step=1, value=0, width=210)
+            hstep, names = 0.05, ("Sweep (0: lowest)", "km above the radar")
+
+        def on_mode(ev):
+            if ev.new == "sweep":
+                lvl.param.update(start=0, end=n - 1, step=1, value=0.0)
+                if names[0]:
+                    lvl.name = names[0]
+            elif ev.new == "height":
+                lvl.param.update(start=0.0, end=ztop, step=hstep,
+                                 value=min(1.0 if ev.old != "height" else lvl.value, ztop))
+                if names[1]:
+                    lvl.name = names[1]
+            lvl.disabled = ev.new in ("colmax", "colmin")
+
+        mode_w.param.watch(on_mode, "value")
         return mode_w, lvl
 
     def _build_widgets(self):
@@ -341,9 +360,11 @@ class Widgets:
         self.workspace = pn.widgets.RadioButtonGroup(
             options=["Map", "3D", "Figure"], value="Map", button_type="primary",
             button_style="outline", width=190, height=32, margin=(4, 2),
-            # (a run with no grid, a radar's: the map only, until its sampler brings 3D
-            # and figures, Phase 6 step 4)
-            visible=bool(run.grid))
+            # (a run with no grid, a radar's: Map and 3D (its sampler); figures come later)
+            visible=bool(run.grid or run.sampled))
+        if not run.grid:
+            self.workspace.options = ["Map", "3D"] if run.sampled else ["Map"]
+            self.workspace.width = 130
         # the registered tools this run gets (viewer.panels: gated on its capabilities)
         self.mode = ToolRail(panels.for_run(run)[1])
         self.hint = _html()

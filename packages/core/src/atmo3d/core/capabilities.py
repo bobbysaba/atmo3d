@@ -6,9 +6,9 @@ offers it AND this run has what it needs (its fields, its files).  `run.offers(n
 asks only the first half: a feature a data type offers stays on screen when one run
 lacks its inputs, so the panel can say what is missing.
 
-Five capabilities are flags on the run, kept as attributes because they also say *how*
+Six capabilities are flags on the run, kept as attributes because they also say *how*
 (a Geo object, terrain-following heights): `terrain`, `geo`, `storm_relative`,
-`traced_parcels`, `grid`.  For those, offers() and can() read the flag.
+`traced_parcels`, `grid`, `sampled`.  For those, offers() and can() read the flag.
 """
 
 # name -> what it means (shown nowhere yet; the reference for data-type authors)
@@ -25,12 +25,14 @@ CAPS = {
     "terrain": "flag: levels follow the terrain (heights vary in space and time)",
     "geo": "flag: the grid sits on a map projection (run.geo)",
     "native_polar": "a native polar (PPI) view of single sweeps (radar: PolarRun)",
-    "grid": "flag: a regular grid (core.run.Run).  The views that sample one (cross-"
-            "sections, time series, distributions, 3D) need it until the data type "
-            "brings a sampler (radar: Phase 6 step 4)",
+    "grid": "flag: a regular grid (core.run.Run).  Time series and distributions "
+            "(region reductions over grid cells) need it",
+    "sampled": "flag: the views sample the data at any x, y, z (cross-sections, "
+               "constant-height maps, 3D): a regular grid, or a data type's own sampler "
+               "(radar: atmo3d_radar.sampler)",
 }
 
-FLAGS = ("terrain", "geo", "storm_relative", "traced_parcels", "grid")
+FLAGS = ("terrain", "geo", "storm_relative", "traced_parcels", "grid", "sampled")
 
 
 def _flag(run, name):
