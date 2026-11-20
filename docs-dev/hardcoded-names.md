@@ -277,3 +277,56 @@ old WoFS file's fields by `wofs_catalog.OLD_NAMES` when all its runs are WoFS (a
 mixing CM1 and WoFS runs is left as saved, with a note: one layer's field name cannot
 suit both). Figure documents keep `version` 3: the renaming is idempotent, so no marker
 is needed. Fixtures: `tests/data/old_files` (written by the pre-Phase-2 code).
+
+# Phase 3 status (2026-11-19)
+
+Capabilities: `core/capabilities.py` (`CAPS`: soundings, parcels, traced_parcels, pdecomp,
+tracking, storm_relative, terrain, geo, native_polar). A data type declares
+`Run.OFFERS` (CM1: soundings, parcels, pdecomp, tracking; WoFS: soundings, tracking.
+No parcels for WoFS, Bobby 2026-11-19; `core.parcels.offered`/`for_run` check the
+capability, so trajectories are not traced for it anywhere. WoFS keeps
+`traced_parcels = True` as a description, and the traced code in `core/trajcalc.py`
+stays tested through test_wofs.py, which turns parcels on for WoFS in the test). The four old flags stay attributes and are capabilities too. `run.offers(c)`:
+the data type offers it. `run.can(c)`: it offers it and this run has the inputs.
+
+Panels: `viewer/panels.py` holds the registry (`Tool`: key, label, icon, tip, layout,
+title, modes, needs, shown). `register()` adds a tool, `for_run(run)` returns (panels
+built, rail tools). The tab strip holds every panel whose `needs` the data type offers.
+The rail button also needs `run.can(needs)`, or `shown(run)` when given. The old
+`TOOLS`, `TOOL_OF`, `PANELS`, `TAB_MODE` and `PANEL_TITLES` tables in `viewer/ui.py` are
+gone, and so is the hand-built tool list in `viewer/widgets.py`. The panel contents are
+`Layout._snd_layout`, `_xs_layout`, `_trk_layout`, `_ser_layout`, `_dist_layout`
+(and `_par_layout`). The panels are still the Viewer's mixins (Phase 5 moves them).
+`_show_panel` takes a panel key (or an int, the registry place, as a saved session
+records it). `_panel()` and `_panel_open(key)` replace the `tabs.active == N` checks.
+
+Saved sessions: `panel.tab` is the panel's place in the registry. For CM1 and WoFS that
+is the same number as before (all six built-in panels are built for both).
+
+## What happened to each gate
+
+| Gate (Phase 0 list) | Fate |
+|---|---|
+| A pdecomp/__init__.py `run.model == "cm1"` | replaced: `run.offers("pdecomp")` |
+| A viewer/swap.py:21-22 model equality | kept: a grid-compatibility check (a member swaps only for one of the same type and grid) |
+| A registry.py:126 `.model != want` | kept: picker semantics (re-open as the type the user picked) |
+| A figures/runs.py:116, viewer/widgets.py:553, core/models.py, viewer/picker.py | kept: registry lookups and data, not branches; Phase 5 moves the registry into packages |
+| A `__main__.py`, `bench.py` `--demo cm1/wofs` | kept: picks which demo to build; Phase 5 makes the choices registry-driven |
+| B `terrain`, `geo`, `storm_relative`, `traced_parcels` reads (about 60) | kept as attribute reads: they are the capabilities (`can()` reads the same flag) and also carry how (the Geo object, terrain heights) |
+| B tracking (viewer/widgets.py rail and storm button) | replaced: `run.can("tracking")` |
+| C soundings: rail | replaced: built and shown when the type offers soundings (still shown if a run lacks the inputs; the panel says what is missing, as before) |
+| C soundings: figures/spec/panels.py | replaced: `run.offers("soundings")` before the name check |
+| C soundings: viewer/sounding.py:105 name check | kept: the per-run input check inside the panel |
+| C pdecomp: viewer/widgets.py:496-501, app.py:95, 348 | kept: these read the write-permission setting; computing goes through `can_compute`, now gated by `offers` |
+| C parcels: rail | replaced: `run.can("parcels")` |
+| C parcels: core/parcels.py `offered`, `for_run` (viewer/swap.py, core/export.py use them) | replaced: return nothing unless `run.offers("parcels")` |
+| C parcels/trajectories: core/parcels.py, core/trajcalc.py | kept: the feature itself, reached only through the panel |
+| C tracking: viewer/tracking.py, core/track.py | kept: the feature itself (rail and storm button gated above) |
+| C members/ensemble mean (`parts`, `stat`) | kept: members come from the data type's `parts` in core/models.py, so any type that lists parts gets them; not a capability |
+| C storm motion `umove`/`vmove` | kept: grid motion is model-neutral (0 when none) |
+| C config `wofs_member` / `WOFS_*` | kept: read by the WoFS reader only; moves with it in Phase 5 |
+
+Saved sessions also record the open panel's key (`panel.key`), and the reader uses it
+first. `panel.tab` is still written for older versions, and a session without a key
+falls back to it. A key whose panel this viewer lacks (package not installed) stays
+closed. The extra field is ignored by readers that don't know it, so FORMAT stays 2.
