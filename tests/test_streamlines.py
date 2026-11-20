@@ -115,7 +115,15 @@ class _Run(SimpleNamespace):
     """RUN with what build_scene needs: volumes kept in a dict, loading counted."""
 
     terrain = False  # (a flat run, as Run)
+    grid = True  # (a regular grid, as Run)
     catalog = C.of_model("cm1")  # (winds by role: uinterp, vinterp, winterp)
+
+    @property
+    def ztop(self):
+        return float(self.z[-1])
+
+    def view_note(self):
+        return ""  # (as Source: nothing to say about how views come about)
 
     def ij(self, x, y):
         return (int(np.clip(np.rint((x - X1[0]) * 2), 0, len(X1) - 1)),
