@@ -277,6 +277,11 @@ branch protection.
    not done; `atmo3d_radar.run.PolarRun(Source)`. `core.fields.Fields` still needs a grid,
    so the app cannot open a radar folder until steps 3-4.)
 3. Native **PPI** view panel (registered by the radar package).
+   (2026-11-19: done, as Bobby chose: radar opens in the shared viewer and its main map
+   draws the chosen sweep (level mode "sweep"; `atmo3d_radar.ppi`, nearest ray and gate
+   on the map's pixels); the radar's "PPI" panel lists the sweeps and shows the gate under
+   a click. Grid-only tools, 3D and figures are off on radar (`grid` capability) until
+   step 4.)
 4. Sampler-based cross-section, column and constant-height views, and 3D (native
    structured grid), per the Phase 4 decision.
 5. **Regrid** (optional, off by default): settings in the settings panel (method,

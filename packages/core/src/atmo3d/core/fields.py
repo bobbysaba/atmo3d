@@ -974,7 +974,11 @@ class Fields:
         pdecomp.register(run)  # decomposition fields, computable where no file has them
         self.run = run
         self.cat = cat = run.catalog  # (the data type's names: core.catalog)
-        self.ctx = dict(dx=run.dx, dy=run.dy, umove=run.umove, vmove=run.vmove,
+        # (a run with no grid, a radar's: no dx, dy, and only the pointwise derived
+        # fields, whose inputs may be any samples, e.g. a sweep's gates)
+        grid = getattr(run, "grid", True)
+        self.ctx = dict(dx=getattr(run, "dx", None), dy=getattr(run, "dy", None),
+                        umove=run.umove, vmove=run.vmove,
                         kappa=getattr(cat, "kappa", KAPPA), f=getattr(run, "fcor", 0.0))
         self.defs = OrderedDict()
         for name, info in run.vars.items():
@@ -988,6 +992,8 @@ class Fields:
         for d in _make_fields(run.vars, cat):
             if d.storm and not getattr(run, "storm_relative", True):
                 continue  # (no storm motion for this run: see Run.storm_relative)
+            if not grid and (not d.pointwise or d.column):
+                continue  # (needs a grid: derivatives, columns)
             if d.name in self.defs and d.name in cat.file_first:
                 continue  # (the files hold it: theirs is listed)
             self.defs[d.name] = d
@@ -1049,7 +1055,8 @@ class Fields:
     def plane(self, name, t, mode="height", value=1.0, storm=None):
         """2D (nj, ni) array of a field.
         mode: 'height' (km AGL), 'msl' (km above sea level: a terrain run's; the same
-        as 'height' on a flat run), 'level' (model level index), 'colmax', 'colmin'.
+        as 'height' on a flat run), 'level' (model level index), 'colmax', 'colmin';
+        on a radar run 'sweep' (value: the sweep's index): (rays, gates), not (nj, ni).
         storm: ground-relative storm motion (m/s) for storm-relative fields."""
         d = self[name]
         if d.ndim == 2:
@@ -1121,6 +1128,8 @@ class Fields:
         """{name: (nj, ni)} of native fields on one surface (plane's mode, value; mode
         "2d": 2D fields, a 3D one's lowest level), their levels read together."""
         run = self.run
+        if mode == "sweep":  # (a radar's: sweep `value` as it is, rays by gates)
+            return {n: run.read_sweep(n, t, int(value)) for n in names}
         if mode in ("height", "msl"):
             return run.read_heights(names, t, float(value), "msl" if mode == "msl" else "agl")
         out = {n: run.read_level(n, t) for n in names if run.vars[n].ndim == 2}

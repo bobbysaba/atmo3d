@@ -108,7 +108,7 @@ class SectionPanel:
         self._xs_add_contour(on=bool(F.role("w")))
         self._xs_add_vec()
         # (a terrain run's section is above sea level: its top over the highest ground)
-        zend = float(np.floor(self.run.z[-1] + (float(self.run.terrain_height().max())
+        zend = float(np.floor(self.run.ztop + (float(self.run.terrain_height().max())
                                                 if self.run.terrain else 0.0)))
         self.xs_ztop = pn.widgets.FloatSlider(name="Top (km MSL)" if self.run.terrain else
                                               "Top (km)", start=1.0, end=zend, step=0.5,

@@ -12,9 +12,9 @@ import os
 import netCDF4
 import numpy as np
 
-from atmo3d.core.run import IO_LOCK, Source, VarInfo
+from atmo3d.core.run import IO_LOCK, MissingAtTime, Source, VarInfo
 
-from . import beam, cfradial
+from . import beam, cfradial, ppi
 
 # fields computed from the sweep table and the beam model, not read from the files
 # (hidden: for checking the geometry)
@@ -154,10 +154,31 @@ class PolarRun(Source):
         self._not_writing(t)
         self._file_check(name, t)
         sw = self.sweeps(t)
+        if not 0 <= k < len(sw):
+            raise MissingAtTime(name, t, f"the volume at {self.time_label(t)} has "
+                                         f"{len(sw)} sweeps (no sweep {k})")
         if name in GEOMETRY:
             return self._geometry(name, sw, [k])[0]
         with IO_LOCK:
             return cfradial.read_sweep(self._ds(t)[name], sw, k)
+
+    # ------------------------------------------------------------------ the map
+    def map_window(self, view, maxpix):
+        """The map's pixels for a view (core.render.view_window on a grid)."""
+        return ppi.window(self, view, maxpix)
+
+    def map_crop(self, a, win, t, mode, level):
+        """x, y, (ny, nx) of a plane `a` (Fields.plane) on the map's pixels win
+        (core.render._crop on a grid): a sweep (mode "sweep", level: its index)."""
+        if mode != "sweep":
+            raise ValueError(f"a radar map shows sweeps, not {mode!r}")
+        return ppi.raster(self, a, t, int(level), win)
+
+    def level_text(self, t, mode, level):
+        """A map title's level: " @ 0.5° sweep" ."""
+        sw = self.sweeps(t)
+        k = int(level)
+        return f" @ {sw.label(k)} sweep" if 0 <= k < len(sw) else f" @ sweep {k}"
 
     # ------------------------------------------------------------------ neutral facts
     @property
@@ -170,6 +191,12 @@ class PolarRun(Source):
         sw = self._sweeps[0]
         top = float(np.nanmax(beam.gate_position(self.ranges[-1], sw.elev)[0]))
         return min(top, ZTOP_MAX)
+
+    @property
+    def nsweeps(self):
+        """Sweeps of a volume, as the first one has them (the sweep choices; a volume
+        cut short lacks its top ones, read_sweep)."""
+        return len(self._sweeps[0])
 
     @property
     def size_label(self):

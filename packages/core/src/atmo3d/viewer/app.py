@@ -71,9 +71,12 @@ class BaseViewer(Widgets, MapView, MapLines, Layout, Events, SoundingPanel, Trac
         self.fixes, self.trk_spec = {}, None  # meso track: {t: fix}, settings used
         self._hold = False
         self._drag_shift = False  # Shift held when the last map drag started
-        dxk, dyk = run.dx / 1000.0, run.dy / 1000.0
-        self.extent = (run.xh[0] - dxk / 2, run.xh[-1] + dxk / 2,
-                       run.yh[0] - dyk / 2, run.yh[-1] + dyk / 2)
+        if run.grid:  # (to the outer cells' edges)
+            dxk, dyk = run.dx / 1000.0, run.dy / 1000.0
+            self.extent = (run.xh[0] - dxk / 2, run.xh[-1] + dxk / 2,
+                           run.yh[0] - dyk / 2, run.yh[-1] + dyk / 2)
+        else:
+            self.extent = tuple(run.extent)
         self.view = self.extent
         self._asked_view = None  # the view the latest map was asked for
         self._build_widgets()

@@ -96,6 +96,12 @@ class Events:
             "Parcel box": "Drag a box: the parcels inside it become a set (height and value "
                           "limits in the panel)",
         }
+        if not self.run.grid:  # (its rail has other tools: name them)
+            hints[None] = (f"Pick a tool on the left ({', '.join(self.mode.btns)}) to "
+                           "query the map")
+        if mode not in hints:  # (a tool a data type's package registered)
+            tool = panels.get(panels.tool_of(mode))
+            hints[mode] = (tool.hint or tool.tip) if tool is not None else ""
         self.hint.object = f'<div class="cv-hint">{hints[mode]}</div>'
         self.fig.toolbar.active_drag = self.bsel if mode in ("3D region", "Area sounding",
                                                              "Seed box", "Parcel box") \
@@ -167,10 +173,14 @@ class Events:
             box = self.box
             txt = "Region"
         x0, x1, y0, y1 = box
-        stride = volume3d.auto_stride(self.run, box, self.v3_ztop.value, 12e6)
+        # (3D on a run with no grid comes with its sampler: Phase 6 step 4)
+        stride = volume3d.auto_stride(self.run, box, self.v3_ztop.value, 12e6) \
+            if self.run.grid else 1
+        res = (f' · auto res {"full" if stride == 1 else f"1/{stride}"}'
+               if self.run.grid else "")
         self.v3_region.object = (
             f'<div class="cv-hint" style="margin:0 8px;white-space:nowrap">{txt} {x1 - x0:.1f} × {y1 - y0:.1f} '
-            f'km · auto res {"full" if stride == 1 else f"1/{stride}"}</div>')
+            f'km{res}</div>')
 
     def _update_3d_labels(self):
         n = sum(o["on"].value for o in self.isos)
@@ -254,6 +264,11 @@ class Events:
             if len(self.xs_pts) == 2:
                 self._show_panel(True, "Cross-section")
                 self.request_xsec()
+        else:  # (a tool a data type's package registered: its own click)
+            tool = panels.get(panels.tool_of(mode)) if mode else None
+            if tool is not None and tool.click is not None:
+                shift = bool((getattr(ev, "modifiers", None) or {}).get("shift"))
+                tool.click(self, x, y, shift)
 
     def _on_pan_start(self, ev):
         self._drag_shift = bool((getattr(ev, "modifiers", None) or {}).get("shift"))

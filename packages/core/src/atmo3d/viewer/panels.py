@@ -7,7 +7,10 @@ type's package adds its own with register():
     from atmo3d.viewer import panels
     panels.register(panels.Tool(
         "PPI", "PPI", "radar", "Native radar sweeps", needs="native_polar",
-        layout=lambda v: v._ppi_layout()))
+        layout=lambda v: v._ppi_layout(), click=lambda v, x, y, shift: v._ppi_click(x, y)))
+
+(atmo3d_radar's own; click: what a map click does while the tool is on, hint: the map's
+hint then.)
 
 The viewer (viewer.layout) asks for_run(run) for the tools a run gets, in registration
 order.  A panel is built when the run's data type offers the tool's capability
@@ -38,6 +41,10 @@ class Tool:
     needs: Optional[str] = None  # a capability the data type must offer (None: any)
     # whether this run gets the rail button, f(run) -> bool (None: run.can(needs))
     shown: Optional[Callable] = field(default=None, compare=False)
+    # what a map click does in this tool's modes, f(viewer, x, y, shift) (None: the
+    # built-in tools, handled by viewer.events._on_tap)
+    click: Optional[Callable] = field(default=None, compare=False)
+    hint: str = ""  # the map's hint while the tool is on ("": the tooltip)
 
     @property
     def heading(self):
@@ -112,7 +119,8 @@ def at(i):
     return keys[i] if 0 <= i < len(keys) else None
 
 
-# ---- the built-in tools (their panels are the viewer's own mixins, viewer/*.py)
+# ---- the built-in tools (their panels are the viewer's own mixins, viewer/*.py); those
+# that sample a grid need one ("grid": a radar run gets them with its sampler, step 4)
 def _builtins():
     register(Tool("Sounding", "Sounding", "balloon",
                   "Soundings: click the map (or drag a box for an area mean)",
@@ -122,17 +130,17 @@ def _builtins():
                   shown=lambda run: True))
     register(Tool("Cross-section", "Section", "slice",
                   "Vertical cross-section: click A, then B",
-                  layout=lambda v: v._xs_layout()))
+                  layout=lambda v: v._xs_layout(), needs="grid"))
     register(Tool("Track", "Track", "route",
                   "Storm track: click a storm to follow it through time",
                   layout=lambda v: v._trk_layout(), title="Storm track", needs="tracking"))
     register(Tool("Series", "Series", "chart-line", "Time series of a field over a region",
-                  layout=lambda v: v._ser_layout(), title="Time series"))
+                  layout=lambda v: v._ser_layout(), title="Time series", needs="grid"))
     register(Tool("Distribution", "Distrib.", "chart-histogram",
                   "Distribution of a field over a region at one time: histogram, box, "
-                  "violin, cumulative", layout=lambda v: v._dist_layout()))
+                  "violin, cumulative", layout=lambda v: v._dist_layout(), needs="grid"))
     register(Tool("3D region", "3D box", "cube", "Drag a box on the map to view it in 3D",
-                  modes=("Seed box",)))
+                  modes=("Seed box",), needs="grid"))
 
 
 _builtins()

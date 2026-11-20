@@ -18,7 +18,7 @@ from ..core.fields import CMAPS, deriv_options
 from .numinput import FloatInput
 from .picker import RunPicker
 from .settings import ConfirmOverwrite, Settings
-from .ui import LEVEL_MODES, ON, TERRAIN_LEVEL_MODES, TIME_BAR, ToolRail, _html
+from .ui import LEVEL_MODES, ON, SWEEP_MODES, TERRAIN_LEVEL_MODES, TIME_BAR, ToolRail, _html
 from .fieldmenu import FieldSelect
 from . import panels
 
@@ -40,7 +40,9 @@ class Widgets:
                                     else self._ov_default)
         o = self._contour_widgets(self.ovs, self.F.groups(), var, levels)
         o["mode"], o["level"] = self._level_pair("height", 1.0)
-        if mode == "level":
+        if not self.run.grid:  # (a radar's: the lowest sweep, off until asked for)
+            o["on"].value, level = False, 0
+        elif mode == "level":
             o["mode"].value = "level"  # rescales the slider to model levels
         o["level"].value = float(level)
         o["row"] = _layer_row(n, o["on"], o["var"], o["mode"], o["level"], o["levels"],
@@ -132,7 +134,7 @@ class Widgets:
             on=pn.widgets.Checkbox(value=on, width=18, margin=(5, 0, 14, 8)),
             q=pn.widgets.Select(name="Vector", options=opts, value=q, width=190),
             level=pn.widgets.FloatSlider(name="Height (km AGL)", start=0.0,
-                                         end=float(np.floor(run.z[-1])), step=0.05,
+                                         end=float(np.floor(run.ztop)), step=0.05,
                                          value=level, width=190),
             frame=pn.widgets.Select(name="Frame", options=vectors.frames(run),
                                     value=vectors.frame_of(
@@ -226,6 +228,8 @@ class Widgets:
         var = F.role("w") or self.fill_var.value
         o = self._fill_widgets(F.groups(), var)
         o["mode"], o["level"] = self._level_pair("height", 3.0 if var == F.role("w") else 1.0)
+        if not self.run.grid:
+            o["level"].value = 0.0
         o["row"] = _layer_row(n, o["on"], o["var"], o["mode"], o["level"], o["style"],
                               o["cmap"], o["rev"], o["auto"], o["vmin"], o["vmax"],
                               o["alpha"], o["clip"], o["drop"])
@@ -247,7 +251,9 @@ class Widgets:
         the terrain has heights above sea level too (from 0 up to the top over the
         highest ground)."""
         run = self.run
-        ztop = float(np.floor(run.z[-1] * 10) / 10)
+        if not run.grid:
+            return self._sweep_pair(compact)
+        ztop = float(np.floor(run.ztop * 10) / 10)
         modes, ground, gtop = LEVEL_MODES, 0.0, 0.0
         if getattr(run, "terrain", False):
             hgt = run.terrain_height()
@@ -289,6 +295,22 @@ class Widgets:
         mode_w.param.watch(on_mode, "value")
         return mode_w, lvl
 
+    def _sweep_pair(self, compact=False):
+        """_level_pair of a radar run: the one mode "sweep", and the sweep's number
+        (0: the lowest; a volume's sweeps by elevation, atmo3d_radar.cfradial)."""
+        n = max(1, int(getattr(self.run, "nsweeps", 1)))
+        if compact:
+            mode_w = pn.widgets.Select(options=SWEEP_MODES, value="sweep", width=140,
+                                       height=32, margin=(4, 2))
+            lvl = FloatInput(start=0, end=n - 1, step=1, value=0, width=70, height=32,
+                             margin=(4, 4))
+        else:
+            mode_w = pn.widgets.Select(name="Level", options=SWEEP_MODES, value="sweep",
+                                       width=150)
+            lvl = pn.widgets.FloatSlider(name="Sweep (0: lowest)", start=0, end=n - 1,
+                                         step=1, value=0, width=210)
+        return mode_w, lvl
+
     def _build_widgets(self):
         run, F = self.run, self.F
         g_all, g3 = F.groups(), F.groups(ndim=3)
@@ -318,7 +340,10 @@ class Widgets:
 
         self.workspace = pn.widgets.RadioButtonGroup(
             options=["Map", "3D", "Figure"], value="Map", button_type="primary",
-            button_style="outline", width=190, height=32, margin=(4, 2))
+            button_style="outline", width=190, height=32, margin=(4, 2),
+            # (a run with no grid, a radar's: the map only, until its sampler brings 3D
+            # and figures, Phase 6 step 4)
+            visible=bool(run.grid))
         # the registered tools this run gets (viewer.panels: gated on its capabilities)
         self.mode = ToolRail(panels.for_run(run)[1])
         self.hint = _html()
@@ -583,9 +608,10 @@ class Widgets:
         part = f" · {models.part_label(run.path)}" if root != run.path else ""
         return (f'<div class="cv-h" style="margin-top:14px">This run</div>'
                 f'<div class="cv-run"><b>{root}</b><br>{run.model_label}{part} · '
-                f'{run.ni}×{run.nj}×{run.nk} · '
-                f'Δx {run.dx:.0f} m · {len(run.times)} times · domain motion '
-                f'({run.umove:g}, {run.vmove:g}) m/s'
+                + (f'{run.ni}×{run.nj}×{run.nk} · '
+                   f'Δx {run.dx:.0f} m · {len(run.times)} times · domain motion '
+                   f'({run.umove:g}, {run.vmove:g}) m/s' if run.grid else
+                   f'{run.size_label} · {len(run.times)} times')
                 + (f'<br><span style="opacity:0.8">{run.note}</span>' if run.note else '')
                 + (f'<br><span style="color:#f59e0b">{html.escape(busy_note(run.busy))}'
                    f'</span>' if run.busy else '')

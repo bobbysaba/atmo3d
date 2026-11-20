@@ -571,10 +571,21 @@ class Source:
     and may override source(t) (what reader processes open for time t).  volume(name,
     t) is the field's native array at time t, whatever its shape; the four neutral
     facts (extent, ztop, size_label, field_bytes) describe the run to the viewer
-    without naming a grid."""
+    without naming a grid.
+
+    A reader with no grid (grid False: a radar's PolarRun) also gives the map what the
+    grid's index window gives it (core.render.view_window, _crop):
+      map_window(view, maxpix)             the map's pixels for a view (win[4]: stride)
+      map_crop(a, win, t, mode, level)     x, y, (ny, nx) of a plane on those pixels
+      level_text(t, mode, level)           the map title's level (" @ 0.5° sweep")
+    and the level mode its planes take (Fields.plane: "sweep")."""
 
     model = None  # key in core.models.MODELS
     model_label = "model"
+    # a regular grid (Run: xh, yh, z, dx, levels).  False (a radar's PolarRun): only
+    # what needs no grid works on it (pointwise fields, the map through map_window /
+    # map_crop, which say what a map of the view looks like)
+    grid = False
     # the features this data type offers (core.capabilities.CAPS keys, besides the four
     # flags below); ask run.can(name) / run.offers(name), not this set
     OFFERS = frozenset()
@@ -799,6 +810,8 @@ class Run(Source):
       attrs   global attributes; nml the run's namelist ({} if none)
       umove, vmove  grid motion (m/s) added to the winds for ground-relative ones
     and may override source(t) (what reader processes open for time t)."""
+
+    grid = True
 
     def _grid_done(self):
         """Sizes and spacing from xh, yh, z (call once they are set)."""

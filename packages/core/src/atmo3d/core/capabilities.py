@@ -6,9 +6,9 @@ offers it AND this run has what it needs (its fields, its files).  `run.offers(n
 asks only the first half: a feature a data type offers stays on screen when one run
 lacks its inputs, so the panel can say what is missing.
 
-Four capabilities are the long-standing flags on Run, kept as attributes because they
-also say *how* (a Geo object, terrain-following heights): `terrain`, `geo`,
-`storm_relative`, `traced_parcels`.  For those, offers() and can() read the flag.
+Five capabilities are flags on the run, kept as attributes because they also say *how*
+(a Geo object, terrain-following heights): `terrain`, `geo`, `storm_relative`,
+`traced_parcels`, `grid`.  For those, offers() and can() read the flag.
 """
 
 # name -> what it means (shown nowhere yet; the reference for data-type authors)
@@ -25,9 +25,12 @@ CAPS = {
     "terrain": "flag: levels follow the terrain (heights vary in space and time)",
     "geo": "flag: the grid sits on a map projection (run.geo)",
     "native_polar": "a native polar (PPI) view of single sweeps (radar: PolarRun)",
+    "grid": "flag: a regular grid (core.run.Run).  The views that sample one (cross-"
+            "sections, time series, distributions, 3D) need it until the data type "
+            "brings a sampler (radar: Phase 6 step 4)",
 }
 
-FLAGS = ("terrain", "geo", "storm_relative", "traced_parcels")
+FLAGS = ("terrain", "geo", "storm_relative", "traced_parcels", "grid")
 
 
 def _flag(run, name):

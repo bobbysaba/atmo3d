@@ -387,7 +387,8 @@ class MapView:
         if isinstance(res, Exception):
             if isinstance(res, FileBusy):
                 self._set_status(f'<span class="busy">{res}</span>')
-            elif isinstance(res, MissingAtTime) and res.name in pdecomp.NAMES:
+            elif isinstance(res, MissingAtTime) and (res.name in pdecomp.NAMES
+                                                     or not self.run.grid):
                 self._set_status(f'<span style="color:#fbbf24">{res}.</span>')
             else:
                 self._set_status(f'<span style="color:#f87171">Map error: {res}</span>')
@@ -452,6 +453,8 @@ class MapView:
         def lvl_txt(mode, level, name):
             if F[name].ndim == 2:
                 return ""
+            if not run.grid:  # (a radar's sweep)
+                return run.level_text(spec["t"], mode, level)
             if mode == "height":
                 return f" @ {level:g} km"
             if mode == "msl":

@@ -96,6 +96,12 @@ def test_read_sweep_is_the_volumes_sweep(folder):
     assert np.array_equal(s, r.volume("reflectivity", 0)[2], equal_nan=True)
 
 
+def test_a_sweep_beyond_the_volume_is_missing(run):
+    with pytest.raises(MissingAtTime):
+        run.read_sweep("reflectivity", 1, 2)  # (the second volume has two)
+    assert run.nsweeps == 3 and run.level_text(0, "sweep", 0) == " @ 0.5° sweep"
+
+
 def test_volume_shape_follows_each_times_sweeps(run):
     assert run.volume("reflectivity", 1).shape == (2, S.NRAY, S.NG)
 

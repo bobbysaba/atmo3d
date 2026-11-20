@@ -32,7 +32,7 @@ class DistPanel:
     def _build_dist(self):
         """Distribution tab: one field over a region at the shown time."""
         run, F = self.run, self.F
-        ztop = float(np.floor(run.z[-1] * 10) / 10)
+        ztop = float(np.floor(run.ztop * 10) / 10)
         first = F.role("w") or next(iter(F.defs))
         self.dist_field = FieldSelect(name="Field", groups=F.groups(), value=first,
                                        width=230)

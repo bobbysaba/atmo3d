@@ -32,7 +32,7 @@ class TrackPanel:
         self.trk_metric = pn.widgets.Select(name="Track on", options=metrics,
                                             value=next(iter(metrics.values())), width=200)
         self.trk_z = FloatInput(name="Height (km)", value=1.0, step=0.25,
-                                           start=0.0, end=float(run.z[-1]), width=90,
+                                           start=0.0, end=float(run.ztop), width=90,
                                            visible=self.trk_metric.value != "uh")
         groups = self.F.groups()
         self.trk_field = FieldSelect(
@@ -180,7 +180,7 @@ class TrackPanel:
     def _trk_preset(self, metric):
         """Default settings per tracked field.  Updraft: w at 1 km with a Gaussian of
         sigma = 3 grid points, as in storm_tracking.ipynb."""
-        dxk = self.run.dx / 1000.0
+        dxk = self.run.dx / 1000.0 if self.run.grid else 1.0  # (radar: no tracking)
         z, smooth, kernel = {"w": (1.0, 3 * dxk, "gauss"), "zeta": (1.0, 1.0, "box"),
                              "uh": (self.trk_z.value, 1.0, "box"),
                              "pmin": (1.0, 1.0, "box"),

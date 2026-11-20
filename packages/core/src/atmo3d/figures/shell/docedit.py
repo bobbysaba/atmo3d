@@ -1114,7 +1114,7 @@ def panel_shape(s, run):
         if d["mode"] == "box" and d.get("box"):
             x0, x1, y0, y1 = d["box"]
         elif d["mode"] == "full":
-            x0, x1, y0, y1 = run.xh[0], run.xh[-1], run.yh[0], run.yh[-1]
+            x0, x1, y0, y1 = run.extent
         else:
             return 1.0
         return abs(y1 - y0) / max(abs(x1 - x0), 1e-6)

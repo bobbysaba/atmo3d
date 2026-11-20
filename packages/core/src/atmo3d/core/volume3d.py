@@ -112,7 +112,7 @@ def level_heights(run):
 def top_height(run):
     """The highest height (km) a scene can reach: run.z[-1], on a terrain run above sea
     level over the highest ground."""
-    return float(run.z[-1]) + (float(np.max(run.terrain_height())) if run.terrain else 0.0)
+    return float(run.ztop) + (float(np.max(run.terrain_height())) if run.terrain else 0.0)
 
 
 def auto_stride(run, box, zmax, max_voxels):

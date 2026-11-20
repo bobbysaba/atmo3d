@@ -64,7 +64,7 @@ class Layout:
                 op=pn.widgets.FloatSlider(name="Opacity", start=0.05, end=1.0, step=0.05,
                                           value=op, width=130),
             ))
-        ztop = float(np.floor(run.z[-1]))
+        ztop = float(np.floor(run.ztop))
         # (a terrain run's scene is above sea level: its top over the highest ground)
         z3top = float(np.floor(volume3d.top_height(run))) if run.terrain else ztop
         self.v3_ztop = pn.widgets.FloatSlider(name="Top (km MSL)" if run.terrain else

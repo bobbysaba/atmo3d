@@ -34,7 +34,7 @@ class SeriesPanel:
     def _build_series(self):
         """Series tab: one field reduced over a region at every output time."""
         run, F = self.run, self.F
-        ztop = float(np.floor(run.z[-1] * 10) / 10)
+        ztop = float(np.floor(run.ztop * 10) / 10)
         first = "thpert" if "thpert" in F else next(iter(F.defs))
         self.ser_field = FieldSelect(name="Field", groups=F.groups(), value=first,
                                       width=230)

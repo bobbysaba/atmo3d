@@ -29,7 +29,10 @@ def parse_levels(text, lo, hi, n=8):
 
 
 def view_window(run, view, maxpix):
-    """Index window + stride covering the current map view."""
+    """Index window + stride covering the current map view.  (A run with no grid: its
+    own window, run.map_window, whose win[4] is the stride as well.)"""
+    if not run.grid:
+        return run.map_window(view, maxpix)
     x0, x1, y0, y1 = view
     dxk, dyk = run.dx / 1000.0, run.dy / 1000.0
     i0 = max(0, int(math.floor((x0 - run.xh[0]) / dxk)) - 2)
@@ -42,7 +45,11 @@ def view_window(run, view, maxpix):
     return i0, i1, j0, j1, s
 
 
-def _crop(run, a, win):
+def _crop(run, a, win, t=None, mode=None, level=None):
+    """x, y, a in the window (a run with no grid: a, a native plane, on its map pixels,
+    run.map_crop, which needs the plane's time, mode and level)."""
+    if not run.grid:
+        return run.map_crop(a, win, t, mode, level)
     i0, i1, j0, j1, s = win
     return run.xh[i0:i1:s], run.yh[j0:j1:s], a[j0:j1:s, i0:i1:s]
 
@@ -177,6 +184,8 @@ def fill_palette(spec):
 def _map_fill(F, f, t, win, fstorm):
     a = F.plane(f["var"], t, f["mode"], f["level"], storm=fstorm)
     m = f.get("minus")  # (a difference: {F, t} of the other run / time)
+    if not F.run.grid:  # (native planes: each on the map's pixels first)
+        return _map_fill_native(F, f, t, win, a, m, fstorm)
     if m:
         a = a - minus_plane(F, m["F"], f["var"], m["t"], f["mode"], f["level"], fstorm)
         lo, hi = diff_range(a) if f["auto"] else (f["vmin"], f["vmax"])
@@ -184,7 +193,25 @@ def _map_fill(F, f, t, win, fstorm):
         lo, hi = F.auto_range(f["var"], a) if f["auto"] else (f["vmin"], f["vmax"])
     if hi <= lo:
         hi = lo + 1e-6
-    x, y, ac = _crop(F.run, a, win)
+    x, y, ac = _crop(F.run, a, win, t, f["mode"], f["level"])
+    return fill_bands(x, y, ac, lo, hi, f, codes=True)
+
+
+def _map_fill_native(F, f, t, win, a, m, fstorm):
+    """_map_fill on a run with no grid (a radar's sweeps): a difference is taken on the
+    map's pixels, as the other time's rays lie elsewhere (the same run only, for now)."""
+    run = F.run
+    x, y, ac = _crop(run, a, win, t, f["mode"], f["level"])
+    if m:
+        if m["F"].run is not run:
+            raise ValueError("differences between two radar runs come later (Phase 6)")
+        b = m["F"].plane(f["var"], m["t"], f["mode"], f["level"], storm=fstorm)
+        ac = ac - _crop(run, b, win, m["t"], f["mode"], f["level"])[2]
+        lo, hi = diff_range(ac) if f["auto"] else (f["vmin"], f["vmax"])
+    else:
+        lo, hi = F.auto_range(f["var"], a) if f["auto"] else (f["vmin"], f["vmax"])
+    if hi <= lo:
+        hi = lo + 1e-6
     return fill_bands(x, y, ac, lo, hi, f, codes=True)
 
 
@@ -234,13 +261,14 @@ def compute_map(F, spec):
         a = F.plane(o["var"], t, o["mode"], o["level"], storm=spec.get("fstorm"))
         lo, hi = F.auto_range(o["var"], a)
         levels = parse_levels(o["levels"], lo, hi)
-        x, y, ac = _crop(run, a, win)
+        x, y, ac = _crop(run, a, win, t, o["mode"], o["level"])
         out["ov"].append(dict(pos=contour_lines(x, y, ac, levels[levels >= 0]),
                               neg=contour_lines(x, y, ac, levels[levels < 0])))
 
     # vector layers: arrows or streamlines each
-    out["vecs"] = [_map_vectors(F, o, t, win, spec["storm"]) if o["on"] else None
-                   for o in spec["vecs"]]
+    # (none on a run with no grid yet: they need winds on a height, Phase 6 step 4)
+    out["vecs"] = [_map_vectors(F, o, t, win, spec["storm"]) if o["on"] and run.grid
+                   else None for o in spec["vecs"]]
     return out
 
 
