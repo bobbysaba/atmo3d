@@ -42,6 +42,18 @@ Not done / differs from the decisions above (to settle):
   has the old acc_b.
 - Image baselines: `sounding.png`, `parts.png` may move (net CAPE).
 
+## Steps 4 and 5 status (2026-11-19)
+
+- Step 4: `FieldDef.confirmed`; `fields.CONFIRMED` names the reviewed fields (all those
+  `_make_fields` gives today). `_confirm` moves any other derived field to the hidden
+  tier, labelled "(unverified)"; it can still be computed. A derivative takes its base's
+  flag. Tests: `CONFIRMED` matches the fields exactly, and an unconfirmed field is hidden
+  and marked. No field changes tier, so no image baseline moves.
+- Step 5: `docs/guide/derived-fields.md` (in the nav, linked from `fields.md`). Notes
+  (`FieldDef.note`) added to the fields that leave something out; the page quotes each
+  note word for word, and a test checks that, and that every confirmed field is named.
+  `mkdocs build` not run (mkdocs is not in the atmo3d env).
+
 ## Bobby's review (2026-11-19)
 
 Every entry not listed here: **confirmed** as written (with the decisions in the next

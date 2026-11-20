@@ -84,8 +84,11 @@ class FieldDef:
     def __init__(self, name, label, units, group, ndim=3, scale=1.0, cmap="viridis",
                  vrange=None, diverging=False, deps=(), func=None, pointwise=True,
                  storm=False, layer=None, edges=False, costly=False, tier="main",
-                 note=""):
+                 note="", confirmed=True):
         self.name, self.label, self.units, self.group = name, label, units, group
+        # confirmed: a derived field whose equation passed the audit (_make_fields sets
+        # it from CONFIRMED; an unconfirmed one is hidden, labelled "unverified")
+        self.confirmed = confirmed
         # note: what the field leaves out or assumes, in a sentence or two (the
         # derived-field docs page, a tooltip)
         self.note = note
@@ -197,6 +200,42 @@ def _bind(d, cat):
     return d
 
 
+# derived fields whose equation Bobby reviewed and confirmed (Phase 2b, 2026-11-19:
+# docs-dev/derived-fields.md), each with a test in tests/test_derived_analytic.py or
+# beside it.  A derived field not named here is listed only under the hidden fields
+# (show_hidden_fields), its label marked "(unverified)": add it after its review.
+CONFIRMED = frozenset([
+    "thpert", "prspert", "buoy", "bgen_x", "bgen_y", "thrho", "thrhopert", "thetae",
+    "tempc", "dewc", "rh", "wspd3d", "hdiv", "xvort", "yvort", "hvort", "wstream",
+    "wcross", "p_dyn", "acc_dyn", "acc_tot", "qcloud", "qprecip",
+    "zstretch", "ztilt", "ztend", "okubo", "uh25", "uh01",
+    "shear0250", "shear0500", "shear01", "shear03", "shear06",
+    "srh0250", "srh0500", "srh01", "srh03",
+    "sbcape", "sbcin", "sblcl", "mlcape", "mlcin", "mllcl", "mucape", "mucin", "mulcl",
+    "stp", "scp",
+])
+UNVERIFIED = " (unverified)"
+
+
+def _confirm(d):
+    """Derived FieldDef d with its confirmed flag set from CONFIRMED; an unconfirmed one
+    moved to the hidden tier and its label marked."""
+    d.confirmed = d.name in CONFIRMED
+    if not d.confirmed:
+        d.tier = "hidden"
+        if not d.label.endswith(UNVERIFIED):
+            d.label += UNVERIFIED
+    return d
+
+
+# notes shared by several fields (FieldDef.note)
+WOFS_PERT = "For WoFS the base state is the member's first time, so this is the change since then."
+PARCEL = ("Pseudoadiabatic, liquid only (no ice), with the virtual-temperature correction "
+          "and no condensate loading.")
+SFC_WIND = "From the 10 m winds when the output has them, else from the lowest model level."
+STORM = "Relative to the storm motion used, which the title shows."
+
+
 def _make_fields(avail, cat):
     """The derived fields computable from fields `avail` of a data type with catalog
     `cat`.  They are written with role names (f("theta"), "ddz.w"), bound to the
@@ -205,10 +244,11 @@ def _make_fields(avail, cat):
     hyd = [r for r in HYDRO if cat.name(r) in avail]
     D.append(FieldDef("thpert", "θ′", "K", "Thermodynamics", cmap="RdBu_r",
                       vrange=(-6, 6), diverging=True, deps=("theta", "theta0"),
-                      func=lambda f, c: f("theta") - f("theta0")))
+                      func=lambda f, c: f("theta") - f("theta0"), note=WOFS_PERT))
     D.append(FieldDef("prspert", "p′", "hPa", "Thermodynamics", cmap="PuOr_r",
                       vrange=(-4, 4), diverging=True, deps=("pres", "pres0"),
-                      func=lambda f, c: 0.01 * (f("pres") - f("pres0"))))
+                      func=lambda f, c: 0.01 * (f("pres") - f("pres0")),
+                      note=WOFS_PERT + " It includes any domain-wide pressure trend."))
 
     # every condensate the model's buoyancy loads: the hydrometeor roles, and the data
     # type's other liquid and ice species present (Catalog.condensate)
@@ -223,7 +263,9 @@ def _make_fields(avail, cat):
     bdeps = ("theta", "qv", "theta0", "qv0", *cond)
     D.append(FieldDef("buoy", "Buoyancy", "m/s²", "Thermodynamics",
                       cmap="RdBu_r", vrange=(-0.3, 0.3), diverging=True,
-                      deps=bdeps, func=buoy))
+                      deps=bdeps, func=buoy,
+                      note="No pressure term; no condensate in the base state (qc0, qi0 "
+                      "not subtracted). " + WOFS_PERT))
 
     # baroclinic generation of horizontal vorticity, ∇ × (B k) = (∂B/∂y, −∂B/∂x): the
     # components of the "Baroclinic generation" vector (core/vectors.py).  ∂B/∂x from
@@ -249,13 +291,14 @@ def _make_fields(avail, cat):
         return ("theta", "theta0", op + ".theta", op + ".theta0", op + ".qv", op + ".qv0",
                 *(op + "." + n for n in cond))
 
+    BGEN = "B as in buoy; the buoyancy torque only (no term from p′)."
     D.append(FieldDef("bgen_x", "Baroclinic x-vorticity generation (∂B/∂y)", "10⁻⁴ s⁻²",
                       "Kinematics", cmap="RdBu_r", vrange=(-2, 2), diverging=True,
-                      deps=ddeps("ddy"),
+                      deps=ddeps("ddy"), note=BGEN,
                       func=lambda f, c, g=dbuoy("ddy"): 1.0e4 * g(f, c)))
     D.append(FieldDef("bgen_y", "Baroclinic y-vorticity generation (−∂B/∂x)", "10⁻⁴ s⁻²",
                       "Kinematics", cmap="RdBu_r", vrange=(-2, 2), diverging=True,
-                      deps=ddeps("ddx"),
+                      deps=ddeps("ddx"), note=BGEN,
                       func=lambda f, c, g=dbuoy("ddx"): -1.0e4 * g(f, c)))
     # density potential temperature (θ including the vapour and condensate loading)
     def thrho(f, c):
@@ -263,38 +306,49 @@ def _make_fields(avail, cat):
         return f("theta") * (1.0 + f("qv") / EPS) / (1.0 + f("qv") + load)
 
     D.append(FieldDef("thrho", "θρ", "K", "Thermodynamics", cmap="cmo.thermal",
-                      deps=("theta", "qv", *cond), func=thrho))
+                      deps=("theta", "qv", *cond), func=thrho,
+                      note="Loads every liquid and ice species in the output."))
     D.append(FieldDef("thrhopert", "θρ′", "K", "Thermodynamics", cmap="RdBu_r",
                       vrange=(-6, 6), diverging=True, deps=("theta", "qv", "theta0", "qv0", *cond),
                       func=lambda f, c: thrho(f, c) - f("theta0") * (1.0 + f("qv0") / EPS)
-                      / (1.0 + f("qv0"))))
+                      / (1.0 + f("qv0")),
+                      note="The base state has no condensate. " + WOFS_PERT))
     D.append(FieldDef("thetae", "θe", "K", "Thermodynamics", cmap="Spectral_r",
-                      deps=("theta", "pres", "qv"), func=_thetae))
+                      deps=("theta", "pres", "qv"), func=_thetae,
+                      note="Pseudo-equivalent; the dewpoint is over liquid and held at or "
+                      "below T."))
     D.append(FieldDef("tempc", "Temperature", "°C", "Thermodynamics", cmap="cmo.thermal",
-                      deps=("theta", "pres"), func=lambda f, c: _tempk(f, c) - 273.15))
+                      deps=("theta", "pres"), func=lambda f, c: _tempk(f, c) - 273.15,
+                      note="κ is the model's own: CM1's Rd/cp, or WRF's 2/7 for WoFS."))
     D.append(FieldDef("dewc", "Dewpoint", "°C", "Thermodynamics", cmap="YlGnBu",
-                      deps=("pres", "qv"), func=_dewc))
+                      deps=("pres", "qv"), func=_dewc,
+                      note="Over liquid water at every temperature (no frost point)."))
     D.append(FieldDef("rh", "Relative humidity (liquid)", "%", "Thermodynamics",
-                      cmap="YlGnBu", vrange=(0, 100), deps=("theta", "pres", "qv"), func=_rh))
+                      cmap="YlGnBu", vrange=(0, 100), deps=("theta", "pres", "qv"), func=_rh,
+                      note="Over liquid water at every temperature, so below 0 °C it reads "
+                      "lower than RH over ice. Not capped at 100 %."))
     D.append(FieldDef("wspd3d", "Wind speed (ground-relative)", "m/s", "Kinematics",
                       cmap="turbo", vrange=(0, 40), deps=("u", "v"),
                       func=lambda f, c: np.hypot(f("u") + c["umove"],
-                                                 f("v") + c["vmove"])))
+                                                 f("v") + c["vmove"]),
+                      note="The horizontal wind only (no w)."))
 
+    NO_MAPFAC = "No map factor (WoFS's map projection is left out)."
     D.append(FieldDef("hdiv", "Horizontal divergence", "10⁻³ s⁻¹", "Kinematics",
                       cmap="PuOr_r", vrange=(-10, 10), diverging=True,
                       deps=("ddx.u", "ddy.v"),
-                      func=lambda f, c: 1.0e3 * (f("ddx.u") + f("ddy.v"))))
+                      func=lambda f, c: 1.0e3 * (f("ddx.u") + f("ddy.v")),
+                      note=NO_MAPFAC))
     # ξ, η: the files' (CM1), or from the winds where a data type writes none (WoFS):
     # ξ = ∂w/∂y − ∂v/∂z, η = ∂u/∂z − ∂w/∂x, listed as xvort / yvort
     xi, eta, xdeps, ydeps = horizontal_vorticity(cat, avail)
     if cat.name("xvort") not in avail and set(xdeps) - {"xvort"}:
         D.append(FieldDef("xvort", "x vorticity (∂w/∂y − ∂v/∂z)", "1/s", "Kinematics",
                           cmap="RdBu_r", vrange=(-0.05, 0.05), diverging=True,
-                          deps=xdeps, func=lambda f, c: xi(f)))
+                          deps=xdeps, func=lambda f, c: xi(f), note=NO_MAPFAC))
         D.append(FieldDef("yvort", "y vorticity (∂u/∂z − ∂w/∂x)", "1/s", "Kinematics",
                           cmap="RdBu_r", vrange=(-0.05, 0.05), diverging=True,
-                          deps=ydeps, func=lambda f, c: eta(f)))
+                          deps=ydeps, func=lambda f, c: eta(f), note=NO_MAPFAC))
     D.append(FieldDef("hvort", "Horizontal vorticity magnitude", "1/s", "Kinematics",
                       cmap="magma", vrange=(0, 0.1), deps=xdeps + ydeps,
                       func=lambda f, c: np.hypot(xi(f), eta(f))))
@@ -315,13 +369,14 @@ def _make_fields(avail, cat):
         sx, sy = sr_unit(f, c)
         return -xi(f) * sy + eta(f) * sx
 
+    SR_DIR = STORM + " The direction is arbitrary where the storm-relative wind is near 0."
     vdeps = tuple(dict.fromkeys(xdeps + ydeps + ("u", "v")))
     D.append(FieldDef("wstream", "Streamwise vorticity", "1/s", "Kinematics", cmap="RdBu_r",
                       vrange=(-0.05, 0.05), diverging=True, deps=vdeps, func=wstream,
-                      storm=True))
+                      storm=True, note=SR_DIR))
     D.append(FieldDef("wcross", "Crosswise vorticity", "1/s", "Kinematics", cmap="RdBu_r",
                       vrange=(-0.05, 0.05), diverging=True, deps=vdeps, func=wcross,
-                      storm=True))
+                      storm=True, note=SR_DIR))
     D.append(FieldDef("p_dyn", "p′ dynamic (p_l + p_nl + p_c)", "Pa", "Pressure decomposition",
                       cmap="PuOr_r", diverging=True, deps=("p_l", "p_nl", "p_c"),
                       func=lambda f, c: f("p_l") + f("p_nl") + f("p_c")))
@@ -332,7 +387,9 @@ def _make_fields(avail, cat):
     D.append(FieldDef("acc_tot", "Total acceleration (b + l + nl + c)", "m/s²",
                       "Pressure decomposition", cmap="RdBu_r", diverging=True,
                       deps=("acc_b", "acc_l", "acc_nl", "acc_c"),
-                      func=lambda f, c: f("acc_b") + f("acc_l") + f("acc_nl") + f("acc_c")))
+                      func=lambda f, c: f("acc_b") + f("acc_l") + f("acc_nl") + f("acc_c"),
+                      note="Leaves out the rest of w's equation: turbulence, damping and "
+                      "the compressible part."))
     if hyd:
         cl = [n for n in CLOUD if n in hyd]
         pr = [n for n in PRECIP if n in hyd]
@@ -343,12 +400,13 @@ def _make_fields(avail, cat):
         if pr:
             D.append(FieldDef("qprecip", "Precipitation (qr+qs+qg+qhl)", "g/kg",
                               "Microphysics", cmap="cmo.rain", vrange=(0, 8), deps=pr,
-                              func=lambda f, c: 1000.0 * sum(f(n) for n in pr)))
+                              func=lambda f, c: 1000.0 * sum(f(n) for n in pr),
+                              note="Snow counts as precipitation."))
     D += _vort_tendencies(cat, avail, xi, eta, xdeps, ydeps)
     D += _columns(cat, avail)
     D += _sounding_kinematics(cat, avail)
     D += _sounding_thermo(cat, avail)
-    D = [_bind(d, cat) for d in D]
+    D = [_bind(_confirm(d), cat) for d in D]
     return [d for d in D if d is not None and all(x in avail for x in d.natives)]
 
 
@@ -385,7 +443,7 @@ def _vort_tendencies(cat, avail, xi, eta, xdeps, ydeps):
     g, kw = "Vorticity tendencies", dict(cmap="RdBu_r", vrange=(-5, 5), diverging=True)
     sdeps = ("zvort", "ddx.u", "ddy.v") + (("fcor",) if has_f else ())
     tdeps = tuple(dict.fromkeys(xdeps + ydeps + ("ddx.w", "ddy.w")))
-    left_out = "Advection, mixing and the baroclinic and solenoidal terms are left out."
+    left_out = "advection, mixing and the baroclinic and solenoidal terms are left out."
     return [
         FieldDef("zstretch", "ζ stretching (−(ζ + f) ∇h·V)", "10⁻⁴ s⁻²", g, deps=sdeps,
                  func=stretch, note="Anelastic form; f is the run's Coriolis parameter.",
@@ -398,7 +456,7 @@ def _vort_tendencies(cat, avail, xi, eta, xdeps, ydeps):
                  note="Not the full ζ tendency: " + left_out, **kw),
         FieldDef("okubo", "Okubo–Weiss (s_n² + s_s² − ω²)", "10⁻⁴ s⁻²", g,
                  deps=("ddx.u", "ddy.u", "ddx.v", "ddy.v"),
-                 func=okubo, **kw),
+                 func=okubo, note="ω is from the winds, not the files' ζ.", **kw),
     ]
 
 
@@ -486,6 +544,7 @@ def _sounding_kinematics(cat=None, avail=()):
 
     g, deps = "Sounding parameters", ("u", "v") + (("u10", "v10") if sfc else ())
     kw = dict(deps=deps, edges=True)
+    srh_note = SFC_WIND + " " + STORM
     # (name, label of the layer, top km, starting range top): shear, then SRH
     shears = (("shear0250", "0–250 m", 0.25, 15), ("shear0500", "0–500 m", 0.5, 20),
               ("shear01", "0–1 km", 1.0, 25), ("shear03", "0–3 km", 3.0, 35),
@@ -494,10 +553,11 @@ def _sounding_kinematics(cat=None, avail=()):
             ("srh01", "0–1 km", 1.0, 300), ("srh03", "0–3 km", 3.0, 500))
     return [
         *(FieldDef(n, f"Bulk shear {lab}", "m/s", g, cmap="viridis", vrange=(0, top),
-                   func=shear, layer=(0.0, z), **kw) for n, lab, z, top in shears),
+                   func=shear, layer=(0.0, z), note=SFC_WIND, **kw)
+          for n, lab, z, top in shears),
         *(FieldDef(n, f"Storm-relative helicity {lab}", "m²/s²", g, cmap="RdBu_r",
                    vrange=(-top, top), diverging=True, func=srh, layer=(0.0, z),
-                   storm=True, **kw) for n, lab, z, top in srhs),
+                   storm=True, note=srh_note, **kw) for n, lab, z, top in srhs),
     ]
 
 
@@ -529,9 +589,9 @@ def _sounding_thermo(cat=None, avail=()):
             return lambda f, c: _parcel(f, c, kind)[i]
         D += [
             FieldDef(f"{kind}cape", f"{lab} CAPE", "J/kg", g, cmap="magma",
-                     vrange=(0, 4000), deps=deps, func=pick(0), **kw),
+                     vrange=(0, 4000), deps=deps, func=pick(0), note=PARCEL, **kw),
             FieldDef(f"{kind}cin", f"{lab} CIN", "J/kg", g, cmap="cmo.ice",
-                     vrange=(-300, 0), deps=deps, func=pick(1), **kw),
+                     vrange=(-300, 0), deps=deps, func=pick(1), note=PARCEL, **kw),
             FieldDef(f"{kind}lcl", f"{lab} LCL height", "m AGL", g, cmap="cividis",
                      vrange=(0, 3000), deps=deps, func=pick(2), **kw),
         ]
@@ -558,9 +618,13 @@ def _sounding_thermo(cat=None, avail=()):
     ckw = dict(cmap="RdBu_r", diverging=True, deps=wdeps, storm=True, **kw)
     D += [
         FieldDef("stp", "Significant tornado parameter (fixed layer)", "", g,
-                 vrange=(-6, 6), func=stp, **ckw),
+                 vrange=(-6, 6), func=stp,
+                 note="Fixed layers (not the effective layer); no CIN term. " + SFC_WIND,
+                 **ckw),
         FieldDef("scp", "Supercell composite parameter (fixed layer)", "", g,
-                 vrange=(-20, 20), func=scp, **ckw),
+                 vrange=(-20, 20), func=scp,
+                 note="0–3 km SRH and 0–6 km shear stand in for the effective-layer "
+                 "ones. " + SFC_WIND, **ckw),
     ]
     return D
 
@@ -797,7 +861,7 @@ def deriv_def(op, base):
                     _per_m(base.units), "Derivatives", ndim=base.ndim,
                     cmap="magma" if op == "gradh" else "RdBu_r", vrange=vr,
                     diverging=op != "gradh", deps=deps, func=_no_func, pointwise=False,
-                    storm=base.storm)
+                    storm=base.storm, confirmed=base.confirmed)
 
 
 def ddz_level(f, z, k):

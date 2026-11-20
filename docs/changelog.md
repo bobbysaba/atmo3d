@@ -5,6 +5,13 @@ has a matching git tag.
 
 ## Unreleased
 
+### Derived fields: audited, documented
+- Every derived field's equation was reviewed (Phase 2b). A new **Derived fields** page
+  in the guide lists each one: the equation as coded, units, sign, inputs and what it
+  leaves out. Each field's note in the code is the page's "Leaves out / assumes" text.
+- A derived field not yet reviewed (not in `fields.CONFIRMED`) is listed only under the
+  hidden fields, marked "(unverified)". It still draws in saved figures.
+
 ### A real demo run
 - `cm1view --demo` opens a real CM1 run instead of synthetic ones: CM1 r21.1's supercell
   case (Weisman and Rotunno 2000, quarter-circle hodograph), 1 km grid spacing, 44

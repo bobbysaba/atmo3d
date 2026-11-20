@@ -45,6 +45,9 @@ components. Vectors can be shown ground-, grid- or storm-relative
 
 ## Derived fields
 
+Every derived field's equation as coded, units, sign, inputs and what it leaves out
+are on [Derived fields](derived-fields.md).
+
 | Name | Field | Definition |
 |---|---|---|
 | `thpert` | θ′ (K) | `th − th0` (the base state `th0` is in the output) |

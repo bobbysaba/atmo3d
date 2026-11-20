@@ -213,3 +213,62 @@ def test_hgrad_level_at_constant_height():
     b = 0.002 * 1000 * x[None, None, :] * np.ones_like(Z)  # (0.002 per m in x only)
     db = FF.ddz_volume(b, Z)
     assert np.allclose(FF.hgrad_level("ddx", b, Z, x, y, db), 0.002)
+
+
+# ---- step 4: the confirmed flag
+
+def _every_derived():
+    """Names of every derived field _make_fields can give, for CM1 and WoFS: with every
+    role present, and without the files' ξ, η and 2–5 km UH (so the derived ones show)."""
+    names = set()
+    for model in ("cm1", "wofs"):
+        cat = C.of_model(model)
+        full = {cat.name(r) for r in C.ROLES} - {None}
+        full |= set(getattr(cat, "condensate", ())) | {"p_l", "p_nl", "p_c", "acc_b",
+                                                        "acc_l", "acc_nl", "acc_c"}
+        bare = full - {cat.name(r) for r in ("xvort", "yvort", "uh25")}
+        for avail in (full, bare):
+            names |= {d.name for d in FF._make_fields(avail, cat)}
+    return names
+
+
+def test_confirmed_matches_the_fields():
+    """CONFIRMED names only fields that exist, and (the audit being done) every derived
+    field is in it: a new one is caught here until it is reviewed."""
+    every = _every_derived()
+    assert FF.CONFIRMED - every == set()
+    assert every - FF.CONFIRMED == set()
+    d, _ = defs()
+    assert all(x.confirmed and x.tier == "main" for x in d.values())
+
+
+def test_unconfirmed_is_hidden_and_marked(monkeypatch):
+    monkeypatch.setattr(FF, "CONFIRMED", FF.CONFIRMED - {"thetae"})
+    d, _ = defs()
+    te = d["thetae"]
+    assert not te.confirmed and te.tier == "hidden" and te.label.endswith(FF.UNVERIFIED)
+    assert d["tempc"].confirmed and d["tempc"].tier == "main"
+    dd = FF.deriv_def("ddx", te)  # (a derivative of it is unconfirmed too)
+    assert not dd.confirmed
+    # still computable (saved figures, the series worker): only its listing changes
+    th, p, qv = 300.0, 85000.0, 0.012
+    assert np.isfinite(call("thetae", {"th": th, "prs": p, "qv": qv}, d=d))
+
+
+# ---- step 5: the derived-field docs page agrees with the code
+
+def test_docs_page_lists_every_field_and_note():
+    """docs/guide/derived-fields.md names every confirmed field, and holds each field's
+    note (FieldDef.note) word for word."""
+    from pathlib import Path
+    page = (Path(__file__).resolve().parents[1] / "docs" / "guide"
+            / "derived-fields.md").read_text()
+    assert [n for n in sorted(FF.CONFIRMED) if f"`{n}`" not in page] == []
+    notes = set()
+    for model in ("cm1", "wofs"):
+        cat = C.of_model(model)
+        full = {cat.name(r) for r in C.ROLES} - {None}
+        full |= {"p_l", "p_nl", "p_c", "acc_b", "acc_l", "acc_nl", "acc_c"}
+        for avail in (full, full - {cat.name(r) for r in ("xvort", "yvort", "uh25")}):
+            notes |= {d.note for d in FF._make_fields(avail, cat) if d.note}
+    assert [n for n in sorted(notes) if n not in page] == []
