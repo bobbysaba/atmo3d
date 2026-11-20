@@ -1,13 +1,19 @@
 # Plan: making atmo3d easy to extend and contribute to
 
-Status (2026-11-20): Phase A done; decision 3 = yes (API versioned); B1, B2 done; B3 next.
-Decision 2 taken as recommended (both: packages/example and a scaffold). Decisions 1, 4,
-5 still open (4 has a recommendation Bobby has not overruled).
-B2 choices made without asking: the example is not installed with the app (not in
-environment.yml, the root pyproject or CI's pip install); tests/test_example.py registers
-it itself. Its synthetic writer lives in the package (atmo3d_example/synthetic.py), not in
-tests/, so a copy carries it.
-Start a fresh session with: "read docs-dev/extending-plan.md and continue with B3".
+Status (2026-11-20): Phase A done; decision 3 = yes (API versioned); B1-B4 done; B5 next
+(the agent playbook, then one trial run of it: needs Bobby's choice of data).
+Decision 2 taken as recommended (both: packages/example and tools/new_datatype.py).
+Decisions 1, 4, 5 still open (4 has a recommendation Bobby has not overruled).
+Choices made without asking (Bobby may overrule):
+- the example is not installed with the app (not in environment.yml, the root pyproject
+  or CI's pip install); tests/test_example.py registers it itself. Its synthetic writer
+  lives in the package (atmo3d_example/synthetic.py), so a copy carries it.
+- the example reads several times per file (TimeSource/TimeView), the harder common case.
+- the scaffold edits only its new files and a commented CODEOWNERS line; CI,
+  environment.yml and the root pyproject are printed as steps, not edited.
+- B4 is docs/datatypes.md itself (walk-through first, then the contract), not a second
+  page; developing.md and CONTRIBUTING.md point to it.
+Start a fresh session with: "read docs-dev/extending-plan.md and continue with B5".
 
 ## Goal
 

@@ -40,6 +40,8 @@ jobs:
             example:
               - 'packages/example/**'
               - 'tests/test_example.py'
+              - 'tests/test_new_datatype.py'
+              - 'tools/new_datatype.py'
 
   test:
     needs: changes

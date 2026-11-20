@@ -1,18 +1,17 @@
 # Writing a data type
 
 A *data type* teaches atmo3d to read another model's or instrument's output. It is a
-Python package of its own, found through an entry point: nothing in the core changes,
-and the package can live in this repository (`packages/<name>/`) or anywhere else.
-CM1, WoFS and radar are the three examples:
+Python package of its own, found through an entry point: nothing in the core changes.
+It can go two ways:
 
-| Package | Shows |
-|---|---|
-| `atmo3d_cm1` | a regular grid with many fields, one time per file; extra tools (parcels, pressure decomposition, a panel) |
-| `atmo3d_wofs` | a grid on a map projection with terrain-following levels; ensemble members read as runs of their own inside one folder |
-| `atmo3d_radar` | no grid: polar volumes the views sample themselves, a panel, and an optional regridded run |
+- **contributed to this repository**, as `packages/<name>/`: installed with atmo3d,
+  tested in its CI, reviewed by its owners and the maintainer;
+- **published on its own**: an ordinary Python package that users `pip install` next to
+  atmo3d. Nothing in this repository changes.
 
-This page is the contract: what a data type must provide, what it may, and how to check
-it. Everything named here is the **extension API**.
+The code is the same either way. The first half of this page is a walk-through, from an
+empty folder to a data type that passes the contract check; the second half is the
+contract itself: what a data type must provide and what it may (the **extension API**).
 
 ## The worked example
 
@@ -33,6 +32,72 @@ Its tests are `tests/test_example.py`: the contract check on the synthetic run, 
 reads checked against the formulas. CI runs them on every core change, so the example
 cannot drift from the core. It is not installed with atmo3d (it is no part of the app);
 the tests register it themselves.
+
+## Step by step
+
+The steps below make a data type for files of your own, from a copy of the example. Run
+them in the atmo3d environment (`conda activate atmo3d`).
+
+**1. Look at your files' headers.** `ncdump -h` on one or two files, never a whole file:
+the dimensions, the coordinate variables and their units, how time is written and how
+many times a file holds, which fields are staggered (one more point along an axis), the
+units of the fields you will map to roles, and fill values. Write down what you find;
+every choice below follows from it. On a shared cluster, list folders without recursing
+through big trees, and do anything heavy on a compute node.
+
+**2. Start the package.** Pick a short lowercase name (it becomes the key, `atmo3d_<name>`
+and `atmo3d-<name>`):
+
+    python tools/new_datatype.py mytype --label "My model"                 # contributed
+    python tools/new_datatype.py mytype --label "My model" --out ~/code   # your own
+
+The copy is the example renamed, so its test passes before you change anything:
+`pytest tests/test_mytype.py`. Its comments still describe the example's files.
+
+**3. Decide which kind of reader it is.**
+
+| Your data | Subclass | Read next |
+|---|---|---|
+| a regular grid in x and y, levels at the same height everywhere | `Run` | the example; `atmo3d_cm1` (one time per file, many fields) |
+| a grid on a map projection, or levels that follow the terrain | `Run`, with `geo`, `terrain` and `heights()` | `atmo3d_wofs` (WRF output; ensemble members read as runs of their own inside one folder) |
+| no grid (radar volumes, soundings, points) | `Source`, and the hooks the views need | `atmo3d_radar` (polar volumes the views sample themselves; an optional regridded run) |
+
+The rest of these steps are for a `Run`; for a `Source`, see
+[With no grid](#with-no-grid-source) and copy from `atmo3d_radar`.
+
+**4. Find the runs: `model.py`.** Set `PATTERN` to your files' names, and `TIME` to the
+time dimension. `looks()` decides from file names alone and `count()` stays cheap: the
+run picker calls them on many folders. See [The Model](#the-model).
+
+**5. Read the grid and the fields: `run.py`.** Change the constants to your files: the
+dimension names and their axes (`AXES`, with staggered dimensions marked), the
+coordinate variables and the factor to km, and the unit changes (`CONVERT`) that bring a
+field into its role's units. If your files are laid out differently (time in the file
+name, fields split over files, heights that vary), change `__init__`, `_info` and
+`TimeView` the same way. The core reads, caches and destaggers from what `source(t)`
+opens. See [The reader](#the-reader).
+
+**6. Name the fields: `catalog.py`.** Map every role your files have (`u`, `v`, `w`,
+`theta`, `pres`, `qv`, `refl`...) in the role's units: the derived fields, soundings and
+defaults are written by role, so each role mapped is more that works. Give display
+defaults to the fields people will look at. See [The field catalog](#the-field-catalog).
+
+**7. Write synthetic data: `synthetic.py`.** A tiny run in your files' layout: the same
+dimension and variable names, units, attributes and quirks as the header, with values
+from formulas so your tests know the answers. Copy no real values into the repository.
+
+**8. Test it.** The written test runs the contract check on the synthetic run; add tests
+of the reads against the formulas (as `tests/test_example.py` does). Then on a real run:
+
+    ATMO3D_MYTYPE_ROOT=/path/to/a/run pytest -m real tests/test_mytype.py
+
+(it reads one or two fields at one time; on a large grid, run it on a compute node).
+[Checking it](#checking-it) says what the check covers.
+
+**9. Open it in atmo3d.** Install it (`pip install -e packages/mytype`, or `pip install -e .`
+in your own package's folder), start atmo3d and open a run; the run picker finds it.
+
+**10. Ship it**: [contribute it, or publish it](#contributing-it-or-publishing-it).
 
 ## The extension API and its version
 
@@ -64,6 +129,8 @@ in any release: a package that reaches past this page does so at its own risk.
 
 ## The package
 
+What `tools/new_datatype.py mytype` writes:
+
 ```
 packages/mytype/
   pyproject.toml
@@ -72,6 +139,10 @@ packages/mytype/
     model.py           the Model: is this folder mine, how many times, open it
     catalog.py         the field catalog: names, looks, roles
     run.py             the reader: a Run (grid) or Source (no grid) subclass
+    synthetic.py       a small run in the files' layout, for the tests (optional, but
+                       the tests need data)
+tests/test_mytype.py   the contract check (with --out: in the package's own tests/)
+tests/mytype-tests.txt the package's tests, for CI
 ```
 
 `pyproject.toml` depends on `atmo3d-core` and names `register` in the
@@ -247,10 +318,24 @@ change that breaks the contract fails there.
 
 ## Contributing it, or publishing it
 
-To add it to this repository: put it under `packages/<name>/`, list its tests in
-`tests/<name>-tests.txt` and in `.github/workflows/tests.yml`, add it to
-`environment.yml` and the root `pyproject.toml`, and add its owners to
-`.github/CODEOWNERS` (see [Contributing](contributing.md)).
+**To contribute it** (in this repository, from `tools/new_datatype.py <name>`): open an
+[issue](https://github.com/bobbysaba/atmo3d/issues) first (the *New data type* template), then
+a pull request as [Contributing](contributing.md) describes. The scaffold wrote the
+package, its test and `tests/<name>-tests.txt`; by hand, add
 
-To publish it on its own: it is an ordinary Python package. Users `pip install` it next
-to atmo3d, and the entry point does the rest.
+- in `.github/workflows/tests.yml`: a `<name>` filter (`packages/<name>/**` and its
+  tests), its line in *Pick the tests*, and `-e packages/<name>` in the install step;
+- `- -e ./packages/<name>` in `environment.yml`, and `"atmo3d-<name>"` in the
+  dependencies of the root `pyproject.toml`;
+- its owners in `.github/CODEOWNERS` (the scaffold left a commented line).
+
+Review looks for the contract check passing on the synthetic run and on a real one (say
+in the pull request which run, and how big), tests of the reads, every role in its
+role's units, and no change in `packages/core`. A data type that seems to need a core
+change says so in its issue: that is a change to the extension API, made on its own.
+
+**To publish it on its own** (from `--out`): it is an ordinary Python package. Users
+`pip install` it into the environment atmo3d is installed in, and its entry point does
+the rest; nothing in this repository changes. Keep `Model.api` at the version you test
+against: a core of another major version leaves the package out with a warning rather
+than failing on it.

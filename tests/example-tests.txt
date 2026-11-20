@@ -1,2 +1,3 @@
 tests/test_example.py
 tests/test_datatype_check.py
+tests/test_new_datatype.py

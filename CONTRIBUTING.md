@@ -140,7 +140,12 @@ approved it, and every review comment is answered. The maintainer merges it.
 
 A data type (a reader for another model's or instrument's output) is a package of its
 own under `packages/<name>/`, with a `pyproject.toml` and an entry point in the
-`atmo3d.datatypes` group; no core file changes. CM1, WoFS and radar are the three
-examples. See [Writing a data type](docs/datatypes.md). When you contribute
-one, also add `tests/<name>-tests.txt`, its entry in `.github/workflows/tests.yml`, and
-yourself as its owner in `.github/CODEOWNERS`.
+`atmo3d.datatypes` group; no core file changes. Start it with
+
+    python tools/new_datatype.py <name> --label "<Its name>"
+
+which copies the worked example (`packages/example`) under the new name, with its tests
+and test list, and prints the few lines left to add by hand (CI, `environment.yml`, the
+root `pyproject.toml`, yourself as its owner in `.github/CODEOWNERS`). Then follow
+[Writing a data type](docs/datatypes.md#step-by-step). CM1, WoFS and radar are the
+examples of what more a data type can do.

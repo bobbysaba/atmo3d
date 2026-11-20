@@ -74,7 +74,7 @@ processes and renders figures.
 | `test_settings.py`, `test_picker.py`, `test_ui.py` | Settings, the run picker, layout logic |
 | `test_browser.py` | The viewer in headless Firefox (marker `browser`) |
 | `test_real.py` | Your own output (marker `real`) |
-| `test_example.py` | The worked example data type (`packages/example`), on its own synthetic run: the contract check and its reads; `tests/example-tests.txt` |
+| `test_example.py`, `test_new_datatype.py` | The worked example data type (`packages/example`), on its own synthetic run: the contract check and its reads; the scaffold (`tools/new_datatype.py`) in both modes. `tests/example-tests.txt` lists them |
 | `test_radar_*.py` | Radar, on `tests/synthetic_radar.py` (analytic answers): reader, PPI, sampler, regrid, hand-worked cases; `tests/radar-tests.txt` lists them for CI |
 | `test_real_radar.py` | Your own radar folder: `ATMO3D_RADAR_ROOT=... pytest -m real` |
 
@@ -228,8 +228,10 @@ the class's bases.
 ## Adding a data type
 
 A data type is a package of its own, found through an entry point; nothing in the core
-changes. What it must provide, the extension API and its version, and the conformance
-check `atmo3d.testing.check_datatype` are in [Writing a data type](datatypes.md).
+changes. `tools/new_datatype.py <name>` starts one from the worked example
+(`packages/example`). The walk-through, what a data type must provide, the extension API
+and its version, and the conformance check `atmo3d.testing.check_datatype` are in
+[Writing a data type](datatypes.md).
 
 ## Adding a derived field
 

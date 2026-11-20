@@ -20,6 +20,9 @@ has a matching git tag.
   every file saying what is required and what is optional. Not installed with the app;
   CI runs its tests on every core change. See
   [Writing a data type](datatypes.md#the-worked-example).
+- `tools/new_datatype.py <name>` starts a data type as a copy of the example, renamed,
+  with its tests: in this repository (`packages/<name>`), or as a package of your own
+  (`--out DIR`).
 
 ## 1.0.0 (2026-11-19)
 
