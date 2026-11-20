@@ -25,7 +25,7 @@ the button shows its name."""
 import param
 from panel.custom import JSComponent
 
-from ..core.fields import DERIVED_PREFIX, HIDDEN_PREFIX, OTHER_PREFIX
+from ..core.fields import DERIVED_PREFIX, HIDDEN_PREFIX, OTHER_PREFIX, Groups
 from ..theme import ACCENT, GRID, HOVER_LINE, MUTED, RAISED, TEXT
 
 # the entries that open sections of their own, in the menu's order after the plain
@@ -36,12 +36,15 @@ NESTED = ((DERIVED_PREFIX, "Derived"), (OTHER_PREFIX, "Other"), (HIDDEN_PREFIX, 
 def menu_tree(groups):
     """The menu of grouped options {group: {label: value}}: a list of nodes
     {"l": label, "c": [children]} (a section) or {"l": label, "v": value} (a field),
-    and {"sep": True} between the plain sections and Derived / Other / Hidden."""
+    and {"sep": True} between the plain sections and Derived / Other / Hidden.  A field
+    with a note (groups.tips, from fields.group_options) has it as "t": its tooltip."""
+    tips = getattr(groups, "tips", {})
     plain, nested = [], {p: [] for p, _ in NESTED}
     for g, opts in (groups or {}).items():
         if not opts:
             continue
-        leaves = [{"l": str(lab), "v": v} for lab, v in opts.items()]
+        leaves = [{"l": str(lab), "v": v} | ({"t": tips[v]} if tips.get(v) else {})
+                  for lab, v in opts.items()]
         prefix = next((p for p, _ in NESTED if str(g).startswith(p)), None)
         if prefix is None:
             if g:
@@ -78,7 +81,9 @@ class FieldSelect(JSComponent):
     def __init__(self, groups=None, options=None, **params):
         if groups is None and options is not None:
             groups = {"": dict(options)}
-        groups = dict(groups or {})
+        tips = getattr(groups, "tips", {})
+        groups = Groups(groups or {})  # (a copy that keeps the notes)
+        groups.tips = tips
         params.pop("tree", None)  # (made from groups: a clone() passes its own too)
         params.setdefault("height", 52 if params.get("name") else 32)
         params.setdefault("margin", (5, 10))  # (a widget's, as the Select's was)
@@ -195,7 +200,7 @@ export function render({ model, el }) {
         continue
       }
       const it = document.createElement('div'); it.className = 'fs-item'
-      it.textContent = n.l; it.title = n.l
+      it.textContent = n.l; it.title = n.t ? n.l + '\\n\\n' + n.t : n.l
       if (hasCur(n)) it.classList.add('fs-cur')
       if (n.c) {
         it.classList.add('fs-sec')
@@ -246,7 +251,7 @@ export function render({ model, el }) {
       }
       for (const [n, p] of hits.slice(0, 200)) {
         const it = document.createElement('div'); it.className = 'fs-item'
-        it.textContent = n.l; it.title = n.l
+        it.textContent = n.l; it.title = n.t ? n.l + '\\n\\n' + n.t : n.l
         const s = document.createElement('span'); s.className = 'fs-path'
         s.textContent = p.join(' › '); it.append(s)
         it.addEventListener('click', (e) => { e.stopPropagation(); pick(n.v) })

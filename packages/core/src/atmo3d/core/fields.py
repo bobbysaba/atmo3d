@@ -798,6 +798,12 @@ def listed(d):
     return d.tier != "hidden" or show_hidden()
 
 
+class Groups(OrderedDict):
+    """group_options' {group: {label: name}}, with .tips: {name: the field's note} for
+    the pickers' tooltips (a copy made of it by hand just goes without tips)."""
+    tips = {}
+
+
 def group_options(defs, ndim=None, label=None):
     """{group: {label: name}} of FieldDefs `defs` for the field pickers
     (viewer.fieldmenu; grouped Selects too): the fields in the files by group
@@ -814,9 +820,10 @@ def group_options(defs, ndim=None, label=None):
         kind = "derived" if d.tier == "main" and d.derived else d.tier
         text = label(d) if label else f"{d.label} [{d.name}]"
         tiers[kind].setdefault(d.group, OrderedDict())[text] = d.name
-    out = OrderedDict()
+    out = Groups()
     for kind, prefix in zip(kinds, ("", DERIVED_PREFIX, OTHER_PREFIX, HIDDEN_PREFIX)):
         out.update((prefix + g, v) for g, v in tiers[kind].items() if v)
+    out.tips = {d.name: d.note for d in defs if d.note}
     return out
 
 

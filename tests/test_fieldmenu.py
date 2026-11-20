@@ -46,3 +46,18 @@ def test_field_select_acts_like_a_select():
     w.value = "not_listed"  # (kept, as a Select keeps it: a saved figure's hidden field)
     assert w.value == "not_listed"
     assert FieldSelect(options={"a": 1}).values == [1]
+
+
+def test_a_fields_note_is_its_tooltip():
+    from atmo3d.core.fields import FieldDef, Groups, group_options
+    defs = [FieldDef("buoy", "Buoyancy", "m/s²", "Thermodynamics", note="No pressure term."),
+            FieldDef("u", "u", "m/s", "Kinematics")]
+    g = group_options(defs)
+    assert g.tips == {"buoy": "No pressure term."}
+    leaves = [n for top in menu_tree(g) for n in top.get("c", [])]
+    tips = {n["v"]: n.get("t") for n in leaves}
+    assert tips == {"buoy": "No pressure term.", "u": None}  # (a field without one: no "t")
+    sel = FieldSelect(groups=g)  # (the copy it keeps still has them)
+    assert isinstance(sel.groups, Groups) and sel.groups.tips == g.tips
+    assert any(n.get("t") for top in sel.tree for n in top.get("c", []))
+    assert menu_tree({"A": {"x": "x"}}) == [{"l": "A", "c": [{"l": "x", "v": "x"}]}]
