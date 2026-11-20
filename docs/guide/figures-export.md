@@ -23,7 +23,7 @@ Saving always keeps the figure's settings, so the [New dialog](figures.md#the-ne
 every figure saved in the *Figures* folder (⚙ Settings) as thumbnails: click one. A figure saved
 elsewhere: give the path of its `_spec.json` (in the `_src/` folder next to the image) under *Or open
 one by its path*; its image or script path works too. The editor then shows the figure with all its settings, ready to keep
-editing, and *Save as* is where it was saved, so saving again replaces it. The New dialog shows the same figures as thumbnails ([Figures](figures.md#the-quick-start)).
+editing, and *Save as* is where it was saved, so saving again replaces it. The New dialog shows the same figures as thumbnails ([Figures](figures.md#the-new-dialog)).
 If a run's `namelist.input` changed since the figure was saved (its hash, below), the
 message says so: the figure is drawn from the run's data as it is now.
 

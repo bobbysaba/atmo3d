@@ -3,7 +3,7 @@
 What changed in each release, newest first. The version is in `pyproject.toml`; a release
 has a matching git tag.
 
-## Unreleased
+## 1.1.0 (2026-11-20)
 
 - **Contributing**: a new page for first-time contributors (fork, set up, test, open a
   pull request, what review looks for), [Contributing](contributing.md); pull request and
@@ -379,7 +379,7 @@ live differences and run time alignment.
   can pair by their nth output instead of by time zero. The first run's times label the panels
   and time axes; past a shorter run's end its panels are blank.
 - **Custom grid for figure parts**
-  ([Figure parts](guide/figures-panels.md#custom-grid)): besides side by side and stacked,
+  ([Figure parts](guide/figures-panels.md#layout-and-size)): besides side by side and stacked,
   parts can go anywhere on a grid of rows and columns, each spanning as many cells as it
   needs, e.g. a plan view on the left with a cross-section above a sounding on its right.
   A map in the editor shows where the parts are. Figures saved before keep their layout.
@@ -706,7 +706,7 @@ workspace (differences, swaths, legends, statistics, a quick start).
 ### Figures
 
 - **Quick start** dialog the first time the Figure workspace opens, and a new-figure
-  button ([Figures](guide/figures.md#the-quick-start)).
+  button ([Figures](guide/figures.md#starting-a-figure)).
 - **Open a saved figure from a list**: the quick start and *Export → Open a saved
   figure* list the figures saved in the *Figures* folder (⚙ Settings), this run's first
   ([Export](guide/figures-export.md#reopening-a-saved-figure)). A reopened figure's
