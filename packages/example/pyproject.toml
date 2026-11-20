@@ -1,0 +1,25 @@
+# The worked example of a data type (docs/datatypes.md).  Copy it with
+# tools/new_datatype.py rather than by hand: that renames everything below.
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "atmo3d-example"                      # REQUIRED: atmo3d-<name>
+version = "1.0.0"
+description = "atmo3d data type: the worked example (gridded netCDF with named x, y, z, time)"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [{ name = "Bobby Saba", email = "bobbysabawx@gmail.com" }]
+license = { text = "GPL-3.0-or-later" }
+# REQUIRED: atmo3d-core, and whatever your reader imports
+dependencies = ["atmo3d-core", "netCDF4>=1.7", "numpy>=1.26"]
+
+# REQUIRED: how atmo3d finds the package.  The name on the left is the entry point's
+# (data types load, and auto-detect tries them, in the alphabetical order of these names);
+# the right names the function that registers the data type.
+[project.entry-points."atmo3d.datatypes"]
+example = "atmo3d_example:register"
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -74,6 +74,7 @@ processes and renders figures.
 | `test_settings.py`, `test_picker.py`, `test_ui.py` | Settings, the run picker, layout logic |
 | `test_browser.py` | The viewer in headless Firefox (marker `browser`) |
 | `test_real.py` | Your own output (marker `real`) |
+| `test_example.py` | The worked example data type (`packages/example`), on its own synthetic run: the contract check and its reads; `tests/example-tests.txt` |
 | `test_radar_*.py` | Radar, on `tests/synthetic_radar.py` (analytic answers): reader, PPI, sampler, regrid, hand-worked cases; `tests/radar-tests.txt` lists them for CI |
 | `test_real_radar.py` | Your own radar folder: `ATMO3D_RADAR_ROOT=... pytest -m real` |
 
@@ -83,7 +84,10 @@ A monorepo: `packages/core` (import name `atmo3d`: everything below except the d
 parts), `packages/cm1` (`atmo3d_cm1`: the CM1 reader, field catalog, parcels, trajectory
 tracing, pressure decomposition and the Parcels panel), `packages/wofs` (`atmo3d_wofs`:
 the WoFS reader, catalog and demo) and `packages/radar` (`atmo3d_radar`: the CfRadial
-reader and catalog). `tests/`, `docs/` and `tools/` stay at the top. Install the four
+reader and catalog). `packages/example` (`atmo3d_example`) is the worked example of a
+data type: no part of the app, it is the pattern new ones are copied from
+([Writing a data type](datatypes.md#the-worked-example)). `tests/`, `docs/` and `tools/`
+stay at the top. Install the four
 editable (`pip install -e packages/core -e packages/cm1 -e packages/wofs -e packages/radar`; the
 conda environment does it). The paths below are relative to `packages/core/src/` unless
 they name a data-type package.
@@ -328,7 +332,7 @@ Versions follow `MAJOR.MINOR.PATCH`, the same in every package, with a matching 
 (`v1.0.0`). To release:
 
 1. On a branch, set the version in `pyproject.toml`, `packages/*/pyproject.toml` (all
-   four) and `__version__` in `packages/core/src/atmo3d/__init__.py`.
+   five, the example's too) and `__version__` in `packages/core/src/atmo3d/__init__.py`.
 2. Move the *Unreleased* heading of [Changes](changelog.md) to the new version and date.
 3. Run the full suite (`pytest`, on a compute node), merge the pull request, then tag the
    merge commit on `master` and push the tag:

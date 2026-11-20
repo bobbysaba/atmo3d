@@ -14,6 +14,12 @@ has a matching git tag.
   it is written for (`Model.api`); one the core cannot serve is left out with a warning.
   `atmo3d.testing.check_datatype(key, folder)` checks a data type against the contract
   in one call. See [Writing a data type](datatypes.md).
+- **The worked example of a data type**, `packages/example` (`atmo3d_example`): a small,
+  real reader of gridded netCDF with named x, y, z and time (several times to a file, a
+  staggered field, a unit converted on read, fill values), its synthetic run and tests,
+  every file saying what is required and what is optional. Not installed with the app;
+  CI runs its tests on every core change. See
+  [Writing a data type](datatypes.md#the-worked-example).
 
 ## 1.0.0 (2026-11-19)
 

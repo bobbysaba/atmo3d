@@ -14,6 +14,26 @@ CM1, WoFS and radar are the three examples:
 This page is the contract: what a data type must provide, what it may, and how to check
 it. Everything named here is the **extension API**.
 
+## The worked example
+
+`packages/example` (`atmo3d_example`) is a small but real data type, written to be
+copied: it reads gridded netCDF with named `x`, `y`, `z` and `time` dimensions, the most
+common case. Every file marks what is **REQUIRED** and what is optional:
+
+| File | What it shows |
+|---|---|
+| `pyproject.toml` | the entry point that registers the data type |
+| `src/atmo3d_example/__init__.py` | `register()` |
+| `model.py` | the Model: a file pattern for `looks`, a cheap `count`, a demo run |
+| `catalog.py` | display defaults, and the roles that make the core's derived fields work |
+| `run.py` | the reader: the grid in km, several times to a file (its own `source(t)`), a staggered field, a unit converted on read, fill values made NaN, a field only some files have |
+| `synthetic.py` | a tiny run in the same layout with values from formulas, for the tests |
+
+Its tests are `tests/test_example.py`: the contract check on the synthetic run, and
+reads checked against the formulas. CI runs them on every core change, so the example
+cannot drift from the core. It is not installed with atmo3d (it is no part of the app);
+the tests register it themselves.
+
 ## The extension API and its version
 
 The extension API is what a data-type package may use:

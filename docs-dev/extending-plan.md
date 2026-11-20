@@ -1,8 +1,13 @@
 # Plan: making atmo3d easy to extend and contribute to
 
-Status (2026-11-20): Phase A done; decision 3 = yes (API versioned); B1 done; B2 next.
-Decisions 1, 2, 4, 5 still open (2 and 4 have recommendations Bobby has not overruled).
-Start a fresh session with: "read docs-dev/extending-plan.md and continue with B2".
+Status (2026-11-20): Phase A done; decision 3 = yes (API versioned); B1, B2 done; B3 next.
+Decision 2 taken as recommended (both: packages/example and a scaffold). Decisions 1, 4,
+5 still open (4 has a recommendation Bobby has not overruled).
+B2 choices made without asking: the example is not installed with the app (not in
+environment.yml, the root pyproject or CI's pip install); tests/test_example.py registers
+it itself. Its synthetic writer lives in the package (atmo3d_example/synthetic.py), not in
+tests/, so a copy carries it.
+Start a fresh session with: "read docs-dev/extending-plan.md and continue with B3".
 
 ## Goal
 
