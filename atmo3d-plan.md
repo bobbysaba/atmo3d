@@ -253,6 +253,15 @@ Done when: Bobby has read the report and decided. (Decided 2026-11-19: `docs-dev
 
 Done when: tests pass; `atmo3d --demo` works; adding an empty data type folder takes no
 core edits.
+
+Decisions (Bobby, 2026-11-19): packages import as `atmo3d` (core), `atmo3d_cm1`,
+`atmo3d_wofs`, registered through the `atmo3d.datatypes` entry point (each installed
+editable; no uv here). `thermo`, `sounding_plot`, `track` and the Sounding/Track panels
+**stay in core**, because WoFS offers soundings and tracking too. Parcels, trajcalc,
+pdecomp and the Parcels panel moved to `packages/cm1`; the core reaches them through
+`core/services.py` and `viewer/ext.py` (no core import of a data-type package; tested).
+Status: step 1-5 done on branch `phase5-monorepo`; Bobby still runs the full suite and sets
+branch protection.
 **CHECKPOINT**.
 
 ### Phase 6: Radar package
