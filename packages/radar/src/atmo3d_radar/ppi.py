@@ -7,6 +7,7 @@ GAP_RAYS ray spacings (a sector the sweep lacks) or outside the gates is empty.
 
   window(run, view, maxpix)   the map pixels of a view: (x0, x1, y0, y1, stride, n)
   raster(run, a, t, k, win)   x (nx,), y (ny,), (ny, nx) of sweep k's values a at time t
+  reduce_sweeps(run, vol, t, win, op)  the most / least of the sweeps over each pixel
 
 The window takes the place of the grid's index window (core.render.view_window): its
 stride (win[4]) says how much coarser than the gates the pixels are (1: full res).
@@ -62,22 +63,18 @@ def _nearest_ray(az_sorted, az):
     return near, np.minimum(di, dj)
 
 
-def index(run, t, k, win):
-    """(ray, gate) index arrays (ny, nx) of sweep k at time t on window win's pixels; -1
-    where a pixel has no gate.  Kept for the last few windows."""
-    sw = run.sweeps(t)
-    az = sw.az[k]
-    nray = int(np.isfinite(az).sum())
-    key = (run.path, t, k, float(sw.elev[k]), nray, win)
-    with _LOCK:
-        got = _INDEX.get(key)
-        if got is not None:
-            _INDEX.move_to_end(key)
-            return got
+def _polar(win):
+    """Ground distance and azimuth (deg) of window win's pixels, (ny, nx) each."""
     x, y = pixels(win)
     X, Y = np.meshgrid(x, y)
-    s = np.hypot(X, Y)
-    paz = np.degrees(np.arctan2(X, Y)) % 360.0
+    return np.hypot(X, Y), np.degrees(np.arctan2(X, Y)) % 360.0
+
+
+def _gates(run, sw, k, s, paz):
+    """(ray, gate) indices of sweep k of sweep table sw at ground distance s and
+    azimuth paz (arrays): the nearest ray and gate, -1 where there is none."""
+    az = sw.az[k]
+    nray = int(np.isfinite(az).sum())
     ray = np.full(s.shape, -1, np.int32)
     gate = np.full(s.shape, -1, np.int32)
     if nray >= 2 and len(run.ranges):
@@ -89,7 +86,21 @@ def index(run, t, k, win):
         g = np.clip(np.searchsorted(0.5 * (sg[1:] + sg[:-1]), s), 0, len(sg) - 1)
         ok = (dist <= GAP_RAYS * spacing) & (s >= sg[0] - half) & (s <= sg[-1] + half)
         ray[ok], gate[ok] = near[ok], g[ok]
-    out = (ray, gate)
+    return ray, gate
+
+
+def index(run, t, k, win):
+    """(ray, gate) index arrays (ny, nx) of sweep k at time t on window win's pixels; -1
+    where a pixel has no gate.  Kept for the last few windows."""
+    sw = run.sweeps(t)
+    nray = int(np.isfinite(sw.az[k]).sum())
+    key = (run.path, t, k, float(sw.elev[k]), nray, win)
+    with _LOCK:
+        got = _INDEX.get(key)
+        if got is not None:
+            _INDEX.move_to_end(key)
+            return got
+    out = _gates(run, sw, k, *_polar(win))
     with _LOCK:
         _INDEX[key] = out
         while len(_INDEX) > _INDEX_MAX:
@@ -106,6 +117,24 @@ def raster(run, a, t, k, win):
     ok = ray >= 0
     out[ok] = a[ray[ok], gate[ok]]
     return x, y, out
+
+
+def reduce_sweeps(run, vol, t, win, op="max"):
+    """The most ("max") or least ("min") of every sweep of vol (sweeps, rays, gates) at
+    time t over each pixel of window win, each sweep's value the gate the pixel falls
+    in (as raster): (ny, nx), NaN where no sweep has a value."""
+    s, paz = _polar(win)
+    sw = run.sweeps(t)
+    out = np.full(s.shape, np.nan, np.float32)
+    pick = np.fmax if op == "max" else np.fmin
+    vol = np.asarray(vol)
+    for k in range(min(len(sw), vol.shape[0])):
+        ray, gate = _gates(run, sw, k, s, paz)
+        ok = ray >= 0
+        v = np.full(s.shape, np.nan, np.float32)
+        v[ok] = vol[k][ray[ok], gate[ok]]
+        pick(out, v, out=out)
+    return out
 
 
 def gate_at(run, t, k, x, y):

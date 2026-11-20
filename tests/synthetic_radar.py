@@ -17,6 +17,8 @@ Fields, at gate g (range R0 + g * DR km), ray azimuth a (deg), sweep elevation e
   reflectivity = refl(a, g, e)   NaN where g is a multiple of 7
   velocity     = vel(a, g, e)    (no missing gates)
   u            = 10, NaN for g < 5 (default fill)
+  v            = -5 (with _FillValue; no missing gates)
+  w            = 1 (the first volume only)
 """
 import os
 
@@ -76,6 +78,8 @@ def _volume(path, nsweep, with_w, seed):
         v_v.units = "meters_per_second"
         u_v = d.createVariable("u", "f8", ("time", "range"))  # (no _FillValue)
         u_v.units = "m/s"
+        vv_v = d.createVariable("v", "f8", ("time", "range"), fill_value=-9999.0)
+        vv_v.units = "m/s"
         w_v = d.createVariable("w", "f8", ("time", "range")) if with_w else None
         s0 = d.createVariable("sweep_start_ray_index", "i4", ("sweep",))
         s1 = d.createVariable("sweep_end_ray_index", "i4", ("sweep",))
@@ -104,6 +108,7 @@ def _volume(path, nsweep, with_w, seed):
         v_v[:nrays] = V
         U = np.full((n_in, NG), 10.0)
         u_v[:n_in, 5:] = U[:, 5:]  # (gates < 5 never written: the default fill)
+        vv_v[:n_in] = np.full((n_in, NG), -5.0)
         if w_v is not None:
             w_v[:n_in] = np.ones((n_in, NG))
         # the padding rays: angles left as fill, data written as fill

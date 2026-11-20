@@ -166,8 +166,10 @@ def test_compute_map_sweep_missing_at_a_time(rf):
 # ------------------------------------------------------------------ the viewer
 def test_viewer_on_a_radar_run(rv):
     v = rv
-    assert list(v.mode.btns) == ["PPI"] and v.panel_keys == ["PPI"]
-    assert not v.workspace.visible and v.extent == tuple(v.run.extent)
+    # (its sampler brings sections and 3D: tests/test_radar_sampler.py)
+    assert list(v.mode.btns) == ["Cross-section", "3D region", "PPI"]
+    assert v.workspace.visible and v.workspace.options == ["Map", "3D"]
+    assert v.extent == tuple(v.run.extent)
     assert v.fill_mode.value == "sweep" and v.fill_lvl.end == 2
     assert v.fill_var.value == "reflectivity"
     assert "PPI" in txt(v.hint.object)
@@ -211,5 +213,7 @@ def test_grid_only_tools_stay_off_a_radar_run(rf):
     from atmo3d.viewer import panels
     run, _ = rf
     built, rail = panels.for_run(run)
-    assert [t.key for t in built] == ["PPI"] and [t.key for t in rail] == ["PPI"]
-    assert not run.can("grid") and run.can("native_polar")
+    assert [t.key for t in rail] == ["Cross-section", "3D region", "PPI"]
+    assert "Series" not in [t.key for t in built] and \
+        "Distribution" not in [t.key for t in built]
+    assert not run.can("grid") and run.can("sampled") and run.can("native_polar")

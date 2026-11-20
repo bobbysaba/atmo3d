@@ -14,7 +14,7 @@ import numpy as np
 
 from atmo3d.core.run import IO_LOCK, MissingAtTime, Source, VarInfo
 
-from . import beam, cfradial, ppi
+from . import beam, cfradial, ppi, sampler, scene
 
 # fields computed from the sweep table and the beam model, not read from the files
 # (hidden: for checking the geometry)
@@ -59,7 +59,9 @@ class PolarRun(Source):
     model = "radar"
     model_label = "Radar"
     OFFERS = frozenset({"native_polar"})
+    sampled = True  # (atmo3d_radar.sampler: sections, constant-height maps, 3D)
     storm_relative = False  # (no storm motion for radar yet)
+    height_units = "km above the radar"
 
     def __init__(self, path, cache_gb=12.0, workers=None, cache=None):
         super().__init__(path, cache_gb, workers, cache)
@@ -162,23 +164,107 @@ class PolarRun(Source):
         with IO_LOCK:
             return cfradial.read_sweep(self._ds(t)[name], sw, k)
 
+    def load_volumes(self, names, t, progress=None, cancelled=None):
+        """Read the volumes of `names` at time t into the cache (core.run.Run's, one at
+        a time here).  False once cancelled."""
+        names = [n for n in dict.fromkeys(names) if n in self.vars]
+        todo = [n for n in names if self.cached(n, t) is None]
+        for i, n in enumerate(todo):
+            if cancelled is not None and cancelled():
+                return False
+            if progress is not None:
+                progress(i, len(todo), n)
+            self.volume(n, t)
+        if progress is not None and todo:
+            progress(len(todo), len(todo), "")
+        return not (cancelled is not None and cancelled())
+
+    # ------------------------------------------------------------------ the sampler
+    def sampling(self):
+        """(method, max_gap_km) of the sampler, from the settings (radar_sampling,
+        radar_max_gap_km; 0: every gap between sweeps bridged)."""
+        from atmo3d import config
+        m = str(config.get("radar_sampling") or "linear").strip().lower()
+        g = config.get("radar_max_gap_km")
+        try:
+            g = 0.0 if g in (None, "", "auto") else max(0.0, float(g))
+        except (TypeError, ValueError):
+            g = 0.0
+        return (m if m in sampler.METHODS else "linear"), g
+
+    def sample(self, vol, t, x, y, z):
+        """Values of time t's volume vol (sweeps, rays, gates) at x, y, z (km; z above
+        the radar), broadcast: atmo3d_radar.sampler with the settings' method and gap."""
+        m, g = self.sampling()
+        return sampler.sample(self, vol, t, x, y, z, m, g)
+
+    def view_note(self):
+        """How the views off the sweeps come about, for their titles."""
+        m, g = self.sampling()
+        return (f"native, {m} between sweeps" if not g else
+                f"native, {m}; gaps over {g:g} km left empty")
+
     # ------------------------------------------------------------------ the map
     def map_window(self, view, maxpix):
         """The map's pixels for a view (core.render.view_window on a grid)."""
         return ppi.window(self, view, maxpix)
 
-    def map_crop(self, a, win, t, mode, level):
-        """x, y, (ny, nx) of a plane `a` (Fields.plane) on the map's pixels win
-        (core.render._crop on a grid): a sweep (mode "sweep", level: its index)."""
-        if mode != "sweep":
-            raise ValueError(f"a radar map shows sweeps, not {mode!r}")
-        return ppi.raster(self, a, t, int(level), win)
+    def map_plane(self, F, name, t, mode, level, win, storm=None):
+        """x, y, (ny, nx) of field `name` (display units) on the map's pixels win:
+          "sweep"   sweep `level` (its index), each pixel the gate it falls in;
+          "height"  `level` km above the radar, through the sampler (a CAPPI);
+          "colmax", "colmin"  the most / least of the sweeps over each pixel (the
+                    column max of reflectivity: composite reflectivity)."""
+        if mode == "sweep":
+            a = F.plane(name, t, "sweep", level, storm=storm)
+            return ppi.raster(self, a, t, int(level), win)
+        x, y = ppi.pixels(win)
+        if mode == "height":
+            X, Y = np.meshgrid(x, y)
+            return x, y, F.take(name, t, lambda v: self.sample(v, t, X, Y, float(level)),
+                                storm)
+        if mode in ("colmax", "colmin"):
+            return x, y, F.take(name, t, lambda v: ppi.reduce_sweeps(
+                self, v, t, win, mode[3:]), storm)
+        raise ValueError(f"a radar map shows sweeps, heights or column extremes, not "
+                         f"{mode!r}")
 
     def level_text(self, t, mode, level):
-        """A map title's level: " @ 0.5° sweep" ."""
+        """A map title's level: " @ 0.5° sweep", " @ 3 km", " column max"."""
+        if mode == "height":
+            return f" @ {level:g} km"
+        if mode in ("colmax", "colmin"):
+            return f" column {mode[3:]} (of the sweeps)"
         sw = self.sweeps(t)
         k = int(level)
         return f" @ {sw.label(k)} sweep" if 0 <= k < len(sw) else f" @ sweep {k}"
+
+    # ------------------------------------------------------------------ sections
+    def section_points(self, A, B, max_pts=1200):
+        """(s, x, y, (ex, ey)) of a section from A to B (km): points about half a gate
+        apart (core.render.section_coords: fi, fj on a grid; x, y km here)."""
+        (xa, ya), (xb, yb) = A, B
+        L = float(np.hypot(xb - xa, yb - ya))
+        dr = float(np.median(np.diff(self.ranges))) if len(self.ranges) > 1 else 1.0
+        n = int(min(max_pts, max(2, np.ceil(L / (dr / 2)) + 1)))
+        s = np.linspace(0.0, L, n)
+        e = ((xb - xa) / max(L, 1e-9), (yb - ya) / max(L, 1e-9))
+        return s, xa + e[0] * s, ya + e[1] * s, e
+
+    def sample_section(self, vol, t, x, y, zq):
+        """(nz, n) of time t's volume at the section's points x, y (km) and heights zq."""
+        zq = np.asarray(zq, np.float64)
+        return self.sample(vol, t, np.asarray(x)[None, :], np.asarray(y)[None, :],
+                           zq[:, None])
+
+    # ------------------------------------------------------------------ 3D
+    def build_scene(self, F, spec, progress=None, cancelled=None, cache=None):
+        """A 3D scene (core.volume3d.build_scene): atmo3d_radar.scene."""
+        return scene.build_scene(self, F, spec, progress, cancelled, cache)
+
+    def scene_stride(self, box, t=0):
+        """The stride a 3D scene of region box takes on its own (its "Auto")."""
+        return scene.auto_stride(self, t, tuple(box))
 
     # ------------------------------------------------------------------ neutral facts
     @property
