@@ -542,6 +542,9 @@ def _var_info(name, v):
                    len(dims) - 1, stag, zchunk, dict(v.__dict__))
 
 
+var_info = _var_info  # (its name in the extension API: docs/datatypes.md)
+
+
 class VarInfo:
     __slots__ = ("name", "long_name", "units", "ndim", "stag", "zchunk", "attrs")
 

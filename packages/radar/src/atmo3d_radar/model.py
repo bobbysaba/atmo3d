@@ -7,6 +7,7 @@ from atmo3d.core.models import Model, is_file
 class Radar(Model):
     """A folder of CfRadial volumes, one file per time (atmo3d_radar.cfradial)."""
     key, label = "radar", "Radar"
+    api = "1.0"  # (atmo3d.API_VERSION it is written for)
 
     @property
     def run_class(self):

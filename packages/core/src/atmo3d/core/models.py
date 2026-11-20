@@ -22,6 +22,10 @@ class Model:
     key = ""
     label = ""
     run_class = None
+    # the extension API version this data type is written for ("1.0": atmo3d.API_VERSION);
+    # register() refuses a data type the installed core cannot serve.  None: not said
+    # (accepted; atmo3d.testing.check_datatype asks for it)
+    api = None
 
     def count(self, path):
         return 0
@@ -124,6 +128,23 @@ MODELS = _Models()
 _LOADED = False
 
 
+class APIMismatch(RuntimeError):
+    """A data type written for an extension API this core does not serve."""
+
+
+def _api(text):
+    major, minor = str(text).split(".")[:2]
+    return int(major), int(minor)
+
+
+def api_compatible(wanted, have=None):
+    """Whether a data type written for extension API `wanted` ("1.0") runs on API `have`
+    (default: this core's, atmo3d.API_VERSION): the same major, and a minor no newer."""
+    from .. import API_VERSION
+    (wm, wn), (hm, hn) = _api(wanted), _api(have or API_VERSION)
+    return wm == hm and wn <= hn
+
+
 def register(model):
     """Add a data type (a Model instance).  A data-type package calls this from the function
     its entry point names:
@@ -131,22 +152,46 @@ def register(model):
         [project.entry-points."atmo3d.datatypes"]
         cm1 = "atmo3d_cm1:register"
 
-    A key registered again replaces the old entry in its place."""
+    A key registered again replaces the old entry in its place.  APIMismatch: the model's
+    `api` is one this core cannot serve (api_compatible)."""
+    want = getattr(model, "api", None)
+    if want is not None:
+        from .. import API_VERSION
+        try:
+            ok = api_compatible(want)
+        except (TypeError, ValueError):
+            raise APIMismatch(f"data type {model.key!r}: api = {want!r} is not a "
+                              f"MAJOR.MINOR version like {API_VERSION!r}") from None
+        if not ok:
+            raise APIMismatch(f"data type {model.key!r} is written for atmo3d's extension "
+                              f"API {want}; this atmo3d serves {API_VERSION} (the same "
+                              f"major, a minor up to {API_VERSION})")
     dict.__setitem__(MODELS, model.key, model)
     return model
+
+
+# {entry-point name: why it was left out}: installed data types this core cannot serve
+SKIPPED = {}
 
 
 def load():
     """Import every installed data-type package: call the function each entry point of the
     group names.  Packages load in the alphabetical order of their entry-point names, which
-    is the order "auto" tries their models in.  Called once, on first use."""
+    is the order "auto" tries their models in.  Called once, on first use.  A package
+    written for another extension API (APIMismatch) is left out with a warning, and the
+    reason kept in SKIPPED; any other error in a package is raised."""
     global _LOADED
     if _LOADED:
         return
     _LOADED = True  # (set first: a package's register() may read MODELS)
+    import warnings
     from importlib.metadata import entry_points
     for ep in sorted(entry_points(group=GROUP), key=lambda e: e.name):
-        ep.load()()
+        try:
+            ep.load()()
+        except APIMismatch as e:
+            SKIPPED[ep.name] = str(e)
+            warnings.warn(f"atmo3d: data type {ep.name!r} not loaded: {e}", stacklevel=2)
 
 
 def choices():

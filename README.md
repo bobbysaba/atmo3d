@@ -70,6 +70,7 @@ in `docs/`:
   fields
 - [Settings](docs/settings.md): the config file and every setting
 - [Contributing](CONTRIBUTING.md): fork, change, test and open a pull request
+- [Writing a data type](docs/datatypes.md): reading another model's or instrument's output
 - [Developing](docs/developing.md): tests, code layout, adding derived fields and vectors,
   building these pages
 - [Changes](docs/changelog.md): what is new in each release

@@ -119,7 +119,7 @@ owners of its own, who then review changes inside it.
 - **It is tested** as above, and the existing tests still pass.
 - **It stays in its place.** Core code does not import a data-type package; a data type
   adds itself through the registration API
-  ([Developing](docs/developing.md#the-registration-api)) instead of editing the core.
+  ([Writing a data type](docs/datatypes.md#the-registration-calls)) instead of editing the core.
 - **The documentation matches**, and the changelog has a line for anything a user notices.
 - **It is no bigger than it needs to be.** Unrelated clean-ups go in a pull request of
   their own.
@@ -141,6 +141,6 @@ approved it, and every review comment is answered. The maintainer merges it.
 A data type (a reader for another model's or instrument's output) is a package of its
 own under `packages/<name>/`, with a `pyproject.toml` and an entry point in the
 `atmo3d.datatypes` group; no core file changes. CM1, WoFS and radar are the three
-examples. See [Developing](docs/developing.md#adding-a-data-type). When you contribute
+examples. See [Writing a data type](docs/datatypes.md). When you contribute
 one, also add `tests/<name>-tests.txt`, its entry in `.github/workflows/tests.yml`, and
 yourself as its owner in `.github/CODEOWNERS`.

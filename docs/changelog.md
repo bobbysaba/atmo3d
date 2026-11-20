@@ -9,11 +9,16 @@ has a matching git tag.
   pull request, what review looks for), [Contributing](contributing.md); pull request and
   issue templates; the maintainer's side (collaborators, code owners, tag protection,
   releases) in [Developing](developing.md#maintaining-the-repository).
+- **Extension API 1.0**: what a data-type package may use is now named and versioned
+  (`atmo3d.API_VERSION`): a minor release only adds to it. A data type says the version
+  it is written for (`Model.api`); one the core cannot serve is left out with a warning.
+  `atmo3d.testing.check_datatype(key, folder)` checks a data type against the contract
+  in one call. See [Writing a data type](datatypes.md).
 
 ## 1.0.0 (2026-11-19)
 
 One core with a data type per package (CM1, WoFS and radar under `packages/`), and a
-registration API for more ([Developing](developing.md#the-registration-api)).
+registration API for more ([Writing a data type](datatypes.md#the-registration-calls)).
 
 ### Radar volumes
 - A folder of CfRadial volumes (the bistatic KTLX files) opens as a run, read in native

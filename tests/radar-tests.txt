@@ -3,3 +3,4 @@ tests/test_radar_ppi.py
 tests/test_radar_sampler.py
 tests/test_radar_regrid.py
 tests/test_radar_analytic.py
+tests/test_datatype_check.py

@@ -65,4 +65,5 @@ nav:
   - Settings: settings.md
   - Contributing: contributing.md
   - Developing: developing.md
+  - Writing a data type: datatypes.md
   - Changes: changelog.md

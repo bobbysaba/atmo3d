@@ -1,7 +1,8 @@
 # Plan: making atmo3d easy to extend and contribute to
 
-Status: **draft for Bobby (2026-11-20)**, written at the end of the 1.0.0 session. Not started.
-Start a fresh session with: "read docs-dev/extending-plan.md and begin Phase A".
+Status (2026-11-20): Phase A done; decision 3 = yes (API versioned); B1 done; B2 next.
+Decisions 1, 2, 4, 5 still open (2 and 4 have recommendations Bobby has not overruled).
+Start a fresh session with: "read docs-dev/extending-plan.md and continue with B2".
 
 ## Goal
 
