@@ -24,6 +24,8 @@ edits the file itself). They are saved in `~/.config/atmo3d/config.toml`
 | `allow_writes_to_output` | off | lets the pressure decomposition write into output files |
 | `show_hidden_fields` | off | lists the hidden fields (WoFS's static, land-surface, radiation and time-step fields, and WRF fields atmo3d does not know) under "Hidden" at the end of the field lists |
 | `column_stride` | auto | CAPE, CIN, LCL, STP and SCP maps on every n-th column (auto: every column up to 500 × 500 points) |
+| `radar_max_gap_km` | auto | radar views off the sweeps (constant heights, sections, columns, 3D) leave a point empty where the two sweeps around it are further apart than this many km; auto: every gap is bridged |
+| `radar_sampling` | `linear` | radar values within a sweep: `linear` between the nearest rays and gates, or `nearest` gate |
 | `cache_gb`, `workers` | auto | from the job's memory and CPUs (restart to apply) |
 | `port`, `maxpix` | 5006, 900 | server port (restart to apply), map pixels per axis |
 | `login_host` | from the batch job | login node shown in the printed SSH tunnel command |

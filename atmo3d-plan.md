@@ -284,6 +284,18 @@ branch protection.
    step 4.)
 4. Sampler-based cross-section, column and constant-height views, and 3D (native
    structured grid), per the Phase 4 decision.
+   (2026-11-19: done. `atmo3d_radar.sampler` (the Phase 4 prototype, numba; ray gaps as
+   on the PPI; settings `radar_sampling`, `radar_max_gap_km`, default: every gap
+   bridged); the radar map's level control adds "Height (km)" (CAPPI) and "Column
+   max/min" (of the sweeps: composite reflectivity, audit D3, as a level mode rather
+   than a separate field); Cross-section and 3D region are on for radar (capability
+   `sampled`), the 3D workspace with isosurfaces by index-space marching cubes
+   (`atmo3d_radar.scene`) and the floor; the PPI panel draws the column under a click;
+   map vectors at a height. Core hooks on the run (`map_plane`, `section_points`,
+   `sample_section`, `build_scene`), grid code paths unchanged. Still off on radar:
+   Series, Distribution, 3D vectors and streamlines, the Figure workspace, sessions.
+   The `Fields` neutral/grid split was not needed: `Fields` leaves out the grid-only
+   derived fields on a run with no grid (step 3).)
 5. **Regrid** (optional, off by default): settings in the settings panel (method,
    horizontal and vertical spacing, maximum range, gap masking); a first-use dialog that
    requires confirming settings; cached with the settings in the cache key; a "regridded:
