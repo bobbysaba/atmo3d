@@ -273,6 +273,9 @@ branch protection.
    field catalog.
 2. Reader: CfRadial files to `Run`-like volumes (one file is one time); radar site as the
    origin; lat/lon via `geo` for map boundaries; native storage as sweeps x rays x gates.
+   (2026-11-19: done. `core.run` split into `Source` / `Run(Source)` first, which Phase 5 had
+   not done; `atmo3d_radar.run.PolarRun(Source)`. `core.fields.Fields` still needs a grid,
+   so the app cannot open a radar folder until steps 3-4.)
 3. Native **PPI** view panel (registered by the radar package).
 4. Sampler-based cross-section, column and constant-height views, and 3D (native
    structured grid), per the Phase 4 decision.
