@@ -90,6 +90,10 @@ KEYS = [
         "List the fields atmo3d hides (WoFS's static, land-surface, radiation and "
         "time-step fields, and WRF fields it does not know) under \"Hidden\" at the "
         "end of the field lists. Applies to runs opened after saving.", kind="bool"),
+    Key("docs_url", "data", "", "Documentation site address",
+        "Where the atmo3d documentation is published (an http or https address, e.g. "
+        "https://example.org/atmo3d). Set, the field menus end with a link to the "
+        "derived-fields page. Blank: no link.", advanced=True),
     Key("column_stride", "data", "auto", "Sounding-parameter stride",
         "CAPE, CIN, LCL, STP and SCP maps are computed on every n-th column in x and "
         "y (each n x n block shows its middle column). auto = as few as keep them to "

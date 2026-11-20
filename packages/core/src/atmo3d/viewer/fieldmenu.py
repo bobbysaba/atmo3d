@@ -33,6 +33,14 @@ from ..theme import ACCENT, GRID, HOVER_LINE, MUTED, RAISED, TEXT
 NESTED = ((DERIVED_PREFIX, "Derived"), (OTHER_PREFIX, "Other"), (HIDDEN_PREFIX, "Hidden"))
 
 
+def derived_docs_link():
+    """The derived-fields page under the docs_url setting ("": the setting is blank, or
+    not an http(s) address: no link)."""
+    from .. import config
+    url = str(config.get("docs_url") or "").strip().rstrip("/")
+    return f"{url}/guide/derived-fields/" if url.lower().startswith(("http://", "https://")) else ""
+
+
 def menu_tree(groups):
     """The menu of grouped options {group: {label: value}}: a list of nodes
     {"l": label, "c": [children]} (a section) or {"l": label, "v": value} (a field),
@@ -74,6 +82,7 @@ class FieldSelect(JSComponent):
     tree = param.List(default=[])
     name = param.String(default="")
     description = param.String(default="")
+    docs_link = param.String(default="")  # (the derived-fields page's address, or "")
     disabled = param.Boolean(default=False)
 
     _rename = {"groups": None}
@@ -85,6 +94,7 @@ class FieldSelect(JSComponent):
         groups = Groups(groups or {})  # (a copy that keeps the notes)
         groups.tips = tips
         params.pop("tree", None)  # (made from groups: a clone() passes its own too)
+        params.setdefault("docs_link", derived_docs_link())
         params.setdefault("height", 52 if params.get("name") else 32)
         params.setdefault("margin", (5, 10))  # (a widget's, as the Select's was)
         if "sizing_mode" not in params:
@@ -132,6 +142,9 @@ class FieldSelect(JSComponent):
 .fs-item.fs-sec::after {{ content: "▸"; position: absolute; right: 8px; color: {MUTED}; }}
 .fs-path {{ color: {MUTED}; font-size: 11px; margin-left: 6px; }}
 .fs-sep {{ border-top: 1px solid {GRID}; margin: 3px 0; }}
+.fs-docs {{ display: block; padding: 5px 10px 3px; margin-top: 3px; border-top: 1px solid {GRID};
+  color: {ACCENT}; text-decoration: none; }}
+.fs-docs:hover {{ text-decoration: underline; }}
 .fs-none {{ padding: 4px 10px; color: {MUTED}; }}
 """]
 
@@ -236,6 +249,13 @@ export function render({ model, el }) {
     search.placeholder = 'Search fields…'
     const list = document.createElement('div')
     menu.append(search, list)
+    if (model.docs_link) {
+      const a = document.createElement('a'); a.className = 'fs-docs'
+      a.href = model.docs_link; a.target = '_blank'; a.rel = 'noopener noreferrer'
+      a.textContent = 'ⓘ Field documentation'
+      a.title = 'What each derived field computes, and what it leaves out'
+      menu.append(a)
+    }
     const tree = model.tree || []
     fill(list, tree, 0)
     let first = null

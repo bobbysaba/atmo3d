@@ -61,3 +61,15 @@ def test_a_fields_note_is_its_tooltip():
     assert isinstance(sel.groups, Groups) and sel.groups.tips == g.tips
     assert any(n.get("t") for top in sel.tree for n in top.get("c", []))
     assert menu_tree({"A": {"x": "x"}}) == [{"l": "A", "c": [{"l": "x", "v": "x"}]}]
+
+
+def test_docs_link_follows_the_docs_url_setting(monkeypatch):
+    from atmo3d import config
+    from atmo3d.viewer import fieldmenu
+    assert config.BY_NAME["docs_url"].default == ""
+    for url, want in [("", ""), ("https://x.org/atmo3d/", "https://x.org/atmo3d/guide/derived-fields/"),
+                      ("http://x.org", "http://x.org/guide/derived-fields/"),
+                      ("javascript:alert(1)", ""), ("x.org/atmo3d", "")]:
+        monkeypatch.setattr(config, "get", lambda name, u=url: u)
+        assert fieldmenu.derived_docs_link() == want
+        assert FieldSelect(groups=GROUPS).docs_link == want

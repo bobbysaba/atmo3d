@@ -23,6 +23,7 @@ edits the file itself). They are saved in `~/.config/atmo3d/config.toml`
 | `settle_seconds` | `60` | a run still going opens without the file being written: the newest file is left out while it changed within this many seconds or will not open (0: only files that will not open); Reload run adds files finished since |
 | `allow_writes_to_output` | off | lets the pressure decomposition write into output files |
 | `show_hidden_fields` | off | lists the hidden fields (WoFS's static, land-surface, radiation and time-step fields, and WRF fields atmo3d does not know) under "Hidden" at the end of the field lists |
+| `docs_url` | blank | where the documentation is published (an http or https address); set, the field menus end with a link to the derived-fields page |
 | `column_stride` | auto | CAPE, CIN, LCL, STP and SCP maps on every n-th column (auto: every column up to 500 × 500 points) |
 | `radar_max_gap_km` | auto | radar views off the sweeps (constant heights, sections, columns, 3D) leave a point empty where the two sweeps around it are further apart than this many km; auto: every gap is bridged |
 | `radar_sampling` | `linear` | radar values within a sweep: `linear` between the nearest rays and gates, or `nearest` gate |
