@@ -7,6 +7,7 @@ import re
 import numpy as np
 
 from ...core import azim, dist, joint, series as ser, thermo, track as trk
+from ...core.fields import sounding_wind10
 from ...core.services import parcels as par
 from .. import draw as figdraw
 from .base import npanels, tindex, storm_motion, profile_runs, entry_run, time_key
@@ -631,8 +632,10 @@ def sounding_column(run, entry, fixes, progress=None, storm=("rm", (0.0, 0.0))):
     if snd is None:
         return "this run has no sounding fields (potential temperature, pressure, vapor, winds)"
     names = snd + (("zagl",) if run.terrain else ())
+    w10 = None
     if kind == "mean":
         c = run.mean_profiles(names, t, progress=progress)
+        w10 = sounding_wind10(run, t)
     else:
         x, y = float(w.get("x", 0.0)), float(w.get("y", 0.0))
         if kind == "trk":
@@ -644,6 +647,7 @@ def sounding_column(run, entry, fixes, progress=None, storm=("rm", (0.0, 0.0))):
         h = int(round(float(w.get("avg", 0.0)) * 500.0 / run.dx))
         i0, i1 = max(0, i - h), min(run.ni, i + h + 1)
         j0, j1 = max(0, j - h), min(run.nj, j + h + 1)
+        w10 = sounding_wind10(run, t, (i0, i1, j0, j1))
         c = {}
         got = run.read_boxes([v for v in names if run.cached(v, t) is None], t, i0, i1, j0, j1)
         for v in names:
@@ -656,7 +660,8 @@ def sounding_column(run, entry, fixes, progress=None, storm=("rm", (0.0, 0.0))):
     th, prs, qv, u, v = snd
     return thermo.analyze(z, c[prs], c[th], c[qv], c[u] + run.umove,
                           c[v] + run.vmove, storm=storm[0], custom=storm[1],
-                          domain=(run.umove, run.vmove), kappa=run.catalog.kappa)
+                          domain=(run.umove, run.vmove), kappa=run.catalog.kappa,
+                          wind10=w10)
 
 
 def _param(r, key):

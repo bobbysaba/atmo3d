@@ -63,7 +63,7 @@ def _cpus():
 
 THREADS = int(os.environ.get('PDECOMP_THREADS', _cpus()))
 
-VERSION = 'atmo3d pdecomp_solver.py (= pdecomp_new_fixed_mp.py; accelerations -cp thv0 dpi/dz)'
+VERSION = 'atmo3d pdecomp_solver.py (= pdecomp_new_fixed_mp.py; accelerations -cp thv0 dpi/dz; acc_b summed at the w levels)'
 
 # ============================================================================
 # THREADING HELPER
@@ -465,11 +465,15 @@ def compute_linear_dynamic_pressure(nc_file, domain, base_state, solver):
     return solve_pressure_equation(forcing, solver)
 
 # post processing
-def vertical_pgf(pi_part, domain, base_state):
+def vertical_pgf(pi_part, domain, base_state, B=None):
     """-cp thv0 d(pi)/dz of one part at the interior w levels, averaged to the scalar
     levels (zero flux at the bottom and top), as CM1 writes its pgrad* fields. pi is only
     defined up to a constant: this form does not depend on it, where -(1/rho) dp/dz with
-    p from p00 (pi0 + pi)^(cp/Rd) does (pi times dpi0/dz enters)."""
+    p from p00 (pi0 + pi)^(cp/Rd) does (pi times dpi0/dz enters).
+    B (scalar levels): the buoyancy, added to it at the w levels (interpolated there as
+    the solver's own source is) before the average: acc_b.  Adding the scalar-level B
+    to the averaged pgf instead puts B's level-to-level structure in acc_b as bands
+    where the two nearly cancel (docs-dev/derived-fields.md section 5.3, F7)."""
     zh, zf = domain['zh'], domain['zf']
     thv = base_state['theta0_v']
     wgt = (zf[1:-1] - zh[:-1]) / (zh[1:] - zh[:-1])
@@ -477,6 +481,8 @@ def vertical_pgf(pi_part, domain, base_state):
     pg = np.zeros((pi_part.shape[0] + 1,) + pi_part.shape[1:])
     pg[1:-1] = (-cp * thv_w / domain['dz_center'])[:, np.newaxis, np.newaxis] \
         * (pi_part[1:] - pi_part[:-1])
+    if B is not None:
+        pg[1:-1] += B[:-1] + wgt[:, np.newaxis, np.newaxis] * (B[1:] - B[:-1])
     lw = ((zf[1:] - zh) / domain['dz_layer'])[:, np.newaxis, np.newaxis]   # weight of w level k
     return lw * pg[:-1] + (1.0 - lw) * pg[1:]
 
@@ -497,7 +503,7 @@ def post_process(pi_b, pi_l, pi_nl, rho, B, domain, base_state):
         out['p_b'][:, rows] = pbb * (p0 + pi_b[:, rows]) ** (cp / Rd) - p_t0
         out['p_l'][:, rows] = pbb * (p0 + pi_l[:, rows]) ** (cp / Rd) - p_t0
         out['p_nl'][:, rows] = pbb * (p0 + pi_nl[:, rows]) ** (cp / Rd) - p_t0
-        out['acc_b'][:, rows] = B[:, rows] + vertical_pgf(pi_b[:, rows], domain, base_state)
+        out['acc_b'][:, rows] = vertical_pgf(pi_b[:, rows], domain, base_state, B[:, rows])
         out['acc_l'][:, rows] = vertical_pgf(pi_l[:, rows], domain, base_state)
         out['acc_nl'][:, rows] = vertical_pgf(pi_nl[:, rows], domain, base_state)
     print("Computing accelerations...")

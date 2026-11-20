@@ -12,7 +12,7 @@ try:  # registers cmo.* colormaps with matplotlib
 except ImportError:  # pragma: no cover
     pass
 
-from .catalog import CLOUD, HYDRO, PRECIP
+from .catalog import BASE_COND, CLOUD, HYDRO, PRECIP
 
 G = 9.81
 RD, RV = 287.04, 461.5
@@ -254,18 +254,23 @@ def _make_fields(avail, cat):
     # type's other liquid and ice species present (Catalog.condensate)
     cond = hyd + [n for n in getattr(cat, "condensate", ()) if n in avail]
     rvrd = RV / RD - 1.0
+    # the base state's own condensate (CM1 writes qc0, qi0 only for some base states)
+    base_cond = [r for r in BASE_COND if cat.name(r) in avail]
 
-    def buoy(f, c):  # CM1's (pdcomp.F, solve2.F): g [θ′/θ0 + (Rv/Rd − 1) qv′ − Σ q_cond]
+    def load0(f):
+        return sum(f(r) for r in base_cond) if base_cond else 0.0
+
+    def buoy(f, c):  # CM1's (pdcomp.F, solve2.F): g [θ′/θ0 + (Rv/Rd − 1) qv′ − Σ q_cond′]
         load = sum(f(n) for n in cond) if cond else 0.0
         return G * ((f("theta") - f("theta0")) / f("theta0")
-                    + rvrd * (f("qv") - f("qv0")) - load)
+                    + rvrd * (f("qv") - f("qv0")) - (load - load0(f)))
 
-    bdeps = ("theta", "qv", "theta0", "qv0", *cond)
+    bdeps = ("theta", "qv", "theta0", "qv0", *cond, *base_cond)
     D.append(FieldDef("buoy", "Buoyancy", "m/s²", "Thermodynamics",
                       cmap="RdBu_r", vrange=(-0.3, 0.3), diverging=True,
                       deps=bdeps, func=buoy,
-                      note="No pressure term; no condensate in the base state (qc0, qi0 "
-                      "not subtracted). " + WOFS_PERT))
+                      note="No pressure term. The base state's condensate (qc0, qi0) is "
+                      "subtracted where the files have it, else taken as zero. " + WOFS_PERT))
 
     # baroclinic generation of horizontal vorticity, ∇ × (B k) = (∂B/∂y, −∂B/∂x): the
     # components of the "Baroclinic generation" vector (core/vectors.py).  ∂B/∂x from
@@ -309,10 +314,12 @@ def _make_fields(avail, cat):
                       deps=("theta", "qv", *cond), func=thrho,
                       note="Loads every liquid and ice species in the output."))
     D.append(FieldDef("thrhopert", "θρ′", "K", "Thermodynamics", cmap="RdBu_r",
-                      vrange=(-6, 6), diverging=True, deps=("theta", "qv", "theta0", "qv0", *cond),
+                      vrange=(-6, 6), diverging=True,
+                      deps=("theta", "qv", "theta0", "qv0", *cond, *base_cond),
                       func=lambda f, c: thrho(f, c) - f("theta0") * (1.0 + f("qv0") / EPS)
-                      / (1.0 + f("qv0")),
-                      note="The base state has no condensate. " + WOFS_PERT))
+                      / (1.0 + f("qv0") + load0(f)),
+                      note="The base state's condensate (qc0, qi0) is loaded where the "
+                      "files have it, else taken as zero. " + WOFS_PERT))
     D.append(FieldDef("thetae", "θe", "K", "Thermodynamics", cmap="Spectral_r",
                       deps=("theta", "pres", "qv"), func=_thetae,
                       note="Pseudo-equivalent; the dewpoint is over liquid and held at or "
@@ -532,6 +539,24 @@ def wind_profile(f, c, sfc):
     return (np.concatenate([np.broadcast_to(u10, u.shape[1:])[None], u]),
             np.concatenate([np.broadcast_to(v10, v.shape[1:])[None], v]),
             np.concatenate([z10, np.asarray(zk, np.float64)]))
+
+
+def sounding_wind10(run, t, box=None):
+    """(u, v) ground-relative 10 m winds for a sounding of run at time index t (thermo.
+    analyze's wind10): the mean over box (i0, i1, j0, j1), or over the domain; None
+    where the data type has none (the roles u10, v10) or they are not finite."""
+    cat = run.catalog
+    names = [cat.name("u10"), cat.name("v10")]
+    if None in names or not all(run.has(n) for n in names):
+        return None
+    out = []
+    for n, move in zip(names, (run.umove, run.vmove)):
+        a = np.asarray(run.read_level(n, t), np.float64)
+        if box is not None:
+            i0, i1, j0, j1 = box
+            a = a[j0:j1, i0:i1]
+        out.append(float(np.nanmean(a)) + float(move) if a.size else np.nan)
+    return tuple(out) if np.all(np.isfinite(out)) else None
 
 
 def _sounding_kinematics(cat=None, avail=()):

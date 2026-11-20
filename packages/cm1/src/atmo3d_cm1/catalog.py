@@ -25,6 +25,7 @@ ROLES = {
     "xvort": "xvort", "yvort": "yvort", "zvort": "zvort",
     "theta": "th", "pres": "prs", "qv": "qv",
     "theta0": "th0", "pres0": "prs0", "qv0": "qv0", "u0": "u0", "v0": "v0",
+    "qc0": "qc0", "qi0": "qi0",
     "qc": "qc", "qi": "qi", "qr": "qr", "qs": "qs", "qg": "qg", "qhl": "qhl",
     "refl": "dbz", "cref": "cref",
     "u10": "u10", "v10": "v10", "uh25": "uh",

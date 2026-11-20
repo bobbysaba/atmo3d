@@ -272,3 +272,25 @@ def test_old_method_values_in_a_file_are_flagged(copy_run):
     assert np.nanmax(F.plane("p_b", 1, "level", 5)) == 1.0
     with pytest.raises(Exception):
         F.plane("p_dyn", 1, "level", 5)   # (needs p_c)
+
+
+def test_solver_acc_b_sums_b_and_pgf_at_the_w_levels():
+    """pdecomp_solver.vertical_pgf(..., B): with pi = 0 the pressure term is 0 and acc_b
+    is B interpolated to the interior w levels (zero at the bottom and top) and averaged
+    back to the scalar levels, by hand here; it is not B itself where B alternates level
+    by level (the bands of F7), and it is the plain pgf when B is not given."""
+    from atmo3d_cm1.pdecomp import pdecomp_solver as S
+    zf = np.concatenate([[0.0], np.cumsum(np.linspace(100.0, 300.0, 12))])
+    zh = 0.5 * (zf[1:] + zf[:-1])
+    dom = {"zh": zh, "zf": zf, "dz_layer": np.diff(zf), "dz_center": np.diff(zh)}
+    base = {"theta0_v": np.full(zh.size, 300.0)}
+    pi = np.zeros((zh.size, 2, 3))
+    B = (0.02 * (1 + 0.5 * (-1.0) ** np.arange(zh.size)))[:, None, None] * np.ones((1, 2, 3))
+    acc = S.vertical_pgf(pi, dom, base, B)
+    wgt = (zf[1:-1] - zh[:-1]) / (zh[1:] - zh[:-1])
+    bw = np.zeros((zh.size + 1, 1, 1))
+    bw[1:-1] = B[:-1, :1, :1] + wgt[:, None, None] * (B[1:, :1, :1] - B[:-1, :1, :1])
+    want = 0.5 * (bw[:-1] + bw[1:])  # (zh midway between the zf levels)
+    assert np.allclose(acc, want * np.ones((1, 2, 3)), atol=1e-12)
+    assert np.abs(acc - B).max() > 0.5 * np.abs(B).max() * 0.1  # (not B at the scalar levels)
+    assert np.all(S.vertical_pgf(pi, dom, base) == 0.0)

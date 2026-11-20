@@ -10,6 +10,7 @@ import numpy as np
 import panel as pn
 
 from ..core import sounding_plot as sp, thermo, track as trk
+from ..core.fields import sounding_wind10
 from ..theme import POINT_COLORS, POINT_LABELS
 from ..core.catalog import SOUNDING
 from .ui import _svg, held
@@ -113,13 +114,14 @@ class SoundingPanel:
             _BASE_CACHE[key] = {r: np.asarray(got[n], np.float32) for r, n in
                                 zip(SOUNDING + ("zagl",) * run.terrain,
                                     names + ("zagl",) * run.terrain)}
+            _BASE_CACHE[key]["wind10"] = sounding_wind10(run, 0)  # (or None)
         b = _BASE_CACHE[key]
         storm, custom = self._item_storm(spec, spec["t"])
         z = b["zagl"] if "zagl" in b else run.z * 1000.0  # (a terrain run's mean, m AGL)
         return thermo.analyze(z, b["pres"], b["theta"], b["qv"],
                               b["u"] + run.umove, b["v"] + run.vmove, storm=storm,
                               custom=custom, domain=(run.umove, run.vmove),
-                              kappa=run.catalog.kappa)
+                              kappa=run.catalog.kappa, wind10=b.get("wind10"))
 
     @staticmethod
     def _item_storm(spec, t):
@@ -229,6 +231,7 @@ class SoundingPanel:
                             vol[:, j0:j1, i0:i1] if vol is not None
                             else run.read_box(v, tt, i0, i1, j0, j1))
                         c[v] = a.mean(axis=(1, 2), dtype=np.float64)
+                    w10 = sounding_wind10(run, tt, (i0, i1, j0, j1))
                     box = (f" box {where[2]:.3g}×{where[3]:.3g} km at" if len(where) == 4
                            else "")
                     if kind == "trk":
@@ -239,6 +242,7 @@ class SoundingPanel:
                         label = f"{POINT_LABELS[n]}{box} ({x:.1f}, {y:.1f}) km{when}"
                 else:
                     c = run.mean_profiles(names, tt, progress=prog_for(tt, "domain means"))
+                    w10 = sounding_wind10(run, tt)
                     if g != self.gen["snd"]:
                         return
                     label = f"{POINT_LABELS[n]} domain mean {run.time_label(tt)}"
@@ -248,7 +252,7 @@ class SoundingPanel:
                 r = thermo.analyze(zc, c[prs], c[th], c[qv], c[u] + run.umove,
                                    c[v] + run.vmove, storm=storm,
                                    custom=custom, domain=(run.umove, run.vmove),
-                                   kappa=run.catalog.kappa)
+                                   kappa=run.catalog.kappa, wind10=w10)
                 r["domain"] = (run.umove, run.vmove)
                 items.append((label, POINT_COLORS[n], r))
             if not items:

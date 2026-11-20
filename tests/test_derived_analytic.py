@@ -272,3 +272,49 @@ def test_docs_page_lists_every_field_and_note():
         for avail in (full, full - {cat.name(r) for r in ("xvort", "yvort", "uh25")}):
             notes |= {d.note for d in FF._make_fields(avail, cat) if d.note}
     assert [n for n in sorted(notes) if n not in page] == []
+
+
+def test_sounding_starts_its_winds_at_the_10m_winds():
+    """thermo.analyze(wind10=...): no wind above 50 m and (10, 0) at 10 m: the 0-1 km
+    shear is that 10 m/s, without them it is 0; not used when the lowest level is at
+    or below 10 m; sounding_wind10 averages the 2D winds over a box and adds the
+    domain motion, and is None where the data has none."""
+    import numpy as np
+    from types import SimpleNamespace
+    from atmo3d.core import fields as FF, thermo
+    z = np.arange(50.0, 12000.0, 100.0)
+    p = 1.0e5 * np.exp(-z / 8000.0)
+    th, qv = 300.0 + z / 1000.0, np.full(z.size, 0.008)
+    zero = np.zeros(z.size)
+    kw = dict(storm="custom", custom=(0.0, 0.0))
+    plain = thermo.analyze(z, p, th, qv, zero, zero, **kw)["kin"]
+    withw = thermo.analyze(z, p, th, qv, zero, zero, wind10=(10.0, 0.0), **kw)["kin"]
+    assert np.hypot(*plain["shear01"]) == 0.0
+    assert abs(np.hypot(*withw["shear01"]) - 10.0) < 1e-6
+    assert withw["sr_sfc"] == 10.0 and plain["sr_sfc"] == 0.0
+    low = thermo.analyze(z - 45.0, p, th, qv, zero, zero, wind10=(10.0, 0.0), **kw)["kin"]
+    assert low["sr_sfc"] == 0.0  # (lowest level at 5 m: the 10 m winds are not used)
+
+    u10, v10 = np.arange(12.0).reshape(3, 4), np.full((3, 4), 2.0)
+    cat = SimpleNamespace(name=lambda r: {"u10": "U10", "v10": "V10"}.get(r))
+    run = SimpleNamespace(catalog=cat, umove=3.0, vmove=-1.0, has=lambda n: n in ("U10", "V10"),
+                          read_level=lambda n, t: u10 if n == "U10" else v10)
+    assert FF.sounding_wind10(run, 0) == (u10.mean() + 3.0, 1.0)
+    assert FF.sounding_wind10(run, 0, (1, 3, 0, 2)) == (np.mean([1, 2, 5, 6]) + 3.0, 1.0)
+    run.has = lambda n: False
+    assert FF.sounding_wind10(run, 0) is None
+
+
+def test_buoyancy_subtracts_the_base_states_condensate_when_the_files_have_it():
+    """B = g [... − (Σ q_cond − qc0 − qi0)]: a column of base-state cloud (qc0 = qi0 =
+    1e-3) with the same cloud in the run has B = 0 (it is the base state's own load),
+    and θρ′ = 0 at θ = θ0 with qv = qv0 and that cloud; the files without qc0, qi0
+    load all of it, as before."""
+    d2, _ = defs(avail=CM1 + ("qc0", "qi0"))
+    same = {"th": 300.0, "th0": 300.0, "qc": 1e-3, "qi": 1e-3, "qc0": 1e-3, "qi0": 1e-3}
+    assert call("buoy", same, d=d2) == pytest.approx(0.0, abs=1e-12)
+    more = dict(same, qc=3e-3)  # (2e-3 more cloud water than the base state)
+    assert call("buoy", more, d=d2) == pytest.approx(-G * 2e-3)
+    assert call("thrhopert", same, d=d2) == pytest.approx(0.0, abs=1e-9)
+    assert {"qc0", "qi0"} <= set(d2["buoy"].deps) and "qc0" not in D["buoy"].deps
+    assert call("buoy", same) == pytest.approx(-G * 2e-3)  # (no qc0 in the files)

@@ -53,6 +53,8 @@ ROLES = {
     # base state (perturbations are relative to it)
     "theta0": "base-state potential temperature", "pres0": "base-state pressure",
     "qv0": "base-state vapor", "u0": "base-state x wind", "v0": "base-state y wind",
+    # base-state condensate, where the files have it (kg/kg; subtracted from the loading)
+    "qc0": "base-state cloud water", "qi0": "base-state cloud ice",
     # hydrometeor mixing ratios (kg/kg): cloud (qc, qi) and precipitation (the rest)
     "qc": "cloud water", "qi": "cloud ice", "qr": "rain", "qs": "snow", "qg": "graupel",
     "qhl": "hail",
@@ -70,6 +72,7 @@ PRECIP = ("qr", "qs", "qg", "qhl")
 KINEMATIC = ("u", "v", "w", "xvort", "yvort", "zvort")
 THERMO = ("theta", "pres", "qv")
 BASE = ("theta0", "pres0", "qv0", "u0", "v0")
+BASE_COND = ("qc0", "qi0")  # (optional: not a base sounding's inputs)
 SOUNDING = ("theta", "pres", "qv", "u", "v")  # a sounding's inputs (thermo.analyze)
 SOUNDING_BASE = BASE
 
@@ -203,7 +206,7 @@ class Catalog:
             return "Pressure decomposition"
         if "b_" in name:
             return "Budgets"
-        if role in BASE:
+        if role in BASE or role in BASE_COND:
             return "Base state"
         if role in KINEMATIC:
             return "Kinematics"

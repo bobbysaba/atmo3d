@@ -356,10 +356,13 @@ def _shear(zz, U, V, h0, h1):
 
 # --------------------------------------------------------------- analysis
 def analyze(z, p, th, qv, u, v, storm="rm", custom=(0.0, 0.0), domain=(0.0, 0.0),
-            kappa=KAPPA):
+            kappa=KAPPA, wind10=None):
     """Full analysis of one column.  z (m AGL), p (Pa), th (K), qv (kg/kg),
     u, v ground-relative (m/s).  kappa: the data type's Rd/cp (Catalog.kappa), to get
-    T from θ.  Returns a nested dict of results."""
+    T from θ.  wind10: (u, v) ground-relative at 10 m AGL, where the data has them: the
+    wind profile (shear, helicity, storm motion) then starts with them, as the maps
+    do (fields.wind_profile); not used where the lowest level is at or below 10 m.
+    Returns a nested dict of results."""
     z = np.asarray(z, np.float64)
     p = np.asarray(p, np.float64)
     th = np.asarray(th, np.float64)
@@ -399,8 +402,12 @@ def analyze(z, p, th, qv, u, v, storm="rm", custom=(0.0, 0.0), domain=(0.0, 0.0)
 
     # ---- kinematics on a uniform 10 m grid
     ztop = min(z[-1], 16000.0)
-    zz = np.arange(z[0], ztop, 10.0)
-    U, V = _resample(z, u, zz), _resample(z, v, zz)
+    zw, uw, vw = z, u, v  # (the wind profile: from 10 m when there are 10 m winds)
+    if wind10 is not None and z[0] > 10.0 and np.all(np.isfinite(wind10)):
+        zw = np.concatenate([[10.0], z])
+        uw, vw = np.concatenate([[wind10[0]], u]), np.concatenate([[wind10[1]], v])
+    zz = np.arange(zw[0], ztop, 10.0)
+    U, V = _resample(zw, uw, zz), _resample(zw, vw, zz)
     rm, lm, mean06 = bunkers(zz, U, V)
     c = {"rm": rm, "lm": lm, "mean": mean06, "domain": tuple(domain),
          "custom": tuple(custom)}[storm]

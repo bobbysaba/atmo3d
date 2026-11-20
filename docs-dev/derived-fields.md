@@ -31,16 +31,27 @@ Done (commits 5fb7b71, 5dd5ec7, 4c2850c), each with a test in
 - WoFS: `REL_VORT` plays `zvort` (main list, label "Vertical vorticity"); `xvort`,
   `yvort` derived from the winds; the vorticity vector uses them.
 
-Not done / differs from the decisions above (to settle):
-- **Soundings do not use the 10 m winds yet** (only the maps). A CM1 run with u10 or a
-  WoFS run shows map shear/SRH a little different from the sounding's.
-- **qc0, qi0 are not subtracted** in `buoy` (CM1 writes none for these runs).
-- CM1's beta plane (f varying in y) is not handled: f is f_cor everywhere.
+Leftovers from step 3, settled 2026-11-20:
+- **Soundings use the 10 m winds** now, as the maps do: `thermo.analyze(wind10=...)`
+  starts the wind profile (shear, SRH, storm motion) with them at 10 m AGL where the
+  data type has `u10`, `v10` and the lowest level is above 10 m; `fields.sounding_wind10`
+  reads them (the mean over the sounding's box, or the domain), at the point, box, mean
+  and base-state sounding sites and in figures. Test: `test_derived_analytic.py`.
+- **qc0, qi0 are subtracted** in `buoy` and loaded in `thrhopert` where the files have
+  them (roles `qc0`, `qi0`; CM1 maps them to its names of the same spelling, which is
+  an assumption: no run here writes them, so only the synthetic test exercises it).
+- **Beta plane: not changed.** Fields that need f use one f per run (CM1's `f_cor`) or,
+  where the data type has a field of it (WoFS `F`), that field, which already varies
+  with latitude. A CM1 run whose files carry a spatially varying f would need its role
+  mapped (`fcor` in the CM1 catalog); none of the runs here do.
+- `FieldDef.note` is shown as the tooltip of every field in the field menus, and
+  `docs_url` adds a link to the derived-fields page.
+- The stand-alone copy `/glade/work/rasaba/cm1_pdecomp/` is at 1.1 (acc_b at the w
+  levels). `pdecomp_solver.py` (the other method) now sums B and pgrad_b at the w levels
+  too (`vertical_pgf(..., B)`), which it had not.
 - STP, SCP: no separate analytic test (the map-vs-sounding test covers them).
-- `FieldDef.note` is not shown in the UI yet (the docs page, step 5, uses it).
-- The stand-alone copy `/glade/work/rasaba/cm1_pdecomp/` (outside this project) still
-  has the old acc_b.
-- Image baselines: `sounding.png`, `parts.png` may move (net CAPE).
+- Image baselines: `sounding.png`, `parts.png` may move (net CAPE; and sounding shear
+  where a run has 10 m winds).
 
 ## Steps 4 and 5 status (2026-11-19)
 
