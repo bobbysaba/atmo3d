@@ -233,7 +233,7 @@ listed as deliberately kept, with a reason); tests pass.
 6. Write a short report in `docs-dev/radar-spike.md` with a recommendation on what to
    build first, including the run-object decision.
 
-Done when: Bobby has read the report and decided.
+Done when: Bobby has read the report and decided. (Decided 2026-11-19: `docs-dev/radar-spike.md` section 8.)
 **CHECKPOINT** (design decision).
 
 ### Phase 5: Split into the monorepo

@@ -1,6 +1,6 @@
 # Radar design spike (Phase 4)
 
-Status: report for Bobby's decision (Phase 4 CHECKPOINT). Nothing here is app code.
+Status: decided (Bobby, 2026-11-19; see section 8). Nothing here is app code.
 The prototype and the measurement scripts are in `docs-dev/radar-spike/`:
 
 | File | What |
@@ -302,3 +302,19 @@ sampler calls in `render.py` / `volume3d.py` and the `Fields` split.
 7. **Still open from the plan:** receiver locations for the bistatic geometry.
 8. **The prototype files** in `docs-dev/radar-spike/`: keep them as the Phase 6
    reference (proposed) or delete them after the decision?
+
+## 8. Decisions (Bobby, 2026-11-19)
+
+1. **Run object:** sibling base class (`Source` → `Run`, `PolarRun`) with a sampler seam.
+2. **3D:** index-space marching cubes; no PyVista.
+3. **Gaps between sweeps:** bridged by default (linear in elevation), with a "max gap"
+   setting; may change later.
+4. **Heights:** above the radar level.
+5. **Time of a volume:** the time in the file name.
+6. **Missing-data rule** (valid neighbours need at least half the weight) and the
+   half-beamwidth extension: both kept.
+7. **Receiver locations:** open. Bobby will check. Note: the per-gate bistatic angle
+   `beta_nwc` should let the reader solve for each receiver's position (least squares
+   over the gates where it is valid), which would be firmer than inferring it from
+   where the data is missing.
+8. **Prototype files:** kept in `docs-dev/radar-spike/` as the Phase 6 reference.
