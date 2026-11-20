@@ -6,7 +6,6 @@ for data Bobby will get and run himself (a fresh agent session with only the pla
 Bobby (2026-11-20): the choices below are fine; the full suite runs at the end of this
 plan (tests are a topic of their own he will take up next).
 Decision 2 taken as recommended (both: packages/example and tools/new_datatype.py).
-Decisions 1, 4, 5 still open (4 has a recommendation Bobby has not overruled).
 Choices made without asking (Bobby may overrule):
 - the example is not installed with the app (not in environment.yml, the root pyproject
   or CI's pip install); tests/test_example.py registers it itself. Its synthetic writer
@@ -16,7 +15,10 @@ Choices made without asking (Bobby may overrule):
   environment.yml and the root pyproject are printed as steps, not edited.
 - B4 is docs/datatypes.md itself (walk-through first, then the contract), not a second
   page; developing.md and CONTRIBUTING.md point to it.
-Next: Phase C (C1 spike), once decisions 1 and 4 are made; 5 may wait for the spike.
+Phase C (2026-11-20): decisions 1 = TOML expressions, 4 = own User section, 5 = figures
+and exports record and reuse the definition (the figure's wins when the local one
+differs). C1 spike done: docs-dev/user-fields-spike.md (design, C2 work list, choices
+made without asking). Next: C2, at Bobby's checkpoint on the spike.
 
 ## Goal
 
