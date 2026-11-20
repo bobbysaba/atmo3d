@@ -661,8 +661,9 @@ class Widgets:
             description="Reload run: add the output written since it opened (a run "
                         "still going); the view is kept")
         self.reload_btn.on_click(self._reload_run)
-        # a run read as several (WoFS: its members and their mean): which one
-        parts = models.siblings(run.path)
+        # a run read as several (WoFS: its members and their mean; a radar folder: its
+        # native sweeps and regridded): which one
+        parts = models.siblings(run.path) or models.parts(run.path, run.model)
         if run.path not in parts:
             parts = []
         if parts:
@@ -671,8 +672,9 @@ class Widgets:
         self.part_sel = pn.widgets.Select(
             options={models.part_label(q): q for q in parts}, value=run.path if parts else None,
             width=150, height=32, margin=(4, 2), visible=bool(parts),
-            description="Ensemble member shown (the view is kept). "
-                        "The member a run opens on: wofs_member in ⚙ Settings.")
+            description=getattr(models.get(run.model), "parts_tip", None) or
+            "Ensemble member shown (the view is kept). "
+            "The member a run opens on: wofs_member in ⚙ Settings.")
         self.part_sel.param.watch(self._switch_part, "value")
         self.gear_btn = pn.widgets.Button(
             name="", icon="settings", button_type="light", button_style="outline", width=40,

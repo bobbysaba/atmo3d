@@ -234,8 +234,9 @@ class DistPanel:
                                    color=POINT_COLORS[n % len(POINT_COLORS)] if n < 4 else
                                    palette("Spectral_r", 12)[(3 * n) % 12])
             self._dist_n += 1
+        note = f" · {self.run.view_note()}" if self.run.view_note() else ""
         self.dist_status.object = (f'<div class="cv-status">{res["n"]:,} values · '
-                                   f'{secs:.1f} s</div>')
+                                   f'{secs:.1f} s{note}</div>')
         self._dist_set_pick(key)
 
     def _dist_follow(self):

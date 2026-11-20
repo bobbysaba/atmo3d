@@ -42,6 +42,11 @@ class NoParcels:
     def _put_parcels(self, pr, put):
         pass
 
+    def _ext_modals(self):
+        """Dialogs a data-type package's mixin puts on the page (out of the flow, like
+        the viewer's own): none here."""
+        return ()
+
 
 def register_mixin(cls):
     """Add a class to the Viewer's bases, ahead of the no-op mixins."""

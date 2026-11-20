@@ -339,6 +339,13 @@ def _make_fields(avail, cat):
                       deps=("ddx.u", "ddy.v"),
                       func=lambda f, c: 1.0e3 * (f("ddx.u") + f("ddy.v")),
                       note=NO_MAPFAC))
+    # ζ: the files' (CM1, WoFS), or from the winds where a data type writes none (a
+    # regridded radar run): ζ = ∂v/∂x − ∂u/∂y
+    if cat.name("zvort") not in avail and cat.name("u") in avail and cat.name("v") in avail:
+        D.append(FieldDef("zvort", "Vertical vorticity (∂v/∂x − ∂u/∂y)", "1/s", "Kinematics",
+                          cmap="RdBu_r", vrange=(-0.05, 0.05), diverging=True,
+                          deps=("ddx.v", "ddy.u"),
+                          func=lambda f, c: f("ddx.v") - f("ddy.u"), note=NO_MAPFAC))
     # ξ, η: the files' (CM1), or from the winds where a data type writes none (WoFS):
     # ξ = ∂w/∂y − ∂v/∂z, η = ∂u/∂z − ∂w/∂x, listed as xvort / yvort
     xi, eta, xdeps, ydeps = horizontal_vorticity(cat, avail)

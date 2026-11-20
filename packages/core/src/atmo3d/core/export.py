@@ -284,6 +284,10 @@ def _header(ds, run, F, p, any3, stormy, compress):
         "umove": run.umove, "vmove": run.vmove,
         "comment": "Winds and positions are grid-relative (CM1's); values are in the "
                    "units the viewer shows (units_shown where those are not UDUNITS)."})
+    if run.view_note():  # (a regridded radar run: its settings)
+        s = getattr(run, "settings", None)
+        ds.setncatts({"atmo3d_regrid": run.view_note(),
+                      "atmo3d_regrid_settings": getattr(s, "long_label", "")})
 
 
 # ---------------------------------------------------------------- atmo3d export

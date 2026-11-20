@@ -339,6 +339,8 @@ class SeriesPanel:
                 why.setdefault(r, []).append(t)
             msg += " · not computed: " + "; ".join(
                 f"{len(ts)} time{'s' if len(ts) > 1 else ''} ({r})" for r, ts in why.items())
+        if run.view_note():  # (a regridded radar run's "regridded: method, spacing")
+            msg += f" · {run.view_note()}"
         msg += "</div>"
         self._schedule(partial(self._ser_finish, g, msg, force=cancelled()))
 

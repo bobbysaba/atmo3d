@@ -45,6 +45,16 @@ class Model:
         """The name of a run named inside a folder (parts) in a list: e.g. "Member 5"."""
         return os.path.basename(path.rstrip("/"))
 
+    def parts_of(self, path):
+        """The runs next to virtual run `path`, itself among them (default: its
+        folder's parts)."""
+        return self.parts(os.path.dirname(os.path.abspath(path)))
+
+    def folder_label(self, path):
+        """The name in a list of parts of a run folder that is one of its own parts (a
+        radar folder's native run), or None."""
+        return None
+
     def virtual(self, path):
         """Is `path` a run of this model that is not a folder on disk?"""
         return False
@@ -209,7 +219,7 @@ def siblings(path):
     """The other runs named inside the same folder as a virtual run (else [])."""
     for m in MODELS.values():
         if m.virtual(path):
-            return m.parts(os.path.dirname(os.path.abspath(path)))
+            return m.parts_of(path)
     return []
 
 
@@ -229,6 +239,10 @@ def part_label(path):
     for m in MODELS.values():
         if m.virtual(path):
             return m.part_label(path)
+    for m in MODELS.values():  # (a folder that is one of its own parts: a radar's)
+        lab = m.folder_label(path)
+        if lab:
+            return lab
     return os.path.basename(os.path.abspath(path).rstrip("/"))
 
 

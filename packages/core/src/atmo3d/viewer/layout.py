@@ -454,7 +454,8 @@ class Layout:
                                 margin=0, styles=dict(FILL, position="relative"))
         return pn.Column(self._top_bar(), *objs, self.map_ws, self.v3_ws, self.fig_ws,
                          *map(out_of_flow, (self.rp_modal, self.ses_modal, self.exp_modal,
-                                            self.settings.modal, self.confirm.modal)),
+                                            self.settings.modal, self.confirm.modal,
+                                            *self._ext_modals())),
                          margin=0, styles={"position": "fixed", "top": "0", "left": "0",
                                            "width": "100vw", "height": "100vh", "min-height": "0",
                                            "display": "flex", "flex-direction": "column"})

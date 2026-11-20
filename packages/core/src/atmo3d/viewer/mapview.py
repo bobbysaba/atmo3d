@@ -477,6 +477,8 @@ class MapView:
         note = self._storm_note(self._spec_names(spec), spec["t"])
         if note:
             parts.append(f'<span>storm-relative vorticity {note[2]}</span>')
+        if run.grid and run.view_note():  # (a regridded radar run: "regridded: ...")
+            parts.append(f'<span style="color:#fbbf24">{run.view_note()}</span>')
         if any(pdecomp.is_pdecomp(F, n) for n in names):
             kind, desc = pdecomp.source(run, spec["t"], block=False)
             col = "#fbbf24" if kind == "file-old" else "inherit"

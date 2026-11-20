@@ -104,6 +104,21 @@ KEYS = [
     Key("radar_sampling", "data", "linear", "Radar: sampling within a sweep",
         "linear: between the two nearest rays and gates; nearest: the nearest gate. "
         "Between sweeps it is always linear in elevation.", advanced=True),
+    Key("radar_regrid_method", "data", "linear", "Radar regrid: sampling within a sweep",
+        "How a radar run is regridded (Regridded in the toolbar; off unless chosen, and "
+        "confirmed each time): linear between the nearest rays and gates, or nearest "
+        "gate. Between sweeps it is linear in elevation."),
+    Key("radar_regrid_dx", "data", 0.5, "Radar regrid: horizontal spacing (km)",
+        "Grid spacing in x and y. auto: 0.5 km.", kind="auto_float"),
+    Key("radar_regrid_dz", "data", 0.5, "Radar regrid: vertical spacing (km)",
+        "Depth of the grid's layers, from the radar's level up. auto: 0.5 km.",
+        kind="auto_float"),
+    Key("radar_regrid_range", "data", 150.0, "Radar regrid: maximum range (km)",
+        "The grid covers this far from the radar in x and y; points further away are "
+        "left empty. auto: 150 km.", kind="auto_float"),
+    Key("radar_regrid_max_gap", "data", 0.0, "Radar regrid: widest gap bridged (km)",
+        "Grid points where the two sweeps around them are further apart than this are "
+        "left empty. 0 or auto: every gap is bridged.", kind="auto_float"),
     Key("cache_gb", "server", "auto", "3D cache (GB)",
         "Memory for cached 3D fields. auto = a share of this job's memory, leaving "
         "room for the pressure decomposition.", kind="auto_float", restart=True,

@@ -142,6 +142,13 @@ def isosurface(run, vol, box, value, stride, smooth, zmax, H=None, part=False):
     # (marching_cubes takes no read-only buffer: a part can be a cached one, so copy then)
     sub = np.require(vol[:kmax] if part else vol[:kmax, j0:j1:stride, i0:i1:stride],
                      np.float32, ["W"])
+    if sub.size and np.isnan(sub).any():  # (a regridded radar's empty points: outside)
+        ok = np.isfinite(sub)
+        if not ok.any():
+            return None
+        lo, hi = float(np.min(sub[ok])), float(np.max(sub[ok]))
+        out = lo - 1.0 if value >= float(np.median(sub[ok])) else hi + 1.0
+        sub = np.where(ok, sub, np.float32(out))  # (a copy: sub may be the cached volume)
     if smooth > 0:
         sub = gaussian_filter(sub, smooth)
     if sub.size == 0 or min(sub.shape) < 2 or not (np.nanmin(sub) < value < np.nanmax(sub)):
@@ -641,6 +648,8 @@ def build_scene(run, F, scene, progress=None, cancelled=None, cache=None):
                                f'{stream["n"]})')
             if run.terrain and ss["seed_box"] is not None:  # (the outline on the ground)
                 stream["seed_ring"] = seed_ring(run, ss["seed_box"], stream["seed_z"])
+    if run.view_note():  # (a regridded radar run: "regridded: method, spacing")
+        notes.append(run.view_note())
     return dict(meshes=meshes, ground=ground, vecs=vecs, stream=stream, notes=notes,
                 stride=stride, off=off, terrain=terrain_surface(run, box))
 
