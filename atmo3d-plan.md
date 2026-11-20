@@ -266,7 +266,7 @@ branch protection.
 
 ### Phase 6: Radar package
 
-1. **Variable audit (interactive, with Bobby; do not skip).** Go through every field in
+1. **Variable audit (interactive, with Bobby; do not skip).** (2026-11-19: self-explanatory rows decided in `docs-dev/radar-audit.md`; the rest wait on the data providers, `docs-dev/radar-questions.md`.) Go through every field in
    the files and decide: shown in the UI or hidden, display name, units, colormap, range,
    diverging or not, mask rules (for example QC flags, where `doppler_degree` < 2), which
    are retrieved vs observed, and what derived fields are wanted. Output: the radar

@@ -1,9 +1,37 @@
 # Phase 6, step 1: radar variable audit
 
-Status: **sheet prepared 2026-11-19, waiting for Bobby's decisions.** Same template as
-`field-audit.md`. Fill the Decision column, or write "ok" for a whole section, and rows you
-leave blank take the proposal. The result becomes the radar field catalog
+Status: **decided for now (Bobby, 2026-11-19): take the self-explanatory proposals, and
+take the rest to the data providers** (`radar-questions.md`). The tables further down are
+the sheet as prepared. The result becomes the radar field catalog
 (`packages/radar/src/atmo3d_radar/catalog.py`).
+
+## Decisions (2026-11-19)
+
+Taken as proposed:
+- **A1 groups**: Moments, Bistatic, Retrieved winds, Bistatic QC.
+- **A2 roles**: `refl` is `reflectivity`; `u v w` are the retrieved `u v w`.
+- **A6**: every velocity uses `RdBu_r`.
+- **A7**: the sweep's Nyquist velocity appears in the PPI title or run info, not in the field lists.
+- **A8**: gate geometry fields (height, ground range, azimuth) are Hidden.
+- **A9**: labels and units in the WoFS style.
+- **Moments (B)**: all as proposed. Reflectivity, radial velocity, ZDR, ρhv and spectrum width are Main; ΦDP and clutter filter power removed are Other.
+- **Bistatic (C)**:
+  - `bistatic_velocity_nwc` is Main.
+  - The unsmoothed and original bistatic velocities and β are Other.
+  - `original_bistatic_velocity_nwc` is labelled "Bistatic velocity (original)", because "before QC" is unconfirmed.
+- **Retrieved winds (D)**:
+  - `u v` are Main.
+  - `w` is Main as the file gives it (±20 m/s colour range), until the providers say how it is made.
+  - `w_direct` (all 0) and `doppler_degree` (always 2) are Hidden.
+- **D1**: wind speed (`wspd3d`) is offered.
+- **D2**: wind derivatives are offered on a regridded run only.
+- **D3**: composite reflectivity is offered as a derived field with the `cref` role.
+- **D4–D6**: not now.
+
+Held until the meeting (`radar-questions.md`), with a stopgap meanwhile:
+- **A3 masks**: the file's own masks are used and nothing extra is applied.
+- **A4 and E, the QC fields**: all five go under Other · Bistatic QC with their file names, raw values, `viridis` and data limits. `beta_cutoff_nwc` is there too, not Hidden. There are no labelled flag values, and their meaning is not guessed.
+- **A5 receivers, and `advcor`**: no effect on the catalog yet.
 
 The data is the 19 CfRadial files in `/glade/derecho/scratch/rasaba/20260403_20260404_results`.
 The numbers below come from file 12 (02:21 UTC, the file with the most bistatic
