@@ -30,7 +30,7 @@ common case. Every file marks what is **REQUIRED** and what is optional:
 | `run.py` | the reader: the grid in km, several times to a file (its own `source(t)`), a staggered field, a unit converted on read, fill values made NaN, a field only some files have |
 | `synthetic.py` | a tiny run in the same layout with values from formulas, for the tests |
 
-Its tests are `tests/test_example.py`: the contract check on the synthetic run, and
+Its tests are `tests/example/test_example.py`: the contract check on the synthetic run, and
 reads checked against the formulas. CI runs them on every core change, so the example
 cannot drift from the core. It is not installed with atmo3d (it is no part of the app);
 the tests register it themselves.
@@ -54,7 +54,7 @@ and `atmo3d-<name>`):
     python tools/new_datatype.py mytype --label "My model" --out ~/code   # your own
 
 The copy is the example renamed, so its test passes before you change anything:
-`pytest tests/test_mytype.py`. Its comments still describe the example's files.
+`pytest tests/mytype`. Its comments still describe the example's files.
 
 **3. Decide which kind of reader it is.**
 
@@ -89,9 +89,9 @@ dimension and variable names, units, attributes and quirks as the header, with v
 from formulas so your tests know the answers. Copy no real values into the repository.
 
 **8. Test it.** The written test runs the contract check on the synthetic run; add tests
-of the reads against the formulas (as `tests/test_example.py` does). Then on a real run:
+of the reads against the formulas (as `tests/example/test_example.py` does). Then on a real run:
 
-    ATMO3D_MYTYPE_ROOT=/path/to/a/run pytest -m real tests/test_mytype.py
+    ATMO3D_MYTYPE_ROOT=/path/to/a/run pytest -m real tests/mytype
 
 (it reads one or two fields at one time; on a large grid, run it on a compute node).
 [Checking it](#checking-it) says what the check covers.
@@ -143,8 +143,9 @@ packages/mytype/
     run.py             the reader: a Run (grid) or Source (no grid) subclass
     synthetic.py       a small run in the files' layout, for the tests (optional, but
                        the tests need data)
-tests/test_mytype.py   the contract check (with --out: in the package's own tests/)
-tests/mytype-tests.txt the package's tests, for CI
+tests/mytype/test_mytype.py   the contract check (with --out: tests/test_mytype.py in
+                              the package's own folder); tests/mytype/ holds the
+                              package's tests, the folder CI runs for it
 ```
 
 `pyproject.toml` depends on `atmo3d-core` and names `register` in the
@@ -315,18 +316,19 @@ def test_contract_real():
 ```
 
 It reads one or two fields at one time; on a real run of a large grid, run it on a
-compute node. `tests/test_datatype_check.py` runs it on CM1, WoFS and radar, so a core
-change that breaks the contract fails there.
+compute node. `tests/<type>/test_<type>_contract.py` runs it on CM1, WoFS and radar, and
+CI runs those on every core change, so a core change that breaks the contract fails
+there.
 
 ## Contributing it, or publishing it
 
 **To contribute it** (in this repository, from `tools/new_datatype.py <name>`): open an
 [issue](https://github.com/bobbysaba/atmo3d/issues) first (the *New data type* template), then
 a pull request as [Contributing](contributing.md) describes. The scaffold wrote the
-package, its test and `tests/<name>-tests.txt`; by hand, add
+package and its test in `tests/<name>/`; by hand, add
 
-- in `.github/workflows/tests.yml`: a `<name>` filter (`packages/<name>/**` and its
-  tests), its line in *Pick the tests*, and `-e packages/<name>` in the install step;
+- in `.github/workflows/tests.yml`: a `<name>` filter (`packages/<name>/**` and
+  `tests/<name>/**`), its line in *Pick the tests*, and `-e packages/<name>` in the install step;
 - `- -e ./packages/<name>` in `environment.yml`, and `"atmo3d-<name>"` in the
   dependencies of the root `pyproject.toml`;
 - its owners in `.github/CODEOWNERS` (the scaffold left a commented line).

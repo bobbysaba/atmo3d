@@ -31,6 +31,7 @@ t = 0, as in CM1. The output is deterministic: the same version writes the same 
 import argparse
 import hashlib
 import os
+import time
 
 import numpy as np
 
@@ -494,11 +495,41 @@ def make(root, force=False, cf=False):
     root = os.path.abspath(os.path.expanduser(root))
     stamp_file = os.path.join(root, ".atmo3d-demo")
     main = os.path.join(root, "demo", "supercell")
+
+    def up_to_date():
+        try:
+            return not force and open(stamp_file).read().strip() == _stamp(cf)
+        except OSError:
+            return False
+
+    if up_to_date():
+        return main
+    # one writer at a time (pytest -n: each worker asks for the demo runs); the others
+    # wait, then find them written.  (A folder: mkdir is atomic on any filesystem.)
+    lock = root.rstrip(os.sep) + ".lock"
+    os.makedirs(os.path.dirname(lock), exist_ok=True)
+    while True:
+        try:
+            os.mkdir(lock)
+            break
+        except FileExistsError:
+            try:  # (left by a writer that was killed: the runs take well under this)
+                if time.time() - os.stat(lock).st_mtime > 600:
+                    os.rmdir(lock)
+                    continue
+            except OSError:
+                continue
+            time.sleep(0.5)
     try:
-        if not force and open(stamp_file).read().strip() == _stamp(cf):
+        if up_to_date():  # (written while this one waited)
             return main
-    except OSError:
-        pass
+        _write_all(root, stamp_file, cf)
+    finally:
+        os.rmdir(lock)
+    return main
+
+
+def _write_all(root, stamp_file, cf):
     os.makedirs(os.path.join(root, "storm_tracks"), exist_ok=True)
     for name, kw in RUNS.items():
         rows = write_run(os.path.join(root, "demo", name), cf=cf, **kw)
@@ -510,7 +541,6 @@ def make(root, force=False, cf=False):
                 fh.write(",".join(f"{x:.4f}" for x in r) + "\n")
     with open(stamp_file, "w") as fh:
         fh.write(_stamp(cf) + "\n")
-    return main
 
 
 def main(argv=None):

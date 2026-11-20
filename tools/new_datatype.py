@@ -9,9 +9,9 @@ In this repository it writes
     packages/<name>/                 pyproject.toml (atmo3d-<name>, its entry point),
                                      README.md, src/atmo3d_<name>/ (the example's
                                      modules, renamed)
-    tests/test_<name>.py             the contract check on the synthetic run, and on a
-                                     real one with pytest -m real (ATMO3D_<NAME>_ROOT)
-    tests/<name>-tests.txt           the package's tests, for CI
+    tests/<name>/test_<name>.py      the contract check on the synthetic run, and on a
+                                     real one with pytest -m real (ATMO3D_<NAME>_ROOT);
+                                     tests/<name>/ holds the package's tests
 and adds a commented line for the package's owners to .github/CODEOWNERS.  It prints
 what is left to do by hand (CI, the environment, the root pyproject).
 
@@ -106,7 +106,7 @@ TEST = '''"""Tests of the {label} data type (atmo3d_{name}): the contract check
 
 (on a real run of a large grid, on a compute node).  Written by tools/new_datatype.py;
 add tests of the reads here, checked against the formulas of atmo3d_{name}.synthetic, as
-atmo3d's tests/test_example.py does for the example."""
+atmo3d's tests/example/test_example.py does for the example."""
 import os
 
 import pytest
@@ -226,8 +226,8 @@ def main(argv=None, root=ROOT):
         test_dir = os.path.join(dest, "tests")
     else:
         dest = os.path.join(root, "packages", name)
-        test_dir = os.path.join(root, "tests")
-    tests = f"tests/test_{name}.py"
+        test_dir = os.path.join(root, "tests", name)
+    tests = f"tests/test_{name}.py" if a.out else f"tests/{name}"
     test_file = os.path.join(test_dir, f"test_{name}.py")
     for p in (dest, test_file):
         if os.path.exists(p):
@@ -248,6 +248,8 @@ def main(argv=None, root=ROOT):
         shutil.rmtree(dest, ignore_errors=True)
         if os.path.exists(test_file):
             os.remove(test_file)
+        if not a.out and os.path.isdir(test_dir) and not os.listdir(test_dir):
+            os.rmdir(test_dir)
         raise
     bad = leftovers(dest)
     if bad:
@@ -262,21 +264,20 @@ def main(argv=None, root=ROOT):
               f"synthetic.py (docs/datatypes.md)")
         return dest
 
-    _write(os.path.join(root, "tests", f"{name}-tests.txt"), f"tests/test_{name}.py\n")
     owners = os.path.join(root, ".github", "CODEOWNERS")
     if os.path.isfile(owners):
         with open(owners, "a") as f:
             f.write(CODEOWNERS.format(name=name))
     rel = os.path.relpath(dest, root)
-    print(f"""wrote {rel}/, tests/test_{name}.py, tests/{name}-tests.txt; a commented line in .github/CODEOWNERS
+    print(f"""wrote {rel}/, tests/{name}/test_{name}.py; a commented line in .github/CODEOWNERS
 
 next:
-  pytest tests/test_{name}.py          (passes as it is: the example's layout)
+  pytest tests/{name}                  (passes as it is: the example's layout)
   adapt it to your files: model.py PATTERN, run.py, catalog.py, synthetic.py, the tests
   (docs/datatypes.md is the contract)
 
 before the pull request, by hand:
-  .github/workflows/tests.yml   a '{name}' filter ('{rel}/**', 'tests/test_{name}.py'),
+  .github/workflows/tests.yml   a '{name}' filter ('{rel}/**', 'tests/{name}/**'),
                                 its line in "Pick the tests", -e {rel} in the install step
   environment.yml               - -e ./{rel}
   pyproject.toml (root)         "atmo3d-{name}" in dependencies

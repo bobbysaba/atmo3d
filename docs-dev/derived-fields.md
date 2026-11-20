@@ -8,7 +8,7 @@ answer for each confirmed one (the "Test" lines are the proposed cases).
 ## Step 3 status (2026-11-19)
 
 Done (commits 5fb7b71, 5dd5ec7, 4c2850c), each with a test in
-`tests/test_derived_analytic.py` (analytic answers) or an updated one:
+`tests/core/test_derived_analytic.py` (analytic answers) or an updated one:
 - F1 UH: w > 0 and ζ > 0 only; role `uh25` (CM1 `uh`, WoFS `UH`), the derived `uh25`
   only without it; `uh01` always. `zvmax01`, `wmax` dropped.
 - F2 `buoy`: CM1's form; loads the hydrometeor roles and `Catalog.condensate` (CM1: qh,

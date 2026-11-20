@@ -1,1 +1,0 @@
-tests/test_wofs.py tests/test_old_wofs_files.py tests/test_catalog_outputs.py tests/test_geo.py tests/test_datatype_check.py

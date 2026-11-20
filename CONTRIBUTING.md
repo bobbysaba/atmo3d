@@ -42,7 +42,7 @@ in through an entry point. The file-by-file layout is in
    After `environment.yml` changes: `conda env update -f environment.yml --prune`.
 
 3. **Check it works:** `atmo3d --demo` opens a real CM1 supercell, and
-   `pytest tests/test_settings.py` should pass in well under a minute.
+   `pytest tests/core/test_settings.py` should pass in well under a minute.
 
 ## Make a change
 
@@ -71,31 +71,35 @@ from the subject.
 
 ## Test
 
-The suite runs on synthetic data written by `tests/synthetic.py` and
-`tests/synthetic_radar.py`, whose answers are known in advance; it needs no data of
-your own. What to run depends on what you changed:
+The suite runs on synthetic data written by `tests/synthetic.py`,
+`tests/synthetic_wofs.py` and `tests/synthetic_radar.py`, whose answers are known in
+advance; it needs no data of your own. The core's tests are in `tests/core/`, each
+data-type package's in its own folder (`tests/cm1/`, `tests/wofs/`, `tests/radar/`,
+`tests/example/`). What to run depends on what you changed:
 
 | You changed | Run locally |
 |---|---|
-| one data-type package | its tests, listed in `tests/<package>-tests.txt`, e.g. `pytest $(cat tests/wofs-tests.txt)` |
-| a test you are writing | that file, `pytest tests/test_x.py -k name` |
-| `packages/core`, `tests/conftest.py`, `tests/synthetic*.py` | the tests near your change; CI runs the whole suite |
+| one data-type package | its folder, e.g. `pytest tests/wofs` |
+| a test you are writing | that file, `pytest tests/core/test_x.py -k name` |
+| `packages/core`, or the shared files in `tests/` | the tests near your change; CI runs the whole suite |
 
 CI (GitHub Actions) repeats this on every pull request: a core change runs every test,
-a package change runs that package's list. The check is called `test`, and it must pass
-before a pull request can merge. You can run the whole suite yourself with `pytest`.
+a package change runs that package's folder. The check is called `test`, and it must
+pass before a pull request can merge. You can run the whole suite yourself with
+`pytest -n auto`: it runs the tests in parallel, a worker per CPU you have (at most 8),
+so it is as fast as the machine allows; plain `pytest` runs them one at a time.
 
 - **On a shared cluster** (NSF NCAR's Derecho or Casper, for example), run the tests on
   a compute node, not a login node: they start reader processes and draw figures. Use an
   interactive job (`qinteractive` on NCAR systems) or a batch command such as
-  `qcmd -A <project> -- pytest`.
-- **Image tests** (`tests/test_images.py`) compare figures with the PNGs in
+  `qcmd -A <project> -- pytest -n auto`.
+- **Image tests** (`tests/core/test_images.py`) compare figures with the PNGs in
   `tests/baseline/`. Do not rewrite baselines unless your change is meant to move a
   figure; when it is, say so in the pull request. How to rewrite them is in
   [Developing](docs/developing.md#tests).
 - **A new feature needs a test**, and a fix a test that failed before it. For a derived
   field, the test checks it against an answer worked out by hand (see
-  `tests/test_derived_analytic.py`); the rest of what its review needs is the
+  `tests/core/test_derived_analytic.py`); the rest of what its review needs is the
   [checklist](docs/developing.md#checklist-for-a-new-derived-field). A field only you
   need can stay [your own](docs/guide/user-fields.md), with no pull request.
 

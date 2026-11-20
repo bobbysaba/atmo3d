@@ -24,23 +24,28 @@ jobs:
           filters: |
             all:
               - 'packages/core/**'
+              - 'tests/core/**'
               - 'tests/conftest.py'
               - 'tests/synthetic.py'
+              - 'tests/catalog_checks.py'
+              - 'tests/synthetic_wofs.py'
               - 'tests/baseline/**'
               - 'pyproject.toml'
               - 'environment.yml'
               - '.github/workflows/tests.yml'
             cm1:
               - 'packages/cm1/**'
+              - 'tests/cm1/**'
             wofs:
               - 'packages/wofs/**'
+              - 'tests/wofs/**'
             radar:
               - 'packages/radar/**'
+              - 'tests/radar/**'
               - 'tests/synthetic_radar.py'
             example:
               - 'packages/example/**'
-              - 'tests/test_example.py'
-              - 'tests/test_new_datatype.py'
+              - 'tests/example/**'
               - 'tools/new_datatype.py'
 
   test:
@@ -65,12 +70,12 @@ jobs:
             echo "paths=tests" >> "$GITHUB_OUTPUT"
           else
             p=""
-            [ "${{ needs.changes.outputs.cm1 }}" = "true" ] && p="$p $(cat tests/cm1-tests.txt)"
-            [ "${{ needs.changes.outputs.wofs }}" = "true" ] && p="$p $(cat tests/wofs-tests.txt)"
-            [ "${{ needs.changes.outputs.radar }}" = "true" ] && p="$p $(cat tests/radar-tests.txt)"
-            [ "${{ needs.changes.outputs.example }}" = "true" ] && p="$p $(cat tests/example-tests.txt)"
+            [ "${{ needs.changes.outputs.cm1 }}" = "true" ] && p="$p tests/cm1"
+            [ "${{ needs.changes.outputs.wofs }}" = "true" ] && p="$p tests/wofs"
+            [ "${{ needs.changes.outputs.radar }}" = "true" ] && p="$p tests/radar"
+            [ "${{ needs.changes.outputs.example }}" = "true" ] && p="$p tests/example"
             echo "paths=$p" >> "$GITHUB_OUTPUT"
           fi
       - name: pytest
         shell: bash -el {0}
-        run: pytest ${{ steps.pick.outputs.paths }} -q
+        run: pytest ${{ steps.pick.outputs.paths }} -q -n auto

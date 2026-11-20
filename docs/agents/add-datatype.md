@@ -95,7 +95,7 @@ Decide, and write the reasons in `NOTES.md`:
         python tools/new_datatype.py <name> --label "<Name>" --out <folder>      # own package
 
    Run its test before changing anything; it must pass (it is the example renamed):
-   `pytest tests/test_<name>.py` (own package: `pytest` in its folder).
+   `pytest tests/<name>` (own package: `pytest` in its folder).
 2. Create `NOTES.md` in the package with what steps 2 and 3 found.
 3. Adapt the copy, file by file, following the comments marked **REQUIRED** and
    optional in each (they describe the example's layout; rewrite them for yours as you
@@ -115,16 +115,16 @@ Decide, and write the reasons in `NOTES.md`:
       units, attributes, fill values, staggering, times per file, quirks), at a tiny size
       (a few points per axis, two or three times), with values from formulas. No value
       copied from the real files.
-4. Write the tests in `tests/test_<name>.py` (the scaffold wrote the contract check and a
+4. Write the tests in `tests/<name>/test_<name>.py` (the scaffold wrote the contract check and a
    `-m real` test): add tests of the reads against the synthetic formulas, one for each
    thing the reader does (grid in km, times, each unit change, staggering, fill values,
-   fields only some times have). `tests/test_example.py` is the model.
+   fields only some times have). `tests/example/test_example.py` is the model.
 
 ## 5. Check
 
-- `pytest tests/test_<name>.py`: everything passes on the synthetic run.
+- `pytest tests/<name>`: everything passes on the synthetic run.
 - The real run: `check_datatype` on the user's path. On a small grid you may run
-  `ATMO3D_<NAME>_ROOT=<path> pytest -m real tests/test_<name>.py` directly; on a large one
+  `ATMO3D_<NAME>_ROOT=<path> pytest -m real tests/<name>` directly; on a large one
   (more than about 10⁷ points per 3D field), or on a login node of a shared cluster,
   **give the user that command to run on a compute node and wait for the result**.
 - Read the check's report, warnings included: roles the catalog names that the run lacks,

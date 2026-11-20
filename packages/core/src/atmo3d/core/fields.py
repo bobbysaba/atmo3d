@@ -203,7 +203,7 @@ def _bind(d, cat):
 
 
 # derived fields whose equation Bobby reviewed and confirmed (Phase 2b, 2026-11-19:
-# docs-dev/derived-fields.md), each with a test in tests/test_derived_analytic.py or
+# docs-dev/derived-fields.md), each with a test in tests/core/test_derived_analytic.py or
 # beside it.  A derived field not named here is listed only under the hidden fields
 # (show_hidden_fields), its label marked "(unverified)": add it after its review.
 CONFIRMED = frozenset([

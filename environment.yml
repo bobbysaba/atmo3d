@@ -29,6 +29,7 @@ dependencies:
   - cmweather=0.3.2        # HomeyerRainbow / ChaseSpectral colormaps in figures
   - websocket-client       # browser screenshots in tests/ (shot.py)
   - pytest=8.4.1           # tests/
+  - pytest-xdist=3.8.0     # pytest -n auto: the tests in parallel
   - pip
   - pip:
       - -e ./packages/core

@@ -4,14 +4,28 @@
 
 ```bash
 conda activate atmo3d
-pytest                                  # the suite, on synthetic demo runs
-pytest tests/test_tracking.py -k manual # one file / matching tests
+pytest -n auto                          # the suite, on synthetic demo runs, in parallel
+pytest tests/wofs                       # one package's tests (tests/core: the core's)
+pytest tests/core/test_tracking.py -k manual   # one file / matching tests
 ATMO3D_TEST_RUN=/path/to/run pytest -m real   # checks on your own output (reads only)
 pytest -m browser                       # the viewer in headless Firefox, with screenshots
 ```
 
 Run the suite on a compute node rather than a shared login node: it starts reader
 processes and renders figures.
+
+- **Folders.** `tests/core/` tests the core (on the synthetic CM1 runs, so it needs the
+  data-type packages installed, though the core never imports them); `tests/cm1/`,
+  `tests/wofs/`, `tests/radar/` and `tests/example/` test one package each. The shared
+  setup stays in `tests/`: `conftest.py`, the synthetic data (`synthetic.py`,
+  `synthetic_wofs.py`, `synthetic_radar.py`), `catalog_checks.py` and `baseline/`. A test imports these by name (`from synthetic_wofs import make_wofs`),
+  never another test file.
+- **In parallel.** `pytest -n auto` (pytest-xdist) runs the tests in one worker per CPU
+  the job may use, at most 8: the CPUs the process is allowed (a PBS or Slurm job's
+  share of the node), else the machine's count. So 1 CPU runs one worker, as fast as without
+  `-n`, and a laptop of 4 cores runs 4. `-n 4` asks for four; without `-n` the tests run
+  one at a time, as before. Each worker has its own settings file and figure folders;
+  the demo data is shared, written once (the first worker writes it, the others wait).
 
 - **Test data.** `tests/synthetic.py` writes small analytic runs shaped like CM1 output
   (staggered winds, base state, swaths, one level per chunk), a weak-mesocyclone twin and
@@ -21,13 +35,13 @@ processes and renders figures.
 - **Demo run.** `atmo3d --demo` opens `demo_data/supercell`, a real CM1 run cut down by
   `tools/make_real_demo.py` (a box around the storms, every 10 min, 16-bit packed fields,
   1500 parcels; about 35 MB). `atmo3d/demo.py` copies it into the cache once.
-  `tests/test_real_demo.py` checks it; to rebuild it from a new run:
+  `tests/cm1/test_real_demo.py` checks it; to rebuild it from a new run:
   `python tools/make_real_demo.py RUN demo_data/supercell --force`.
 - **Isolation.** Tests use a throwaway settings file and write only into temporary
   folders. The pressure-decomposition tests work on copies of demo files.
 - **Browser tests** need Firefox (on `PATH`, or `$FIREFOX`). Screenshots go to
   `$ATMO3D_SHOTS` (default: a temporary folder, printed with `pytest -s`).
-- **Image baselines.** `tests/test_images.py` draws typical figures of the demo run (plan
+- **Image baselines.** `tests/core/test_images.py` draws typical figures of the demo run (plan
   view, cross-section, time–height, time series, soundings, distributions, a difference
   fill, a swath, parts, a dark style) and compares each with a PNG in `tests/baseline/`;
   it also checks that save → load → draw of every panel kind gives the identical image.
@@ -35,12 +49,12 @@ processes and renders figures.
   difference (0–255, default 3), because fonts and matplotlib versions shift pixels
   between machines. When a figure changes **on purpose**, look at the failure's
   `*-failed-diff.png` (left in pytest's temporary folder), then rewrite the baselines with
-  `pytest tests/test_images.py --make-baselines` and commit the new PNGs. Commit
+  `pytest tests/core/test_images.py --make-baselines` and commit the new PNGs. Commit
   baselines made with the versions in `environment.yml`.
 - **Fixtures** (`tests/conftest.py`): `demo_root`, `demo_run`, `reg` (one Registry for
   the session) and `viewer` (a fresh Viewer on the demo supercell at its first storm
   time). `wait(pred)` polls background work; `tap(v, x, y)` is a map click. For the
-  figure tests (`tests/test_figure*.py`): `ed` (the viewer's figure editor, no auto
+  figure tests (`tests/core/test_figure*.py`): `ed` (the viewer's figure editor, no auto
   render), `coarse_run` (a second run with other output times), `new_spec(ed, kind, rows, cols)`
   (the spec the New dialog starts from), `doc_now(ed)`, `put(s, widget, value)`,
   `render(ed, figure)`, `settled(ed, figure)` and the spec helpers `difference_layer`,
@@ -48,10 +62,12 @@ processes and renders figures.
 
 ### Which test file covers what
 
+Files in `tests/core/` unless the row says otherwise.
+
 | File | Covers |
 |---|---|
 | `test_fields.py` | Derived fields, shared reads, the cache, the base state; levels read together, volumes in slabs, parts of fields larger than the cache |
-| `test_pool.py` | The shared reader processes: one pool for every run, files kept open, the scan of a run's files, work spread to a width, reading ahead over times |
+| `cm1/test_pool.py` | The shared reader processes: one pool for every run, files kept open, the scan of a run's files, work spread to a width, reading ahead over times |
 | `test_timing.py` | The timing hooks of `--timing` and `atmo3d bench`, the log summary |
 | `test_map.py` | Map, cross-section and 3D: layers, differences, streamlines, the region and floor |
 | `test_streamlines.py` | The 3D streamline tracer on analytic winds, and the 3D pane's restyle echo |
@@ -60,23 +76,26 @@ processes and renders figures.
 | `test_session.py` | Session files: save, load, rows and values a run cannot take, another run's session; soundings, section, 3D, series and distributions back |
 | `test_export.py` | netCDF export: values == the volumes / map planes, heights, box, stop, missing times, the dialog, `atmo3d export` |
 | `test_series.py`, `test_dist.py` | Series (cache, time–height, files) and distributions |
-| `test_parcels.py` | Parcel output: reads, lattice, selections, sets, trajectory cache, heads, wraps, split files; the Parcels panel |
-| `test_pdecomp.py` | The pressure decomposition, on copies of demo files |
+| `cm1/test_parcels.py` | Parcel output: reads, lattice, selections, sets, trajectory cache, heads, wraps, split files; the Parcels panel |
+| `cm1/test_pdecomp.py` | The pressure decomposition, on copies of demo files |
 | `test_figure_shell.py` | The figure editor: its tree, picking, edits and undo |
 | `test_figure_shell_plan.py` | Plan views there: shared layers and overrides, heights, time zero, Fill panels, look settings, the New dialog |
 | `test_figure_shell_*.py` | The other kinds there, mixed grids, insets, Find, the scrubber, Export, other runs |
-| `test_figure_doc.py` | The document: conversion from older figures, drawing from it |
+| `test_figure_doc.py` | The document: drawing from it |
 | `test_figure_drawing.py` | What figures draw and save: each kind's plots, tables, series, animations, the script, own code |
-| `test_figure.py`, `test_figure_layers.py`, `test_figure_runs.py`, `test_figure_export.py`, `test_figure_spec.py` | Without the editor: thumbnails, layer data, runs and time zeros, frames, spec upgrades |
+| `test_figure.py`, `test_figure_layers.py`, `test_figure_runs.py`, `test_figure_export.py`, `test_figure_spec.py` | Without the editor: thumbnails, layer data, runs and time zeros, frames, the spec's panels and edits |
 | `test_legend.py` | Legends of blocks and panels |
 | `test_images.py` | Image baselines and save–load–draw |
-| `test_datatypes.py`, `test_datatype_check.py` | Data types plug in with no core edits; the extension API's version rule; `check_datatype` on CM1, WoFS and radar |
+| `test_datatypes.py`, `test_datatype_check.py` | Data types plug in with no core edits; the extension API's version rule; what `check_datatype` reports of a broken data type |
+| `test_catalog.py` | The field catalog: tidied units and labels, renamed fields in saved files, derived fields' units |
+| `cm1/`, `wofs/`, `radar/` `test_<type>_contract.py`, `test_<type>_outputs.py` | Each data type passes `check_datatype` on its synthetic run; its field table and catalog |
+| `wofs/test_wofs.py` | The WoFS reader on `tests/synthetic_wofs.py`, members and the mean |
 | `test_settings.py`, `test_picker.py`, `test_ui.py` | Settings, the run picker, layout logic |
 | `test_browser.py` | The viewer in headless Firefox (marker `browser`) |
-| `test_real.py` | Your own output (marker `real`) |
-| `test_example.py`, `test_new_datatype.py` | The worked example data type (`packages/example`), on its own synthetic run: the contract check and its reads; the scaffold (`tools/new_datatype.py`) in both modes. `tests/example-tests.txt` lists them |
-| `test_radar_*.py` | Radar, on `tests/synthetic_radar.py` (analytic answers): reader, PPI, sampler, regrid, hand-worked cases; `tests/radar-tests.txt` lists them for CI |
-| `test_real_radar.py` | Your own radar folder: `ATMO3D_RADAR_ROOT=... pytest -m real` |
+| `cm1/test_real.py`, `wofs/test_real_wofs.py` | Your own output (marker `real`) |
+| `example/test_example.py`, `example/test_new_datatype.py` | The worked example data type (`packages/example`), on its own synthetic run: the contract check and its reads; the scaffold (`tools/new_datatype.py`) in both modes |
+| `radar/test_radar_*.py` | Radar, on `tests/synthetic_radar.py` (analytic answers): reader, PPI, sampler, regrid, hand-worked cases |
+| `radar/test_real_radar.py` | Your own radar folder: `ATMO3D_RADAR_ROOT=... pytest -m real` |
 
 ## Layout
 
@@ -217,7 +236,7 @@ figures/                  the Figure workspace
   combo.py                figures of parts, an older form: combine, for conversion and tests
   times.py                helpers for model times and typed heights
 
-tests/                    pytest suite
+tests/                    pytest suite: core/, and a folder per data-type package
 docs/                     these pages
 ```
 
@@ -268,7 +287,7 @@ fails until it is added. A pull request that adds a field has:
 2. **Its inputs in raw units**: a `func` gets natives as the files store them (qv in
    kg/kg, p in Pa) and derivatives per metre. Name inputs by role (`theta`, `qv`), not by
    one model's names, so every data type that has them gets the field.
-3. **An analytic test** in `tests/test_derived_analytic.py`: synthetic inputs whose
+3. **An analytic test** in `tests/core/test_derived_analytic.py`: synthetic inputs whose
    answer is known by hand (a uniform lapse rate, a circular hodograph), not the code's
    own output fed back. Include a sign or an edge case: zero, a negative, a missing
    optional input.
@@ -347,8 +366,8 @@ data-type package:
 
    Any one owner on the line can approve a change there. Later lines win, so a package's
    line must come after the `*` line, and a change that also touches `packages/core`
-   still needs the core owner. Their package's test list (`tests/<name>-tests.txt`) can
-   have a line of its own the same way.
+   still needs the core owner. Their package's tests (`tests/<name>/`) can have a line
+   of its own the same way.
 3. Make that change by pull request, like any other.
 
 ### Protecting release tags

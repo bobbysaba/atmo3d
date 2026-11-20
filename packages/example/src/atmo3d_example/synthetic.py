@@ -1,5 +1,5 @@
 """A small synthetic run in the example's layout (run.py), with fields known in closed
-form, for the tests (tests/test_example.py) and the demo (atmo3d --demo example).
+form, for the tests (tests/example/test_example.py) and the demo (atmo3d --demo example).
 
 A copy for another data type writes its own files' layout: the same dimension and
 variable names, units, attributes and quirks as the real files (from their header,

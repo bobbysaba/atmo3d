@@ -3,6 +3,16 @@
 What changed in each release, newest first. The version is in `pyproject.toml`; a release
 has a matching git tag.
 
+## Unreleased
+
+- **Tests in parallel**: `pytest -n auto` (pytest-xdist, now in the environment and the
+  `test` extra) runs the suite in one worker per CPU the job may use, at most 8; plain
+  `pytest` still runs them one at a time. See [Developing](developing.md#tests).
+- **Tests by package**: `tests/core/` for the core and a folder per data-type package
+  (`tests/cm1/`, `tests/wofs/`, `tests/radar/`, `tests/example/`), so `pytest tests/wofs`
+  runs one package's tests; the `tests/<package>-tests.txt` lists are gone.
+  `tools/new_datatype.py` writes a new type's test into `tests/<name>/`.
+
 ## 1.1.0 (2026-11-20)
 
 - **Contributing**: a new page for first-time contributors (fork, set up, test, open a
