@@ -456,7 +456,7 @@ class TrackPanel:
         """The Storm chip: load the run's track file if there is no track yet, and open
         the Track tool."""
         found = None if self.fixes else self._track_file()
-        self._show_panel(True, 2)
+        self._show_panel(True, "Track")
         if found:
             self.trk_path.value = found
             self._load_track()

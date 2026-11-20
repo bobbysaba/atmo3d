@@ -11,7 +11,7 @@ import numpy as np
 import panel as pn
 
 from .. import config, pdecomp
-from ..core import models, parcels, sounding_plot as sp, track as trk, vectors
+from ..core import models, sounding_plot as sp, vectors
 from ..core.run import busy_note
 from ..core.fields import CMAPS, deriv_options
 from .numinput import FloatInput
@@ -19,6 +19,7 @@ from .picker import RunPicker
 from .settings import ConfirmOverwrite, Settings
 from .ui import LEVEL_MODES, ON, TERRAIN_LEVEL_MODES, TIME_BAR, ToolRail, _html
 from .fieldmenu import FieldSelect
+from . import panels
 
 
 class Widgets:
@@ -317,10 +318,8 @@ class Widgets:
         self.workspace = pn.widgets.RadioButtonGroup(
             options=["Map", "3D", "Figure"], value="Map", button_type="primary",
             button_style="outline", width=190, height=32, margin=(4, 2))
-        tools = ["Sounding", "Cross-section"] + (["Track"] if trk.available(run) else []) \
-            + ["Series", "Distribution"] \
-            + (["Parcels"] if parcels.offered(run) else []) + ["3D region"]
-        self.mode = ToolRail(tools)
+        # the registered tools this run gets (viewer.panels: gated on its capabilities)
+        self.mode = ToolRail(panels.for_run(run)[1])
         self.hint = _html()
         # the Sounding tool's click: a point, or a dragged box (area mean). snd_pick holds
         # the choice (not shown); the two buttons below set it and light up when chosen
@@ -337,7 +336,7 @@ class Widgets:
         # the storm track, for everything storm-relative (shown in the top bar)
         self.storm_btn = pn.widgets.Button(
             name="No storm track", icon="tornado", button_type="light",
-            button_style="outline", height=32, margin=(4, 2), visible=trk.available(run),
+            button_style="outline", height=32, margin=(4, 2), visible=run.can("tracking"),
             stylesheets=[ON, ":host(.cv-warn) .bk-btn { color: #fbbf24 !important; }"],
             description="The tracked storm: storm-relative soundings, tracked storm "
                         "motion, series around the storm, figures centred on it. Click to "

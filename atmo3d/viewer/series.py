@@ -622,4 +622,4 @@ class SeriesPanel:
                 if path.lower().endswith(".pkl") else "")
         self._ser_file_msg(f"Loaded <code>{path}</code>"
                            + (f" · {note}" if note else "") + warn)
-        self._show_panel(True, 3)
+        self._show_panel(True, "Series")

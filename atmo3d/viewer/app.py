@@ -20,7 +20,8 @@ from ..figures import editor as figui
 from .picker import RunPicker
 from .settings import Settings
 from ..theme import ACCENT, BG, CSS, GRID, PANEL, Fast
-from .ui import PANELS, _html, held
+from . import panels
+from .ui import _html, held
 # the Viewer's feature groups, one module each
 from .events import Events
 from .export import DataExport
@@ -182,8 +183,8 @@ class Viewer(Widgets, MapView, MapLines, Layout, Events, SoundingPanel, TrackPan
         self.panel_btn.on_click(lambda e: self._show_panel(False))
         self.mode.reclick = self._on_tool_reclick
         self.snd_pick.param.watch(
-            lambda e: self.mode.set(e.new) if self.mode.value in PANELS and
-            PANELS[self.mode.value] == 0 else None, "value")
+            lambda e: self.mode.set(e.new) if panels.panel_of(self.mode.value) == "Sounding"
+            else None, "value")
         self.snd_pick.param.watch(self._show_snd_pick, "value")
         self.snd_point_btn.on_click(lambda e: setattr(self.snd_pick, "value", "Sounding"))
         self.snd_box_btn.on_click(lambda e: setattr(self.snd_pick, "value", "Area sounding"))
@@ -220,7 +221,7 @@ class Viewer(Widgets, MapView, MapLines, Layout, Events, SoundingPanel, TrackPan
         self.trk_whole.param.watch(self._on_trk_whole, "value")
         self.trk_sense.param.watch(lambda e: self._trk_stop_label(), "value")
         self.trk_fix.param.watch(self._on_trk_fix, "value")
-        self.trk_find.on_click(lambda e: (self._show_panel(True, 2),
+        self.trk_find.on_click(lambda e: (self._show_panel(True, "Track"),
                                           self.request_track(None, None)))
         self.trk_stop_btn.on_click(lambda e: self._cancel_track())
         self.trk_clear.on_click(self._on_clear_track)
@@ -420,10 +421,10 @@ class Viewer(Widgets, MapView, MapLines, Layout, Events, SoundingPanel, TrackPan
         the 3D cache, so the first click finds them there."""
         if self._closed or self.playing or self._applying:
             return
-        tab = PANELS.get(self.mode.value)
-        if tab == 0:
+        tab = panels.panel_of(self.mode.value)
+        if tab == "Sounding":
             names, ok = self._snd_fields(), self._snd_whole()
-        elif tab == 1:
+        elif tab == "Cross-section":
             names, shown = self._xs_fields()
             ok = self.F.fits(shown, self.t)
         else:

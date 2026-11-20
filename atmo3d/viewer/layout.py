@@ -12,10 +12,11 @@ from .zoomview import ParamTable
 from ..theme import BG, CSS, GRID, PANEL
 from .numinput import FloatInput
 from .ui import (
-    BAR, DRAWER, FILL, PANEL_TITLES, PANELS, RAIL_BTN, TAB_MODE, Drawer, Plotly3D,
+    BAR, DRAWER, FILL, RAIL_BTN, Drawer, Plotly3D,
     _bar, _bokeh, _group, _html, _pill, _settings_toggle, out_of_flow,
 )
 from .fieldmenu import FieldSelect
+from . import panels
 
 
 class Layout:
@@ -163,7 +164,39 @@ class Layout:
                                visible=False)
         self._build_streamline_card()
 
-        # ---- analysis panel (right of the map)
+        # ---- analysis panel (right of the map): the registered tools' panels this run
+        # gets (viewer.panels), in registry order
+        self.panel_tools = panels.for_run(run)[0]
+        self.panel_keys = [t.key for t in self.panel_tools]
+        self.tabs = pn.Tabs(
+            *[(t.key, t.layout(self)) for t in self.panel_tools],
+            # dynamic: a tab's models are made when it is first opened (the page then
+            # carries the Sounding tab only: half the models of the whole page)
+            sizing_mode="stretch_both", dynamic=True, margin=0,
+            # (only the floor: a flex basis of 0 here left the panel empty)
+            styles={"min-height": "0"},
+            # no tab strip: the tool rail picks the panel (_show_panel). The tabs' row
+            # ("stack", under the hidden header) is held to the panel's height: Bokeh's
+            # 1fr grows to the content, and a long tab (Parcels) ran off the bottom of
+            # the window instead of scrolling
+            stylesheets=[":host > .bk-header { display: none !important; }",
+                         ":host { grid-template-rows: max-content minmax(0, 1fr)"
+                         " !important; }"])
+        # the open tool's panel, right of the map: its name, expand and close
+        self.panel_col = pn.Column(
+            pn.Row(self.panel_title, pn.Spacer(), self.full_btn, self.panel_btn, margin=0,
+                   sizing_mode="stretch_width",
+                   # the title stays put while the panel scrolls under it
+                   styles={"border-bottom": f"1px solid {GRID}", "position": "sticky",
+                           "top": "0", "z-index": "5", "background": BG}),
+            self.tabs, sizing_mode="stretch_both", margin=(0, 8, 0, 4),
+            # the panel scrolls itself: a tab longer than the window (Parcels) was cut
+            # off, its own scroll never set off since nothing inside held its height
+            styles={"flex": "1 1 48%", "min-width": "0", "max-height": "100%",
+                    "overflow-y": "auto"})
+
+    def _snd_layout(self):
+        """The Sounding panel."""
         snd_set = pn.FlexBox(self.parcel, self.wunits, self.storm, self.storm_u,
                              self.storm_v, self.avg, self.base_on, self.follow,
                              self.storm_follow, flex_wrap="wrap", align_items="flex-end",
@@ -186,6 +219,11 @@ class Layout:
                        look_btn, flex_wrap="wrap",
                        align_items="center", gap="0 4px", sizing_mode="stretch_width"),
             snd_set, snd_look, sizing_mode="stretch_width", margin=0)
+        return pn.Column(snd_opts, self.snd_msg, self.snd_col, scroll="y-auto",
+                         sizing_mode="stretch_both")
+
+    def _xs_layout(self):
+        """The Cross-section panel."""
         d = self.xs_drawer = Drawer()
         # as on the map: the fill's style in the fill's pill, what goes over it in the next
         xs_style = d.add("style", "Style", self.xs_fill_style, self.xs_cmap, self.xs_rev,
@@ -220,6 +258,10 @@ class Layout:
             self.xs_status, self.xs_pd_btn,
             _bokeh(self.xs_fig, sizing_mode="stretch_width"),
             sizing_mode="stretch_width")
+        return pn.Column(xs, scroll="y-auto", sizing_mode="stretch_both")
+
+    def _trk_layout(self):
+        """The Storm track panel."""
         trk_set = pn.FlexBox(self.trk_metric, self.trk_field, self.trk_sense, self.trk_z,
                              self.trk_smooth, self.trk_kernel, self.trk_radius,
                              self.trk_fix, self.trk_cut, self.trk_stop, self.trk_from,
@@ -227,81 +269,58 @@ class Layout:
                              flex_wrap="wrap", align_items="flex-end", gap="0 4px",
                              sizing_mode="stretch_width",
                              styles={"border-top": f"1px solid {GRID}"})
-        self.tabs = pn.Tabs(
-            ("Sounding", pn.Column(snd_opts, self.snd_msg, self.snd_col, scroll="y-auto",
-                                   sizing_mode="stretch_both")),
-            ("Cross-section", pn.Column(xs, scroll="y-auto", sizing_mode="stretch_both")),
-            ("Track", pn.Column(
-                pn.FlexBox(self.trk_how, self.trk_find, self.trk_stop_btn, self.trk_del,
-                           self.trk_clear,
-                           _settings_toggle(trk_set, description="Tracking settings"),
-                           self.trk_advance, flex_wrap="wrap",
-                           align_items="center", gap="0 4px", sizing_mode="stretch_width"),
-                trk_set,
-                self.trk_status,
-                self.trk_pane,
-                pn.FlexBox(self.trk_path, self.trk_storm, self.trk_save, self.trk_dl,
-                           self.trk_load,
-                           flex_wrap="wrap",
-                           align_items="flex-end", gap="0 4px", sizing_mode="stretch_width"),
-                self.trk_table, scroll="y-auto", sizing_mode="stretch_both")),
-            ("Series", pn.Column(
-                pn.FlexBox(self.ser_field, self.ser_op, self.ser_vmode, self.ser_z,
-                           self.ser_z0, self.ser_z1, self.ser_region, self.ser_radius,
-                           self.ser_offx, self.ser_offy, self.ser_reduce, self.ser_pct, self.ser_go,
-                           self.ser_stop, flex_wrap="wrap", align_items="flex-end",
-                           gap="0 4px", sizing_mode="stretch_width"),
-                self.ser_status,
-                pn.FlexBox(self.ser_pick, self.ser_view, self.ser_remove, self.ser_set_btn,
-                           flex_wrap="wrap", align_items="flex-end", gap="0 4px",
-                           sizing_mode="stretch_width"),
-                self.ser_set, self.ser_plot,
-                pn.FlexBox(self.ser_path, self.ser_fmt, self.ser_save, self.ser_dl,
-                           self.ser_load, flex_wrap="wrap", align_items="flex-end",
-                           gap="0 4px", sizing_mode="stretch_width"),
-                self.ser_file_msg, scroll="y-auto", sizing_mode="stretch_both")),
-            ("Distribution", pn.Column(
-                pn.FlexBox(self.dist_field, self.dist_vmode, self.dist_z, self.dist_z0,
-                           self.dist_z1, self.dist_region, self.dist_radius, self.dist_offx,
-                           self.dist_offy, self.dist_lo, self.dist_hi, self.dist_go,
-                           self.dist_follow, flex_wrap="wrap", align_items="flex-end",
-                           gap="0 4px", sizing_mode="stretch_width"),
-                self.dist_status,
-                pn.FlexBox(self.dist_pick, self.dist_remove, self.dist_clear,
-                           self.dist_to_fig, flex_wrap="wrap", align_items="flex-end",
-                           gap="0 4px", sizing_mode="stretch_width"),
-                pn.FlexBox(self.dist_kind, self.dist_norm, self.dist_bins, self.dist_cum,
-                           self.dist_whis, self.dist_logy, self.dist_x0, self.dist_x1,
-                           flex_wrap="wrap", align_items="flex-end", gap="0 4px",
-                           sizing_mode="stretch_width",
-                           styles={"border-top": f"1px solid {GRID}"}),
-                self.dist_plot, self.dist_table, scroll="y-auto",
-                sizing_mode="stretch_both")),
-            ("Parcels", self._par_layout()),
-            # dynamic: a tab's models are made when it is first opened (the page then
-            # carries the Sounding tab only: half the models of the whole page)
-            sizing_mode="stretch_both", dynamic=True, margin=0,
-            # (only the floor: a flex basis of 0 here left the panel empty)
-            styles={"min-height": "0"},
-            # no tab strip: the tool rail picks the panel (_show_panel). The tabs' row
-            # ("stack", under the hidden header) is held to the panel's height: Bokeh's
-            # 1fr grows to the content, and a long tab (Parcels) ran off the bottom of
-            # the window instead of scrolling
-            stylesheets=[":host > .bk-header { display: none !important; }",
-                         ":host { grid-template-rows: max-content minmax(0, 1fr)"
-                         " !important; }"])
-        # the open tool's panel, right of the map: its name, expand and close
-        self.panel_col = pn.Column(
-            pn.Row(self.panel_title, pn.Spacer(), self.full_btn, self.panel_btn, margin=0,
-                   sizing_mode="stretch_width",
-                   # the title stays put while the panel scrolls under it
-                   styles={"border-bottom": f"1px solid {GRID}", "position": "sticky",
-                           "top": "0", "z-index": "5", "background": BG}),
-            self.tabs, sizing_mode="stretch_both", margin=(0, 8, 0, 4),
-            # the panel scrolls itself: a tab longer than the window (Parcels) was cut
-            # off, its own scroll never set off since nothing inside held its height
-            styles={"flex": "1 1 48%", "min-width": "0", "max-height": "100%",
-                    "overflow-y": "auto"})
+        return pn.Column(
+            pn.FlexBox(self.trk_how, self.trk_find, self.trk_stop_btn, self.trk_del,
+                       self.trk_clear,
+                       _settings_toggle(trk_set, description="Tracking settings"),
+                       self.trk_advance, flex_wrap="wrap",
+                       align_items="center", gap="0 4px", sizing_mode="stretch_width"),
+            trk_set,
+            self.trk_status,
+            self.trk_pane,
+            pn.FlexBox(self.trk_path, self.trk_storm, self.trk_save, self.trk_dl,
+                       self.trk_load,
+                       flex_wrap="wrap",
+                       align_items="flex-end", gap="0 4px", sizing_mode="stretch_width"),
+            self.trk_table, scroll="y-auto", sizing_mode="stretch_both")
+
+    def _ser_layout(self):
+        """The Time series panel."""
+        return pn.Column(
+            pn.FlexBox(self.ser_field, self.ser_op, self.ser_vmode, self.ser_z,
+                       self.ser_z0, self.ser_z1, self.ser_region, self.ser_radius,
+                       self.ser_offx, self.ser_offy, self.ser_reduce, self.ser_pct, self.ser_go,
+                       self.ser_stop, flex_wrap="wrap", align_items="flex-end",
+                       gap="0 4px", sizing_mode="stretch_width"),
+            self.ser_status,
+            pn.FlexBox(self.ser_pick, self.ser_view, self.ser_remove, self.ser_set_btn,
+                       flex_wrap="wrap", align_items="flex-end", gap="0 4px",
+                       sizing_mode="stretch_width"),
+            self.ser_set, self.ser_plot,
+            pn.FlexBox(self.ser_path, self.ser_fmt, self.ser_save, self.ser_dl,
+                       self.ser_load, flex_wrap="wrap", align_items="flex-end",
+                       gap="0 4px", sizing_mode="stretch_width"),
+            self.ser_file_msg, scroll="y-auto", sizing_mode="stretch_both")
+
+    def _dist_layout(self):
+        """The Distribution panel."""
+        return pn.Column(
+            pn.FlexBox(self.dist_field, self.dist_vmode, self.dist_z, self.dist_z0,
+                       self.dist_z1, self.dist_region, self.dist_radius, self.dist_offx,
+                       self.dist_offy, self.dist_lo, self.dist_hi, self.dist_go,
+                       self.dist_follow, flex_wrap="wrap", align_items="flex-end",
+                       gap="0 4px", sizing_mode="stretch_width"),
+            self.dist_status,
+            pn.FlexBox(self.dist_pick, self.dist_remove, self.dist_clear,
+                       self.dist_to_fig, flex_wrap="wrap", align_items="flex-end",
+                       gap="0 4px", sizing_mode="stretch_width"),
+            pn.FlexBox(self.dist_kind, self.dist_norm, self.dist_bins, self.dist_cum,
+                       self.dist_whis, self.dist_logy, self.dist_x0, self.dist_x1,
+                       flex_wrap="wrap", align_items="flex-end", gap="0 4px",
+                       sizing_mode="stretch_width",
+                       styles={"border-top": f"1px solid {GRID}"}),
+            self.dist_plot, self.dist_table, scroll="y-auto",
+            sizing_mode="stretch_both")
 
     def _top_bar(self):
         """Run, time and workspace pills floating across the top of the window."""
@@ -452,18 +471,32 @@ class Layout:
         for z in self._zoom_images():
             z.interactive = on
 
+    def _panel(self):
+        """The key of the panel on the active tab (viewer.panels; open or not)."""
+        return self.panel_keys[self.tabs.active] if self.panel_keys else None
+
+    def _panel_open(self, key):
+        """Whether the panel is showing, on tool `key`'s tab."""
+        return bool(self.panel_col.visible) and self._panel() == key
+
     def _show_panel(self, show, tab=None):
-        """Show (or close) the panel, on tab `tab`.  The tool rail follows the panel:
-        opening a tool's panel makes it the active tool."""
+        """Show (or close) the panel, on tool `tab`'s panel (its key; an int is a place
+        in the registry, as a saved session records it).  A panel this run has none of
+        is not opened.  The tool rail follows the panel: opening a tool's panel makes it
+        the active tool."""
+        if isinstance(tab, int):
+            tab = panels.at(tab)
+        if tab is not None and tab not in self.panel_keys:
+            return
         if not show and self.full:
             self._set_full(False)
         self.panel_col.visible = show
         if tab is not None:
-            self.tabs.active = tab
-            self.panel_title.object = f'<div class="cv-h" style="margin:0">{PANEL_TITLES[tab]}</div>'
-            if show and PANELS.get(self.mode.value) != tab:
-                self.mode.set(self.snd_pick.value if tab == 0 else
-                              self.par_pick.value if tab == 5 else TAB_MODE[tab])
+            self.tabs.active = self.panel_keys.index(tab)
+            title = panels.get(tab).heading
+            self.panel_title.object = f'<div class="cv-h" style="margin:0">{title}</div>'
+            if show and panels.panel_of(self.mode.value) != tab:
+                self.mode.set(self.mode.mode_for.get(tab, tab))
 
     def _on_workspace(self, ev):
         is3d, isfig = ev.new == "3D", ev.new == "Figure"

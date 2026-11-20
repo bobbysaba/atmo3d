@@ -36,14 +36,14 @@ class SoundingPanel:
         else:
             self.points = [new]
         self._draw_points()
-        self._show_panel(True, 0)
+        self._show_panel(True, "Sounding")
         self.request_soundings()
 
     def _add_mean(self):
         """Domain-mean sounding that follows the time slider."""
         self.points = [("mean", None, None)]
         self._draw_points()
-        self._show_panel(True, 0)
+        self._show_panel(True, "Sounding")
         self.request_soundings()
 
     def _pin_time(self):
@@ -56,7 +56,7 @@ class SoundingPanel:
         if new not in self.points:
             self.points = self.points[:1] + (self.points[1:] + [new])[-3:]
         self._draw_points()
-        self._show_panel(True, 0)
+        self._show_panel(True, "Sounding")
         self.request_soundings()
 
     def _snd_xy(self, kind, where, t):

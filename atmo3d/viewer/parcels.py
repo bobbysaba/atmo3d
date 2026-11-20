@@ -415,7 +415,7 @@ class ParcelsPanel:
         else:
             rule["near"] = [x, y, float(self.par_radius.value or 1.0)]
         self._par_n += 1
-        self._show_panel(True, 5)
+        self._show_panel(True, "Parcels")
         self.request_parcels(rule, f"set {self._par_n}")
 
     def request_parcels(self, rule, name, color=None):
@@ -574,7 +574,7 @@ class ParcelsPanel:
             self.par_status.object = ('<div class="cv-status" style="color:#f87171">That set '
                                       'is from parcel output with more parcels.</div>')
             return
-        self._show_panel(True, 5)
+        self._show_panel(True, "Parcels")
         self.gen["par"] += 1
         g = self.gen["par"]
 

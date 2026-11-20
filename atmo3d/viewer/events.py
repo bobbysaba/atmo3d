@@ -13,7 +13,8 @@ from ..core import vectors, volume3d
 from ..core.fields import deriv_options
 from .diff import DIFF_CMAP
 from .zoomview import ZoomImage
-from .ui import PANELS, held
+from . import panels
+from .ui import held
 
 
 class Events:
@@ -37,7 +38,7 @@ class Events:
             return
         if self.points and self.follow.value:
             self.request_soundings()
-        if len(self.xs_pts) == 2 and self.panel_col.visible and self.tabs.active == 1:
+        if len(self.xs_pts) == 2 and self._panel_open("Cross-section"):
             self.request_xsec()
         if self.v3_follow.value and self.plot3d.visible and self.workspace.value == "3D":
             self.request_3d()
@@ -105,10 +106,10 @@ class Events:
             self.mode.mode_for["Parcels"] = self.par_pick.value = mode
         if init:
             return
-        if self.full and PANELS.get(mode) != self.tabs.active:
+        if self.full and panels.panel_of(mode) != self._panel():
             self._set_full(False)  # another tool: back to the map
-        if mode in PANELS:
-            self._show_panel(True, PANELS[mode])
+        if panels.panel_of(mode) is not None:
+            self._show_panel(True, panels.panel_of(mode))
         elif mode is None:
             self._show_panel(False)
         self._early_load()  # (Sounding, Section: their fields at the shown time)
@@ -116,8 +117,8 @@ class Events:
     def _on_tool_reclick(self, tool):
         """The lit tool's button pressed again: reopen its closed panel (True), or
         let the tool switch off (False)."""
-        tab = PANELS.get(tool)
-        if tab is None or (self.panel_col.visible and self.tabs.active == tab):
+        tab = panels.panel_of(tool)
+        if tab is None or self._panel_open(tab):
             return False
         self._show_panel(True, tab)
         return True
@@ -243,7 +244,7 @@ class Events:
             shift = bool((getattr(ev, "modifiers", None) or {}).get("shift"))
             self._add_sounding(x, y, shift)
         elif mode == "Track":
-            self._show_panel(True, 2)
+            self._show_panel(True, "Track")
             self.request_track(x, y)
         elif mode == "Parcels":
             self._par_choose(x, y)
@@ -251,7 +252,7 @@ class Events:
             self.xs_pts = [(x, y)] if len(self.xs_pts) != 1 else self.xs_pts + [(x, y)]
             self._draw_xs()
             if len(self.xs_pts) == 2:
-                self._show_panel(True, 1)
+                self._show_panel(True, "Cross-section")
                 self.request_xsec()
 
     def _on_pan_start(self, ev):

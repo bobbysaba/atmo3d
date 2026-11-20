@@ -19,7 +19,8 @@ from panel.widgets.select import SingleSelectBase
 from .. import config, pdecomp
 from ..core import dist, series as ser
 from ..theme import DIALOG_DARK
-from .ui import PANELS, TOOL_OF, _html, held
+from . import panels
+from .ui import _html, held
 from .fieldmenu import FieldSelect
 
 # the session file's version ("atmo3d_session"); 2: fields by their data type's own
@@ -218,8 +219,9 @@ class Sessions:
             run=os.path.abspath(self.run.path),
             time_s=float(self.run.times[self.t]), view=[x0, x1, y0, y1],
             workspace=self.workspace.value, tool=tool,
-            panel=dict(open=bool(self.panel_col.visible), tab=int(self.tabs.active),
-                       full=bool(self.full)),
+            # key: the open tab's panel; tab: its registry place (what older versions read)
+            panel=dict(open=bool(self.panel_col.visible), tab=panels.index(self._panel()),
+                       key=self._panel(), full=bool(self.full)),
             fill={k: getattr(self, a).value for k, a in MAIN_FILL + MAIN_STYLE},
             diff={k: w.value for k, w in self.fill_diff.items()},
             fills=[{k: o[k].value for k in FILL_KEYS} for o in self.fills],
@@ -682,14 +684,19 @@ class Sessions:
         self.fig.tags = [f"view{self._views}"]  # re-runs the fit in the browser
 
     def _put_tool(self, tool, panel):
-        if tool is not None and TOOL_OF.get(tool, tool) not in self.mode.btns:
+        if tool is not None and panels.tool_of(tool) not in self.mode.btns:
             tool = None  # (e.g. Track, in a run that cannot be tracked)
         if tool in ("Sounding", "Area sounding"):
             self.snd_pick.value = tool
         self.mode.set(tool)
-        tab = panel.get("tab")
-        if panel.get("open") and tab is not None and (tool is None or PANELS.get(tool) == tab):
-            self._show_panel(True, int(tab))
+        # the panel by its key; a session from before keys were saved: by its place in
+        # the registry (tab, viewer.panels.index; the built-in panels keep 0 to 5).  A
+        # key this viewer has no panel for (its package not installed) stays closed
+        tab = panel.get("key") if "key" in panel else \
+            panels.at(int(panel["tab"])) if panel.get("tab") is not None else None
+        if panel.get("open") and tab is not None and \
+                (tool is None or panels.panel_of(tool) == tab):
+            self._show_panel(True, tab)
             if panel.get("full"):
                 self._set_full(True)
         elif not panel.get("open", True):

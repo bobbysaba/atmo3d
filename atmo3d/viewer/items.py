@@ -95,7 +95,7 @@ class ItemsTray:
             objs = [_html('<span class="cv-hint">Soundings</span>', margin=(0, 4, 0, 6),
                           align="center")]
             for _, n, lab, col in snd:
-                objs += label(lab, lambda: self._show_panel(True, 0), col)
+                objs += label(lab, lambda: self._show_panel(True, "Sounding"), col)
                 objs.append(icon("x", "Remove this sounding", partial(self._remove_point, n)))
             objs.append(icon("photo", "Make a figure of these soundings (skew-T)",
                              to_fig(self.figed.from_soundings)))
@@ -103,7 +103,7 @@ class ItemsTray:
         for kind, k, lab, col in entries:
             if kind == "xs":
                 groups.append(group(
-                    *label(lab, lambda: self._show_panel(True, 1)),
+                    *label(lab, lambda: self._show_panel(True, "Cross-section")),
                     icon("x", "Remove the section", self._remove_xs),
                     icon("photo", "Make a figure of the section", to_fig(
                         self.figed.from_xsec))))
@@ -158,9 +158,9 @@ class ItemsTray:
             self.request_3d()
 
     def _show_parcels(self, key):
-        self._show_panel(True, 5)
+        self._show_panel(True, "Parcels")
         self.par_list.value = key
 
     def _show_series(self, key):
-        self._show_panel(True, 3)
+        self._show_panel(True, "Series")
         self.ser_pick.value = key

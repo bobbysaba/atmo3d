@@ -13,6 +13,7 @@ from bokeh.models import FixedTicker, LinearAxis
 
 from ..core.vectors import FRAME_SHORT  # noqa: F401  (re-exported)
 from ..theme import BG, CSS, FIGURE, GRID, MUTED, PANEL, TEXT, TOOLBAR
+from . import panels
 
 LEVEL_MODES = {"Height AGL (km)": "height", "Model level (k)": "level",
                "Column max": "colmax", "Column min": "colmin"}
@@ -249,29 +250,7 @@ def _bar(*groups):
                       styles={"pointer-events": "none"}, sizing_mode="stretch_width")
 
 
-# the analysis tools down the left of the map: button -> (icon, label, tooltip)
-TOOLS = {
-    "Sounding": ("balloon", "Sounding", "Soundings: click the map (or drag a box for "
-                                            "an area mean)"),
-    "Cross-section": ("slice", "Section", "Vertical cross-section: click A, then B"),
-    "Track": ("route", "Track", "Storm track: click a storm to follow it through time"),
-    "Series": ("chart-line", "Series", "Time series of a field over a region"),
-    "Distribution": ("chart-histogram", "Distrib.", "Distribution of a field over a region "
-                                                    "at one time: histogram, box, violin, "
-                                                    "cumulative"),
-    "Parcels": ("grain", "Parcels", "Parcels: click the map (or drag a box) to choose "
-                                    "parcels and draw their trajectories"),
-    "3D region": ("cube", "3D box", "Drag a box on the map to view it in 3D"),
-}
-# click mode -> its tool button (both kinds of sounding are the Sounding tool)
-TOOL_OF = {"Area sounding": "Sounding", "Seed box": "3D region", "Parcel box": "Parcels"}
-# click mode -> its panel (tab of the analysis panel); 3D region has none
-PANELS = {"Sounding": 0, "Area sounding": 0, "Cross-section": 1, "Track": 2, "Series": 3,
-          "Distribution": 4, "Parcels": 5, "Parcel box": 5}
-TAB_MODE = {0: "Sounding", 1: "Cross-section", 2: "Track", 3: "Series", 4: "Distribution",
-            5: "Parcels"}
-PANEL_TITLES = ["Sounding", "Cross-section", "Storm track", "Time series", "Distribution",
-                "Parcels"]
+# the analysis tools down the left of the map, their click modes and panels: viewer.panels
 
 RAIL_BTN = """
 .bk-btn { display: flex !important; flex-direction: column; align-items: center; gap: 3px;
@@ -295,28 +274,28 @@ TIME_BAR = """
 
 class ToolRail:
     """The analysis tools: one on at a time, or none (value None).  The value is the
-    click mode; a tool button can stand for several modes (TOOL_OF)."""
+    click mode; a tool button can stand for several modes (panels.Tool.modes).
+    tools: the viewer.panels.Tool entries on the rail, top to bottom."""
 
-    def __init__(self, modes):
+    def __init__(self, tools):
         self.btns = {}
-        for m in modes:
-            icon, label, tip = TOOLS[m]
-            b = pn.widgets.Button(name=label, icon=icon, description=tip, width=64,
+        for t in tools:
+            b = pn.widgets.Button(name=t.label, icon=t.icon, description=t.tip, width=64,
                                   height=58, margin=(2, 4), stylesheets=[RAIL_BTN])
-            b.on_click(partial(self._on, m))
-            self.btns[m] = b
+            b.on_click(partial(self._on, t.key))
+            self.btns[t.key] = b
         self.value, self._cbs = None, []
         self.mode_for = {}  # tool -> the mode its button picks (e.g. Area sounding)
         self.reclick = None  # f(tool) -> True: the lit button pressed again stays on
 
     def _on(self, tool, ev):
-        if TOOL_OF.get(self.value, self.value) != tool:
+        if panels.tool_of(self.value) != tool:
             self.set(self.mode_for.get(tool, tool))
         elif self.reclick is None or not self.reclick(tool):
             self.set(None)
 
     def set(self, o):
-        tool = TOOL_OF.get(o, o)
+        tool = panels.tool_of(o)
         for k, b in self.btns.items():
             b.css_classes = ["cv-on"] if k == tool else []
         if o != self.value:
