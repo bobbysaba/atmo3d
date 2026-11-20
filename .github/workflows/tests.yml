@@ -1,0 +1,63 @@
+name: tests
+
+# Path-filtered: a change to the core (or to anything shared) runs every test; a change
+# only inside a data-type package runs that package's own tests.
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      all: ${{ steps.f.outputs.all }}
+      cm1: ${{ steps.f.outputs.cm1 }}
+      wofs: ${{ steps.f.outputs.wofs }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: f
+        with:
+          filters: |
+            all:
+              - 'packages/core/**'
+              - 'tests/conftest.py'
+              - 'tests/synthetic.py'
+              - 'tests/baseline/**'
+              - 'pyproject.toml'
+              - 'environment.yml'
+              - '.github/workflows/tests.yml'
+            cm1:
+              - 'packages/cm1/**'
+            wofs:
+              - 'packages/wofs/**'
+
+  test:
+    needs: changes
+    if: needs.changes.outputs.all == 'true' || needs.changes.outputs.cm1 == 'true' || needs.changes.outputs.wofs == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          environment-file: environment.yml
+          activate-environment: atmo3d
+      - name: Install the packages (editable)
+        shell: bash -el {0}
+        run: pip install --no-deps -e packages/core -e packages/cm1 -e packages/wofs
+      - name: Pick the tests
+        id: pick
+        shell: bash
+        run: |
+          if [ "${{ needs.changes.outputs.all }}" = "true" ]; then
+            echo "paths=tests" >> "$GITHUB_OUTPUT"
+          else
+            p=""
+            [ "${{ needs.changes.outputs.cm1 }}" = "true" ] && p="$p $(cat tests/cm1-tests.txt)"
+            [ "${{ needs.changes.outputs.wofs }}" = "true" ] && p="$p $(cat tests/wofs-tests.txt)"
+            echo "paths=$p" >> "$GITHUB_OUTPUT"
+          fi
+      - name: pytest
+        shell: bash -el {0}
+        run: pytest ${{ steps.pick.outputs.paths }} -q

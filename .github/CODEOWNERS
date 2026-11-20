@@ -1,0 +1,9 @@
+# Who must review a change to what (GitHub requires the code owners' review when branch
+# protection on master asks for it).  Later lines win.
+*                          @bobbysaba
+/packages/core/            @bobbysaba
+/tests/                    @bobbysaba
+/.github/                  @bobbysaba
+# Data-type packages: add each package's owners after Bobby (a collaborator's GitHub name)
+/packages/cm1/             @bobbysaba
+/packages/wofs/            @bobbysaba
