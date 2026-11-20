@@ -1,7 +1,9 @@
 # Plan: making atmo3d easy to extend and contribute to
 
-Status (2026-11-20): Phase A done; decision 3 = yes (API versioned); B1-B4 done; B5 next
-(the agent playbook, then one trial run of it: needs Bobby's choice of data).
+Status (2026-11-20): Phase A done; decision 3 = yes (API versioned); B1-B4 done; B5's
+playbook written (docs/agents/add-datatype.md, top-level AGENTS.md); its trial run is
+next and needs Bobby's choice of data (and a fresh agent session that has only the
+playbook).
 Decision 2 taken as recommended (both: packages/example and tools/new_datatype.py).
 Decisions 1, 4, 5 still open (4 has a recommendation Bobby has not overruled).
 Choices made without asking (Bobby may overrule):
@@ -13,7 +15,7 @@ Choices made without asking (Bobby may overrule):
   environment.yml and the root pyproject are printed as steps, not edited.
 - B4 is docs/datatypes.md itself (walk-through first, then the contract), not a second
   page; developing.md and CONTRIBUTING.md point to it.
-Start a fresh session with: "read docs-dev/extending-plan.md and continue with B5".
+Start a fresh session with: "read docs-dev/extending-plan.md and continue with the B5 trial".
 
 ## Goal
 

@@ -23,6 +23,9 @@ has a matching git tag.
 - `tools/new_datatype.py <name>` starts a data type as a copy of the example, renamed,
   with its tests: in this repository (`packages/<name>`), or as a package of your own
   (`--out DIR`).
+- [A playbook for a coding agent](agents/add-datatype.md) that adds a data type: what to
+  ask, how to inspect the files without loading them, when to stop and ask, and what to
+  report. `AGENTS.md` at the top of the repository points agents to it.
 
 ## 1.0.0 (2026-11-19)
 

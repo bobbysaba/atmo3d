@@ -12,6 +12,8 @@ It can go two ways:
 The code is the same either way. The first half of this page is a walk-through, from an
 empty folder to a data type that passes the contract check; the second half is the
 contract itself: what a data type must provide and what it may (the **extension API**).
+To have a coding agent do it, point it at
+[the playbook](agents/add-datatype.md).
 
 ## The worked example
 

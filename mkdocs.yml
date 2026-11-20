@@ -66,4 +66,5 @@ nav:
   - Contributing: contributing.md
   - Developing: developing.md
   - Writing a data type: datatypes.md
+  - "Playbook: an agent adds a data type": agents/add-datatype.md
   - Changes: changelog.md
