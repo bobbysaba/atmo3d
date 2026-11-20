@@ -301,6 +301,18 @@ branch protection.
    requires confirming settings; cached with the settings in the cache key; a "regridded:
    method, spacing" label on every view; the settings are saved into figure bundles,
    exports, and sessions.
+   (2026-11-19: done. `atmo3d_radar.regrid.RegriddedRun(Run)` at the virtual path
+   `<folder>/regrid_<method>_dx<km>_dz<km>_r<km>_gap<km>`, so the settings travel with
+   sessions, figure bundles, exports and the address; the toolbar's parts switch
+   (Native sweeps | Regridded) opens it only after a dialog confirming the settings
+   (`regrid_ui`), saved as `radar_regrid_*`; each field and time regridded when first
+   read (the sampler at every grid point; about 2-3 s at 0.5 km over 150 km), kept in
+   the 3D cache and as .npy cache files (settings and source file state in the key;
+   at most 4 GB per regridded run); "regridded: method, spacing" on the map, section,
+   3D, series and distribution views; export attributes `atmo3d_regrid*`. Every grid
+   feature works on it, with derived wind fields (audit D2) and a derived vertical
+   vorticity where the data type has none. Core: `Model.parts_of`, `folder_label`,
+   `parts_tip`; `_ext_modals`; grid isosurfaces treat empty (NaN) points as outside.)
 6. Tests: a small synthetic radar generator (like `tests/synthetic.py`) with analytic
    answers; reader, sampler and regrid tests.
 

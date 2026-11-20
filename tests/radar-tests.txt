@@ -1,3 +1,4 @@
 tests/test_radar_reader.py
 tests/test_radar_ppi.py
 tests/test_radar_sampler.py
+tests/test_radar_regrid.py

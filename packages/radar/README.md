@@ -11,3 +11,8 @@ Views, all native (nothing is regridded):
   azimuth and range within a sweep, linear in elevation between sweeps, 4/3-earth beams,
   settings `radar_sampling` and `radar_max_gap_km`);
 - 3D isosurfaces by marching cubes in (sweep, azimuth, gate) index space (`scene.py`).
+
+Optional regrid (`regrid.py`, `regrid_ui.py`): **Regridded** in the toolbar, after a dialog
+confirming the settings, opens the folder as a grid run (`<folder>/regrid_<method>_dx.._dz.._r.._gap..`)
+that every grid feature works on, labelled "regridded: method, spacing". Regridded fields are
+kept as `.npy` files under the cache folder (at most 4 GB per regridded run).
