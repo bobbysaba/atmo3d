@@ -3,7 +3,9 @@
 Every field atmo3d computes from the output: what it is, the equation as coded, its
 units and sign, the inputs it needs, and what it leaves out or assumes. A field is listed
 only when the run has every input it needs. [Notes on the fields](fields.md) says how
-the derived fields are used (layers, storm motion, derivatives, speed).
+the derived fields are used (layers, storm motion, derivatives, speed). To add a field of
+your own as an expression, without changing the code, see
+[Your own derived fields](user-fields.md).
 
 Inputs are given as CM1 / WoFS names. Constants: g = 9.81 m/s², Rd = 287.04, Rv = 461.5
 J/(kg K), ε = Rd/Rv, κ = Rd/cp (CM1's 287.04/1005.7 = 0.2854; WRF's 2/7 for WoFS).

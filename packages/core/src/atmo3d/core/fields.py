@@ -871,7 +871,8 @@ def group_options(defs, ndim=None, label=None, off=()):
     out.update(user)
     out.tips = {d.name: (userfields.describe(d) if d.user is not None else d.note)
                 for d in defs if d.note or d.user is not None}
-    out.off = [(user_group(u["group"]), f"{u['label']} [{u['name']}]", why)
+    out.off = [(user_group(u["group"]),
+                f"{u['label']} [{u['name']}]" if u["name"] else u["label"], why)
                for u, why in off]
     return out
 
@@ -1079,7 +1080,8 @@ class Fields:
     def sync_user(self):
         """Bind the user-defined fields in use (userfields.current()) if they changed
         since last time: the ones this run can compute join defs (after the rest), the
-        others go to user_off [(definition, why)]."""
+        others go to user_off [(definition, why)], after one entry for a fields file or
+        package that could not be read (userfields.problems)."""
         from . import userfields
         specs = userfields.current()
         key = tuple((d["name"], d["expr"], d["units"], d["error"]) for d in specs)
@@ -1098,6 +1100,10 @@ class Fields:
                 off.append((d.user, "uses derivatives, which need a grid this run lacks"))
             else:
                 defs[d.name] = d
+        probs = userfields.problems()  # (a file or package that could not be read)
+        if probs:
+            off.insert(0, (dict(name="", label=userfields.NOT_READ, group=""),
+                           "; ".join(probs)))
         self.defs, self.user_off, self._user_key = defs, off, key
 
     def user_task(self):

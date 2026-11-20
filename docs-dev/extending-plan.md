@@ -24,7 +24,11 @@ numbers bound as hidden float64 names (Python's float power raises on overflow);
 definitions a run bound are recorded (a shadowing one is not); the series cache key
 includes the definition chain. Limit: a session from someone else opens its adopted
 fields in the figure, but the viewer's own menus only show them after a page reload.
-Next: C3 (the user page and the repo-level derived-field checklist).
+C3 done: docs/guide/user-fields.md (in nav; its TOML examples are tested), the
+checklist for a built-in derived field in developing.md (linked from CONTRIBUTING.md).
+Found while writing it: C2 only logged an unreadable fields file; it is now one greyed
+"Fields not read" entry under User, as the spike said. Plan done but for Bobby's B5 trial
+and the full suite.
 
 ## Goal
 

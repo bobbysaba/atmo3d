@@ -239,7 +239,7 @@ Derived fields are defined in `atmo3d/core/fields.py` (`_make_fields`) as `Field
 name, label, units and menu group, a default colormap and range, the fields it needs
 (`deps`) and a function of them (`func`). They then appear in every
 field menu (map, section, 3D, series, figures). A dep can be a derivative of a native
-field (`"ddz.winterp"`, `"ddx.uinterp"`: per km, as the Derivative select gives it), as
+field (`"ddz.winterp"`, `"ddx.uinterp"`: per metre, as the Derivative select gives it), as
 for the vorticity tendencies; the field is then computed from whole levels, and series
 read the points just outside their region. A *column field* (`layer=(z0, z1)` km AGL) is
 2D from 3D natives: its `func` gets each input on the levels of the layer only
@@ -250,8 +250,39 @@ shear and helicity do (`at_height`, `layer_points`). The series worker then read
 those levels. `costly=True` marks a column field that is slow per column (the parcels
 of `thermo.parcel_columns`): it is computed on every `column_stride(run)`-th column,
 and its `func` gets `c["memo"]`, a dict shared by the fields of one time (so SB CAPE,
-SB CIN and STP lift the SB parcel once), and `c["threads"]`. Add a test in `tests/test_fields.py`
-against the definition, as for θρ.
+SB CIN and STP lift the SB parcel once), and `c["threads"]`.
+
+A field only one person needs does not have to be built in: it can be an expression in
+their own file ([Your own derived fields](guide/user-fields.md)). Build one in when
+others will use it, or when an expression cannot write it (a column field, a parcel).
+
+### Checklist for a new derived field
+
+Every built-in field is reviewed before it is listed. A field not in `CONFIRMED` is listed
+only among the hidden fields, marked *(unverified)*, and `test_confirmed_matches_the_fields`
+fails until it is added. A pull request that adds a field has:
+
+1. **The equation and its source**: in the pull request, the equation as coded and the
+   paper, textbook or model code it comes from (with the page or line), and the
+   constants it uses (the model's own κ, Rd, cp where they differ).
+2. **Its inputs in raw units**: a `func` gets natives as the files store them (qv in
+   kg/kg, p in Pa) and derivatives per metre. Name inputs by role (`theta`, `qv`), not by
+   one model's names, so every data type that has them gets the field.
+3. **An analytic test** in `tests/test_derived_analytic.py`: synthetic inputs whose
+   answer is known by hand (a uniform lapse rate, a circular hodograph), not the code's
+   own output fed back. Include a sign or an edge case: zero, a negative, a missing
+   optional input.
+4. **A `note`**: what it leaves out or assumes, in a sentence ("Over liquid water at
+   every temperature").
+5. **A row in [Derived fields](guide/derived-fields.md)**: name, label and units, the
+   equation as coded, inputs, and the note word for word
+   (`test_docs_page_lists_every_field_and_note` checks both).
+6. **Its name in `CONFIRMED`** (`core/fields.py`), added once the review agrees with the
+   equation and the test.
+7. **A line in [Changes](changelog.md)** under *Unreleased*.
+
+The reviewer checks the equation against its source, the units at each step, and that
+the test's answer was worked out independently of the code.
 
 ## Adding a vector
 

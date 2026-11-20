@@ -95,7 +95,9 @@ before a pull request can merge. You can run the whole suite yourself with `pyte
   [Developing](docs/developing.md#tests).
 - **A new feature needs a test**, and a fix a test that failed before it. For a derived
   field, the test checks it against an answer worked out by hand (see
-  `tests/test_derived_analytic.py`).
+  `tests/test_derived_analytic.py`); the rest of what its review needs is the
+  [checklist](docs/developing.md#checklist-for-a-new-derived-field). A field only you
+  need can stay [your own](docs/guide/user-fields.md), with no pull request.
 
 ## Open a pull request
 

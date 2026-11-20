@@ -137,6 +137,20 @@ def test_a_broken_file_is_a_problem_not_a_crash(tmp_path, monkeypatch):
         U.reset()
 
 
+def test_a_broken_file_is_one_greyed_entry_in_the_menus(reg, tmp_path, monkeypatch):
+    from atmo3d.core.fields import Fields
+    p = tmp_path / "fields.toml"
+    p.write_text("[fields.x\nexpr = ")
+    monkeypatch.setenv("ATMO3D_FIELDS_FILE", str(p))
+    U.reset()
+    try:
+        g = Fields(reg.get()[0]).groups()
+        (grp, text, why), = g.off
+        assert text == U.NOT_READ and grp.startswith("User") and "fields.toml" in why
+    finally:
+        U.reset()
+
+
 def test_the_file_defaults_to_beside_the_settings(monkeypatch):
     import os
 
@@ -300,3 +314,30 @@ def test_a_series_of_a_user_field_runs_in_the_workers(F):
     U._state["loaded"] = [dict(d, expr="tempc * 2") if d["name"] == "tempf" else d
                           for d in U._state["loaded"]]
     assert S._cache_path(run, r) != before  # (tempf_k uses tempf)
+
+
+def test_the_docs_pages_examples_work(reg, tmp_path, monkeypatch):
+    """Every field in docs/guide/user-fields.md's TOML blocks loads and is computed on
+    the demo run."""
+    import re
+    import tomllib
+    from pathlib import Path
+    from atmo3d.core.fields import Fields
+    page = (Path(__file__).resolve().parents[1] / "docs" / "guide"
+            / "user-fields.md").read_text()
+    blocks = [b for b in re.findall(r"```toml\n(.*?)```", page, re.S) if "[fields." in b]
+    text = "\n".join(blocks)
+    names = list(tomllib.loads(text)["fields"])
+    p = tmp_path / "fields.toml"
+    p.write_text(text)
+    monkeypatch.setenv("ATMO3D_FIELDS_FILE", str(p))
+    U.reset()
+    try:
+        F = Fields(reg.get()[0])
+        F.sync_user()
+        assert {u["name"]: why for u, why in F.user_off} == {}
+        for n in names:
+            v = F.plane(n, T, "level", K)
+            assert np.isfinite(v).any(), n
+    finally:
+        U.reset()

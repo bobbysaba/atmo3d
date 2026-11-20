@@ -34,7 +34,9 @@ has a matching git tag.
   reason. Figures and sessions record the definitions they use, and reopen with them
   where the field is not defined (the figure's own wins where yours differs); data exports
   record the expression. Installed packages can add fields the same way
-  (`atmo3d.fields` entry points).
+  (`atmo3d.fields` entry points). See [Your own derived fields](guide/user-fields.md);
+  the checklist for adding a built-in one is in
+  [Developing](developing.md#adding-a-derived-field).
 
 ## 1.0.0 (2026-11-19)
 

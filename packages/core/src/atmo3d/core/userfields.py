@@ -39,6 +39,7 @@ KEYS = ("label", "units", "expr", "group", "cmap", "vrange", "diverging", "note"
 USER_MARK = " (user)"
 FIGURE_MARK = " (from figure)"
 ENTRY_POINTS = "atmo3d.fields"
+NOT_READ = "Fields not read"  # (the greyed entry of a file or package that failed)
 
 _ALLOWED = (
     ast.Expression, ast.BinOp, ast.UnaryOp, ast.Compare, ast.Call, ast.Name,
