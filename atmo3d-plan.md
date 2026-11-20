@@ -338,8 +338,11 @@ and 3D, and regrid with confirmed settings. **CHECKPOINT** after steps 1, 3, and
 
 ## 7. Open items
 
-- Receiver locations for the bistatic geometry: where do they come from?
-- Real `w` data in other files, or always zero? (Phase 4: `w` is nonzero in files 1-18; `w_direct` is zero in all 19. See `docs-dev/radar-spike.md`.)
+- Receiver locations for the bistatic geometry: decided 2026-11-20 (Bobby): one receiver,
+  at the NWC, today; keep the code open to more receivers later (do not hardcode one).
+- `w` (decided 2026-11-20, Bobby): real in the `w` files. A dual-Doppler `w` can be derived
+  wherever there are at least two radars, poles or receivers. (Phase 4: `w` is nonzero in
+  files 1-18; `w_direct` is zero in all 19. See `docs-dev/radar-spike.md`.)
 - Depth of the upgrade path (figures only, or sessions too). Plan assumes both.
 - Whether the radar collaborators get write access or work through forks and PRs
   (Phase 5 sets up CODEOWNERS either way).
