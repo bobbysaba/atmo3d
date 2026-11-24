@@ -91,12 +91,7 @@ class RunSwap:
         self._track_found = ()
         self._s3, self._st_cache = None, {}
         self.results = []
-        for w in (self.fill_diff, self.xs_diff):  # (this run is no longer "another")
-            if len(w["run"].options) > 1:
-                cur = w["run"].value
-                w["run"].options = self._minus_runs()
-                if cur == self.run.path:
-                    w["run"].value = ""
+        self._rerun_layers()  # (the map's and section's: their controls offer this run's)
 
     def _refresh_run_labels(self):
         self._run_info.object = self._run_info_html()

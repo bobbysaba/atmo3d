@@ -1,13 +1,14 @@
 # Figure panels
 
-The tree says what the figure holds. The **Figure** node has the grid and size, a kind's node what
-its panels share, and each panel where it sits, its type, and its run and time. The layers drawn
-in them are in [Figure layers](figures-layers.md).
+**Layout** has the grid and size (at the figure) and each panel's place and type (at the panel:
+click it in the preview); **Times** each panel's run and time; **Look**, at *All plan views* (or
+another kind), what its panels share. The layers drawn in them are in [Figure
+layers](figures-layers.md).
 
 ## Layout and size
 
 A figure is one grid of panels, and panels of any kinds can share it: plan views beside soundings,
-or a plan view with a cross-section under it. On the **Figure** node:
+or a plan view with a cross-section under it. In **Layout**, at the figure:
 
 - **Rows**, **Columns**: any size. Making the grid smaller moves panels into free cells; those
   with no room are set aside, not drawn, and kept with the figure until there is room (*Bring back*
@@ -15,24 +16,26 @@ or a plan view with a cross-section under it. On the **Figure** node:
 - **Column widths**, **Row heights**: shares of the figure, such as `2, 1` (blank: equal). The map
   under them shows where the panels sit.
 - **Figure type** changes every panel to another type, each staying in its cell at its run and
-  time; **Panel type**, on a panel, changes that one. What they showed is replaced, and Undo takes
+  time; **Panel type**, at a panel, changes that one. What they showed is replaced, and Undo takes
   it back.
 - **Add a panel of** a type, in a free cell or a new row or column. **Fill empty cells** puts one in
   every free cell.
 - The **size**: presets by width (3.25 in one journal column, 5, 6.5 full page, 7.5, a 13.3 × 7.5 in
   slide) or your own. The height follows the panels until you type a size; **Fit height** makes it
   follow again. A figure of several kinds has no automatic size, so set it by hand.
-- The figure's **title**.
+- The figure's **title**; **Spacing** between and around the panels
+  ([Spacing](figures-style.md#spacing)).
 
-On a **panel**:
+At a **panel** (Layout):
 
 - **Row**, **Column**, **Rows tall**, **Columns wide**: the cell it sits in and what it spans, so a
   plan view can run down the left beside a cross-section above a sounding.
 - **Copy this panel** and **Remove this panel**.
-- Its **title**, a **row label** at the left, and its own run and time. The time lists offer the
-  output times of the panel's run. An empty cell draws nothing.
+- Its **title** and a **row label** at the left. Its run and time are in **Times**; the time lists
+  offer the output times of the panel's run. An empty cell draws nothing.
 - **+ Zoom inset** (plan views and cross-sections): a box in the panel showing part of it larger,
-  with lines to where that is.
+  with lines to where that is. **Inset 1**, **Inset 2**… pick one: its *Where it sits* and *Area*
+  are in Layout, its layers in Layers, its *Box and lines* in Look.
 
 ## Panel kinds
 
@@ -43,18 +46,21 @@ columns ([Rows and columns](#rows-and-columns)), e.g. the same field at several 
 several fields at one time, or plan views at several heights or model levels (e.g. 1, 3
 and 6 km, or levels 5, 10 and 20; a layer can keep its own height, and *Panel labels → Height label* names each panel's height or level).
 
-**Plan-view area** is *Follow the tracked storm* (with a *Half-width*, default 12.5 km),
+**Plan-view area** (Layout → *Area*, at *All plan views* or a panel) is *Follow the tracked storm* (with a *Half-width*, default 12.5 km),
 a *Fixed box* (x and y minimum and maximum, in grid km) or the *Whole domain*. *Axis
 coordinates* are the model grid's x, y or relative to the storm.
 
 ### Vertical cross-sections
 
-A cross-section panel has its *Run*, *Time* and section. The node **Vertical cross-sections** has
-*Top* (km) and the *x–z, y–z x axis* for all of them (**Height and x axis**), the sections, and the
-layers (fill, contours, vectors …) they share. **+ Cross-section panel** adds one like the last,
-showing the next section (an x–z one's next is its y–z twin, an along-motion one's the across one).
-Sections are shared: an edit reaches every panel showing that section, and the inspector says which;
-*Keep apart* gives a panel a copy. **Copy this panel** then a different run makes runs × sections.
+A cross-section panel has its *Run* and *Time* (Times) and its section (Layers, at the panel:
+*Section* picks one, **+ Section** makes one, above its layers). At **All cross-sections**,
+*Height and x axis* (Look) has *Top* (km) and the *x–z, y–z x axis* for all of them; Layers lists
+the **Sections**, above the layers (fill, contours, vectors …) they share; Layout has **+
+Cross-section panel**, which adds one like the last, showing the next section (an x–z one's next is
+its y–z twin, an along-motion one's the across one). Sections are shared: an edit reaches every
+panel showing that section, and the panel's Layers say which; *Keep apart* gives a panel a copy.
+**One per run** (Layout, at the panel) copies a panel for each other run down its column, at the
+same time since time zero: runs × sections.
 
 Each section has a *Label*, an
 *Orientation* — *x–z*, *y–z*, *Angled* (a direction in degrees clockwise from north),
@@ -66,9 +72,9 @@ sections are always through the storm and turn with its tracked ground-relative 
 at each time (behind → ahead, or left → right of it; the domain's motion where the track
 has none): a *Half-length*, the centre *ahead of* and *right of* the storm (km), and
 *Motion averaged over* (minutes about the panel time; 0: the motion at that time) to
-steady a wobbly track. *Use map A–B* takes the section drawn
-on the map; clicking the ends in a plan-view panel (*Place: section*) sets the first A–B
-section. **Average across** (km) makes it a strip-averaged section: the mean of the
+steady a wobbly track. *Use the map's A–B* takes the section drawn
+on the map; clicking the ends in a plan-view panel (*Click twice: section A–B*, above the
+preview) sets the first A–B section. **Average across** (km) makes it a strip-averaged section: the mean of the
 sections parallel to the line within half that width either side (0: the line alone).
 A plan view can draw the sections' lines as a *Section line* layer
 ([Figure layers](figures-layers.md)), each drawn once however many panels show it. Figures saved
@@ -82,88 +88,89 @@ centre, or at A). With *Axes and ticks → x
 label* blank each panel is labelled so (*x (km)*, *y from storm (km)*, *distance
 (km)*); a label typed there is every panel's.
 
-*Maximum and minimum* writes a layer's maximum and/or minimum over what each
+*Maximum and minimum* (Marks) writes a layer's maximum and/or minimum over what each
 panel shows in a corner (e.g. "max 32.1 m/s"), with + and × where they are.
 
 ### Time–height (series)
 
-One series per panel: a panel holds its series' **Run** and settings. **+ Time–height panel** on
-the kind's node adds one in the first free cell or a new row or column, and **Copy this panel** with
+One series per panel: a panel's series (Layers, at the panel) holds its **Run** and settings.
+**+ Time–height panel** (Layers or Layout, at *All time–height*) adds one in the first free cell or a new row or column, and **Copy this panel** with
 another run makes runs × series. A series here is always a layer (every level from *Read from* to *Read to*), so it has no *Vertical* choice. One colorbar per row. A series can be plotted as its d/dz or
 d/dt. *Maximum and minimum* works here too. The height axis spans the series' layer (a
 0–10 km layer shows 0 to 10 km). Older time–height figures (a row per series and a
 column per run) open as the same panels.
 
-A new time–height panel starts with no series, so nothing is computed until you add one: **A series
-from the Series tool** copies one of the viewer's Series tool, and **+ New series** starts from the
-maximum updraft in 0–10 km.
+A new time–height panel starts with no series, so nothing is computed until you add one: **+ From
+the Series tool** copies one of the viewer's Series tool, and **+ Series** starts from the maximum
+updraft in 0–10 km.
 
 ### Time series
 
-Series in the same panel share a panel; series in other units get their own y
-axis. Each card sets its line's **Colour**, **Line style**, width and markers. A card of
-several runs, alone in its panel, draws a line per run in the run's colour (with the
-card's line style); next to other series, its runs share the card's colour and get a line
-style each. For your own colour and style per run, use **One per run**. The legend shows the card's
-**Label** as it is; a card of several runs adds each run's folder name to tell its lines
-apart ("w max · supercell_weak"). A card's **Run** is one run,
-*All runs* of the figure, or *Several runs…* (pick them in the list next to it); like a
-sounding's, it also offers runs not in the figure (picking one adds it). **One per run**
-splits a card of several runs into a card per run in the same panel, each in its run's
-colour (a card of one run: a copy for each other run); **Copy this panel** copies it into a
-new panel. **Mark each line's** maximum, minimum or
-both puts a dot and its value on the line (over the plotted times); **Extremes in the
-legend** adds "max 32.1 at 95 min" to each line's entry. Like time–height, it starts with
-no series.
+A time-series panel's series are its entries, in **Layers** at the panel (each a fold: ↑ ↓ ⧉ ✕,
+*In panel* to move it to another panel, **One per run**). Series in the same panel share a panel;
+series in other units get their own y axis. Each series sets its line's **Colour**, **Line
+style**, width and markers. A series of several runs, alone in its panel, draws a line per run in
+the run's colour (with the series' line style); next to other series, its runs share its colour
+and get a line style each. For your own colour and style per run, use **One per run**. The legend
+shows the series' **Label** as it is; a series of several runs adds each run's folder name to tell
+its lines apart ("w max · supercell_weak"). A series' **Run** is one run, *All runs* of the
+figure, or *Several runs…* (pick them in the list next to it); like a sounding's, it also offers
+runs not in the figure (picking one adds it). **One per run** splits a series of several runs into
+one per run in the same panel, each in its run's colour (a series of one run: a copy for each
+other run); **Copy this panel** (Layout) copies it into a new panel. **Mark each line's** maximum,
+minimum or both (Look → *Plot*) puts a dot and its value on the line (over the plotted times);
+**Extremes in the legend** adds "max 32.1 at 95 min" to each line's entry. Like time–height, it
+starts with no series: **+ Series**, or **+ From the Series tool**.
 
-A card's points can be changed or blanked by hand, and **+ Your data** adds a series of
+A series' points can be changed or blanked by hand, and **+ Your data** adds a series of
 your own (observations, another model) from pasted text or a CSV file; see
 [Editing a series' values](figures-layers.md#editing-a-series-values) and
 [Your own data](figures-layers.md#your-own-data). With parcel output, **+ Parcels** adds a
 parcel set's variable over the parcel times ([Parcels in figures](parcels.md#in-figures)),
 and **+ w budget** a set's [w budget](parcels.md#the-w-budget) as a panel of four.
 
-**Ensemble of its runs** (a card of *All runs* or *Several runs…*) draws a series from
+**Ensemble of its runs** (a series of *All runs* or *Several runs…*) draws a series from
 several runs as one band: its *Centre line*
 (the runs' mean or median, or none) and a shaded range: *Min to max*, the *10–90th* or
-*25–75th percentile*, or *Mean ± 1 sd*, in the series' colour, with the card's label in
+*25–75th percentile*, or *Mean ± 1 sd*, in the series' colour, with its label in
 the legend. The runs' own lines stay *Faint*, are *Hidden*, or are drawn *As other lines*.
 Runs with other output times are interpolated onto every run's times; the band covers
 the times where two runs or more have values.
 
 To line up the same stage of different runs, set each run's **time zero** in
-the tree's [**Runs** node](#runs). For example, if one run initiates at 0 min and another at
+the [**Runs** tool](#runs). For example, if one run initiates at 0 min and another at
 30 min, give the second run a time zero of 30. Both then show their first hour at 0–60 on
-the time axis; set *From* and *To* in *Plot* to 0–60 to show just that hour. A card
+the time axis; set *From* and *To* in *Plot* to 0–60 to show just that hour. A series
 of several runs lines them up, and an ensemble band uses the shifted times.
 
-Your own data has no run, so its card has its own *Time zero*. A figure saved with a *Time
-zero* on a series or parcel series card, or a *Minutes counted from* in *Panel
+Your own data has no run, so it has its own *Time zero*. A figure saved with a *Time
+zero* on a series or parcel series, or a *Minutes counted from* in *Panel
 labels*, keeps those boxes and they add to the run's time zero; at 0 each one goes away.
 
-With **Region: Around tracked storm**, a card says what each of its runs' **storm tracks**
+With **Region: Around tracked storm**, a series says what each of its runs' **storm tracks**
 gives: the number of fixes and their times. The tracks are set in
-the tree's [**Runs** node](#runs).
+the [**Runs** tool](#runs).
 
-The **Plot** section on the kind's node holds the axes of its panels: *From* and *To*
-(minutes), the height axis (time–height) or the left y axis (time series), and for time
-series the zero line and *Mark each line's* maximum or minimum (the panel's legend is *Legend in the panel*). Time–height panels
-mark theirs in *Maximum and minimum*, below it.
+The **Plot** section (Look, at *All time series* or *All time–height*) holds the axes of its
+panels: *From* and *To* (minutes), the height axis (time–height) or the left y axis (time series),
+and for time series the zero line and *Mark each line's* maximum or minimum (the panel's legend is
+*Legend in the panel*). Time–height panels mark theirs with *Maximum and minimum* (Marks).
 
-To give one time-series panel its own left y axis, pick it in the tree and fill in
-*y from (left axis)* or *y to (left axis)*. A box left blank uses the value on the kind's node,
-or the data's range if that is blank too. With *Axes and ticks → Share limits* on y, panels
-take the combined range of their limits, so turn it off to keep them different.
+To give one time-series panel its own left y axis, click it in the preview and fill in
+*y from (left axis)* or *y to (left axis)* (Look → *Plot*). A box left blank uses the value at
+*All time series*, or the data's range if that is blank too. With *Axes and ticks → Share limits*
+on y, panels take the combined range of their limits, so turn it off to keep them different.
 
 ### Soundings
 
 Skew-T log-p with adiabats, parcel and barbs, and a hodograph: as an inset, side by side
 with the skew-T, or alone (or no hodograph). Several soundings (runs, times,
-storm-relative spots) can share a panel; the picture button on a sounding in the items tray
-brings the viewer's soundings in.
+storm-relative spots) can share a panel: they are its entries in Layers (**+ Sounding**, each with
+its own run and time). The picture button on a sounding in the items tray, or **+ The map's
+soundings** at *All soundings*, brings the viewer's soundings in.
 
 With several in a panel each takes one colour, with a dashed dewpoint and a dotted parcel.
-**Own line looks** on a sounding's card sets the colour, style and width of its temperature,
+**Own line looks** on a sounding sets the colour, style and width of its temperature,
 dewpoint and parcel lines, so two soundings can both be red and green with one dashed. The
 hodograph's traces then follow the temperature's style, as long as the panel's soundings
 differ by it.
@@ -195,20 +202,21 @@ A **parameter table** under each panel can list surface-based, mixed-layer and
 most-unstable CAPE and CIN, LCL and LFC heights, 0–1, 0–3 and 0–6 km shear, SRH, STP and
 SCP, a row per sounding (a choice of the Sounding tab's table).
 
-The kind's node (or a panel, for that panel alone) groups the options: *Sounding panels* (what each
-panel shows, the table, the storm motion), then *Skew-T* and *Hodograph*, each shown only when the
-panels draw one.
+Look, at *All soundings* (or at a panel, for that panel alone), groups the options: *Sounding
+panels* (what each panel shows, the table, the storm motion), then *Skew-T* and *Hodograph*, each
+shown only when the panels draw one.
 
 ### Distributions
 
 Histograms (counts, PDF or fractions; bins by number or width; filled outlines, outlines
 or bars), box plots, violins or cumulative distributions, of any field at a height, over
 a layer or the whole depth, in the whole domain, a box or around each run's track, with
-an optional value range. Each has its own run and time; those in the same panel
-share a panel (e.g. w at two times, or two runs), coloured by run (see [Runs](#runs)).
+an optional value range. They are a panel's entries in Layers (**+ Distribution**; **+ The
+Distribution tool's** at *All distributions* makes a panel for each of the tool's). Each has its
+own run and time; those in the same panel share a panel (e.g. w at two times, or two runs), coloured by run (see [Runs](#runs)).
 
 *Bar labels* writes each histogram bar's count, its percentage of the whole sample, or its
-value. *Statistics* (n, mean, sd, median, IQR, min, max, 5–95 % and 1–99 % ranges, from
+value (Look → *Plot*). *Statistics* (n, mean, sd, median, IQR, min, max, 5–95 % and 1–99 % ranges, from
 every value) go in the legend (box plots and violins: under the boxes), or in a box in
 the panel, a line per distribution in its colour.
 
@@ -218,28 +226,29 @@ A field against height: its maximum, minimum, mean or a percentile over the whol
 domain, a box or a disc around each run's track, at every model level from *Read from* to
 *Read to*. Each profile has its own run and time, or a time window (*Mean to*) whose
 profiles are averaged; those in the same panel share a panel (e.g. two runs,
-or one run at two times), coloured by run (see [Runs](#runs)). *+ The Series tool's
-layer series* adds the Series tool's layer series at the shown time.
+or one run at two times), coloured by run (see [Runs](#runs)). They are a panel's entries in
+Layers: **+ Profile**, or **+ The Series tool's**, which adds the Series tool's layer series at the
+shown time.
 
-A card's *Run* can also be **All runs** or **Several runs…**: a line per run (at the
-output nearest the card's time, which lists the first run's outputs), in the runs'
-colours, or in the card's colour with a line style per run when the panel has other
+A profile's *Run* can also be **All runs** or **Several runs…**: a line per run (at the
+output nearest the profile's time, which lists the first run's outputs), in the runs'
+colours, or in the profile's colour with a line style per run when the panel has other
 profiles. *Ensemble of its runs* draws a band instead (min to max, 10–90th or 25–75th
 percentile, or mean ± 1 sd) with a mean or median line, the runs' own lines faint,
-hidden or drawn as usual. **Copy this panel** copies it into a new panel; **One per
-run** splits a card of several runs into a card per run, or copies a card of one run
+hidden or drawn as usual. **Copy this panel** (Layout) copies it into a new panel; **One per
+run** splits a profile of several runs into one per run, or copies a profile of one run
 for each other run of the figure, in its panel.
 
 *Then apply* **d/dz** draws the profile's vertical derivative, per metre (e.g. s⁻¹ for w).
 It is d/dz of the reduced profile, e.g. of the maximum w at each level, not the maximum
-of ∂w/∂z at each level. For that, pick ∂/∂z in the card's **Derivative** select (a
-[field derivative](fields.md#derivatives-of-any-field), per m), which series cards
+of ∂w/∂z at each level. For that, pick ∂/∂z in the profile's **Derivative** select (a
+[field derivative](fields.md#derivatives-of-any-field), per m), which series
 have too.
 
 A profile is a layer series computed only at the times it needs, and cached with the
 Series tool's: a time–height panel of the same series later reuses those times, and the
-other way round. *Plot* (the panel options) sets the value and height ranges, a zero
-line and whether edited lines are marked (the legend is *Legend in the panel*). A card's values can be edited by
+other way round. *Plot* (Look) sets the value and height ranges, a zero
+line and whether edited lines are marked (the legend is *Legend in the panel*). A profile's values can be edited by
 hand and downloaded, and **+ Your data** draws a profile of your own beside them
 ([Profiles: edits and your own data](figures-layers.md#profiles-edits-and-your-own-data)).
 
@@ -249,8 +258,8 @@ Two fields against each other at the same points (e.g. vertical vorticity agains
 at a height, over a layer or the whole depth (a 2D field pairs at one height), in the
 whole domain, a box or around each run's track, with an optional value range for each
 field. Each has its own run and time, or a time window (*To*) whose pairs are all taken;
-those in the same panel share a panel, coloured by run (see [Runs](#runs)).
-A new one starts from the Distribution tool's last distribution (its field as x), else
+those in the same panel share a panel, coloured by run (see [Runs](#runs)); they are its
+entries in Layers (**+ Joint distribution**). A new one starts from the Distribution tool's last distribution (its field as x), else
 w at 1 km.
 
 *Draw as*: a **2D histogram** (counts, PDF or fractions, linear or log colours, with its
@@ -290,7 +299,8 @@ A **Sector** layer on a plan view outlines a sector at each panel's time (see
 
 ### Tables
 
-A table of values across runs and times, set on the panel: each of its entries gives its columns:
+A table of values across runs and times. Its entries (Layers, at the panel: **+ Values**) each give
+its columns:
 
 - **Values**: *Sounding parameters* (CAPE, CIN, LCL, SRH, shear, STP and the rest) of the
   sounding at the storm, a point or the domain mean, or *Field statistics* (mean, sd, min,
@@ -304,7 +314,7 @@ A table of values across runs and times, set on the panel: each of its entries g
 A panel's entries make one table, so one table can hold parameters and statistics side by side.
 Several panels make several tables.
 
-In **Table**, *Set out as* picks what the rows and columns are: a row per run and time
+In **Table** (Look), *Set out as* picks what the rows and columns are: a row per run and time
 with a column per value, a row per value with a column per run and time, or a row per value
 with a column per time (to follow one run) or per run (to compare runs). *Show* gives the
 values, or the differences from the first run (at each time) or from the first time (of each
@@ -328,25 +338,25 @@ colorbars (floor, streamlines) and axis ticks are drawn by matplotlib around it,
 any figure, so they stay sharp and editable.
 
 The quickest start is the **photo icon** on the 3D box in the items tray (or **Copy the
-3D view** on the scene's node): a figure of everything the 3D workspace shows, its box, settings
+3D view**, in Layers at the scene): a figure of everything the 3D workspace shows, its box, settings
 and camera included, at the shown time. Rotate the 3D view first to choose the camera.
 *3D scene (one picture)* in the New dialog, or as a panel's type, also makes one, from what the
 3D workspace shows (the whole domain when it has no box). A figure can hold several scenes beside
-other panels. The run and time are on its panel.
+other panels. Its run and time are in Times.
 
 The scene's settings:
 
-| Section | Settings |
-|---|---|
-| **Isosurfaces** | Up to 6: field, value, colour, opacity. Untick one to leave it out (it is kept). |
-| **Floor** | As in the 3D workspace: a field (a 3D one at a height), colormap, *Reverse*, *Range*. |
-| **Vectors** | Up to 6 planes of arrows: vector, height, frame, *Arrows across*, *Ref. length*, colour. |
-| **Streamlines** | Seed height, seeds (*n × n*), maximum length, direction, frame, *Colour by* height or w. **The map's seed box** seeds inside the box picked on the map; **Whole region** clears it. |
-| **Parcels** | Runs with parcel output: up to 6 parcel sets, each as the viewer's *Parcels* tab chose it (its rule), with colour or *Colour by* a parcel variable, tails, line width, head size, opacity. **+ Parcels** adds the viewer's next set (or a saved one). See [Parcels in figures](parcels.md#in-figures). |
-| **Region and resolution** | *Whole domain* or a *Fixed box* (typed, or **The map's 3D box**), *Top*, *Vertical exaggeration*, *Smoothing σ*, *Resolution*. |
-| **Camera** | *View* (from the southwest, above, south, north, west, east), *Azimuth* and *Elevation* (blank: the view's), *Zoom* (1: the whole region fits), *Projection* (perspective or orthographic), *View angle*. **Camera of the 3D view** takes the 3D workspace's, as you left it. |
-| **Look** | *Lighting* (a soft light kit, three lights, or a headlight), *Background* (the figure's, white, black or transparent), vectors as 3D arrows or lines, *Shine*, *Ambient light*, *Line thickness*, where the colorbars go, box colour, axis labels; box outline, axis ticks, legend, seed box outline. |
-| **Animation** | *Box in animations* and *Camera orbit*: see below. |
+| Section | Tool | Settings |
+|---|---|---|
+| **Isosurfaces** | Layers | Up to 6: field, value, colour, opacity. Untick one to leave it out (it is kept). |
+| **Floor** | Layers | As in the 3D workspace: a field (a 3D one at a height), colormap, *Reverse*, *Range*. |
+| **Vectors** | Layers | Up to 6 planes of arrows: vector, height, frame, *Arrows across*, *Ref. length*, colour. |
+| **Streamlines** | Layers | Seed height, seeds (*n × n*), maximum length, direction, frame, *Colour by* height or w. **The map's seed box** seeds inside the box picked on the map; **Whole region** clears it. |
+| **Parcels** | Layers | Runs with parcel output: up to 6 parcel sets, each as the viewer's *Parcels* tab chose it (its rule), with colour or *Colour by* a parcel variable, tails, line width, head size, opacity. **+ Parcels** adds the viewer's next set (or a saved one). See [Parcels in figures](parcels.md#in-figures). |
+| **Region and resolution** | Layout | *Whole domain* or a *Fixed box* (typed, or **The map's 3D box**), *Top*, *Vertical exaggeration*, *Smoothing σ*, *Resolution*. |
+| **Camera** | Look | *View* (from the southwest, above, south, north, west, east), *Azimuth* and *Elevation* (blank: the view's), *Zoom* (1: the whole region fits), *Projection* (perspective or orthographic), *View angle*. **Camera of the 3D view** takes the 3D workspace's, as you left it. |
+| **Look** | Look | *Lighting* (a soft light kit, three lights, or a headlight), *Background* (the figure's, white, black or transparent), vectors as 3D arrows or lines, *Shine*, *Ambient light*, *Line thickness*, where the colorbars go, box colour, axis labels; box outline, axis ticks, legend, seed box outline. |
+| **Animation** | Times | *Box in animations* and *Camera orbit*: see below. |
 
 Only the region, top, smoothing, resolution, surfaces, floor, vectors and streamlines
 read and compute again; the camera, look and exaggeration only render the picture
@@ -375,7 +385,8 @@ The list also offers runs not yet in the figure: your recent runs, the runs next
 one and those under *Where your runs live*. Picking one adds it, with its storm track. The field
 lists hold the fields of every run.
 
-The **Runs** node in the tree lists the runs of the figure. Each has
+The **Runs** tool (on the rail, or the **Runs** button in the top bar, which names them) lists the
+runs of the figure, each in a fold that says what of the figure is of it. Each has
 
 - a **label**,
 - a **colour**,
@@ -389,7 +400,7 @@ zeros. If one run initiates
 at 60 min and another at 90 min, give them 60 and 90: a grid of the two runs at 75 min of
 the first shows 105 min of the second, and both panels are labelled `t = 15 min`.
 Differences and ensembles of other runs read the same matched times, and so does a profile
-card of several runs: its *Time* is its first run's, and each other run draws the matching
+of several runs: its *Time* is its first run's, and each other run draws the matching
 output.
 
 - A time picked for a run stays that run's model time; only a time taken over from
@@ -399,12 +410,12 @@ output.
   the first panel's run, staying at the moment it showed, and when you pick another run on it.
   All of these go to that run's nearest output.
 - Otherwise a moved time needs an output there: the panel says it has none, and a profile
-  card says which run has no line (it isn't moved to the nearest output), so runs with
+  says which run has no line (it isn't moved to the nearest output), so runs with
   different output intervals only show the times they share. The time pickers mark times
   that aren't in every run.
 - `{min}` in the *Time label* counts from the time zero, on 3D scenes too; `{model}`, `{s}`
   and `{hms}` stay model time. Times in automatic legend text count from the run's time
-  zero. The Time lists on the cards stay model time.
+  zero. The Time lists of a panel's entries stay model time.
 
 **Line runs up by** (shown with two runs or more) chooses how runs pair up: *Time since each
 run's time zero*, as above, or **Output number**: the nth output of each run, whatever its
@@ -414,7 +425,7 @@ model time, e.g. for runs that output at different intervals or restart at diffe
   the time axes of time series and time–height panels use its times, from its time zero. The
   other runs' time zeros don't apply, so they are greyed out. `{model}`, `{s}` and `{hms}` stay
   each panel's own model time.
-- Past a shorter run's end its panels are blank and it has no line on a profile card. On a
+- Past a shorter run's end its panels are blank and it has no line on a profile. On a
   time series, a run with more outputs than the first carries on at the first run's last
   interval.
 - A time picked for a run stays that run's model time, and animations step every run one output
@@ -427,7 +438,7 @@ On time series and time–height figures each series also sets its own colour an
 style, and (with *Region: Around tracked storm*) says what the track here gives (see
 [Time series](#time-series)).
 
-A run can be added there first (the runs under *Where your runs live* are found in the background
+A run can be added there first, with *Add a run* (the runs under *Where your runs live* are found in the background
 and join the lists when the search is done).
 
 The colour is the default for the run's storm-track layers, run name in the
@@ -444,7 +455,37 @@ panel is of.
 
 ## Rows and columns
 
-**Fill panels**, on the Plan views node, writes a grid of plan views at once. **Rows are** and
+### Picking a row or a column
+
+In a grid of more than one row or column, a header above each column and beside each row of the
+preview names what that row or column has that the others have otherwise (its run, time,
+height or field: *ntor*, *80 min*), else *Row 2*, *Column 3*. Clicking a header picks it, like a
+panel: the level switch shows **Column 2 · b, d**, the panels are outlined, and every tool's
+drawer is that of its panels.
+
+- **An edit there is written to each of its panels** (those of the kind most of them are; the
+  line under the switch names any it skips). The drawer shows its first panel's values; a
+  setting its panels do not all have the same of is outlined with dashes, and its section says
+  how many (*1 differ between its panels*). **↺** and *Reset section* take it back in each.
+- **Layout** at a row or column: what it differs in (its time, run or height, written to each of
+  its panels; a field is each panel's first fill, in Layers), its share of the figure's height
+  or width, its panels' titles and row labels, and **+ Panel in this row** for an empty cell.
+- **Layers** there: the layers its panels share are the kind's (the chips above the preview),
+  and its panels' own changes are listed, each with **Use the shared ones**.
+- **Times** and **Look** write each of its panels; **Marks** and **Runs** are the figure's.
+
+**What the grid varies** (Layout, at the figure) says what the rows and the columns differ in,
+and lists each one's value (*Column 1: time*, *Column 2: time*), editable in place.
+
+**A panel added beside others** (Layout's *Add a panel* at a free cell, **+ Panel in this row**,
+*Fill the empty cells*): a plan view or cross-section starts as a copy of the nearest panel of its
+kind in its row (else its column), without its title, and takes what the columns (rows) differ
+in from its own column's (row's) panel. So a cell added to a grid of runs by times shows its
+row's run at its column's time, with the row's layers and look. Other kinds start new.
+
+### Filling a grid
+
+**Fill panels** (Layout, at the figure) writes a grid of plan views at once. **Rows are** and
 **Columns are** each step through one of
 
 - **Runs**: the runs picked (blank: all), in the order picked;
@@ -461,8 +502,9 @@ or edit any panel on its own afterwards. A panel that already is what a cell ask
 keeping what was set on it; panels left over go. Figures saved with *Panels differ in*, *Fill a
 grid*, or rows and columns that step, open as the same panels.
 
-**Titles from what each shows** labels the panels; with both rows and columns stepping, the top
-row's titles name the columns and a row label names each row at its left.
+**Titles from what differs** labels the panels (**Clear the titles** clears them); with both rows
+and columns stepping, the top row's titles name the columns and a row label names each row at its
+left.
 
 ## Figures saved with parts
 

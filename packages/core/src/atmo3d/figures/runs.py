@@ -1,7 +1,7 @@
 """Figure editor: the runs a figure could add (found in the background), what a run's storm track
-gives, and the run lists of cards (RunLists: a card's host has them).
+gives, and the fields of all a figure's runs (AllFields).
 
-Mixins of the FigureEditor (figures/editor.py) and the shell's card host (shell/layerrow.py)."""
+A mixin of the FigureEditor (figures/editor.py)."""
 
 import os
 import threading
@@ -10,7 +10,6 @@ from collections import OrderedDict
 from .. import config, registry
 from ..core import models
 from ..core.fields import deriv_def, group_options, split_deriv
-from ..viewer.ui import held
 
 
 TYPE_PATH = "type a path"  # (the track list's "Type a path…": never a full path)
@@ -166,44 +165,3 @@ class FigureRuns:
             ts = sorted(fx)
             note += f" ({run.times[ts[0]] / 60:g}–{run.times[ts[-1]] / 60:g} min)"
         return note
-
-
-class RunLists:
-    """A card's run lists; its host has _run_names, _other_runs and _add_run."""
-
-    def _run_choices(self, names=None):
-        """A run list's choices (Select keywords): the figure's runs, then under a
-        heading of their own the other runs (picking one adds it); just the figure's
-        runs, without headings, when there are no others."""
-        names = names or self._run_names()
-        others = self._other_runs()
-        if not others:
-            return dict(groups=None, options=names)
-        return dict(options={}, groups={"In this figure": names,
-                                        "Other runs (adds it)": others})
-
-    def _layer_run_choices(self, names=None):
-        """A layer's run choices: "the panel's run" (-1), then _run_choices."""
-        names = names or self._run_names()
-        ch = self._run_choices(names)
-        first = {"the panel's run": -1}
-        if ch["groups"]:
-            return dict(options={}, groups={"": first} | ch["groups"])
-        return dict(groups=None, options=first | names)
-
-    def _series_run_opts(self, names=None):
-        """Options of a series' Runs list (no groups in a multi-choice): the figure's
-        runs, then the others, marked (picking one adds it to the figure)."""
-        names = dict(names or self._run_names())
-        for lab, p in self._other_runs().items():
-            names[f"+ {lab} (adds it)"] = p
-        return names
-
-    def _pick_other(self, w, old):
-        """A run list picked a run not in the figure: add it, and pick it."""
-        k = self._add_run(w.value, grid=False)
-        with held(self):
-            if k is None:  # (the message says why)
-                w.value = old if isinstance(old, int) else 0
-                return
-        w.value = k  # (as if picked from the list: the panel's times follow)

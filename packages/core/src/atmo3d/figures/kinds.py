@@ -1,5 +1,5 @@
 """What the figure editor knows about each kind of panel, one entry per kind: a new kind
-is one more entry here (and its cards, spec block and drawing)."""
+is one more entry here (and its schema rows, spec block and drawing)."""
 
 from dataclasses import dataclass
 
@@ -52,19 +52,19 @@ KINDS = {
         "Vertical cross-sections", "cross-sections", 0.5,
         labels=("", "height (km)"), colorbar=(), style=MAP_STYLE,
         note="Panels alternately x–z and y–z (through the storm when it is tracked) at the "
-             "shown time: pick a panel in the tree to set its run, time and section."),
+             "shown time: click a panel to set its run and time (Times) and section (Layers)."),
     "th": Kind(
         "Time–height (series)", "time–height", 0.55,
         labels=("time (min)", "height (km)"), colorbar=("row", "right"),
         size=lambda r, c: (4.5 * c + 1.0, 2.8 * r + 0.6),
         quick_grid=False, style=("axes", "y_step", "colorbar", "run_label"),
         note="It starts with no series, so nothing is computed until you add one: "
-             "<b>+ Time–height panel</b> in the tree's Time–height node."),
+             "<b>+ Series</b> in Layers, at the panel."),
     "line": Kind(
         "Time series", "time series", 0.45, labels=("time (min)", ""),
         one="line", head="Time series", size=_sized(_wide(7.0, 6.0), 3.0, 0.5), style=("axes", "y_step"),
-        note="It starts with no series, so nothing is computed until you add one: pick the "
-             "panel in the tree (each series has its run, or all runs)."),
+        note="It starts with no series, so nothing is computed until you add one: <b>+ Series</b> "
+             "in Layers, at the panel (each series has its run, or all runs)."),
     "sounding": Kind(
         "Soundings", "soundings", 1.0,
         labels=("temperature (°C)", "pressure (hPa)"), one="sounding", head="Sounding",
@@ -72,42 +72,42 @@ KINDS = {
         letter_at="above left", time_at="above right",  # (clear of the barbs and the inset)
         note="The Sounding tab's soundings go one per panel (more soundings "
              "than panels: they wrap and share panels); panels left over start "
-             "as a copy of the last, to change in the tree."),
+             "as a copy of the last, to change in Layers."),
     "dist": Kind(
         "Distributions", "distributions", 0.7, one="distribution",
         head="Distribution", size=_sized(_wide(5.5, 4.2), 3.6), entries="dists",
         note="The Distribution tool's distributions go one per panel (more than "
              "panels: they wrap and share panels); panels left over start as a "
-             "copy of the last, to change in the tree."),
+             "copy of the last, to change in Layers."),
     "profile": Kind(
         "Vertical profiles", "profiles", 1.3, labels=("", "height (km)"),
         one="profile", head="Profile", size=_sized(_wide(4.0, 3.4, 0.4), 4.6), entries="profiles",
         note="The Series tool's layer series go one per panel at the shown time "
              "(more than panels: they wrap and share panels); panels left over "
-             "start as a copy of the last, to change in the tree."),
+             "start as a copy of the last, to change in Layers."),
     "joint": Kind(
         "Joint distributions (x vs y)", "joint distributions", 0.85,
         one="joint distribution", head="Joint", size=_sized(_wide(5.2, 4.4, 0.3), 4.0), entries="joints",
         note="Every panel starts with vertical vorticity against w at 1 km at the "
-             "shown time, to change in the tree."),
+             "shown time, to change in Layers."),
     "azim": Kind(
         "Azimuthal means (radius–height)", "azimuthal means", 0.8,
         one="azimuthal mean", head="Azimuthal", size=_sized(_wide(5.6, 4.6, 0.3), 3.8), entries="azims",
         note="Every panel starts with w around the tracked storm (else the middle "
              "of the map's view) at the shown time, the whole ring out to 20 km, to "
-             "change in the tree."),
+             "change in Layers."),
     "table": Kind(
         "Tables (sounding parameters, field statistics)", "tables", 0.5,
         one="table", head="Table", size=lambda r, c: (7.5 * c, 3.0 * r + 0.3), entries="tables",
         quick_grid=False, style=(),
         note="A table starts with sounding parameters at the shown time: pick its values, "
-             "runs and times in the tree, and add more for more columns."),
+             "runs and times in Layers, and add more for more columns."),
     "scene": Kind(
         "3D scene (one picture)", "scene", 0.8,
         size=lambda r, c: (6.5, 5.2), quick_grid=False, style=("time_label", "run_label"),
         note="One 3D picture of what the 3D workspace shows (its box, surfaces "
              "and camera; the whole domain without a box), at the shown time: "
-             "change it in the tree."),
+             "change it in Layers."),
 }
 
 KIND_LABELS = {k.label: key for key, k in KINDS.items()}  # (the "Panels show" list)

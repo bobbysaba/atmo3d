@@ -4,11 +4,48 @@ figures/render.py.)
 
 A mixin of the FigureEditor (figures/editor.py)."""
 
+import os
+
 from . import spec as fg
 from ..core import render, series as ser, vectors
 from ..core.services import parcels as P
-from .cards import TERRAIN_LEVEL_MODES, _dark, parcel_source
+from .choices import TERRAIN_LEVEL_MODES, _dark
 from .kinds import KINDS
+
+
+def parcel_source(name, e):
+    """A parcels layer's set: the viewer's set `name` (e: {set, color}) as its rule
+    (its parcel indices when it has none)."""
+    ps = e["set"]
+    return dict(name=name, color=e["color"], rule=dict(ps.rule) or None,
+                ids=None if ps.rule else [int(i) for i in ps.ids])
+
+
+def parcel_sets(v, lay, own="this layer's"):
+    """{label: source} of a Parcels list: the set of `lay` (""), viewer v's sets
+    ("v:<name>") and its run's saved sets ("f:<path>")."""
+    opts = {f"{lay.get('name') or 'parcels'} ({own})": ""}
+    opts |= {f"{n} (viewer)": f"v:{n}" for n in getattr(v, "psets", {})}
+    if v.pf is not None:
+        opts |= {f"{os.path.splitext(os.path.basename(p))[0]} (saved)": f"f:{p}"
+                 for p in P.list_sets(v.run.path)}
+    return opts
+
+
+def parcel_pick(ed, choice):
+    """The set (parcel_source's keys) of choice `choice` of a Parcels list
+    (parcel_sets'), or None (a saved set that does not load: a message)."""
+    v = ed.v
+    if choice.startswith("v:"):
+        e = v.psets.get(choice[2:])
+        return None if e is None else parcel_source(choice[2:], e)
+    try:
+        ps = P.ParcelSet.load(choice[2:])
+    except (OSError, ValueError, KeyError) as e:
+        getattr(ed, "_msg", lambda *a: None)(f"Could not load that parcel set: {e}", True)
+        return None
+    return dict(name=ps.name, rule=ps.rule or None,
+                ids=None if ps.rule else [int(i) for i in ps.ids])
 
 
 class FigureSources:
@@ -19,6 +56,15 @@ class FigureSources:
         s = self._keep_runs(fg.default_spec(self.run, self.F, self.v.t))
         if not self.v.fixes:
             s["domain"] = dict(s["domain"], mode="full")
+        return s
+
+    def _blank(self):
+        """An empty figure: one plan view at the shown time, drawing nothing yet (its layers are
+        the user's to add), centred on the storm when there is a track."""
+        s = self._default()
+        s.update(rows=1, cols=1, layers=[], times=[], times_s=[], size=[8.0, 6.0],
+                 grid=dict(rows="none", cols="none", runs=[]),
+                 vary=fg.legacy_vary("none", "none"))
         return s
 
     def _own_track(self):
@@ -53,7 +99,7 @@ class FigureSources:
         return s
 
     def _minus(self, s, lay, m, rng):
-        """Fill layer `lay` of figure spec s as the viewer's difference m (_minus_spec;
+        """Fill layer `lay` of figure spec s as the viewer's difference m (viewer/layers.minus_spec;
         another run is added to the figure's runs), in the colours it is shown in:
         range rng (lo, hi)."""
         if not m:
@@ -152,7 +198,7 @@ class FigureSources:
                                step=float(geo["step"] or 0.0)))
         s = self._keep_runs(fg.default_spec(self.run, F, t))
         self._times(s, [t], t)
-        self._minus(s, layers[0], sp["fill"].get("minus"), v._last_range)
+        self._minus(s, layers[0], sp["fill"].get("minus"), v.map_fill.last)
         s.update(rows=1, cols=1, size=[5.0, 4.5], layers=layers, vary="time", kind="plan")
         s["domain"] = dict(s["domain"], mode="box", box=[float(x) for x in v.view])
         s["colorbar"] = dict(s["colorbar"], mode="each", orientation="vertical", shrink=0.9)
@@ -197,7 +243,7 @@ class FigureSources:
         layers += self._parcel_layers()
         s = self._keep_runs(fg.default_spec(self.run, F, t))
         self._times(s, [t], t)
-        self._minus(s, layers[0], sp["minus"], v._xs_range)
+        self._minus(s, layers[0], sp["minus"], v.xs_main.last)
         s.update(kind="xsec", rows=1, cols=1, size=[7.0, 3.5], layers=layers, vary="time")
         s["xsec"] = dict(s["xsec"], ztop=float(v.xs_ztop.value))
         s["sections"] = [fg.section_defaults(orient="ab", pos="fixed", a=list(v.xs_pts[0]),

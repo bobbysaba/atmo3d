@@ -22,25 +22,21 @@ from ..core.services import pdecomp
 from ..core import dist, series as ser
 from ..theme import DIALOG_DARK
 from . import panels
+from ..figures.schema import viewer as V
 from .ui import _html, held
 from .fieldmenu import FieldSelect
 
-# the session file's version ("atmo3d_session"); 2: fields by their data type's own
-# names (1: WoFS's by CM1's, renamed on load by upgrade)
-FORMAT = 2
+# the session file's version ("atmo3d_session"); 3: the map's and the section's layers as
+# their dicts (layers.py, figures/schema/viewer.py: "fill", "fills", "contours", "vectors";
+# 2 kept their widgets' values, a first fill's difference as "diff" beside it); 2: fields by
+# their data type's own names (1: WoFS's by CM1's).  upgrade brings older ones up to date.
+FORMAT = 3
 
-# the widgets of a layer row, in the order they are put back (a field before its
-# colours and range, a level mode before its level, a vector before its reference)
-FILL_KEYS = ("on", "var", "mode", "level", "style", "cmap", "rev", "auto", "vmin", "vmax",
-             "alpha", "clip")
-OV_KEYS = ("on", "var", "mode", "level", "levels", "color", "width", "negdash")
+# the widgets of a 3D vector row, in the order they are put back (a vector before its
+# reference arrow)
 VEC_KEYS = ("on", "q", "level", "frame", "style", "density", "ref", "color")
-# the first fill's widgets (Viewer attributes), the same way
-MAIN_FILL = (("var", "fill_var"), ("op", "fill_op"), ("mode", "fill_mode"),
-             ("level", "fill_lvl"), ("style", "fill_style"))
-MAIN_STYLE = (("cmap", "fill_cmap"), ("rev", "fill_rev"), ("auto", "fill_auto"),
-              ("vmin", "fill_min"), ("vmax", "fill_max"), ("nlev", "fill_nlev"),
-              ("alpha", "fill_alpha"))
+# a FORMAT 2 cross-section's first fill (beside its own settings)
+XS_MAIN_V2 = ("var", "style", "cmap", "rev", "auto", "vmin", "vmax", "nlev", "diff")
 STORM = (("storm", "storm"), ("storm_u", "storm_u"), ("storm_v", "storm_v"))
 # soundings: settings (Viewer attributes) and their plot style (Viewer.ps keys)
 SND = (("avg", "avg"), ("parcel", "parcel"), ("units", "wunits"), ("prof_top", "prof_top"),
@@ -49,11 +45,8 @@ SND = (("avg", "avg"), ("parcel", "parcel"), ("units", "wunits"), ("prof_top", "
 SND_STYLE = ("t", "td", "parcel", "base", "lw", "parcel_lw", "hodo_lw", "prof_lw", "ptop",
              "tmin", "tmax", "ring", "htop", "hheights", "shade", "barbs", "guides")
 # the cross-section: its first fill, its style, extent and look
-XS_FILL = (("var", "xs_fill"), ("style", "xs_fill_style"))
-XS_STYLE = (("cmap", "xs_cmap"), ("rev", "xs_rev"), ("auto", "xs_auto"), ("vmin", "xs_min"),
-            ("vmax", "xs_max"), ("nlev", "xs_nlev"), ("ztop", "xs_ztop"),
-            ("height", "xs_height"), ("font", "xs_font"), ("grid", "xs_grid"),
-            ("ab", "xs_ab"))
+XS_STYLE = (("ztop", "xs_ztop"), ("height", "xs_height"), ("font", "xs_font"),
+            ("grid", "xs_grid"), ("ab", "xs_ab"))
 XS_LIMITS = (("smin", "xs_smin"), ("smax", "xs_smax"), ("zmin", "xs_zmin"),
              ("zmax", "xs_zmax"))  # (blank: the whole section)
 # the 3D view: scene, floor, camera; isosurfaces; streamlines
@@ -111,10 +104,35 @@ def upgrade(s):
     if isinstance(ver, (int, float)) and ver < 2:
         table, _ = renames_for([config.expand(s["run"])] if s.get("run") else [])
         rename_fields(s, table)
+    if not isinstance(ver, (int, float)) or ver < 3:
+        _layers_v3(s)
     s["field_names"] = FIELD_NAMES
     if figure is not None:
         s["figure"] = figure
     return s
+
+
+def _layers_v3(s):
+    """A FORMAT 2 session's map and section layers (their widgets' values) as FORMAT 3
+    keeps them (their dicts: figures/schema/viewer.py's upgraded), in place."""
+    def lists(d, kind):
+        for key, role in (("fills", "more"), ("contours", "contour"), ("vectors", "vectors")):
+            if isinstance(d.get(key), list):
+                d[key] = [V.upgraded(role, r, kind) for r in d[key] if isinstance(r, dict)]
+    fill = dict(s.get("fill") or {})
+    if isinstance(s.get("diff"), dict):
+        fill["diff"] = s["diff"]
+    s.pop("diff", None)
+    if fill:
+        s["fill"] = V.upgraded("fill", fill, "plan")
+    lists(s, "plan")
+    xs = s.get("section")
+    if isinstance(xs, dict):
+        main = {k: xs.pop(k) for k in XS_MAIN_V2 if k in xs}
+        if main:
+            xs["fill"] = V.upgraded("fill", main, "xsec")
+        lists(xs, "xsec")
+    s["atmo3d_session"] = FORMAT
 
 
 def _plain(v):
@@ -227,11 +245,10 @@ class Sessions:
             # key: the open tab's panel; tab: its registry place (what older versions read)
             panel=dict(open=bool(self.panel_col.visible), tab=panels.index(self._panel()),
                        key=self._panel(), full=bool(self.full)),
-            fill={k: getattr(self, a).value for k, a in MAIN_FILL + MAIN_STYLE},
-            diff={k: w.value for k, w in self.fill_diff.items()},
-            fills=[{k: o[k].value for k in FILL_KEYS} for o in self.fills],
-            contours=[{k: o[k].value for k in OV_KEYS} for o in self.ovs],
-            vectors=[{k: o[k].value for k in VEC_KEYS} for o in self.vecs],
+            fill=V.saved(self.map_fill.lay),
+            fills=[V.saved(o.lay) for o in self.fills],
+            contours=[V.saved(o.lay) for o in self.ovs],
+            vectors=[V.saved(o.lay) for o in self.vecs],
             storm={k: getattr(self, a).value for k, a in STORM},
             track=dict(path=self.trk_path.value, storm=self.trk_storm.value,
                        opts=self.trk_spec,
@@ -283,12 +300,11 @@ class Sessions:
 
     def _xs_state(self):
         return dict(points=[list(p) for p in self.xs_pts],
-                    **{k: getattr(self, a).value for k, a in XS_FILL + XS_STYLE + XS_LIMITS},
-                    diff={k: w.value for k, w in self.xs_diff.items()},
-                    fills=[{k: o[k].value for k in FILL_KEYS if k in o} for o in self.xs_fills],
-                    contours=[{k: o[k].value for k in OV_KEYS if k in o} for o in self.xs_ovs],
-                    vectors=[{k: o[k].value for k in VEC_KEYS if k in o}
-                             for o in self.xs_vecs])
+                    **{k: getattr(self, a).value for k, a in XS_STYLE + XS_LIMITS},
+                    fill=V.saved(self.xs_main.lay),
+                    fills=[V.saved(o.lay) for o in self.xs_fills],
+                    contours=[V.saved(o.lay) for o in self.xs_ovs],
+                    vectors=[V.saved(o.lay) for o in self.xs_vecs])
 
     def _3d_state(self):
         return dict(box=self.box, seed_box=self.seed_box,
@@ -375,25 +391,17 @@ class Sessions:
             if s.get("time_s") is not None:
                 self.tslider.value = int(np.argmin(np.abs(np.asarray(self.run.times)
                                                           - float(s["time_s"]))))
-            f = s.get("fill", {})
-            for k, a in MAIN_FILL:
-                put(getattr(self, a), f.get(k), k)
-            self._put_diff(self.fill_diff, s.get("diff", {}), put)
-            for k, a in MAIN_STYLE:
-                put(getattr(self, a), f.get(k), k)
-            self._put_rows(s.get("fills"), self.fills, self._add_fill, self._drop_fill,
-                           FILL_KEYS, put)
-            self._put_rows(s.get("contours"), self.ovs, self._add_overlay,
-                           self._drop_overlay, OV_KEYS, put)
-            self._put_rows(s.get("vectors"), self.vecs, self._add_vec, self._drop_vec,
-                           VEC_KEYS, put)
+            self._put_map_fill(s.get("fill") or {}, put, skipped)
+            self._put_layers(s.get("fills"), self.fills, self._add_fill, skipped)
+            self._put_layers(s.get("contours"), self.ovs, self._add_overlay, skipped)
+            self._put_layers(s.get("vectors"), self.vecs, self._add_vec, skipped)
             st = s.get("storm", {})
             for k, a in STORM:
                 put(getattr(self, a), st.get(k), k)
             self._put_geo(s.get("boundaries"), put)
             self._put_track(s.get("track"))
             self._put_soundings(s.get("soundings"), put)
-            self._put_section(s.get("section"), put)
+            self._put_section(s.get("section"), put, skipped)
             self._put_3d(s.get("view3d"), put)
             self._put_series(s.get("series"), put, skipped)
             dists = self._put_dists(s.get("distributions"), put, skipped)
@@ -421,17 +429,6 @@ class Sessions:
         if s.get("figure") and self.workspace.value == "Figure":
             self.figed.request(delay=False)
         return skipped
-
-    @staticmethod
-    def _put_diff(ws, d, put):
-        """A difference's on / Minus run / Minus time (fill_diff or xs_diff)."""
-        for k in ("on", "run", "time"):
-            if k not in d:
-                continue
-            w = ws[k]
-            if k == "run" and d[k] and d[k] not in w.options.values():
-                w.options = dict(w.options, **{d[k]: d[k]})  # a run not listed
-            put(w, d[k], f"difference {k}")
 
     def _put_soundings(self, sd, put):
         if sd is None:
@@ -461,24 +458,21 @@ class Sessions:
         self.snd_lim = lim
         self._draw_points()
 
-    def _put_section(self, xs, put):
+    def _put_section(self, xs, put, skipped):
         if xs is None:
             return
         with held(self, "_hold_xs"):
-            for k, a in XS_FILL:
-                put(getattr(self, a), xs.get(k), f"section {k}")
-            self._put_diff(self.xs_diff, xs.get("diff", {}), put)
+            main = xs.get("fill") or {}
+            put(self.xs_fill, main.get("field"), "section var")
+            self._put_xs_main(main, skipped)
             for k, a in XS_STYLE:
                 put(getattr(self, a), xs.get(k), f"section {k}")
             for k, a in XS_LIMITS:
                 if k in xs:
                     put(getattr(self, a), xs[k], f"section {k}", blank=True)
-            self._put_rows(xs.get("fills"), self.xs_fills, self._xs_add_fill,
-                           self._xs_drop_fill, FILL_KEYS, put)
-            self._put_rows(xs.get("contours"), self.xs_ovs, self._xs_add_contour,
-                           self._xs_drop_contour, OV_KEYS, put)
-            self._put_rows(xs.get("vectors"), self.xs_vecs, self._xs_add_vec,
-                           self._xs_drop_vec, VEC_KEYS, put)
+            self._put_layers(xs.get("fills"), self.xs_fills, self._xs_add_fill, skipped)
+            self._put_layers(xs.get("contours"), self.xs_ovs, self._xs_add_contour, skipped)
+            self._put_layers(xs.get("vectors"), self.xs_vecs, self._xs_add_vec, skipped)
         pts = xs.get("points") or []
         self.xs_pts = [tuple(float(c) for c in p) for p in pts] if len(pts) == 2 else []
         self._draw_xs()

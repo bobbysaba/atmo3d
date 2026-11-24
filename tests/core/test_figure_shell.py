@@ -1,8 +1,8 @@
-"""The figure editor's new layout (figures/shell): the tree of a document, picking in it and in
-the preview, edits, undo, and the switch that shows it."""
+"""The figure editor's layout (figures/shell, figures/ui): the nodes of a document, picking them
+in the level switch and the preview, edits, undo, the Runs tool."""
 import pytest
 
-from conftest import fresh_shell
+from conftest import at_tool, control, drawer_text, every_node, fresh_shell
 
 from atmo3d.figures.shell import nodes
 
@@ -23,19 +23,15 @@ def small_doc():
                  layers=[dict(ref="l0", over={})], letter=25)])
 
 
-def test_tree_rows_in_reading_order_under_their_kind():
-    rows = nodes.tree_items(small_doc())
-    assert [(r["id"], r["depth"]) for r in rows] == [
-        ("figure", 0), ("runs", 0), ("kind:plan", 0), ("panel:0", 1), ("layer:0:0", 2),
-        ("panel:1", 1), ("layer:1:0", 2), ("kind:sounding", 0), ("panel:7", 1),
-        ("layer:7:0", 2)]
-    labels = {r["id"]: r["label"] for r in rows}
-    assert labels["runs"] == "Runs (3)"
-    assert labels["kind:plan"] == "All plan views (2)"
-    assert labels["panel:0"] == "a  one · 10 min · “Early”"
-    assert labels["panel:1"].startswith("z  Two · 20 min")  # (its own letter)
-    assert labels["layer:0:0"] == "Fill · w"  # (what differs in this panel)
-    assert labels["layer:7:0"] == "Sounding · Inflow"
+def test_the_places_of_a_figure_in_words():
+    from atmo3d.figures import draw as figdraw
+    doc = small_doc()
+    assert every_node(doc) == ["figure", "runs", "kind:plan", "panel:0", "layer:0:0", "panel:1",
+                               "layer:1:0", "kind:sounding", "panel:7", "layer:7:0"]
+    assert nodes.kind_name("plan", 2) == "plan views (2)"
+    lays = {p["id"]: figdraw.panel_layers(doc, p)[0][1] for p in doc["panels"]}
+    assert nodes.layer_name(lays[0]) == "Fill · w"  # (what differs in this panel)
+    assert nodes.layer_name(lays[7]) == "Sounding · Inflow"
 
 
 def test_letters_follow_the_reading_order_not_the_list():
@@ -74,7 +70,7 @@ def test_pick_at():
 
 
 def test_grid_map_shows_spans_and_empty_cells():
-    from atmo3d.figures.shell.inspector import grid_map
+    from atmo3d.figures.ui.grid import grid_map
     doc = small_doc()
     doc["grid"] = dict(rows=2, cols=3)
     doc["panels"][1]["cell"] = [0, 0, 2, 1]
@@ -119,86 +115,78 @@ def test_open_shows_the_figure_there(shell):
     assert shell.image.src.startswith("data:image/png")
     assert "6 panels" in shell.status.object
     assert set(shell._boxes) == {p["id"] for p in shell.doc["panels"]}
-    assert shell.tree.sel == "figure" and shell.image.marks == {}
+    assert shell.node == "figure" and shell.image.marks == {}
 
 
 def test_a_click_in_the_preview_picks_the_panel(shell):
     x0, x1, y0, y1 = shell._boxes[4]
     shell.image.click = [0.5 * (x0 + x1), 0.5 * (y0 + y1), 1]
-    assert shell.node == shell.tree.sel == "panel:4"
+    assert shell.node == "panel:4"
     assert shell.image.marks == {"4": shell._boxes[4]}
-    assert "Panel" in shell.inspector.head.object and "panel e only" in shell.inspector.head.object
+    assert "panel e only" in shell.frame.levels.said.object
     shell.image.click = [0.0, 0.999, 2]  # (off every panel: the figure)
     assert shell.node == "figure" and shell.image.marks == {}
 
 
-def test_a_click_in_the_tree_picks_the_node(shell):
-    shell.tree.pick = ["kind:plan", 1]
+def test_picking_a_node_outlines_its_panels(shell):
+    shell.frame.pick("kind:plan")
     assert shell.node == "kind:plan" and len(shell.image.marks) == 6
-    shell.tree.pick = ["runs", 2]
+    shell.frame.pick("runs")
     assert shell.image.marks == {}
-    assert "every panel" in shell.inspector.head.object
 
 
 def test_every_node_shows(shell):
-    for row in shell.tree.items:
-        shell.select(row["id"])
-        assert shell.inspector.body.objects, row["id"]
-
-
-def _named(col, name):
-    """The widget called `name` in a column, however deep."""
-    for w in col.select():
-        if getattr(w, "name", None) == name and hasattr(w, "value"):
-            return w
-    raise AssertionError(f"no {name}")
+    for node in every_node(shell.doc):
+        at_tool(shell, "layout", node)
+        assert shell.frame.body.objects, node
+        assert "Could not show" not in drawer_text(shell), node
 
 
 def test_edits_undo_and_redo_with_what_was_picked(shell):
-    shell.select("panel:1")
-    _named(shell.inspector.body, "Title").value = " North "
+    from conftest import control
+    control(shell, "Title", "layout", "panel:1").value = " North "
     pan = next(p for p in shell.doc["panels"] if p["id"] == 1)
     assert pan["title"] == "North"
-    assert any("North" in r["label"] for r in shell.tree.items if r["id"] == "panel:1")
     assert not shell.undo_btn.disabled and shell.redo_btn.disabled
     shell.select("figure")
     shell.undo()
     assert next(p for p in shell.doc["panels"] if p["id"] == 1)["title"] == ""
     assert shell.node == "panel:1"  # (where the edit was made)
     assert shell.undo_btn.disabled and not shell.redo_btn.disabled
-    assert _named(shell.inspector.body, "Title").value == ""
+    assert control(shell, "Title", "layout").value == ""
     shell.redo()
     assert next(p for p in shell.doc["panels"] if p["id"] == 1)["title"] == "North"
-    assert _named(shell.inspector.body, "Title").value == "North"
+    assert control(shell, "Title", "layout").value == "North"
 
 
 def test_figure_size_and_title(shell):
-    _named(shell.inspector.body, "Width (in)").value = 5.0
+    control(shell, "Width (in)", "layout", "figure").value = 5.0
     assert shell.doc["size"][0] == 5.0 and shell.doc["size_auto"] is False
-    _named(shell.inspector.body, "Figure title").value = "Storm"
+    control(shell, "Figure title").value = "Storm"
     assert shell.doc["suptitle"] == "Storm"
     assert shell._png[1][0] / shell._png[2] < 5.5  # (drawn at that width)
 
 
-def test_runs_are_a_tree_item(shell):
-    shell.select("runs")
-    _named(shell.inspector.body, "Label").value = "Control"
+def test_the_runs_tool(shell):
+    control(shell, "Label", "runs").value = "Control"
     assert shell.doc["runs"][0]["label"] == "Control"
-    _named(shell.inspector.body, "Time zero (min)").value = 5.0
+    control(shell, "Time zero (min)").value = 5.0
     assert shell.doc["runs"][0]["t0_min"] == 5.0
-    rm = next(w for w in shell.inspector.body.select() if getattr(w, "name", "") == "✕")
+    rm = next(w for w in shell.frame.body.select() if getattr(w, "name", "") == "✕")
     assert rm.disabled  # (in use, and the only one)
+    assert "outputs" in drawer_text(shell)  # (what the run holds)
 
 
 def test_add_and_remove_a_run(shell, demo_run):
     import os
     other = os.path.join(os.path.dirname(demo_run), "supercell_weak")
-    shell.select("runs")
-    shell.inspector._add_run(other)
+    at_tool(shell, "runs", "runs")
+    shell.add_run(other, node="runs")
     assert [r["path"] for r in shell.doc["runs"]][-1] == other
-    assert shell.tree.items[1]["label"] == "Runs (2)"
+    assert len(shell.doc["runs"]) == 2
     assert shell.node == "runs"
-    rms = [w for w in shell.inspector.body.select() if getattr(w, "name", "") == "✕"]
+    at_tool(shell, "runs")
+    rms = [w for w in shell.frame.body.select() if getattr(w, "name", "") == "✕"]
     assert [b.disabled for b in rms] == [True, False]  # (the first in use)
     rms[1].clicks += 1
     assert len(shell.doc["runs"]) == 1
@@ -240,21 +228,8 @@ def test_every_kind_opens_and_every_node_shows(shell):
         _new_figure(shell, kind)
         assert shell.doc["panels"] or kind == "th", kind
         assert "Could not draw" not in shell.status.object, kind
-        for row in shell.tree.items:
-            shell.select(row["id"])
-            assert shell.inspector.body.objects, (kind, row["id"])
-
-
-def test_the_plain_code_box_holds_the_same_code():
-    import panel as pn
-    from atmo3d.figures.shell.looks import code_extra
-    editor = pn.widgets.TextInput(value="x = 1")
-    plain, box = code_extra({"code.text": editor})
-    assert plain.value == "x = 1"
-    box.value = True
-    assert plain.visible and not editor.visible
-    plain.value = "y = 2"
-    assert editor.value == "y = 2"
-    box.value = False
-    assert editor.visible and not plain.visible
-
+        for tool in ("layout", "layers", "look", "times"):
+            for node in every_node(shell.doc):
+                at_tool(shell, tool, node)
+                assert shell.frame.body.objects, (kind, tool, node)
+                assert "Could not show" not in drawer_text(shell), (kind, tool, node)

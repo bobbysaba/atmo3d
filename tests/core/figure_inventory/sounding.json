@@ -1,0 +1,3163 @@
+{
+ "records": [
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Width (in)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "size[]",
+    "size_auto"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Height (in)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "size[]",
+    "size_auto"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Size",
+   "control": "Select",
+   "options": [
+    "Custom",
+    "3.25 in wide (one journal column)",
+    "5 in wide",
+    "6.5 in wide (full page width)",
+    "7.5 in wide",
+    "Slide, 13.3 \u00d7 7.5 in"
+   ],
+   "keys": [
+    "size[]",
+    "size_auto"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Figure title",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "suptitle"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Figure type",
+   "control": "Select",
+   "options": [
+    "Plan views",
+    "Soundings",
+    "Vertical cross-sections",
+    "Time\u2013height (series)",
+    "Time series",
+    "Distributions",
+    "Vertical profiles",
+    "Joint distributions (x vs y)",
+    "Azimuthal means (radius\u2013height)",
+    "Tables (sounding parameters, field statistics)",
+    "3D scene (one picture)"
+   ],
+   "keys": [
+    "annotations[].color",
+    "annotations[].coords",
+    "annotations[].kind",
+    "annotations[].ls",
+    "annotations[].lw",
+    "annotations[].panel",
+    "annotations[].r",
+    "annotations[].size",
+    "annotations[].text",
+    "annotations[].x",
+    "annotations[].x2",
+    "annotations[].y",
+    "annotations[].y2",
+    "kinds.plan.axes.equal",
+    "kinds.plan.axes.frame_lw",
+    "kinds.plan.axes.minor",
+    "kinds.plan.axes.tickdir",
+    "kinds.plan.axes.ticklabels",
+    "kinds.plan.axes.ticks",
+    "kinds.plan.axes.title_bold",
+    "kinds.plan.axes.title_loc",
+    "kinds.plan.axes.xlabel",
+    "kinds.plan.axes.ylabel",
+    "kinds.plan.coords",
+    "kinds.plan.domain.box",
+    "kinds.plan.domain.half",
+    "kinds.plan.domain.mode",
+    "kinds.plan.xsec.coords",
+    "kinds.plan.xsec.dz",
+    "kinds.plan.xsec.ztop",
+    "layers.*.arrowsize",
+    "layers.*.barb_len",
+    "layers.*.barb_units",
+    "layers.*.clabel",
+    "layers.*.cmap",
+    "layers.*.color",
+    "layers.*.density",
+    "layers.*.extend",
+    "layers.*.field",
+    "layers.*.frame",
+    "layers.*.key",
+    "layers.*.legend",
+    "layers.*.levels",
+    "layers.*.lw",
+    "layers.*.mask_below",
+    "layers.*.mode",
+    "layers.*.neg_dashed",
+    "layers.*.nlevels",
+    "layers.*.on",
+    "layers.*.reverse",
+    "layers.*.scale",
+    "layers.*.slw",
+    "layers.*.spacing",
+    "layers.*.style",
+    "layers.*.type",
+    "layers.*.units",
+    "layers.*.vector",
+    "layers.*.vmax",
+    "layers.*.vmin",
+    "layers.*.white_first",
+    "layers.*.width",
+    "layers.*.z",
+    "layers.*.zspacing",
+    "panels[].id",
+    "panels[].kind",
+    "panels[].layers[].color",
+    "panels[].layers[].label",
+    "panels[].layers[].ref",
+    "panels[].layers[].run",
+    "panels[].layers[].time_s",
+    "panels[].layers[].type",
+    "panels[].layers[].where.avg",
+    "panels[].layers[].where.kind",
+    "panels[].layers[].where.x",
+    "panels[].layers[].where.y",
+    "panels[].opts.letters.loc",
+    "panels[].opts.time_label.loc",
+    "panels[].run",
+    "panels[].section",
+    "panels[].time_s",
+    "sections.s0.a",
+    "sections.s0.ahead",
+    "sections.s0.angle",
+    "sections.s0.avg",
+    "sections.s0.b",
+    "sections.s0.cx",
+    "sections.s0.cy",
+    "sections.s0.half",
+    "sections.s0.label",
+    "sections.s0.mwin",
+    "sections.s0.off",
+    "sections.s0.offset[]",
+    "sections.s0.orient",
+    "sections.s0.pos",
+    "sections.s0.right",
+    "sections.s0.x",
+    "sections.s0.x0",
+    "sections.s0.x1",
+    "sections.s0.y",
+    "sections.s0.y0",
+    "sections.s0.y1",
+    "size[]"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Rows",
+   "control": "IntInput",
+   "options": [],
+   "keys": [
+    "grid.rows",
+    "size[]"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Columns",
+   "control": "IntInput",
+   "options": [],
+   "keys": [
+    "grid.cols",
+    "size[]"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Column widths",
+   "control": "TextInput",
+   "options": [],
+   "keys": [],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Row heights",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "grid.heights[]"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Add a panel of",
+   "control": "Select",
+   "options": [
+    "Plan views",
+    "Soundings",
+    "Vertical cross-sections",
+    "Time\u2013height (series)",
+    "Time series",
+    "Distributions",
+    "Vertical profiles",
+    "Joint distributions (x vs y)",
+    "Azimuthal means (radius\u2013height)",
+    "Tables (sounding parameters, field statistics)",
+    "3D scene (one picture)"
+   ],
+   "keys": [],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "At",
+   "control": "Select",
+   "options": [
+    "A new row",
+    "A new column"
+   ],
+   "keys": [],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Apply a style preset",
+   "control": "MenuButton",
+   "options": [],
+   "keys": [],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Text",
+   "label": "Font",
+   "control": "Select",
+   "options": [
+    "sans-serif",
+    "serif",
+    "DejaVu Sans",
+    "Liberation Sans",
+    "Source Sans Pro",
+    "Roboto",
+    "Open Sans",
+    "Noto Sans",
+    "DejaVu Serif",
+    "Liberation Serif",
+    "STIXGeneral"
+   ],
+   "keys": [
+    "style.font.family"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Text",
+   "label": "Math & units font",
+   "control": "Select",
+   "options": [
+    "DejaVu Sans",
+    "Like the text font",
+    "STIX Sans",
+    "STIX (Times-like)",
+    "Computer Modern (LaTeX)"
+   ],
+   "keys": [
+    "style.font.math"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Text",
+   "label": "Base size (pt)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.font.size"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Text",
+   "label": "Tick labels (pt)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.font.tick"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Text",
+   "label": "Axis labels (pt)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.font.label"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Text",
+   "label": "Panel titles (pt)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.font.title"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Text",
+   "label": "Figure title (pt)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.font.suptitle"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Text",
+   "label": "Legends (pt)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.font.legend"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Where",
+   "control": "Select",
+   "options": [
+    "Center",
+    "Left",
+    "Right"
+   ],
+   "keys": [
+    "kinds.sounding.axes.title_loc"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Bold",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.sounding.axes.title_bold"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Shrink these labels to fit narrow panels",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "style.label_fit"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Panel letters",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "style.letters.auto",
+    "style.letters.on"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Style",
+   "control": "Select",
+   "options": [
+    "a",
+    "(a)",
+    "a)",
+    "A",
+    "(A)"
+   ],
+   "keys": [
+    "style.letters.fmt"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Size (pt)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.letters.size"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "White box",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "style.letters.box"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Time label",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "style.time_label.on"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Text",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "style.time_label.fmt"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Legend",
+   "label": "Legends on",
+   "control": "Select",
+   "options": [
+    "Each panel",
+    "The figure"
+   ],
+   "keys": [
+    "style.legend.where"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Legend",
+   "label": "Panels' own legends",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "style.legend.own"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Contour key",
+   "label": "Of the layer",
+   "control": "Select",
+   "options": [
+    "First contours"
+   ],
+   "keys": [],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Maximum and minimum",
+   "label": "Of the layer",
+   "control": "Select",
+   "options": [
+    "First fill"
+   ],
+   "keys": [],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Spacing",
+   "label": "Between columns",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.spacing.wspace"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Spacing",
+   "label": "Between rows",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.spacing.hspace"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Spacing",
+   "label": "Around panels, x (in)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.spacing.w_pad"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Spacing",
+   "label": "Around panels, y (in)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.spacing.h_pad"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "matplotlib style",
+   "label": "matplotlib style (blank: none)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "style.mplstyle"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Your own code",
+   "label": "Run the code",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "code.on"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Your own code",
+   "label": "",
+   "control": "CodeEditor",
+   "options": [],
+   "keys": [],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Your own code",
+   "label": "Python, run after the figure is drawn",
+   "control": "TextAreaInput",
+   "options": [],
+   "keys": [
+    "code.text"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Your own code",
+   "label": "Plain text box (if the highlighted editor stays blank, e.g. without internet)",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Add",
+   "control": "Select",
+   "options": [
+    "Text",
+    "Marker",
+    "Arrow",
+    "Line",
+    "Vertical line",
+    "Horizontal line",
+    "Box",
+    "Circle",
+    "Legend entry"
+   ],
+   "keys": [],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Kind",
+   "control": "Select",
+   "options": [
+    "Text",
+    "Marker",
+    "Arrow",
+    "Line",
+    "Vertical line",
+    "Horizontal line",
+    "Box",
+    "Circle",
+    "Legend entry"
+   ],
+   "keys": [
+    "annotations[].kind",
+    "annotations[].marker"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Panels (blank: all)",
+   "control": "MultiChoice",
+   "options": [
+    "a",
+    "b"
+   ],
+   "keys": [
+    "annotations[].panel"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Position in",
+   "control": "Select",
+   "options": [
+    "Axis units (km, min)",
+    "Panel fraction (0\u20131)"
+   ],
+   "keys": [
+    "annotations[].coords"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "x",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].x"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "y",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].y"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Text",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "annotations[].text"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Size",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].size"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Bold",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "annotations[].bold"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Colour",
+   "control": "ColorPicker",
+   "options": [],
+   "keys": [
+    "annotations[].color"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Line width",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].lw"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Marker",
+   "control": "Select",
+   "options": [
+    "\u00d7",
+    "+",
+    "\u25cf",
+    "\u25cb",
+    "\u25a1",
+    "\u2605",
+    "\u25b2"
+   ],
+   "keys": [
+    "annotations[].marker"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "x to",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].x2"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "y to",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].y2"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Line style",
+   "control": "Select",
+   "options": [
+    "Solid",
+    "Dashed",
+    "Dotted",
+    "Dash-dot"
+   ],
+   "keys": [
+    "annotations[].ls"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Radius",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].r"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Looks like",
+   "control": "Select",
+   "options": [
+    "Line",
+    "Marker",
+    "Line and marker",
+    "Filled box"
+   ],
+   "keys": [
+    "annotations[].look"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "runs",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Label",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "runs[].label"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "runs",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Colour",
+   "control": "ColorPicker",
+   "options": [],
+   "keys": [
+    "runs[].color"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "runs",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Time zero (min)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "runs[].t0_min"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "runs",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Viewer's track",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "runs[].track"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "runs",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Track file",
+   "control": "Select",
+   "options": [
+    "None",
+    "demo_supercell.csv",
+    "demo_supercell_weak.csv",
+    "Type a path\u2026"
+   ],
+   "keys": [
+    "runs[].track"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "runs",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Track file path (blank: none)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "runs[].track"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "runs",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Storm",
+   "control": "Select",
+   "options": [],
+   "keys": [],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "runs",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Add a run",
+   "control": "Select",
+   "options": [
+    "demo/supercell_weak"
+   ],
+   "keys": [],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "kind",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Sounding panels",
+   "label": "Sounding layout",
+   "control": "Select",
+   "options": [
+    "Skew-T with a hodograph inset",
+    "Skew-T and hodograph side by side",
+    "Skew-T only",
+    "Hodograph only"
+   ],
+   "keys": [
+    "kinds.sounding.skewt.layout",
+    "size[]"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "kind",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Sounding panels",
+   "label": "Parameter table under each panel (blank: none)",
+   "control": "MultiChoice",
+   "options": [
+    "SBCAPE (J kg$^{-1}$)",
+    "SBCIN (J kg$^{-1}$)",
+    "SBLCL (m)",
+    "MLCAPE (J kg$^{-1}$)",
+    "MLCIN (J kg$^{-1}$)",
+    "MLLCL (m)",
+    "MLLFC (m)",
+    "MUCAPE (J kg$^{-1}$)",
+    "MUCIN (J kg$^{-1}$)",
+    "0\u2013250 m shear (m s$^{-1}$)",
+    "0\u2013500 m shear (m s$^{-1}$)",
+    "0\u20131 km shear (m s$^{-1}$)",
+    "0\u20133 km shear (m s$^{-1}$)",
+    "0\u20136 km shear (m s$^{-1}$)",
+    "0\u2013250 m SRH (m$^2$ s$^{-2}$)",
+    "0\u2013500 m SRH (m$^2$ s$^{-2}$)",
+    "0\u20131 km SRH (m$^2$ s$^{-2}$)",
+    "0\u20133 km SRH (m$^2$ s$^{-2}$)",
+    "ESRH (m$^2$ s$^{-2}$)",
+    "STP (fixed)",
+    "STP",
+    "SCP"
+   ],
+   "keys": [
+    "kinds.sounding.skewt.table[]",
+    "size[]"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "kind",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Sounding panels",
+   "label": "Storm motion (SRH, ring)",
+   "control": "Select",
+   "options": [
+    "Bunkers right mover",
+    "Bunkers left mover",
+    "0\u20136 km mean wind",
+    "Custom (u, v)"
+   ],
+   "keys": [
+    "kinds.sounding.skewt.storm"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "kind",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Skew-T",
+   "label": "Bottom (hPa)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.sounding.skewt.pmax"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "kind",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Skew-T",
+   "label": "Top (hPa)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.sounding.skewt.pmin"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "kind",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Skew-T",
+   "label": "Skew",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.sounding.skewt.skew"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "kind",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Skew-T",
+   "label": "T left (\u00b0C)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.sounding.skewt.tmin"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "kind",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Skew-T",
+   "label": "T right (\u00b0C)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.sounding.skewt.tmax"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "kind",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Skew-T",
+   "label": "Line width",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.sounding.skewt.lw"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "kind",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Skew-T",
+   "label": "Parcel",
+   "control": "Select",
+   "options": [
+    "Mixed layer",
+    "Surface",
+    "Most unstable",
+    "None"
+   ],
+   "keys": [
+    "kinds.sounding.skewt.parcel"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "kind",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Skew-T",
+   "label": "CAPE / CIN in legend",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.sounding.skewt.params"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "kind",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Skew-T",
+   "label": "Adiabats",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.sounding.skewt.guides"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "kind",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Skew-T",
+   "label": "Wind barbs",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.sounding.skewt.barbs"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "kind",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Hodograph",
+   "label": "Hodograph \u00b1 (m/s)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.sounding.skewt.hodo_max"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "kind",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Hodograph",
+   "label": "Hodograph top (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.sounding.skewt.hodo_top"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "kind",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Hodograph",
+   "label": "Inset size",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.sounding.skewt.inset_size"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "kind",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Hodograph",
+   "label": "Hodograph centred on",
+   "control": "Select",
+   "options": [
+    "The origin (0, 0)",
+    "What is drawn (fit)",
+    "Custom (u, v below)"
+   ],
+   "keys": [
+    "kinds.sounding.skewt.hodo_center"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "kind",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Hodograph",
+   "label": "Bunkers right mover (RM)",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.sounding.skewt.hodo_rm"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "kind",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Hodograph",
+   "label": "Bunkers left mover (LM)",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.sounding.skewt.hodo_lm"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "kind",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Hodograph",
+   "label": "0\u20136 km mean wind",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.sounding.skewt.hodo_mean"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "kind",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Hodograph",
+   "label": "Heights along the trace",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.sounding.skewt.hodo_labels"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "kind",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Hodograph",
+   "label": "Heights marked (km)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "kinds.sounding.skewt.hodo_heights"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "kind",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Hodograph",
+   "label": "Ring at the storm motion",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.sounding.skewt.hodo_storm"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "kind",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Hodograph",
+   "label": "Inset at",
+   "control": "Select",
+   "options": [
+    "Auto (clear of the traces)",
+    "Auto, top corners only (older figures)",
+    "Upper right",
+    "Upper left",
+    "Lower right",
+    "Lower left",
+    "Custom (x, y below)"
+   ],
+   "keys": [
+    "kinds.sounding.skewt.inset_loc"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "kind",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Legend in the panel",
+   "label": "Legend (one sounding)",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.sounding.skewt.legend"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "kind",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Legend in the panel",
+   "label": "At",
+   "control": "Select",
+   "options": [
+    "best",
+    "upper left",
+    "upper right",
+    "lower left",
+    "lower right",
+    "upper center",
+    "lower center",
+    "center left",
+    "center right"
+   ],
+   "keys": [
+    "kinds.sounding.skewt.legend_loc"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "kind",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Legend in the panel",
+   "label": "Columns",
+   "control": "IntInput",
+   "options": [],
+   "keys": [
+    "kinds.sounding.skewt.legend_ncol"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "kind",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Legend in the panel",
+   "label": "Frame",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.sounding.skewt.legend_frame"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "kind",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "x label",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "kinds.sounding.axes.xlabel"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "kind",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "y label",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "kinds.sounding.axes.ylabel"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "kind",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "Tick labels on",
+   "control": "Select",
+   "options": [
+    "All panels",
+    "Outer panels",
+    "No panels"
+   ],
+   "keys": [
+    "kinds.sounding.axes.ticklabels"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "kind",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "Share limits (panels of a kind)",
+   "control": "Select",
+   "options": [
+    "No",
+    "x",
+    "y",
+    "x and y"
+   ],
+   "keys": [
+    "kinds.sounding.axes.share"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "kind",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "Tick marks",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.sounding.axes.ticks"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "kind",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "Minor ticks",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.sounding.axes.minor"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "kind",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "Ticks point",
+   "control": "Select",
+   "options": [
+    "Out",
+    "In",
+    "Across"
+   ],
+   "keys": [
+    "kinds.sounding.axes.tickdir"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "kind",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "x tick every",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.sounding.axes.xstep"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "kind",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "Frame width (pt)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.sounding.axes.frame_lw"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "kind",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "Grid lines",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.sounding.axes.grid"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "kind",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "Grid style",
+   "control": "Select",
+   "options": [
+    "dotted",
+    "dashed",
+    "solid"
+   ],
+   "keys": [
+    "kinds.sounding.axes.grid_ls"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "",
+   "label": "Title",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].title"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "",
+   "label": "Row label (left)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].rowlabel"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "[sounding]",
+   "label": "",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "[sounding]",
+   "label": "In panel",
+   "control": "Select",
+   "options": [
+    "a",
+    "b"
+   ],
+   "keys": [
+    "panels[].layers[].color",
+    "panels[].layers[].label",
+    "panels[].layers[].run",
+    "panels[].layers[].time_s",
+    "panels[].layers[].type",
+    "panels[].layers[].where.avg",
+    "panels[].layers[].where.kind",
+    "panels[].layers[].where.x",
+    "panels[].layers[].where.y"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "[sounding]",
+   "label": "Run",
+   "control": "Select",
+   "options": [],
+   "keys": [],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "[sounding]",
+   "label": "Time",
+   "control": "Select",
+   "options": [
+    "0:00:00  (0 min)",
+    "1:00:00  (60 min)",
+    "1:05:00  (65 min)",
+    "1:10:00  (70 min)",
+    "1:15:00  (75 min)",
+    "1:20:00  (80 min)",
+    "1:25:00  (85 min)",
+    "1:30:00  (90 min)",
+    "1:35:00  (95 min)",
+    "1:40:00  (100 min)"
+   ],
+   "keys": [
+    "panels[].layers[].time_s"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "[sounding]",
+   "label": "Keep this time in animations",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].time_lock"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "[sounding]",
+   "label": "Where",
+   "control": "Select",
+   "options": [
+    "Storm (offset, km)",
+    "Point (model x, y km)",
+    "Domain mean"
+   ],
+   "keys": [
+    "panels[].layers[].where.kind"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "[sounding]",
+   "label": "x (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].where.x"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "[sounding]",
+   "label": "y (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].where.y"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "[sounding]",
+   "label": "Box width (km, 0: column)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].where.avg"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "[sounding]",
+   "label": "Automatic colour",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].color"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "[sounding]",
+   "label": "Legend text (blank: automatic)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].label"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "[sounding]",
+   "label": "Own line looks",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].T_color",
+    "panels[].layers[].T_ls",
+    "panels[].layers[].Td_color",
+    "panels[].layers[].Td_ls",
+    "panels[].layers[].Tp_color",
+    "panels[].layers[].Tp_ls"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "x label",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].opts.axes.xlabel"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "y label",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].opts.axes.ylabel"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "Tick marks",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.axes.ticks"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "Minor ticks",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.axes.minor"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "Ticks point",
+   "control": "Select",
+   "options": [
+    "Out",
+    "In",
+    "Across"
+   ],
+   "keys": [
+    "panels[].opts.axes.tickdir"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "x tick every",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].opts.axes.xstep"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "Frame width (pt)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].opts.axes.frame_lw"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "Grid lines",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.axes.grid"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "Grid style",
+   "control": "Select",
+   "options": [
+    "dotted",
+    "dashed",
+    "solid"
+   ],
+   "keys": [
+    "panels[].opts.axes.grid_ls"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Where",
+   "control": "Select",
+   "options": [
+    "Center",
+    "Left",
+    "Right"
+   ],
+   "keys": [
+    "panels[].opts.axes.title_loc"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Bold",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.axes.title_bold"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Panel letters",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.letters.on"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Size (pt)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].opts.letters.size"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "White box",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.letters.box"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Time label",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.time_label.on"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Text",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].opts.time_label.fmt"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Sounding panels",
+   "label": "Sounding layout",
+   "control": "Select",
+   "options": [
+    "Skew-T with a hodograph inset",
+    "Skew-T and hodograph side by side",
+    "Skew-T only",
+    "Hodograph only"
+   ],
+   "keys": [
+    "panels[].opts.skewt.layout",
+    "size[]"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Sounding panels",
+   "label": "Parameter table under each panel (blank: none)",
+   "control": "MultiChoice",
+   "options": [
+    "SBCAPE (J kg$^{-1}$)",
+    "SBCIN (J kg$^{-1}$)",
+    "SBLCL (m)",
+    "MLCAPE (J kg$^{-1}$)",
+    "MLCIN (J kg$^{-1}$)",
+    "MLLCL (m)",
+    "MLLFC (m)",
+    "MUCAPE (J kg$^{-1}$)",
+    "MUCIN (J kg$^{-1}$)",
+    "0\u2013250 m shear (m s$^{-1}$)",
+    "0\u2013500 m shear (m s$^{-1}$)",
+    "0\u20131 km shear (m s$^{-1}$)",
+    "0\u20133 km shear (m s$^{-1}$)",
+    "0\u20136 km shear (m s$^{-1}$)",
+    "0\u2013250 m SRH (m$^2$ s$^{-2}$)",
+    "0\u2013500 m SRH (m$^2$ s$^{-2}$)",
+    "0\u20131 km SRH (m$^2$ s$^{-2}$)",
+    "0\u20133 km SRH (m$^2$ s$^{-2}$)",
+    "ESRH (m$^2$ s$^{-2}$)",
+    "STP (fixed)",
+    "STP",
+    "SCP"
+   ],
+   "keys": [
+    "panels[].opts.skewt.table[]",
+    "size[]"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Sounding panels",
+   "label": "Storm motion (SRH, ring)",
+   "control": "Select",
+   "options": [
+    "Bunkers right mover",
+    "Bunkers left mover",
+    "0\u20136 km mean wind",
+    "Custom (u, v)"
+   ],
+   "keys": [
+    "panels[].opts.skewt.storm"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Skew-T",
+   "label": "Bottom (hPa)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].opts.skewt.pmax"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Skew-T",
+   "label": "Top (hPa)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].opts.skewt.pmin"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Skew-T",
+   "label": "Skew",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].opts.skewt.skew"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Skew-T",
+   "label": "T left (\u00b0C)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].opts.skewt.tmin"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Skew-T",
+   "label": "T right (\u00b0C)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].opts.skewt.tmax"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Skew-T",
+   "label": "Line width",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].opts.skewt.lw"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Skew-T",
+   "label": "Parcel",
+   "control": "Select",
+   "options": [
+    "Mixed layer",
+    "Surface",
+    "Most unstable",
+    "None"
+   ],
+   "keys": [
+    "panels[].opts.skewt.parcel"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Skew-T",
+   "label": "CAPE / CIN in legend",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.skewt.params"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Skew-T",
+   "label": "Adiabats",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.skewt.guides"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Skew-T",
+   "label": "Wind barbs",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.skewt.barbs"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Hodograph",
+   "label": "Hodograph \u00b1 (m/s)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].opts.skewt.hodo_max"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Hodograph",
+   "label": "Hodograph top (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].opts.skewt.hodo_top"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Hodograph",
+   "label": "Inset size",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].opts.skewt.inset_size"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Hodograph",
+   "label": "Hodograph centred on",
+   "control": "Select",
+   "options": [
+    "The origin (0, 0)",
+    "What is drawn (fit)",
+    "Custom (u, v below)"
+   ],
+   "keys": [
+    "panels[].opts.skewt.hodo_center"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Hodograph",
+   "label": "Bunkers right mover (RM)",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.skewt.hodo_rm"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Hodograph",
+   "label": "Bunkers left mover (LM)",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.skewt.hodo_lm"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Hodograph",
+   "label": "0\u20136 km mean wind",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.skewt.hodo_mean"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Hodograph",
+   "label": "Heights along the trace",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.skewt.hodo_labels"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Hodograph",
+   "label": "Heights marked (km)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].opts.skewt.hodo_heights"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Hodograph",
+   "label": "Ring at the storm motion",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.skewt.hodo_storm"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Hodograph",
+   "label": "Inset at",
+   "control": "Select",
+   "options": [
+    "Auto (clear of the traces)",
+    "Auto, top corners only (older figures)",
+    "Upper right",
+    "Upper left",
+    "Lower right",
+    "Lower left",
+    "Custom (x, y below)"
+   ],
+   "keys": [
+    "panels[].opts.skewt.inset_loc"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Legend in the panel",
+   "label": "Legend (one sounding)",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.skewt.legend"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Legend in the panel",
+   "label": "At",
+   "control": "Select",
+   "options": [
+    "best",
+    "upper left",
+    "upper right",
+    "lower left",
+    "lower right",
+    "upper center",
+    "lower center",
+    "center left",
+    "center right"
+   ],
+   "keys": [
+    "panels[].opts.skewt.legend_loc"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Legend in the panel",
+   "label": "Columns",
+   "control": "IntInput",
+   "options": [],
+   "keys": [
+    "panels[].opts.skewt.legend_ncol"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Legend in the panel",
+   "label": "Frame",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.skewt.legend_frame"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Add",
+   "control": "Select",
+   "options": [
+    "Text",
+    "Marker",
+    "Arrow",
+    "Line",
+    "Vertical line",
+    "Horizontal line",
+    "Box",
+    "Circle",
+    "Legend entry"
+   ],
+   "keys": [],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Kind",
+   "control": "Select",
+   "options": [
+    "Text",
+    "Marker",
+    "Arrow",
+    "Line",
+    "Vertical line",
+    "Horizontal line",
+    "Box",
+    "Circle",
+    "Legend entry"
+   ],
+   "keys": [
+    "annotations[].kind",
+    "annotations[].marker"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Panels (blank: all)",
+   "control": "MultiChoice",
+   "options": [
+    "a",
+    "b"
+   ],
+   "keys": [
+    "annotations[].panel"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Position in",
+   "control": "Select",
+   "options": [
+    "Axis units (km, min)",
+    "Panel fraction (0\u20131)"
+   ],
+   "keys": [
+    "annotations[].coords"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "x",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].x"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "y",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].y"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Text",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "annotations[].text"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Size",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].size"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Bold",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "annotations[].bold"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Colour",
+   "control": "ColorPicker",
+   "options": [],
+   "keys": [
+    "annotations[].color"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Line width",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].lw"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Marker",
+   "control": "Select",
+   "options": [
+    "\u00d7",
+    "+",
+    "\u25cf",
+    "\u25cb",
+    "\u25a1",
+    "\u2605",
+    "\u25b2"
+   ],
+   "keys": [
+    "annotations[].marker"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "x to",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].x2"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "y to",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].y2"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Line style",
+   "control": "Select",
+   "options": [
+    "Solid",
+    "Dashed",
+    "Dotted",
+    "Dash-dot"
+   ],
+   "keys": [
+    "annotations[].ls"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Radius",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].r"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Looks like",
+   "control": "Select",
+   "options": [
+    "Line",
+    "Marker",
+    "Line and marker",
+    "Filled box"
+   ],
+   "keys": [
+    "annotations[].look"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "",
+   "label": "Panel type",
+   "control": "Select",
+   "options": [
+    "Plan views",
+    "Soundings",
+    "Vertical cross-sections",
+    "Time\u2013height (series)",
+    "Time series",
+    "Distributions",
+    "Vertical profiles",
+    "Joint distributions (x vs y)",
+    "Azimuthal means (radius\u2013height)",
+    "Tables (sounding parameters, field statistics)",
+    "3D scene (one picture)"
+   ],
+   "keys": [
+    "annotations[].color",
+    "annotations[].coords",
+    "annotations[].kind",
+    "annotations[].ls",
+    "annotations[].lw",
+    "annotations[].panel",
+    "annotations[].r",
+    "annotations[].size",
+    "annotations[].text",
+    "annotations[].x",
+    "annotations[].x2",
+    "annotations[].y",
+    "annotations[].y2",
+    "kinds.plan.axes.equal",
+    "kinds.plan.axes.frame_lw",
+    "kinds.plan.axes.minor",
+    "kinds.plan.axes.tickdir",
+    "kinds.plan.axes.ticklabels",
+    "kinds.plan.axes.ticks",
+    "kinds.plan.axes.title_bold",
+    "kinds.plan.axes.title_loc",
+    "kinds.plan.axes.xlabel",
+    "kinds.plan.axes.ylabel",
+    "kinds.plan.coords",
+    "kinds.plan.domain.box",
+    "kinds.plan.domain.half",
+    "kinds.plan.domain.mode",
+    "kinds.plan.xsec.coords",
+    "kinds.plan.xsec.dz",
+    "kinds.plan.xsec.ztop",
+    "layers.*.arrowsize",
+    "layers.*.barb_len",
+    "layers.*.barb_units",
+    "layers.*.clabel",
+    "layers.*.cmap",
+    "layers.*.color",
+    "layers.*.density",
+    "layers.*.extend",
+    "layers.*.field",
+    "layers.*.frame",
+    "layers.*.key",
+    "layers.*.legend",
+    "layers.*.levels",
+    "layers.*.lw",
+    "layers.*.mask_below",
+    "layers.*.mode",
+    "layers.*.neg_dashed",
+    "layers.*.nlevels",
+    "layers.*.on",
+    "layers.*.reverse",
+    "layers.*.scale",
+    "layers.*.slw",
+    "layers.*.spacing",
+    "layers.*.style",
+    "layers.*.type",
+    "layers.*.units",
+    "layers.*.vector",
+    "layers.*.vmax",
+    "layers.*.vmin",
+    "layers.*.white_first",
+    "layers.*.width",
+    "layers.*.z",
+    "layers.*.zspacing",
+    "panels[].cell[]",
+    "panels[].id",
+    "panels[].kind",
+    "panels[].layers[].color",
+    "panels[].layers[].label",
+    "panels[].layers[].ref",
+    "panels[].layers[].run",
+    "panels[].layers[].time_s",
+    "panels[].layers[].type",
+    "panels[].layers[].where.avg",
+    "panels[].layers[].where.kind",
+    "panels[].layers[].where.x",
+    "panels[].layers[].where.y",
+    "panels[].opts.letters.loc",
+    "panels[].opts.time_label.loc",
+    "panels[].run",
+    "panels[].section",
+    "panels[].time_s",
+    "sections.s0.a",
+    "sections.s0.ahead",
+    "sections.s0.angle",
+    "sections.s0.avg",
+    "sections.s0.b",
+    "sections.s0.cx",
+    "sections.s0.cy",
+    "sections.s0.half",
+    "sections.s0.label",
+    "sections.s0.mwin",
+    "sections.s0.off",
+    "sections.s0.offset[]",
+    "sections.s0.orient",
+    "sections.s0.pos",
+    "sections.s0.right",
+    "sections.s0.x",
+    "sections.s0.x0",
+    "sections.s0.x1",
+    "sections.s0.y",
+    "sections.s0.y0",
+    "sections.s0.y1"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "",
+   "label": "Row",
+   "control": "IntInput",
+   "options": [],
+   "keys": [],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "",
+   "label": "Column",
+   "control": "IntInput",
+   "options": [],
+   "keys": [
+    "panels[].cell[]"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "",
+   "label": "Rows tall",
+   "control": "IntInput",
+   "options": [],
+   "keys": [],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "",
+   "label": "Columns wide",
+   "control": "IntInput",
+   "options": [],
+   "keys": [],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "layer",
+   "kind": "sounding",
+   "layer": "sounding",
+   "section": "[sounding]",
+   "label": "",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "layer",
+   "kind": "sounding",
+   "layer": "sounding",
+   "section": "[sounding]",
+   "label": "In panel",
+   "control": "Select",
+   "options": [
+    "a",
+    "b"
+   ],
+   "keys": [
+    "panels[].layers[].color",
+    "panels[].layers[].label",
+    "panels[].layers[].run",
+    "panels[].layers[].time_s",
+    "panels[].layers[].type",
+    "panels[].layers[].where.avg",
+    "panels[].layers[].where.kind",
+    "panels[].layers[].where.x",
+    "panels[].layers[].where.y"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "layer",
+   "kind": "sounding",
+   "layer": "sounding",
+   "section": "[sounding]",
+   "label": "Run",
+   "control": "Select",
+   "options": [],
+   "keys": [],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "layer",
+   "kind": "sounding",
+   "layer": "sounding",
+   "section": "[sounding]",
+   "label": "Time",
+   "control": "Select",
+   "options": [
+    "0:00:00  (0 min)",
+    "1:00:00  (60 min)",
+    "1:05:00  (65 min)",
+    "1:10:00  (70 min)",
+    "1:15:00  (75 min)",
+    "1:20:00  (80 min)",
+    "1:25:00  (85 min)",
+    "1:30:00  (90 min)",
+    "1:35:00  (95 min)",
+    "1:40:00  (100 min)"
+   ],
+   "keys": [
+    "panels[].layers[].time_s"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "layer",
+   "kind": "sounding",
+   "layer": "sounding",
+   "section": "[sounding]",
+   "label": "Keep this time in animations",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].time_lock"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "layer",
+   "kind": "sounding",
+   "layer": "sounding",
+   "section": "[sounding]",
+   "label": "Where",
+   "control": "Select",
+   "options": [
+    "Storm (offset, km)",
+    "Point (model x, y km)",
+    "Domain mean"
+   ],
+   "keys": [
+    "panels[].layers[].where.kind"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "layer",
+   "kind": "sounding",
+   "layer": "sounding",
+   "section": "[sounding]",
+   "label": "x (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].where.x"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "layer",
+   "kind": "sounding",
+   "layer": "sounding",
+   "section": "[sounding]",
+   "label": "y (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].where.y"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "layer",
+   "kind": "sounding",
+   "layer": "sounding",
+   "section": "[sounding]",
+   "label": "Box width (km, 0: column)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].where.avg"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "layer",
+   "kind": "sounding",
+   "layer": "sounding",
+   "section": "[sounding]",
+   "label": "Automatic colour",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].color"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "layer",
+   "kind": "sounding",
+   "layer": "sounding",
+   "section": "[sounding]",
+   "label": "Legend text (blank: automatic)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].label"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "layer",
+   "kind": "sounding",
+   "layer": "sounding",
+   "section": "[sounding]",
+   "label": "Own line looks",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].T_color",
+    "panels[].layers[].T_ls",
+    "panels[].layers[].Td_color",
+    "panels[].layers[].Td_ls",
+    "panels[].layers[].Tp_color",
+    "panels[].layers[].Tp_ls"
+   ],
+   "seen_in": "sounding figure"
+  },
+  {
+   "level": "panel",
+   "kind": "sounding",
+   "layer": "",
+   "section": "Annotations",
+   "label": "Add",
+   "control": "Select",
+   "options": [
+    "Text",
+    "Marker",
+    "Arrow",
+    "Line",
+    "Vertical line",
+    "Horizontal line",
+    "Box",
+    "Circle",
+    "Legend entry"
+   ],
+   "keys": [],
+   "seen_in": "sounding figure"
+  }
+ ],
+ "left": []
+}

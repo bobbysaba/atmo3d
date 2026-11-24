@@ -33,12 +33,14 @@ def _one_line(ed):
 
 def test_publication_options_draw(ed):
     s = new_spec(ed, "plan", 1, 2)
-    for widget, value in (("font", "serif"), ("math", "custom"), ("fs_tick", 7), ("fs_label", 9),
-                          ("fs_title", 11), ("tickdir", "in"), ("xstep", 5.0), ("ystep", 5.0),
-                          ("grid", True), ("frame_lw", 1.2), ("minor", True), ("let_box", True),
-                          ("let_loc", "above left"), ("tl_box", True), ("cb_loc", "right"),
-                          ("cb_lsize", 9), ("cb_tsize", 7), ("lg_ncol", 2), ("sp_w", 0.1)):
-        put(s, widget, value)
+    for key, value in (("font.family", "serif"), ("font.math", "custom"), ("font.tick", 7),
+                       ("font.label", 9), ("font.title", 11), ("axes.tickdir", "in"),
+                       ("axes.xstep", 5.0), ("axes.ystep", 5.0), ("axes.grid", True),
+                       ("axes.frame_lw", 1.2), ("axes.minor", True), ("letters.box", True),
+                       ("letters.loc", "above left"), ("time_label.box", True),
+                       ("colorbar.location", "right"), ("colorbar.label_size", 9),
+                       ("colorbar.tick_size", 7), ("legend.ncol", 2), ("spacing.wspace", 0.1)):
+        put(s, key, value)
     fill = next(lay for lay in s["layers"] if lay["type"] == "fill")
     fill.update(alpha=0.7, scale="log", vmin=1.0, vmax=60.0, cbar_label="reflectivity (dBZ)")
     cont = next(lay for lay in s["layers"] if lay["type"] == "contour")
@@ -53,13 +55,13 @@ def test_publication_options_draw(ed):
 
 
 def test_time_series_y_range(ed):
-    s = put(put(_one_line(ed), "ts_ymin", 0.0), "ts_ymax", 50.0)
+    s = put(put(_one_line(ed), "ts.ymin", 0.0), "ts.ymax", 50.0)
     _, _, fig = render(ed, settled(ed, s))
     assert fig.axes[0].get_ylim() == (0.0, 50.0)
 
 
 def test_time_series_marks_extremes(ed):
-    s = put(put(_one_line(ed), "ts_mark", "max"), "ts_mark_legend", True)
+    s = put(put(_one_line(ed), "ts.mark", "max"), "ts.mark_legend", True)
     _, data, fig = render(ed, settled(ed, s))
     ax, d = fig.axes[0], data[0]
     (_, _, v), = figdraw.series_extremes(d["S0_t"], d["S0_v"], "max")
@@ -270,7 +272,7 @@ def test_a_figure_draws_your_own_data_and_hand_edits(ed):
     """A hand-edited series and a series of your own data draw both lines; with its mark on, the
     edited one's legend entry says "(edited)"."""
     spec = _one_line(ed)
-    put(spec, "ts_mark_edited", True)
+    put(spec, "ts.mark_edited", True)
     spec = settled(ed, spec)
     n = ed.panel_data(spec)[0]["nlines"]
     e0 = spec["series"][0]
@@ -357,7 +359,7 @@ def test_exact_size(ed, tmp_path, fit, height):
         def apply(d):
             d["size"] = [3.25, d["size"][1]]
             d["export"] = dict(d["export"], dpi=200)
-            put(d, "fit", fit_to)
+            put(d, "export.fit", fit_to)
         return apply
 
     ed.shell.edit(size_and("trim"))

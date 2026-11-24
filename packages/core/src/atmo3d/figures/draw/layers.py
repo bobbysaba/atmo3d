@@ -397,20 +397,30 @@ def _colorbars(fig, cb, mappables, used, cell):
     kw = dict(location=loc, shrink=float(cb.get("shrink", 0.8)),
               fraction=float(cb.get("fraction", 0.05)), pad=float(cb.get("pad", 0.02)))
     if mode == "shared":
-        groups = [(used, [ml for _, _, ml in mappables])]
+        groups = [(used, [ml for _, _, ml in mappables], [i for i, _, _ in mappables])]
     elif mode in ("row", "col"):  # one colorbar per row (column) of panels
         by = {}
         for i, ax, ml in mappables:
             r, c = cell(i)
-            by.setdefault(r if mode == "row" else c, []).append((ax, ml))
-        groups = [([a for a, _ in items], [ml for _, ml in items]) for items in by.values()]
+            by.setdefault(r if mode == "row" else c, []).append((ax, ml, i))
+        groups = [([a for a, _, _ in items], [ml for _, ml, _ in items], [i for *_, i in items])
+                  for items in by.values()]
     else:
-        groups = [(ax, [ml]) for _, ax, ml in mappables]
-    for axes, mls in groups:
+        groups = [(ax, [ml], [i]) for i, ax, ml in mappables]
+    for axes, mls, ids in groups:
         m, lay = mls[0]
         c = fig.colorbar(m, ax=axes, extend=lay.get("extend", "neither"),
                          aspect=_cbar_aspect(axes, kw, orient), **kw)
         _cbar_style(c, cb, bar_layer([ml[1] for ml in mls]), loc)
+        note_bar(fig, c.ax, ids, mode)
+
+
+def note_bar(fig, cax, ids, mode):
+    """Record a colorbar drawn (its axes cax) and the panels it serves (ids, the first: the one
+    whose colours it shows) on the figure fig is of: fig._cv_bars [(cax, ids, mode)], for a
+    click on it in the preview (click.part_boxes)."""
+    root = fig.figure  # (a subfigure's figure: the one saved)
+    root.__dict__.setdefault("_cv_bars", []).append((cax, list(ids), mode))
 
 
 def bar_layer(lays):

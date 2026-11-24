@@ -31,13 +31,14 @@ Short walkthroughs that combine the tools. Each uses only what the other pages d
 
 1. In the Figure workspace, use the New dialog: *Plan views*, *Time*, 2 rows × 3
    columns. Press **Make the figure**.
-2. On the tree's **Runs** node, add the second run and give each run a label and a colour. Check that each has a storm track.
-3. On the **Plan views** node, open **Fill panels**: set *Rows are* to *Runs* and *Columns are* to
-   *Times*, the time to start from and *Every nth output*, then **Fill the panels**. In *Area*, set
-   *Plan-view area* to *Follow the tracked storm*.
-4. Put a reflectivity fill and a w contour in the node's layers, and set *Colorbars* to *One for
-   the figure* in *Colorbar* on the Figure node.
-5. Press **Export**, give **Save as** a name, choose the format and DPI, tick **Also the script
+2. In the **Runs** tool, add the second run and give each run a label and a colour. Check that each
+   has a storm track.
+3. In **Layout**, at the figure, open **Fill panels**: set *Rows are* to *Runs* and *Columns are* to
+   *Times*, the time to start from and *Every nth output*, then **Fill the panels**. At **All plan views**, in *Area*,
+   set *Plan-view area* to *Follow the tracked storm*.
+4. In **Layers**, at **All plan views**, add a reflectivity fill and a w contour (*+ Add a layer*),
+   and in **Look**, at the figure, set *Colorbars* to *One for the figure* in *Colorbar*.
+5. Press **Export** (top bar), give **Save as** a name, choose the format and DPI, tick **Also the script
    and data** to keep the data and a script that redraws the figure, and **Save**
    ([Figures](figures.md)).
 

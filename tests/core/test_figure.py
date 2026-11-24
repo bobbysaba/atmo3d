@@ -190,7 +190,8 @@ def test_sounding_table_lists_every_parameter(ed):
     from atmo3d.figures import draw as figdraw
     ed.from_soundings()
     keys = [k for k, _, _ in figdraw.SND_PARAMS]
-    assert sorted(ed.sk["table"].options.values()) == sorted(keys)
+    from atmo3d.figures import schema as S
+    assert sorted(S.row("look.skewt.table").control.options.values()) == sorted(keys)
     set_look(ed, "sounding", "skewt", table=["sbcape", "sbcin", "mucin", "shear01"])
     spec, data, fig = render(ed)
     par = data[0]["N0_par"]

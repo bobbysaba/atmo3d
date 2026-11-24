@@ -138,8 +138,8 @@ def test_workspaces_fill_a_short_window(ff, server):
     click_text(ff, "Figure")
     assert until(lambda: find(ff, "Export"), 60), "no Figure editor"
     time.sleep(5)
-    cols = [r for r in rects(ff, ".scrollable-vertical") if r[3] > 300]  # (the tree, the inspector)
-    assert len(cols) == 2 and all(abs(r[1] + r[3] - 600) < 2 for r in cols), cols
+    cols = [r for r in rects(ff, ".scrollable-vertical") if r[3] > 300]  # (the tool's drawer)
+    assert len(cols) == 1 and all(abs(r[1] + r[3] - 600) < 2 for r in cols), cols
 
 
 def test_figure_workspace(ff, server, shots):
@@ -180,7 +180,8 @@ def test_figure_clicks_download_and_scanned_runs(ff, server, shots, scanned_run)
                "return n; })()")
 
     def on_runs_node():
-        click_text(ff, "Runs (1)")  # (shown anew: the list as it is by then)
+        click_text(ff, "Layers")  # (then the Runs tool: shown anew, the list as it is by then)
+        click_text(ff, "Runs")
         time.sleep(2)
         return ff.js(offered)
 

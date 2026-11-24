@@ -22,7 +22,7 @@ from .picker import RunPicker
 from .settings import Settings
 from ..theme import ACCENT, BG, CSS, GRID, PANEL, Fast
 from . import panels
-from .ui import _html, held
+from .ui import _html
 # the Viewer's feature groups, one module each
 from .events import Events
 from .export import DataExport
@@ -30,6 +30,7 @@ from .layout import Layout
 from .mapview import MapView
 from .geomap import MapLines
 from .widgets import Widgets
+from .layers import MapLayers
 from .diff import Differences
 from .dist import DistPanel
 from .items import ItemsTray
@@ -45,7 +46,7 @@ from .view3d import View3DPanel
 from .xsec import SectionPanel
 
 
-class BaseViewer(Widgets, MapView, MapLines, Layout, Events, SoundingPanel, TrackPanel, SeriesPanel,
+class BaseViewer(Widgets, MapLayers, MapView, MapLines, Layout, Events, SoundingPanel, TrackPanel, SeriesPanel,
              DistPanel, NoParcels, SectionPanel, View3DPanel, ItemsTray, Differences,
              Sessions, DataExport, RunSwap):
     def __init__(self, run, fields, maxpix=900, error="", reg=None):
@@ -116,21 +117,9 @@ class BaseViewer(Widgets, MapView, MapLines, Layout, Events, SoundingPanel, Trac
         self.mode.watch(self._on_mode)
         self.fill_var.param.watch(self._on_fill_var, "value")
         self.fill_op.param.watch(self._on_fill_var, "value")
-        for w in (self.fill_mode, self.fill_style, self.fill_cmap, self.fill_rev,
-                  self.fill_nlev):
-            w.param.watch(rm, "value")
-        for w in (self.fill_lvl, self.fill_alpha):
-            w.param.watch(rm, "value_throttled")
-        self.fill_auto.param.watch(self._on_fill_auto, "value")
-        self._wire_diff(self.fill_diff, self.fill_cmap, self.fill_rev, self.fill_auto,
-                        self._fill_name, self.request_map, "_hold")
-        for w in (self.fill_min, self.fill_max):
-            w.param.watch(lambda e: None if self.fill_auto.value else self.request_map(),
-                          "value")
-        for o in self.ovs:
-            self._wire_overlay(o)
-        for o in self.vecs:
-            self._wire_vec(o)
+        for w in (self.fill_mode, self.fill_lvl):  # (the first fill's: layers.py)
+            w.param.watch(self._on_bar_level, "value")
+        self.fill_lvl.param.watch(rm, "value_throttled")
         self.storm.param.watch(self._on_storm, "value")
         rs = lambda *e: self.request_soundings()  # noqa: E731
         self.mean_btn.on_click(lambda e: self._add_mean())
@@ -160,23 +149,8 @@ class BaseViewer(Widgets, MapView, MapLines, Layout, Events, SoundingPanel, Trac
         self.wunits.param.watch(unzoom("hodo", "prof_x"), "value")
         self.prof_top.param.watch(unzoom("prof_z", "prof_x"), "value")
         rx = lambda *e: self.request_xsec()  # noqa: E731
-        for w in (self.xs_cmap, self.xs_rev, self.xs_fill_style):
-            w.param.watch(rx, "value")
-        self.xs_nlev.param.watch(rx, "value_throttled")
-        for o in self.xs_fills:
-            self._wire_fill(o, xs=True)
-        for o in self.xs_ovs:
-            self._wire_overlay(o, xs=True)
-        for o in self.xs_vecs:
-            self._wire_vec(o, xs=True)
-        self._xs_wired = True
-        for w in (self.xs_min, self.xs_max):
-            w.param.watch(lambda e: None if self.xs_auto.value else self.request_xsec(),
-                          "value")
+        self._xs_wired = True  # (its layers redraw it themselves: layers.py)
         self.xs_fill.param.watch(self._on_xs_fill, "value")
-        self.xs_auto.param.watch(self._on_xs_auto, "value")
-        self._wire_diff(self.xs_diff, self.xs_cmap, self.xs_rev, self.xs_auto,
-                        lambda: self.xs_fill.value, self.request_xsec, "_hold_xs")
         self.xs_ztop.param.watch(rx, "value_throttled")
         self.v3_view.on_click(self._on_use_view)
         self.v3_render.on_click(lambda e: self.request_3d())
@@ -253,62 +227,6 @@ class BaseViewer(Widgets, MapView, MapLines, Layout, Events, SoundingPanel, Trac
         if self.doc is not None:
             pn.state.add_periodic_callback(self._update_cache_html, period=3000)
         self._update_cache_html()
-
-    def _layer_request(self, xs):
-        """What a layer row's change redraws: the map, or (xs) the cross-section."""
-        return (lambda *e: self.request_xsec()) if xs else (lambda *e: self.request_map())
-
-    def _wire_fill(self, o, xs=False):
-        rq = self._layer_request(xs)
-        hold = "_hold_xs" if xs else "_hold"
-
-        def on_var(ev):  # the field's own colormap and range
-            d = self.F[ev.new]
-            with held(self, hold):
-                o["cmap"].value, o["rev"].value = d.cmap, False
-                if d.vrange:
-                    o["vmin"].value, o["vmax"].value = d.vrange
-                if "mode" in o:
-                    o["mode"].disabled = o["level"].disabled = d.ndim == 2
-            rq()
-
-        def on_auto(ev):
-            self._auto_toggled(ev.new, o["vmin"], o["vmax"], o["last"], hold)
-            rq()
-
-        o["var"].param.watch(on_var, "value")
-        o["auto"].param.watch(on_auto, "value")
-        for k in ("on", "mode", "style", "cmap", "rev", "clip"):
-            if k in o:
-                o[k].param.watch(rq, "value")
-        for k in ("vmin", "vmax"):
-            o[k].param.watch(lambda e: None if o["auto"].value else rq(), "value")
-        for k in ("level", "alpha"):
-            if k in o:
-                o[k].param.watch(rq, "value_throttled")
-
-    def _wire_overlay(self, o, xs=False):
-        rq = self._layer_request(xs)
-        for k in ("on", "var", "mode", "levels", "color", "negdash"):
-            if k in o:
-                o[k].param.watch(rq, "value")
-        for k in ("level", "width"):
-            if k in o:
-                o[k].param.watch(rq, "value_throttled")
-
-    def _wire_vec(self, o, xs=False):
-        """A map (or xs: cross-section) vector layer's widgets redraw it (a new vector:
-        its reference arrow first, then one redraw)."""
-        rq = self._layer_request(xs)
-        for k in ("q", "style"):
-            if k in o:
-                o[k].param.watch(lambda e: self._vec_vis(o, e), "value")
-        for k in ("on", "q", "frame", "style", "ref", "color"):
-            if k in o:
-                o[k].param.watch(rq, "value")
-        for k in ("level", "density"):
-            if k in o:
-                o[k].param.watch(rq, "value_throttled")
 
     def _wire_sv(self, o):
         """A 3D vector layer's widgets re-render a scene shown or being rendered."""

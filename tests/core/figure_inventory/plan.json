@@ -1,0 +1,7569 @@
+{
+ "records": [
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Width (in)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "size[]",
+    "size_auto"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Height (in)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "size[]",
+    "size_auto"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Size",
+   "control": "Select",
+   "options": [
+    "Custom",
+    "3.25 in wide (one journal column)",
+    "5 in wide",
+    "6.5 in wide (full page width)",
+    "7.5 in wide",
+    "Slide, 13.3 \u00d7 7.5 in"
+   ],
+   "keys": [
+    "size[]"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Figure title",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "size[]",
+    "suptitle"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Figure type",
+   "control": "Select",
+   "options": [
+    "Plan views",
+    "Soundings",
+    "Vertical cross-sections",
+    "Time\u2013height (series)",
+    "Time series",
+    "Distributions",
+    "Vertical profiles",
+    "Joint distributions (x vs y)",
+    "Azimuthal means (radius\u2013height)",
+    "Tables (sounding parameters, field statistics)",
+    "3D scene (one picture)"
+   ],
+   "keys": [
+    "annotations[].color",
+    "annotations[].coords",
+    "annotations[].kind",
+    "annotations[].ls",
+    "annotations[].lw",
+    "annotations[].panel",
+    "annotations[].r",
+    "annotations[].size",
+    "annotations[].text",
+    "annotations[].x",
+    "annotations[].x2",
+    "annotations[].y",
+    "annotations[].y2",
+    "kinds.sounding.axes.equal",
+    "kinds.sounding.axes.frame_lw",
+    "kinds.sounding.axes.minor",
+    "kinds.sounding.axes.tickdir",
+    "kinds.sounding.axes.ticklabels",
+    "kinds.sounding.axes.ticks",
+    "kinds.sounding.axes.title_bold",
+    "kinds.sounding.axes.title_loc",
+    "kinds.sounding.axes.xlabel",
+    "kinds.sounding.axes.ylabel",
+    "kinds.sounding.skewt.barbs",
+    "kinds.sounding.skewt.guides",
+    "kinds.sounding.skewt.hodo_center",
+    "kinds.sounding.skewt.hodo_cu",
+    "kinds.sounding.skewt.hodo_cv",
+    "kinds.sounding.skewt.hodo_heights",
+    "kinds.sounding.skewt.hodo_key",
+    "kinds.sounding.skewt.hodo_labels",
+    "kinds.sounding.skewt.hodo_lm",
+    "kinds.sounding.skewt.hodo_max",
+    "kinds.sounding.skewt.hodo_mean",
+    "kinds.sounding.skewt.hodo_rm",
+    "kinds.sounding.skewt.hodo_storm",
+    "kinds.sounding.skewt.hodo_top",
+    "kinds.sounding.skewt.inset_loc",
+    "kinds.sounding.skewt.inset_size",
+    "kinds.sounding.skewt.inset_x",
+    "kinds.sounding.skewt.inset_y",
+    "kinds.sounding.skewt.layout",
+    "kinds.sounding.skewt.legend",
+    "kinds.sounding.skewt.legend_frame",
+    "kinds.sounding.skewt.legend_loc",
+    "kinds.sounding.skewt.legend_ncol",
+    "kinds.sounding.skewt.lw",
+    "kinds.sounding.skewt.params",
+    "kinds.sounding.skewt.parcel",
+    "kinds.sounding.skewt.pmax",
+    "kinds.sounding.skewt.pmin",
+    "kinds.sounding.skewt.skew",
+    "kinds.sounding.skewt.srh",
+    "kinds.sounding.skewt.storm",
+    "kinds.sounding.skewt.storm_u",
+    "kinds.sounding.skewt.storm_v",
+    "kinds.sounding.skewt.tmax",
+    "kinds.sounding.skewt.tmin",
+    "panels[].id",
+    "panels[].insets[].id",
+    "panels[].insets[].loc",
+    "panels[].insets[].opts.domain.box[]",
+    "panels[].insets[].opts.domain.mode",
+    "panels[].insets[].size",
+    "panels[].kind",
+    "panels[].layers[].color",
+    "panels[].layers[].label",
+    "panels[].layers[].ref",
+    "panels[].layers[].run",
+    "panels[].layers[].time_s",
+    "panels[].layers[].type",
+    "panels[].layers[].where.avg",
+    "panels[].layers[].where.kind",
+    "panels[].layers[].where.x",
+    "panels[].layers[].where.y",
+    "panels[].opts.letters.loc",
+    "panels[].opts.time_label.loc",
+    "panels[].run",
+    "panels[].section",
+    "panels[].time_s",
+    "size[]"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Rows",
+   "control": "IntInput",
+   "options": [],
+   "keys": [
+    "grid.rows",
+    "size[]"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Columns",
+   "control": "IntInput",
+   "options": [],
+   "keys": [
+    "grid.cols",
+    "size[]"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Column widths",
+   "control": "TextInput",
+   "options": [],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Row heights",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "grid.heights[]"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Add a panel of",
+   "control": "Select",
+   "options": [
+    "Plan views",
+    "Soundings",
+    "Vertical cross-sections",
+    "Time\u2013height (series)",
+    "Time series",
+    "Distributions",
+    "Vertical profiles",
+    "Joint distributions (x vs y)",
+    "Azimuthal means (radius\u2013height)",
+    "Tables (sounding parameters, field statistics)",
+    "3D scene (one picture)"
+   ],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "At",
+   "control": "Select",
+   "options": [
+    "A new row",
+    "A new column"
+   ],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Fill panels",
+   "label": "Rows",
+   "control": "IntInput",
+   "options": [],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Fill panels",
+   "label": "Columns",
+   "control": "IntInput",
+   "options": [],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Fill panels",
+   "label": "Rows are",
+   "control": "Select",
+   "options": [
+    "\u2014 (fill row by row)",
+    "Runs",
+    "Times",
+    "Fields",
+    "Heights"
+   ],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Fill panels",
+   "label": "Columns are",
+   "control": "Select",
+   "options": [
+    "\u2014 (fill row by row)",
+    "Runs",
+    "Times",
+    "Fields",
+    "Heights"
+   ],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Fill panels",
+   "label": "Run",
+   "control": "Select",
+   "options": [
+    "1. supercell"
+   ],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Fill panels",
+   "label": "First time",
+   "control": "Select",
+   "options": [
+    "0:00:00  (0 min)",
+    "1:00:00  (60 min)",
+    "1:05:00  (65 min)",
+    "1:10:00  (70 min)",
+    "1:15:00  (75 min)",
+    "1:20:00  (80 min)",
+    "1:25:00  (85 min)",
+    "1:30:00  (90 min)",
+    "1:35:00  (95 min)",
+    "1:40:00  (100 min)"
+   ],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Fill panels",
+   "label": "Every nth output",
+   "control": "IntInput",
+   "options": [],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Apply a style preset",
+   "control": "MenuButton",
+   "options": [],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Text",
+   "label": "Font",
+   "control": "Select",
+   "options": [
+    "sans-serif",
+    "serif",
+    "DejaVu Sans",
+    "Liberation Sans",
+    "Source Sans Pro",
+    "Roboto",
+    "Open Sans",
+    "Noto Sans",
+    "DejaVu Serif",
+    "Liberation Serif",
+    "STIXGeneral"
+   ],
+   "keys": [
+    "style.font.family"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Text",
+   "label": "Math & units font",
+   "control": "Select",
+   "options": [
+    "DejaVu Sans",
+    "Like the text font",
+    "STIX Sans",
+    "STIX (Times-like)",
+    "Computer Modern (LaTeX)"
+   ],
+   "keys": [
+    "style.font.math"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Text",
+   "label": "Base size (pt)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.font.size"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Text",
+   "label": "Tick labels (pt)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.font.tick"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Text",
+   "label": "Axis labels (pt)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.font.label"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Text",
+   "label": "Panel titles (pt)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.font.title"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Text",
+   "label": "Figure title (pt)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.font.suptitle"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Text",
+   "label": "Legends (pt)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.font.legend"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Where",
+   "control": "Select",
+   "options": [
+    "Center",
+    "Left",
+    "Right"
+   ],
+   "keys": [
+    "kinds.plan.axes.title_loc"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Bold",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.plan.axes.title_bold"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Shrink these labels to fit narrow panels",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "style.label_fit"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Panel letters",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "style.letters.auto",
+    "style.letters.on"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Style",
+   "control": "Select",
+   "options": [
+    "a",
+    "(a)",
+    "a)",
+    "A",
+    "(A)"
+   ],
+   "keys": [
+    "style.letters.fmt"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Size (pt)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.letters.size"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "White box",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "style.letters.box"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Time label",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "style.time_label.on"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Text",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "style.time_label.fmt"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Run name",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "style.run_label.on"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "In the run's colour",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "style.run_label.run_color"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Height label",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "style.z_label.on"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Text (blank: z = \u2026 km / k = \u2026)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "style.z_label.fmt"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Colorbar",
+   "label": "Colorbars",
+   "control": "Select",
+   "options": [
+    "One for the figure",
+    "One per row",
+    "One per column",
+    "One per panel",
+    "None"
+   ],
+   "keys": [
+    "style.colorbar.mode"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Colorbar",
+   "label": "Label of bars with none of their own (blank: units)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "style.colorbar.label"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Colorbar",
+   "label": "Length (0\u20131)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.colorbar.shrink"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Colorbar",
+   "label": "Ticks of bars with none of their own (blank: auto)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "style.colorbar.ticks"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Colorbar",
+   "label": "Thickness (0\u20131)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.colorbar.fraction"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Colorbar",
+   "label": "Gap (0\u20131)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.colorbar.pad"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Colorbar",
+   "label": "Label size (pt)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.colorbar.label_size"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Colorbar",
+   "label": "Tick size (pt)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.colorbar.tick_size"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Colorbar",
+   "label": "Bold label",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "style.colorbar.label_bold"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Colorbar",
+   "label": "Label side",
+   "control": "Select",
+   "options": [
+    "Auto",
+    "Above / left",
+    "Below / right"
+   ],
+   "keys": [
+    "style.colorbar.label_side"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Colorbar",
+   "label": "Tick format (blank: auto)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "style.colorbar.tick_fmt"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Colorbar",
+   "label": "Where",
+   "control": "Select",
+   "options": [
+    "Below",
+    "Right",
+    "Above",
+    "Left"
+   ],
+   "keys": [
+    "size[]",
+    "style.colorbar.location",
+    "style.colorbar.orientation"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Legend",
+   "label": "Layer legend on",
+   "control": "Select",
+   "options": [
+    "A panel",
+    "The figure"
+   ],
+   "keys": [
+    "style.legend.where"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Legend",
+   "label": "At",
+   "control": "Select",
+   "options": [
+    "upper left",
+    "upper right",
+    "lower left",
+    "lower right",
+    "upper center",
+    "lower center",
+    "center left",
+    "center right"
+   ],
+   "keys": [
+    "style.legend.loc"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Legend",
+   "label": "Title",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "style.legend.title"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Legend",
+   "label": "Columns",
+   "control": "IntInput",
+   "options": [],
+   "keys": [
+    "style.legend.ncol"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Legend",
+   "label": "Frame",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "style.legend.frame"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Legend",
+   "label": "Anchor x, y (blank: none)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Legend",
+   "label": "In panel",
+   "control": "Select",
+   "options": [
+    "a",
+    "b"
+   ],
+   "keys": [
+    "style.legend.panel"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Contour key",
+   "label": "Contour key (nested circles)",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "style.contour_key.on"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Contour key",
+   "label": "Name in the middle",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "style.contour_key.label"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Contour key",
+   "label": "x (figure 0\u20131)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.contour_key.x"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Contour key",
+   "label": "y (figure 0\u20131)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.contour_key.y"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Contour key",
+   "label": "Size (0\u20131)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.contour_key.size"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Contour key",
+   "label": "Font (pt)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.contour_key.fs"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Contour key",
+   "label": "Frame",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "style.contour_key.frame"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Contour key",
+   "label": "Of the layer",
+   "control": "Select",
+   "options": [
+    "First contours",
+    "Contours: Vertical velocity (l1)"
+   ],
+   "keys": [
+    "style.contour_key.layer"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Maximum and minimum",
+   "label": "Maximum / minimum",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "style.extremes.on"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Maximum and minimum",
+   "label": "Show",
+   "control": "Select",
+   "options": [
+    "Maximum",
+    "Minimum",
+    "Both"
+   ],
+   "keys": [
+    "style.extremes.what"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Maximum and minimum",
+   "label": "Text at",
+   "control": "Select",
+   "options": [
+    "upper left",
+    "upper right",
+    "lower left",
+    "lower right",
+    "upper center",
+    "lower center",
+    "center left",
+    "center right"
+   ],
+   "keys": [
+    "style.extremes.loc"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Maximum and minimum",
+   "label": "Mark where (+ max, \u00d7 min)",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "style.extremes.marker"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Maximum and minimum",
+   "label": "White box",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "style.extremes.box"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Maximum and minimum",
+   "label": "Of the layer",
+   "control": "Select",
+   "options": [
+    "First fill",
+    "Fill: Reflectivity (l0)",
+    "Contours: Vertical velocity (l1)",
+    "Shading: Vertical velocity (l3)"
+   ],
+   "keys": [
+    "style.extremes.layer"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Spacing",
+   "label": "Between columns",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.spacing.wspace"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Spacing",
+   "label": "Between rows",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.spacing.hspace"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Spacing",
+   "label": "Around panels, x (in)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.spacing.w_pad"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Spacing",
+   "label": "Around panels, y (in)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.spacing.h_pad"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "matplotlib style",
+   "label": "matplotlib style (blank: none)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "style.mplstyle"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Your own code",
+   "label": "Run the code",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "code.on"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Your own code",
+   "label": "",
+   "control": "CodeEditor",
+   "options": [],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Your own code",
+   "label": "Python, run after the figure is drawn",
+   "control": "TextAreaInput",
+   "options": [],
+   "keys": [
+    "code.text"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Your own code",
+   "label": "Plain text box (if the highlighted editor stays blank, e.g. without internet)",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Add",
+   "control": "Select",
+   "options": [
+    "Text",
+    "Marker",
+    "Arrow",
+    "Line",
+    "Vertical line",
+    "Horizontal line",
+    "Box",
+    "Circle",
+    "Legend entry"
+   ],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Kind",
+   "control": "Select",
+   "options": [
+    "Text",
+    "Marker",
+    "Arrow",
+    "Line",
+    "Vertical line",
+    "Horizontal line",
+    "Box",
+    "Circle",
+    "Legend entry"
+   ],
+   "keys": [
+    "annotations[].kind",
+    "annotations[].marker"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Panels (blank: all)",
+   "control": "MultiChoice",
+   "options": [
+    "a",
+    "b"
+   ],
+   "keys": [
+    "annotations[].panel"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Position in",
+   "control": "Select",
+   "options": [
+    "Axis units (km, min)",
+    "Panel fraction (0\u20131)"
+   ],
+   "keys": [
+    "annotations[].coords"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "x",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].x"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "y",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].y"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Text",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "annotations[].text"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Size",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].size"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Bold",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "annotations[].bold"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Colour",
+   "control": "ColorPicker",
+   "options": [],
+   "keys": [
+    "annotations[].color"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Line width",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].lw"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Marker",
+   "control": "Select",
+   "options": [
+    "\u00d7",
+    "+",
+    "\u25cf",
+    "\u25cb",
+    "\u25a1",
+    "\u2605",
+    "\u25b2"
+   ],
+   "keys": [
+    "annotations[].marker"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "x to",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].x2"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "y to",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].y2"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Line style",
+   "control": "Select",
+   "options": [
+    "Solid",
+    "Dashed",
+    "Dotted",
+    "Dash-dot"
+   ],
+   "keys": [
+    "annotations[].ls"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Radius",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].r"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Looks like",
+   "control": "Select",
+   "options": [
+    "Line",
+    "Marker",
+    "Line and marker",
+    "Filled box"
+   ],
+   "keys": [
+    "annotations[].look"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "runs",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Label",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "runs[].label"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "runs",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Colour",
+   "control": "ColorPicker",
+   "options": [],
+   "keys": [
+    "runs[].color"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "runs",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Time zero (min)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "runs[].t0_min"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "runs",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Viewer's track",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "runs[].track"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "runs",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Track file",
+   "control": "Select",
+   "options": [
+    "None",
+    "demo_supercell.csv",
+    "demo_supercell_weak.csv",
+    "Type a path\u2026"
+   ],
+   "keys": [
+    "runs[].track"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "runs",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Track file path (blank: none)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "runs[].track"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "runs",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Storm",
+   "control": "Select",
+   "options": [],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "runs",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Add a run",
+   "control": "Select",
+   "options": [
+    "demo/supercell_weak"
+   ],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "",
+   "label": "Add a layer",
+   "control": "MenuButton",
+   "options": [],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[fill]",
+   "label": "",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "layers.*.on"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[fill]",
+   "label": "In panels",
+   "control": "CheckButtonGroup",
+   "options": [
+    "a",
+    "b"
+   ],
+   "keys": [
+    "panels[].layers[].over.on"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[fill]",
+   "label": "Run",
+   "control": "Select",
+   "options": [],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[fill]",
+   "label": "Derivative",
+   "control": "Select",
+   "options": [
+    "None",
+    "\u2202/\u2202z",
+    "\u2202/\u2202x",
+    "\u2202/\u2202y",
+    "|\u2207h|"
+   ],
+   "keys": [
+    "layers.*.cmap",
+    "layers.*.field",
+    "layers.*.mask_below",
+    "layers.*.units",
+    "layers.*.vmax",
+    "layers.*.vmin"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[fill]",
+   "label": "Level",
+   "control": "Select",
+   "options": [
+    "Height (km AGL)",
+    "Model level (k)",
+    "Column max",
+    "Column min"
+   ],
+   "keys": [
+    "layers.*.mode"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[fill]",
+   "label": "Height (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "layers.*.z"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[fill]",
+   "label": "Draw as",
+   "control": "Select",
+   "options": [
+    "Grid cells",
+    "Filled contours"
+   ],
+   "keys": [
+    "layers.*.style"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[fill]",
+   "label": "Blank where \u2264",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "layers.*.mask_below"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[fill]",
+   "label": "Colormap",
+   "control": "Select",
+   "options": [
+    "HomeyerRainbow",
+    "ChaseSpectral",
+    "NWSRef",
+    "NWSVel",
+    "LangRainbow12",
+    "SpectralExtended",
+    "Carbone42",
+    "Theodore16",
+    "BuDRd18",
+    "reflectivity",
+    "turbo",
+    "viridis",
+    "magma",
+    "inferno",
+    "plasma",
+    "cividis",
+    "RdBu_r",
+    "PuOr_r",
+    "BrBG",
+    "coolwarm",
+    "seismic",
+    "cmo.balance",
+    "cmo.curl",
+    "cmo.thermal",
+    "cmo.haline",
+    "cmo.deep",
+    "cmo.rain",
+    "cmo.ice",
+    "cmo.amp",
+    "YlGnBu",
+    "YlOrRd",
+    "Spectral_r",
+    "Greys_r",
+    "cubehelix",
+    "Greys",
+    "gray_r",
+    "Blues",
+    "Reds",
+    "Purples",
+    "PuOr"
+   ],
+   "keys": [
+    "layers.*.cmap"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[fill]",
+   "label": "Reverse",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "layers.*.reverse"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[fill]",
+   "label": "Start from white",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "layers.*.white_first"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[fill]",
+   "label": "Min",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "layers.*.vmin"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[fill]",
+   "label": "Max",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "layers.*.vmax"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[fill]",
+   "label": "Colour steps (0: smooth)",
+   "control": "IntInput",
+   "options": [],
+   "keys": [
+    "layers.*.nlevels"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[fill]",
+   "label": "Scale",
+   "control": "Select",
+   "options": [
+    "Linear",
+    "Logarithmic"
+   ],
+   "keys": [
+    "layers.*.scale"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[fill]",
+   "label": "Colorbar arrows",
+   "control": "Select",
+   "options": [
+    "Auto (where the data pass the range)",
+    "None",
+    "Max end",
+    "Min end",
+    "Both ends"
+   ],
+   "keys": [
+    "layers.*.extend"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[fill]",
+   "label": "Opacity (0\u20131)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "layers.*.alpha"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[fill]",
+   "label": "Colorbar label (blank: Style's, else units)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "layers.*.cbar_label"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[fill]",
+   "label": "Colorbar ticks (blank: Style's, else auto)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "layers.*.cbar_ticks"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[fill] > Difference",
+   "label": "Difference: minus another run or time",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "layers.*.cmap",
+    "layers.*.mask_below",
+    "layers.*.minus.grid",
+    "layers.*.minus.run",
+    "layers.*.minus.time_s",
+    "layers.*.reverse",
+    "layers.*.vmax",
+    "layers.*.vmin"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[fill] > Ensemble",
+   "label": "Ensemble: a statistic over several runs",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "layers.*.ens.above",
+    "layers.*.ens.grid",
+    "layers.*.ens.runs",
+    "layers.*.ens.stat",
+    "layers.*.ens.threshold"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[fill] > Time window",
+   "label": "Over a time window",
+   "control": "Select",
+   "options": [
+    "One time (off)",
+    "Maximum (swath)",
+    "Minimum",
+    "Mean",
+    "Sum",
+    "Storm-following mean (composite)"
+   ],
+   "keys": [
+    "layers.*.reduce.every",
+    "layers.*.reduce.op",
+    "layers.*.reduce.t0",
+    "layers.*.reduce.t1"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[contour]",
+   "label": "",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "layers.*.on"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[contour]",
+   "label": "In panels",
+   "control": "CheckButtonGroup",
+   "options": [
+    "a",
+    "b"
+   ],
+   "keys": [
+    "panels[].layers[].over.on"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[contour]",
+   "label": "Run",
+   "control": "Select",
+   "options": [],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[contour]",
+   "label": "Derivative",
+   "control": "Select",
+   "options": [
+    "None",
+    "\u2202/\u2202z",
+    "\u2202/\u2202x",
+    "\u2202/\u2202y",
+    "|\u2207h|"
+   ],
+   "keys": [
+    "layers.*.field"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[contour]",
+   "label": "Level",
+   "control": "Select",
+   "options": [
+    "Height (km AGL)",
+    "Model level (k)",
+    "Column max",
+    "Column min"
+   ],
+   "keys": [
+    "layers.*.mode"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[contour]",
+   "label": "Height (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "layers.*.z"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[contour]",
+   "label": "Levels (e.g. 10, 20 or -6:6:2)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "layers.*.levels"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[contour]",
+   "label": "Colour",
+   "control": "ColorPicker",
+   "options": [],
+   "keys": [
+    "layers.*.color"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[contour]",
+   "label": "Line width",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "layers.*.lw"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[contour]",
+   "label": "Dash negative",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "layers.*.neg_dashed"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[contour]",
+   "label": "Label the lines",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "layers.*.clabel"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[contour]",
+   "label": "Legend entry (blank: none)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "layers.*.legend"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[contour]",
+   "label": "Over a time window",
+   "control": "Select",
+   "options": [
+    "One time (off)",
+    "Maximum (swath)",
+    "Minimum",
+    "Mean",
+    "Sum",
+    "Storm-following mean (composite)"
+   ],
+   "keys": [
+    "layers.*.reduce.every",
+    "layers.*.reduce.op",
+    "layers.*.reduce.t0",
+    "layers.*.reduce.t1"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[vectors]",
+   "label": "",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "layers.*.on"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[vectors]",
+   "label": "In panels",
+   "control": "CheckButtonGroup",
+   "options": [
+    "a",
+    "b"
+   ],
+   "keys": [
+    "panels[].layers[].over.on"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[vectors]",
+   "label": "Run",
+   "control": "Select",
+   "options": [],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[vectors]",
+   "label": "Vector",
+   "control": "Select",
+   "options": [
+    "Wind",
+    "Horizontal vorticity",
+    "Baroclinic generation"
+   ],
+   "keys": [
+    "layers.*.scale",
+    "layers.*.vector"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[vectors]",
+   "label": "Draw as",
+   "control": "Select",
+   "options": [
+    "Arrows",
+    "Barbs (plan views)",
+    "Streamlines"
+   ],
+   "keys": [
+    "layers.*.style"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[vectors]",
+   "label": "Frame",
+   "control": "Select",
+   "options": [
+    "Ground-relative",
+    "Grid-relative",
+    "Storm-relative"
+   ],
+   "keys": [
+    "layers.*.frame"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[vectors]",
+   "label": "Colour",
+   "control": "ColorPicker",
+   "options": [],
+   "keys": [
+    "layers.*.color"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[vectors]",
+   "label": "Height (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "layers.*.z"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[vectors]",
+   "label": "Spacing (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "layers.*.spacing"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[vectors]",
+   "label": "Scale (larger: shorter)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "layers.*.scale"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[vectors]",
+   "label": "Arrow width",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "layers.*.width"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[vectors]",
+   "label": "Key arrow (m/s, 0: none)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "layers.*.key"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[shade]",
+   "label": "",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "layers.*.on"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[shade]",
+   "label": "In panels",
+   "control": "CheckButtonGroup",
+   "options": [
+    "a",
+    "b"
+   ],
+   "keys": [
+    "panels[].layers[].over.on"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[shade]",
+   "label": "Run",
+   "control": "Select",
+   "options": [],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[shade]",
+   "label": "Derivative",
+   "control": "Select",
+   "options": [
+    "None",
+    "\u2202/\u2202z",
+    "\u2202/\u2202x",
+    "\u2202/\u2202y",
+    "|\u2207h|"
+   ],
+   "keys": [
+    "layers.*.field"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[shade]",
+   "label": "Level",
+   "control": "Select",
+   "options": [
+    "Height (km AGL)",
+    "Model level (k)",
+    "Column max",
+    "Column min"
+   ],
+   "keys": [
+    "layers.*.mode"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[shade]",
+   "label": "Height (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "layers.*.z"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[shade]",
+   "label": "Threshold",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "layers.*.threshold"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[shade]",
+   "label": "Shade",
+   "control": "Select",
+   "options": [
+    "Above",
+    "Below"
+   ],
+   "keys": [
+    "layers.*.above"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[shade]",
+   "label": "Pattern",
+   "control": "Select",
+   "options": [
+    "Solid",
+    "Hatching /",
+    "Hatching \\",
+    "Cross-hatching",
+    "Stippling",
+    "Dense stippling",
+    "Circles"
+   ],
+   "keys": [
+    "layers.*.hatch"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[shade]",
+   "label": "Colour",
+   "control": "ColorPicker",
+   "options": [],
+   "keys": [
+    "layers.*.color"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[shade]",
+   "label": "Opacity (0\u20131)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "layers.*.alpha"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[shade]",
+   "label": "Outline",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "layers.*.outline"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[shade]",
+   "label": "Legend entry (blank: none)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "layers.*.legend"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[shade]",
+   "label": "Over a time window",
+   "control": "Select",
+   "options": [
+    "One time (off)",
+    "Maximum (swath)",
+    "Minimum",
+    "Mean",
+    "Sum",
+    "Storm-following mean (composite)"
+   ],
+   "keys": [
+    "layers.*.reduce.every",
+    "layers.*.reduce.op",
+    "layers.*.reduce.t0",
+    "layers.*.reduce.t1"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[track]",
+   "label": "",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "layers.*.on"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[track]",
+   "label": "In panels",
+   "control": "CheckButtonGroup",
+   "options": [
+    "a",
+    "b"
+   ],
+   "keys": [
+    "panels[].layers[].over.on"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[track]",
+   "label": "Run",
+   "control": "Select",
+   "options": [],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[track]",
+   "label": "Run's colour",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "layers.*.run_color"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[track]",
+   "label": "Line width",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "layers.*.lw"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[track]",
+   "label": "Line style",
+   "control": "Select",
+   "options": [
+    "Solid",
+    "Dashed",
+    "Dotted",
+    "Dash-dot"
+   ],
+   "keys": [
+    "layers.*.ls"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[track]",
+   "label": "Legend entry (blank: none)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "layers.*.legend"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[track]",
+   "label": "Dot at the panel time",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "layers.*.marker"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[line]",
+   "label": "",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "layers.*.on"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[line]",
+   "label": "In panels",
+   "control": "CheckButtonGroup",
+   "options": [
+    "a",
+    "b"
+   ],
+   "keys": [
+    "panels[].layers[].over.on"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[line]",
+   "label": "Run",
+   "control": "Select",
+   "options": [],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[line]",
+   "label": "Sections",
+   "control": "Select",
+   "options": [
+    "All, labelled in turn",
+    "The panel's own"
+   ],
+   "keys": [
+    "layers.*.which"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[line]",
+   "label": "Colour",
+   "control": "ColorPicker",
+   "options": [],
+   "keys": [
+    "layers.*.color"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[line]",
+   "label": "Line width",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "layers.*.lw"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[line]",
+   "label": "End labels",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "layers.*.labels"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[line]",
+   "label": "Legend entry (blank: none)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "layers.*.legend"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[sector]",
+   "label": "",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "layers.*.on"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[sector]",
+   "label": "In panels",
+   "control": "CheckButtonGroup",
+   "options": [
+    "a",
+    "b"
+   ],
+   "keys": [
+    "panels[].layers[].over.on"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[sector]",
+   "label": "Run",
+   "control": "Select",
+   "options": [],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[sector]",
+   "label": "Centre",
+   "control": "Select",
+   "options": [
+    "Tracked storm (offset, km)",
+    "Point (model x, y km)"
+   ],
+   "keys": [
+    "layers.*.center"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[sector]",
+   "label": "Offset x (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "layers.*.offx"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[sector]",
+   "label": "Offset y (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "layers.*.offy"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[sector]",
+   "label": "Azimuth 0",
+   "control": "Select",
+   "options": [
+    "Storm motion (0: ahead, 90: right)",
+    "Grid north (0: north, 90: east)"
+   ],
+   "keys": [
+    "layers.*.ref"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[sector]",
+   "label": "Azimuth from (\u00b0)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "layers.*.az0"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[sector]",
+   "label": "to (\u00b0)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "layers.*.az1"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[sector]",
+   "label": "Radius (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "layers.*.rmax"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[sector]",
+   "label": "Colour",
+   "control": "ColorPicker",
+   "options": [],
+   "keys": [
+    "layers.*.color"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[sector]",
+   "label": "Line width",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "layers.*.lw"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[sector]",
+   "label": "Line style",
+   "control": "Select",
+   "options": [
+    "Solid",
+    "Dashed",
+    "Dotted",
+    "Dash-dot"
+   ],
+   "keys": [
+    "layers.*.ls"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[sector]",
+   "label": "Legend entry (blank: none)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "layers.*.legend"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "Copy a layer's look",
+   "label": "Copy the look of",
+   "control": "Select",
+   "options": [
+    "1. Fill: Reflectivity",
+    "2. Contours: Vertical velocity",
+    "3. Vectors",
+    "4. Shading: Vertical velocity",
+    "5. Storm track",
+    "6. Section line",
+    "7. Sector"
+   ],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "Copy a layer's look",
+   "label": "To layers",
+   "control": "MultiChoice",
+   "options": [
+    "1. Fill: Reflectivity",
+    "2. Contours: Vertical velocity",
+    "3. Vectors",
+    "4. Shading: Vertical velocity",
+    "5. Storm track",
+    "6. Section line",
+    "7. Sector"
+   ],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[entry]",
+   "label": "",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[entry]",
+   "label": "Name (blank: automatic)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "sections.s0.label"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[entry]",
+   "label": "Orientation",
+   "control": "Select",
+   "options": [
+    "x\u2013z (along x)",
+    "y\u2013z (along y)",
+    "Angled",
+    "Along the storm motion",
+    "Across the storm motion",
+    "A\u2013B points"
+   ],
+   "keys": [
+    "sections.s0.orient"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[entry]",
+   "label": "Position",
+   "control": "Select",
+   "options": [
+    "Through the storm",
+    "Fixed"
+   ],
+   "keys": [
+    "sections.s0.pos"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[entry]",
+   "label": "Half-length (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "sections.s0.half"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[entry]",
+   "label": "Offset in y (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "sections.s0.off"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "[entry]",
+   "label": "Average across (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "sections.s0.avg"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "Area",
+   "label": "Plan-view area",
+   "control": "Select",
+   "options": [
+    "Follow the tracked storm",
+    "Fixed box",
+    "Whole domain"
+   ],
+   "keys": [
+    "kinds.plan.domain.mode"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "Area",
+   "label": "Axis coordinates",
+   "control": "Select",
+   "options": [
+    "Model grid x, y",
+    "Relative to the storm"
+   ],
+   "keys": [
+    "kinds.plan.coords"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "Area",
+   "label": "x min (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "Area",
+   "label": "x max (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "Area",
+   "label": "y min (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "Area",
+   "label": "y max (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "x label",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "kinds.plan.axes.xlabel"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "y label",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "kinds.plan.axes.ylabel"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "Tick labels on",
+   "control": "Select",
+   "options": [
+    "All panels",
+    "Outer panels",
+    "No panels"
+   ],
+   "keys": [
+    "kinds.plan.axes.ticklabels",
+    "size[]"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "Share limits (panels of a kind)",
+   "control": "Select",
+   "options": [
+    "No",
+    "x",
+    "y",
+    "x and y"
+   ],
+   "keys": [
+    "kinds.plan.axes.share"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "Tick marks",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.plan.axes.ticks"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "Minor ticks",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.plan.axes.minor"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "Equal x/y scale",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.plan.axes.equal",
+    "size[]"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "Ticks point",
+   "control": "Select",
+   "options": [
+    "Out",
+    "In",
+    "Across"
+   ],
+   "keys": [
+    "kinds.plan.axes.tickdir"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "x tick every",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.plan.axes.xstep"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "y tick every",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.plan.axes.ystep"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "Frame width (pt)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.plan.axes.frame_lw"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "Grid lines",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.plan.axes.grid"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "kind",
+   "kind": "plan",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "Grid style",
+   "control": "Select",
+   "options": [
+    "dotted",
+    "dashed",
+    "solid"
+   ],
+   "keys": [
+    "kinds.plan.axes.grid_ls"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "",
+   "label": "Title",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].title",
+    "size[]"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "",
+   "label": "Run",
+   "control": "Select",
+   "options": [
+    "1. supercell"
+   ],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "",
+   "label": "Time",
+   "control": "Select",
+   "options": [
+    "0:00:00  (0 min)",
+    "1:00:00  (60 min)",
+    "1:05:00  (65 min)",
+    "1:10:00  (70 min)",
+    "1:15:00  (75 min)",
+    "1:20:00  (80 min)",
+    "1:25:00  (85 min)",
+    "1:30:00  (90 min)",
+    "1:35:00  (95 min)",
+    "1:40:00  (100 min)"
+   ],
+   "keys": [
+    "panels[].time_s"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "",
+   "label": "Own height (blank: its layers')",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.z",
+    "panels[].z",
+    "panels[].zmode"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "",
+   "label": "Height in",
+   "control": "Select",
+   "options": [
+    "km",
+    "Model level"
+   ],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "",
+   "label": "Row label (left)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].rowlabel",
+    "size[]"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "",
+   "label": "Add a layer to this panel",
+   "control": "MenuButton",
+   "options": [],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[fill]",
+   "label": "",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.on"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[fill]",
+   "label": "Time",
+   "control": "Select",
+   "options": [
+    "the panel's",
+    "0:00:00  (0 min)",
+    "1:00:00  (60 min)",
+    "1:05:00  (65 min)",
+    "1:10:00  (70 min)",
+    "1:15:00  (75 min)",
+    "1:20:00  (80 min)",
+    "1:25:00  (85 min)",
+    "1:30:00  (90 min)",
+    "1:35:00  (95 min)",
+    "1:40:00  (100 min)"
+   ],
+   "keys": [
+    "panels[].layers[].over.time_s"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[fill]",
+   "label": "Keep this time in animations",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.time_lock"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[fill]",
+   "label": "Run",
+   "control": "Select",
+   "options": [],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[fill]",
+   "label": "Derivative",
+   "control": "Select",
+   "options": [
+    "None",
+    "\u2202/\u2202z",
+    "\u2202/\u2202x",
+    "\u2202/\u2202y",
+    "|\u2207h|"
+   ],
+   "keys": [
+    "panels[].layers[].over.cmap",
+    "panels[].layers[].over.field",
+    "panels[].layers[].over.mask_below",
+    "panels[].layers[].over.units",
+    "panels[].layers[].over.vmax",
+    "panels[].layers[].over.vmin"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[fill]",
+   "label": "Level",
+   "control": "Select",
+   "options": [
+    "Height (km AGL)",
+    "Model level (k)",
+    "Column max",
+    "Column min"
+   ],
+   "keys": [
+    "panels[].layers[].over.mode"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[fill]",
+   "label": "Height (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.z"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[fill]",
+   "label": "Draw as",
+   "control": "Select",
+   "options": [
+    "Grid cells",
+    "Filled contours"
+   ],
+   "keys": [
+    "panels[].layers[].over.style"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[fill]",
+   "label": "Blank where \u2264",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.mask_below"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[fill]",
+   "label": "Colormap",
+   "control": "Select",
+   "options": [
+    "HomeyerRainbow",
+    "ChaseSpectral",
+    "NWSRef",
+    "NWSVel",
+    "LangRainbow12",
+    "SpectralExtended",
+    "Carbone42",
+    "Theodore16",
+    "BuDRd18",
+    "reflectivity",
+    "turbo",
+    "viridis",
+    "magma",
+    "inferno",
+    "plasma",
+    "cividis",
+    "RdBu_r",
+    "PuOr_r",
+    "BrBG",
+    "coolwarm",
+    "seismic",
+    "cmo.balance",
+    "cmo.curl",
+    "cmo.thermal",
+    "cmo.haline",
+    "cmo.deep",
+    "cmo.rain",
+    "cmo.ice",
+    "cmo.amp",
+    "YlGnBu",
+    "YlOrRd",
+    "Spectral_r",
+    "Greys_r",
+    "cubehelix",
+    "Greys",
+    "gray_r",
+    "Blues",
+    "Reds",
+    "Purples",
+    "PuOr"
+   ],
+   "keys": [
+    "panels[].layers[].over.cmap"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[fill]",
+   "label": "Reverse",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.reverse"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[fill]",
+   "label": "Start from white",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.white_first"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[fill]",
+   "label": "Min",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.vmin"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[fill]",
+   "label": "Max",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.vmax"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[fill]",
+   "label": "Colour steps (0: smooth)",
+   "control": "IntInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.nlevels"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[fill]",
+   "label": "Scale",
+   "control": "Select",
+   "options": [
+    "Linear",
+    "Logarithmic"
+   ],
+   "keys": [
+    "panels[].layers[].over.scale"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[fill]",
+   "label": "Opacity (0\u20131)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.alpha"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[fill] > Difference",
+   "label": "Difference: minus another run or time",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.cmap",
+    "panels[].layers[].over.mask_below",
+    "panels[].layers[].over.minus.grid",
+    "panels[].layers[].over.minus.run",
+    "panels[].layers[].over.minus.time_s",
+    "panels[].layers[].over.reverse",
+    "panels[].layers[].over.vmax",
+    "panels[].layers[].over.vmin"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[fill] > Ensemble",
+   "label": "Ensemble: a statistic over several runs",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.ens.above",
+    "panels[].layers[].over.ens.grid",
+    "panels[].layers[].over.ens.runs",
+    "panels[].layers[].over.ens.stat",
+    "panels[].layers[].over.ens.threshold"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[fill] > Time window",
+   "label": "Over a time window",
+   "control": "Select",
+   "options": [
+    "One time (off)",
+    "Maximum (swath)",
+    "Minimum",
+    "Mean",
+    "Sum",
+    "Storm-following mean (composite)"
+   ],
+   "keys": [
+    "panels[].layers[].over.reduce.every",
+    "panels[].layers[].over.reduce.op",
+    "panels[].layers[].over.reduce.t0",
+    "panels[].layers[].over.reduce.t1"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[contour]",
+   "label": "",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.on"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[contour]",
+   "label": "Time",
+   "control": "Select",
+   "options": [
+    "the panel's",
+    "0:00:00  (0 min)",
+    "1:00:00  (60 min)",
+    "1:05:00  (65 min)",
+    "1:10:00  (70 min)",
+    "1:15:00  (75 min)",
+    "1:20:00  (80 min)",
+    "1:25:00  (85 min)",
+    "1:30:00  (90 min)",
+    "1:35:00  (95 min)",
+    "1:40:00  (100 min)"
+   ],
+   "keys": [
+    "panels[].layers[].over.time_s"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[contour]",
+   "label": "Keep this time in animations",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.time_lock"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[contour]",
+   "label": "Run",
+   "control": "Select",
+   "options": [],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[contour]",
+   "label": "Derivative",
+   "control": "Select",
+   "options": [
+    "None",
+    "\u2202/\u2202z",
+    "\u2202/\u2202x",
+    "\u2202/\u2202y",
+    "|\u2207h|"
+   ],
+   "keys": [
+    "panels[].layers[].over.field"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[contour]",
+   "label": "Level",
+   "control": "Select",
+   "options": [
+    "Height (km AGL)",
+    "Model level (k)",
+    "Column max",
+    "Column min"
+   ],
+   "keys": [
+    "panels[].layers[].over.mode"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[contour]",
+   "label": "Height (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.z"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[contour]",
+   "label": "Levels (e.g. 10, 20 or -6:6:2)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.levels"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[contour]",
+   "label": "Colour",
+   "control": "ColorPicker",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.color"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[contour]",
+   "label": "Line width",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.lw"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[contour]",
+   "label": "Dash negative",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.neg_dashed"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[contour]",
+   "label": "Label the lines",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.clabel"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[contour]",
+   "label": "Legend entry (blank: none)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.legend"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[contour]",
+   "label": "Over a time window",
+   "control": "Select",
+   "options": [
+    "One time (off)",
+    "Maximum (swath)",
+    "Minimum",
+    "Mean",
+    "Sum",
+    "Storm-following mean (composite)"
+   ],
+   "keys": [
+    "panels[].layers[].over.reduce.every",
+    "panels[].layers[].over.reduce.op",
+    "panels[].layers[].over.reduce.t0",
+    "panels[].layers[].over.reduce.t1"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[vectors]",
+   "label": "",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.on"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[vectors]",
+   "label": "Time",
+   "control": "Select",
+   "options": [
+    "the panel's",
+    "0:00:00  (0 min)",
+    "1:00:00  (60 min)",
+    "1:05:00  (65 min)",
+    "1:10:00  (70 min)",
+    "1:15:00  (75 min)",
+    "1:20:00  (80 min)",
+    "1:25:00  (85 min)",
+    "1:30:00  (90 min)",
+    "1:35:00  (95 min)",
+    "1:40:00  (100 min)"
+   ],
+   "keys": [
+    "panels[].layers[].over.time_s"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[vectors]",
+   "label": "Keep this time in animations",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.time_lock"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[vectors]",
+   "label": "Run",
+   "control": "Select",
+   "options": [],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[vectors]",
+   "label": "Vector",
+   "control": "Select",
+   "options": [
+    "Wind",
+    "Horizontal vorticity",
+    "Baroclinic generation"
+   ],
+   "keys": [
+    "panels[].layers[].over.scale",
+    "panels[].layers[].over.vector"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[vectors]",
+   "label": "Draw as",
+   "control": "Select",
+   "options": [
+    "Arrows",
+    "Barbs (plan views)",
+    "Streamlines"
+   ],
+   "keys": [
+    "panels[].layers[].over.style"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[vectors]",
+   "label": "Frame",
+   "control": "Select",
+   "options": [
+    "Ground-relative",
+    "Grid-relative",
+    "Storm-relative"
+   ],
+   "keys": [
+    "panels[].layers[].over.frame"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[vectors]",
+   "label": "Colour",
+   "control": "ColorPicker",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.color"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[vectors]",
+   "label": "Height (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.z"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[vectors]",
+   "label": "Spacing (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.spacing"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[vectors]",
+   "label": "Scale (larger: shorter)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.scale"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[vectors]",
+   "label": "Arrow width",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.width"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[vectors]",
+   "label": "Key arrow (m/s, 0: none)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.key"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[shade]",
+   "label": "",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.on"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[shade]",
+   "label": "Time",
+   "control": "Select",
+   "options": [
+    "the panel's",
+    "0:00:00  (0 min)",
+    "1:00:00  (60 min)",
+    "1:05:00  (65 min)",
+    "1:10:00  (70 min)",
+    "1:15:00  (75 min)",
+    "1:20:00  (80 min)",
+    "1:25:00  (85 min)",
+    "1:30:00  (90 min)",
+    "1:35:00  (95 min)",
+    "1:40:00  (100 min)"
+   ],
+   "keys": [
+    "panels[].layers[].over.time_s"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[shade]",
+   "label": "Keep this time in animations",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.time_lock"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[shade]",
+   "label": "Run",
+   "control": "Select",
+   "options": [],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[shade]",
+   "label": "Derivative",
+   "control": "Select",
+   "options": [
+    "None",
+    "\u2202/\u2202z",
+    "\u2202/\u2202x",
+    "\u2202/\u2202y",
+    "|\u2207h|"
+   ],
+   "keys": [
+    "panels[].layers[].over.field"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[shade]",
+   "label": "Level",
+   "control": "Select",
+   "options": [
+    "Height (km AGL)",
+    "Model level (k)",
+    "Column max",
+    "Column min"
+   ],
+   "keys": [
+    "panels[].layers[].over.mode"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[shade]",
+   "label": "Height (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.z"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[shade]",
+   "label": "Threshold",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.threshold"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[shade]",
+   "label": "Shade",
+   "control": "Select",
+   "options": [
+    "Above",
+    "Below"
+   ],
+   "keys": [
+    "panels[].layers[].over.above"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[shade]",
+   "label": "Pattern",
+   "control": "Select",
+   "options": [
+    "Solid",
+    "Hatching /",
+    "Hatching \\",
+    "Cross-hatching",
+    "Stippling",
+    "Dense stippling",
+    "Circles"
+   ],
+   "keys": [
+    "panels[].layers[].over.hatch"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[shade]",
+   "label": "Colour",
+   "control": "ColorPicker",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.color"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[shade]",
+   "label": "Opacity (0\u20131)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.alpha"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[shade]",
+   "label": "Outline",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.outline"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[shade]",
+   "label": "Legend entry (blank: none)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.legend"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[shade]",
+   "label": "Over a time window",
+   "control": "Select",
+   "options": [
+    "One time (off)",
+    "Maximum (swath)",
+    "Minimum",
+    "Mean",
+    "Sum",
+    "Storm-following mean (composite)"
+   ],
+   "keys": [
+    "panels[].layers[].over.reduce.every",
+    "panels[].layers[].over.reduce.op",
+    "panels[].layers[].over.reduce.t0",
+    "panels[].layers[].over.reduce.t1"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[track]",
+   "label": "",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.on"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[track]",
+   "label": "Time",
+   "control": "Select",
+   "options": [
+    "the panel's",
+    "0:00:00  (0 min)",
+    "1:00:00  (60 min)",
+    "1:05:00  (65 min)",
+    "1:10:00  (70 min)",
+    "1:15:00  (75 min)",
+    "1:20:00  (80 min)",
+    "1:25:00  (85 min)",
+    "1:30:00  (90 min)",
+    "1:35:00  (95 min)",
+    "1:40:00  (100 min)"
+   ],
+   "keys": [
+    "panels[].layers[].over.time_s"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[track]",
+   "label": "Keep this time in animations",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.time_lock"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[track]",
+   "label": "Run",
+   "control": "Select",
+   "options": [],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[track]",
+   "label": "Run's colour",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.run_color"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[track]",
+   "label": "Line width",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.lw"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[track]",
+   "label": "Line style",
+   "control": "Select",
+   "options": [
+    "Solid",
+    "Dashed",
+    "Dotted",
+    "Dash-dot"
+   ],
+   "keys": [
+    "panels[].layers[].over.ls"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[track]",
+   "label": "Legend entry (blank: none)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.legend"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[track]",
+   "label": "Dot at the panel time",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.marker"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[line]",
+   "label": "",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.on"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[line]",
+   "label": "Time",
+   "control": "Select",
+   "options": [
+    "the panel's",
+    "0:00:00  (0 min)",
+    "1:00:00  (60 min)",
+    "1:05:00  (65 min)",
+    "1:10:00  (70 min)",
+    "1:15:00  (75 min)",
+    "1:20:00  (80 min)",
+    "1:25:00  (85 min)",
+    "1:30:00  (90 min)",
+    "1:35:00  (95 min)",
+    "1:40:00  (100 min)"
+   ],
+   "keys": [
+    "panels[].layers[].over.time_s"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[line]",
+   "label": "Keep this time in animations",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.time_lock"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[line]",
+   "label": "Run",
+   "control": "Select",
+   "options": [],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[line]",
+   "label": "Sections",
+   "control": "Select",
+   "options": [
+    "All, labelled in turn",
+    "The panel's own"
+   ],
+   "keys": [
+    "panels[].layers[].over.which"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[line]",
+   "label": "Colour",
+   "control": "ColorPicker",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.color"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[line]",
+   "label": "Line width",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.lw"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[line]",
+   "label": "End labels",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.labels"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[line]",
+   "label": "Legend entry (blank: none)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.legend"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[sector]",
+   "label": "",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.on"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[sector]",
+   "label": "Time",
+   "control": "Select",
+   "options": [
+    "the panel's",
+    "0:00:00  (0 min)",
+    "1:00:00  (60 min)",
+    "1:05:00  (65 min)",
+    "1:10:00  (70 min)",
+    "1:15:00  (75 min)",
+    "1:20:00  (80 min)",
+    "1:25:00  (85 min)",
+    "1:30:00  (90 min)",
+    "1:35:00  (95 min)",
+    "1:40:00  (100 min)"
+   ],
+   "keys": [
+    "panels[].layers[].over.time_s"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[sector]",
+   "label": "Keep this time in animations",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.time_lock"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[sector]",
+   "label": "Run",
+   "control": "Select",
+   "options": [],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[sector]",
+   "label": "Centre",
+   "control": "Select",
+   "options": [
+    "Tracked storm (offset, km)",
+    "Point (model x, y km)"
+   ],
+   "keys": [
+    "panels[].layers[].over.center"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[sector]",
+   "label": "Offset x (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.offx"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[sector]",
+   "label": "Offset y (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.offy"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[sector]",
+   "label": "Azimuth 0",
+   "control": "Select",
+   "options": [
+    "Storm motion (0: ahead, 90: right)",
+    "Grid north (0: north, 90: east)"
+   ],
+   "keys": [
+    "panels[].layers[].over.ref"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[sector]",
+   "label": "Azimuth from (\u00b0)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.az0"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[sector]",
+   "label": "to (\u00b0)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.az1"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[sector]",
+   "label": "Radius (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.rmax"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[sector]",
+   "label": "Colour",
+   "control": "ColorPicker",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.color"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[sector]",
+   "label": "Line width",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.lw"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[sector]",
+   "label": "Line style",
+   "control": "Select",
+   "options": [
+    "Solid",
+    "Dashed",
+    "Dotted",
+    "Dash-dot"
+   ],
+   "keys": [
+    "panels[].layers[].over.ls"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "[sector]",
+   "label": "Legend entry (blank: none)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.legend"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Area",
+   "label": "Plan-view area",
+   "control": "Select",
+   "options": [
+    "Follow the tracked storm",
+    "Fixed box",
+    "Whole domain"
+   ],
+   "keys": [
+    "panels[].opts.domain.mode"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Area",
+   "label": "Axis coordinates",
+   "control": "Select",
+   "options": [
+    "Model grid x, y",
+    "Relative to the storm"
+   ],
+   "keys": [
+    "panels[].opts.coords"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Area",
+   "label": "x min (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Area",
+   "label": "x max (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Area",
+   "label": "y min (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Area",
+   "label": "y max (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "x label",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].opts.axes.xlabel"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "y label",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].opts.axes.ylabel"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "Tick marks",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.axes.ticks"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "Minor ticks",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.axes.minor"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "Ticks point",
+   "control": "Select",
+   "options": [
+    "Out",
+    "In",
+    "Across"
+   ],
+   "keys": [
+    "panels[].opts.axes.tickdir"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "x tick every",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].opts.axes.xstep"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "y tick every",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].opts.axes.ystep"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "Frame width (pt)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].opts.axes.frame_lw"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "Grid lines",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.axes.grid"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "Grid style",
+   "control": "Select",
+   "options": [
+    "dotted",
+    "dashed",
+    "solid"
+   ],
+   "keys": [
+    "panels[].opts.axes.grid_ls"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Where",
+   "control": "Select",
+   "options": [
+    "Center",
+    "Left",
+    "Right"
+   ],
+   "keys": [
+    "panels[].opts.axes.title_loc"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Bold",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.axes.title_bold"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Panel letters",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.letters.on"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Size (pt)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].opts.letters.size"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "White box",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.letters.box"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Time label",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.time_label.on"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Text",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].opts.time_label.fmt"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Run name",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.run_label.on"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "In the run's colour",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.run_label.run_color"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Height label",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.z_label.on"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Text (blank: z = \u2026 km / k = \u2026)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].opts.z_label.fmt"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Colorbar",
+   "label": "Its colours have a bar",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].colorbar.show"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Colorbar",
+   "label": "The bar it shares (a name)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].colorbar.group"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Colorbar",
+   "label": "Colorbar label (blank: the figure's, else units)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.cbar_label"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Colorbar",
+   "label": "Colorbar ticks (blank: the figure's, else auto)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.cbar_ticks"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Colorbar",
+   "label": "Colorbar arrows",
+   "control": "Select",
+   "options": [
+    "Auto (where the data pass the range)",
+    "None",
+    "Max end",
+    "Min end",
+    "Both ends"
+   ],
+   "keys": [
+    "panels[].layers[].over.extend"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Add",
+   "control": "Select",
+   "options": [
+    "Text",
+    "Marker",
+    "Arrow",
+    "Line",
+    "Vertical line",
+    "Horizontal line",
+    "Box",
+    "Circle",
+    "Legend entry"
+   ],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Kind",
+   "control": "Select",
+   "options": [
+    "Text",
+    "Marker",
+    "Arrow",
+    "Line",
+    "Vertical line",
+    "Horizontal line",
+    "Box",
+    "Circle",
+    "Legend entry"
+   ],
+   "keys": [
+    "annotations[].kind",
+    "annotations[].marker"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Panels (blank: all)",
+   "control": "MultiChoice",
+   "options": [
+    "a",
+    "b"
+   ],
+   "keys": [
+    "annotations[].panel"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Position in",
+   "control": "Select",
+   "options": [
+    "Axis units (km, min)",
+    "Panel fraction (0\u20131)"
+   ],
+   "keys": [
+    "annotations[].coords"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "x",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].x"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "y",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].y"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Text",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "annotations[].text"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Size",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].size"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Bold",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "annotations[].bold"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Colour",
+   "control": "ColorPicker",
+   "options": [],
+   "keys": [
+    "annotations[].color"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Line width",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].lw"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Marker",
+   "control": "Select",
+   "options": [
+    "\u00d7",
+    "+",
+    "\u25cf",
+    "\u25cb",
+    "\u25a1",
+    "\u2605",
+    "\u25b2"
+   ],
+   "keys": [
+    "annotations[].marker"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "x to",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].x2"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "y to",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].y2"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Line style",
+   "control": "Select",
+   "options": [
+    "Solid",
+    "Dashed",
+    "Dotted",
+    "Dash-dot"
+   ],
+   "keys": [
+    "annotations[].ls"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Radius",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].r"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Looks like",
+   "control": "Select",
+   "options": [
+    "Line",
+    "Marker",
+    "Line and marker",
+    "Filled box"
+   ],
+   "keys": [
+    "annotations[].look"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "",
+   "label": "Panel type",
+   "control": "Select",
+   "options": [
+    "Plan views",
+    "Soundings",
+    "Vertical cross-sections",
+    "Time\u2013height (series)",
+    "Time series",
+    "Distributions",
+    "Vertical profiles",
+    "Joint distributions (x vs y)",
+    "Azimuthal means (radius\u2013height)",
+    "Tables (sounding parameters, field statistics)",
+    "3D scene (one picture)"
+   ],
+   "keys": [
+    "annotations[].color",
+    "annotations[].coords",
+    "annotations[].kind",
+    "annotations[].ls",
+    "annotations[].lw",
+    "annotations[].panel",
+    "annotations[].r",
+    "annotations[].size",
+    "annotations[].text",
+    "annotations[].x",
+    "annotations[].x2",
+    "annotations[].y",
+    "annotations[].y2",
+    "kinds.sounding.axes.equal",
+    "kinds.sounding.axes.frame_lw",
+    "kinds.sounding.axes.minor",
+    "kinds.sounding.axes.tickdir",
+    "kinds.sounding.axes.ticklabels",
+    "kinds.sounding.axes.ticks",
+    "kinds.sounding.axes.title_bold",
+    "kinds.sounding.axes.title_loc",
+    "kinds.sounding.axes.xlabel",
+    "kinds.sounding.axes.ylabel",
+    "kinds.sounding.skewt.barbs",
+    "kinds.sounding.skewt.guides",
+    "kinds.sounding.skewt.hodo_center",
+    "kinds.sounding.skewt.hodo_cu",
+    "kinds.sounding.skewt.hodo_cv",
+    "kinds.sounding.skewt.hodo_heights",
+    "kinds.sounding.skewt.hodo_key",
+    "kinds.sounding.skewt.hodo_labels",
+    "kinds.sounding.skewt.hodo_lm",
+    "kinds.sounding.skewt.hodo_max",
+    "kinds.sounding.skewt.hodo_mean",
+    "kinds.sounding.skewt.hodo_rm",
+    "kinds.sounding.skewt.hodo_storm",
+    "kinds.sounding.skewt.hodo_top",
+    "kinds.sounding.skewt.inset_loc",
+    "kinds.sounding.skewt.inset_size",
+    "kinds.sounding.skewt.inset_x",
+    "kinds.sounding.skewt.inset_y",
+    "kinds.sounding.skewt.layout",
+    "kinds.sounding.skewt.legend",
+    "kinds.sounding.skewt.legend_frame",
+    "kinds.sounding.skewt.legend_loc",
+    "kinds.sounding.skewt.legend_ncol",
+    "kinds.sounding.skewt.lw",
+    "kinds.sounding.skewt.params",
+    "kinds.sounding.skewt.parcel",
+    "kinds.sounding.skewt.pmax",
+    "kinds.sounding.skewt.pmin",
+    "kinds.sounding.skewt.skew",
+    "kinds.sounding.skewt.srh",
+    "kinds.sounding.skewt.storm",
+    "kinds.sounding.skewt.storm_u",
+    "kinds.sounding.skewt.storm_v",
+    "kinds.sounding.skewt.tmax",
+    "kinds.sounding.skewt.tmin",
+    "panels[].cell[]",
+    "panels[].id",
+    "panels[].insets[].id",
+    "panels[].insets[].loc",
+    "panels[].insets[].opts.domain.box[]",
+    "panels[].insets[].opts.domain.mode",
+    "panels[].insets[].size",
+    "panels[].kind",
+    "panels[].layers[].color",
+    "panels[].layers[].label",
+    "panels[].layers[].ref",
+    "panels[].layers[].run",
+    "panels[].layers[].time_s",
+    "panels[].layers[].type",
+    "panels[].layers[].where.avg",
+    "panels[].layers[].where.kind",
+    "panels[].layers[].where.x",
+    "panels[].layers[].where.y",
+    "panels[].opts.letters.loc",
+    "panels[].opts.time_label.loc",
+    "panels[].run",
+    "panels[].section",
+    "panels[].time_s"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "",
+   "label": "Row",
+   "control": "IntInput",
+   "options": [],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "",
+   "label": "Column",
+   "control": "IntInput",
+   "options": [],
+   "keys": [
+    "panels[].cell[]"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "",
+   "label": "Rows tall",
+   "control": "IntInput",
+   "options": [],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "",
+   "label": "Columns wide",
+   "control": "IntInput",
+   "options": [],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "fill",
+   "section": "[fill]",
+   "label": "",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.on"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "fill",
+   "section": "[fill]",
+   "label": "Time",
+   "control": "Select",
+   "options": [
+    "the panel's",
+    "0:00:00  (0 min)",
+    "1:00:00  (60 min)",
+    "1:05:00  (65 min)",
+    "1:10:00  (70 min)",
+    "1:15:00  (75 min)",
+    "1:20:00  (80 min)",
+    "1:25:00  (85 min)",
+    "1:30:00  (90 min)",
+    "1:35:00  (95 min)",
+    "1:40:00  (100 min)"
+   ],
+   "keys": [
+    "panels[].layers[].over.time_s"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "fill",
+   "section": "[fill]",
+   "label": "Keep this time in animations",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.time_lock"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "fill",
+   "section": "[fill]",
+   "label": "Run",
+   "control": "Select",
+   "options": [],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "fill",
+   "section": "[fill]",
+   "label": "Derivative",
+   "control": "Select",
+   "options": [
+    "None",
+    "\u2202/\u2202z",
+    "\u2202/\u2202x",
+    "\u2202/\u2202y",
+    "|\u2207h|"
+   ],
+   "keys": [
+    "panels[].layers[].over.cmap",
+    "panels[].layers[].over.field",
+    "panels[].layers[].over.mask_below",
+    "panels[].layers[].over.units",
+    "panels[].layers[].over.vmax",
+    "panels[].layers[].over.vmin"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "fill",
+   "section": "[fill]",
+   "label": "Level",
+   "control": "Select",
+   "options": [
+    "Height (km AGL)",
+    "Model level (k)",
+    "Column max",
+    "Column min"
+   ],
+   "keys": [
+    "panels[].layers[].over.mode"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "fill",
+   "section": "[fill]",
+   "label": "Height (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.z"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "fill",
+   "section": "[fill]",
+   "label": "Draw as",
+   "control": "Select",
+   "options": [
+    "Grid cells",
+    "Filled contours"
+   ],
+   "keys": [
+    "panels[].layers[].over.style"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "fill",
+   "section": "[fill]",
+   "label": "Blank where \u2264",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.mask_below"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "fill",
+   "section": "[fill]",
+   "label": "Colormap",
+   "control": "Select",
+   "options": [
+    "HomeyerRainbow",
+    "ChaseSpectral",
+    "NWSRef",
+    "NWSVel",
+    "LangRainbow12",
+    "SpectralExtended",
+    "Carbone42",
+    "Theodore16",
+    "BuDRd18",
+    "reflectivity",
+    "turbo",
+    "viridis",
+    "magma",
+    "inferno",
+    "plasma",
+    "cividis",
+    "RdBu_r",
+    "PuOr_r",
+    "BrBG",
+    "coolwarm",
+    "seismic",
+    "cmo.balance",
+    "cmo.curl",
+    "cmo.thermal",
+    "cmo.haline",
+    "cmo.deep",
+    "cmo.rain",
+    "cmo.ice",
+    "cmo.amp",
+    "YlGnBu",
+    "YlOrRd",
+    "Spectral_r",
+    "Greys_r",
+    "cubehelix",
+    "Greys",
+    "gray_r",
+    "Blues",
+    "Reds",
+    "Purples",
+    "PuOr"
+   ],
+   "keys": [
+    "panels[].layers[].over.cmap"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "fill",
+   "section": "[fill]",
+   "label": "Reverse",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.reverse"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "fill",
+   "section": "[fill]",
+   "label": "Start from white",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.white_first"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "fill",
+   "section": "[fill]",
+   "label": "Min",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.vmin"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "fill",
+   "section": "[fill]",
+   "label": "Max",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.vmax"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "fill",
+   "section": "[fill]",
+   "label": "Colour steps (0: smooth)",
+   "control": "IntInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.nlevels"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "fill",
+   "section": "[fill]",
+   "label": "Scale",
+   "control": "Select",
+   "options": [
+    "Linear",
+    "Logarithmic"
+   ],
+   "keys": [
+    "panels[].layers[].over.scale"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "fill",
+   "section": "[fill]",
+   "label": "Opacity (0\u20131)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.alpha"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "fill",
+   "section": "[fill] > Difference",
+   "label": "Difference: minus another run or time",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.cmap",
+    "panels[].layers[].over.mask_below",
+    "panels[].layers[].over.minus.grid",
+    "panels[].layers[].over.minus.run",
+    "panels[].layers[].over.minus.time_s",
+    "panels[].layers[].over.reverse",
+    "panels[].layers[].over.vmax",
+    "panels[].layers[].over.vmin"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "fill",
+   "section": "[fill] > Ensemble",
+   "label": "Ensemble: a statistic over several runs",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.ens.above",
+    "panels[].layers[].over.ens.grid",
+    "panels[].layers[].over.ens.runs",
+    "panels[].layers[].over.ens.stat",
+    "panels[].layers[].over.ens.threshold"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "fill",
+   "section": "[fill] > Time window",
+   "label": "Over a time window",
+   "control": "Select",
+   "options": [
+    "One time (off)",
+    "Maximum (swath)",
+    "Minimum",
+    "Mean",
+    "Sum",
+    "Storm-following mean (composite)"
+   ],
+   "keys": [
+    "panels[].layers[].over.reduce.every",
+    "panels[].layers[].over.reduce.op",
+    "panels[].layers[].over.reduce.t0",
+    "panels[].layers[].over.reduce.t1"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "contour",
+   "section": "[contour]",
+   "label": "",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.on"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "contour",
+   "section": "[contour]",
+   "label": "Time",
+   "control": "Select",
+   "options": [
+    "the panel's",
+    "0:00:00  (0 min)",
+    "1:00:00  (60 min)",
+    "1:05:00  (65 min)",
+    "1:10:00  (70 min)",
+    "1:15:00  (75 min)",
+    "1:20:00  (80 min)",
+    "1:25:00  (85 min)",
+    "1:30:00  (90 min)",
+    "1:35:00  (95 min)",
+    "1:40:00  (100 min)"
+   ],
+   "keys": [
+    "panels[].layers[].over.time_s"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "contour",
+   "section": "[contour]",
+   "label": "Keep this time in animations",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.time_lock"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "contour",
+   "section": "[contour]",
+   "label": "Run",
+   "control": "Select",
+   "options": [],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "contour",
+   "section": "[contour]",
+   "label": "Derivative",
+   "control": "Select",
+   "options": [
+    "None",
+    "\u2202/\u2202z",
+    "\u2202/\u2202x",
+    "\u2202/\u2202y",
+    "|\u2207h|"
+   ],
+   "keys": [
+    "panels[].layers[].over.field"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "contour",
+   "section": "[contour]",
+   "label": "Level",
+   "control": "Select",
+   "options": [
+    "Height (km AGL)",
+    "Model level (k)",
+    "Column max",
+    "Column min"
+   ],
+   "keys": [
+    "panels[].layers[].over.mode"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "contour",
+   "section": "[contour]",
+   "label": "Height (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.z"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "contour",
+   "section": "[contour]",
+   "label": "Levels (e.g. 10, 20 or -6:6:2)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.levels"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "contour",
+   "section": "[contour]",
+   "label": "Colour",
+   "control": "ColorPicker",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.color"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "contour",
+   "section": "[contour]",
+   "label": "Line width",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.lw"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "contour",
+   "section": "[contour]",
+   "label": "Dash negative",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.neg_dashed"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "contour",
+   "section": "[contour]",
+   "label": "Label the lines",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.clabel"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "contour",
+   "section": "[contour]",
+   "label": "Legend entry (blank: none)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.legend"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "contour",
+   "section": "[contour]",
+   "label": "Over a time window",
+   "control": "Select",
+   "options": [
+    "One time (off)",
+    "Maximum (swath)",
+    "Minimum",
+    "Mean",
+    "Sum",
+    "Storm-following mean (composite)"
+   ],
+   "keys": [
+    "panels[].layers[].over.reduce.every",
+    "panels[].layers[].over.reduce.op",
+    "panels[].layers[].over.reduce.t0",
+    "panels[].layers[].over.reduce.t1"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "vectors",
+   "section": "[vectors]",
+   "label": "",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.on"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "vectors",
+   "section": "[vectors]",
+   "label": "Time",
+   "control": "Select",
+   "options": [
+    "the panel's",
+    "0:00:00  (0 min)",
+    "1:00:00  (60 min)",
+    "1:05:00  (65 min)",
+    "1:10:00  (70 min)",
+    "1:15:00  (75 min)",
+    "1:20:00  (80 min)",
+    "1:25:00  (85 min)",
+    "1:30:00  (90 min)",
+    "1:35:00  (95 min)",
+    "1:40:00  (100 min)"
+   ],
+   "keys": [
+    "panels[].layers[].over.time_s"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "vectors",
+   "section": "[vectors]",
+   "label": "Keep this time in animations",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.time_lock"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "vectors",
+   "section": "[vectors]",
+   "label": "Run",
+   "control": "Select",
+   "options": [],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "vectors",
+   "section": "[vectors]",
+   "label": "Vector",
+   "control": "Select",
+   "options": [
+    "Wind",
+    "Horizontal vorticity",
+    "Baroclinic generation"
+   ],
+   "keys": [
+    "panels[].layers[].over.scale",
+    "panels[].layers[].over.vector"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "vectors",
+   "section": "[vectors]",
+   "label": "Draw as",
+   "control": "Select",
+   "options": [
+    "Arrows",
+    "Barbs (plan views)",
+    "Streamlines"
+   ],
+   "keys": [
+    "panels[].layers[].over.style"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "vectors",
+   "section": "[vectors]",
+   "label": "Frame",
+   "control": "Select",
+   "options": [
+    "Ground-relative",
+    "Grid-relative",
+    "Storm-relative"
+   ],
+   "keys": [
+    "panels[].layers[].over.frame"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "vectors",
+   "section": "[vectors]",
+   "label": "Colour",
+   "control": "ColorPicker",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.color"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "vectors",
+   "section": "[vectors]",
+   "label": "Height (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.z"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "vectors",
+   "section": "[vectors]",
+   "label": "Spacing (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.spacing"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "vectors",
+   "section": "[vectors]",
+   "label": "Scale (larger: shorter)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.scale"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "vectors",
+   "section": "[vectors]",
+   "label": "Arrow width",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.width"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "vectors",
+   "section": "[vectors]",
+   "label": "Key arrow (m/s, 0: none)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.key"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "shade",
+   "section": "[shade]",
+   "label": "",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.on"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "shade",
+   "section": "[shade]",
+   "label": "Time",
+   "control": "Select",
+   "options": [
+    "the panel's",
+    "0:00:00  (0 min)",
+    "1:00:00  (60 min)",
+    "1:05:00  (65 min)",
+    "1:10:00  (70 min)",
+    "1:15:00  (75 min)",
+    "1:20:00  (80 min)",
+    "1:25:00  (85 min)",
+    "1:30:00  (90 min)",
+    "1:35:00  (95 min)",
+    "1:40:00  (100 min)"
+   ],
+   "keys": [
+    "panels[].layers[].over.time_s"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "shade",
+   "section": "[shade]",
+   "label": "Keep this time in animations",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.time_lock"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "shade",
+   "section": "[shade]",
+   "label": "Run",
+   "control": "Select",
+   "options": [],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "shade",
+   "section": "[shade]",
+   "label": "Derivative",
+   "control": "Select",
+   "options": [
+    "None",
+    "\u2202/\u2202z",
+    "\u2202/\u2202x",
+    "\u2202/\u2202y",
+    "|\u2207h|"
+   ],
+   "keys": [
+    "panels[].layers[].over.field"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "shade",
+   "section": "[shade]",
+   "label": "Level",
+   "control": "Select",
+   "options": [
+    "Height (km AGL)",
+    "Model level (k)",
+    "Column max",
+    "Column min"
+   ],
+   "keys": [
+    "panels[].layers[].over.mode"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "shade",
+   "section": "[shade]",
+   "label": "Height (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.z"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "shade",
+   "section": "[shade]",
+   "label": "Threshold",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.threshold"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "shade",
+   "section": "[shade]",
+   "label": "Shade",
+   "control": "Select",
+   "options": [
+    "Above",
+    "Below"
+   ],
+   "keys": [
+    "panels[].layers[].over.above"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "shade",
+   "section": "[shade]",
+   "label": "Pattern",
+   "control": "Select",
+   "options": [
+    "Solid",
+    "Hatching /",
+    "Hatching \\",
+    "Cross-hatching",
+    "Stippling",
+    "Dense stippling",
+    "Circles"
+   ],
+   "keys": [
+    "panels[].layers[].over.hatch"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "shade",
+   "section": "[shade]",
+   "label": "Colour",
+   "control": "ColorPicker",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.color"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "shade",
+   "section": "[shade]",
+   "label": "Opacity (0\u20131)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.alpha"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "shade",
+   "section": "[shade]",
+   "label": "Outline",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.outline"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "shade",
+   "section": "[shade]",
+   "label": "Legend entry (blank: none)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.legend"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "shade",
+   "section": "[shade]",
+   "label": "Over a time window",
+   "control": "Select",
+   "options": [
+    "One time (off)",
+    "Maximum (swath)",
+    "Minimum",
+    "Mean",
+    "Sum",
+    "Storm-following mean (composite)"
+   ],
+   "keys": [
+    "panels[].layers[].over.reduce.every",
+    "panels[].layers[].over.reduce.op",
+    "panels[].layers[].over.reduce.t0",
+    "panels[].layers[].over.reduce.t1"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "track",
+   "section": "[track]",
+   "label": "",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.on"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "track",
+   "section": "[track]",
+   "label": "Time",
+   "control": "Select",
+   "options": [
+    "the panel's",
+    "0:00:00  (0 min)",
+    "1:00:00  (60 min)",
+    "1:05:00  (65 min)",
+    "1:10:00  (70 min)",
+    "1:15:00  (75 min)",
+    "1:20:00  (80 min)",
+    "1:25:00  (85 min)",
+    "1:30:00  (90 min)",
+    "1:35:00  (95 min)",
+    "1:40:00  (100 min)"
+   ],
+   "keys": [
+    "panels[].layers[].over.time_s"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "track",
+   "section": "[track]",
+   "label": "Keep this time in animations",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.time_lock"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "track",
+   "section": "[track]",
+   "label": "Run",
+   "control": "Select",
+   "options": [],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "track",
+   "section": "[track]",
+   "label": "Run's colour",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.run_color"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "track",
+   "section": "[track]",
+   "label": "Line width",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.lw"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "track",
+   "section": "[track]",
+   "label": "Line style",
+   "control": "Select",
+   "options": [
+    "Solid",
+    "Dashed",
+    "Dotted",
+    "Dash-dot"
+   ],
+   "keys": [
+    "panels[].layers[].over.ls"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "track",
+   "section": "[track]",
+   "label": "Legend entry (blank: none)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.legend"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "track",
+   "section": "[track]",
+   "label": "Dot at the panel time",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.marker"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "line",
+   "section": "[line]",
+   "label": "",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.on"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "line",
+   "section": "[line]",
+   "label": "Time",
+   "control": "Select",
+   "options": [
+    "the panel's",
+    "0:00:00  (0 min)",
+    "1:00:00  (60 min)",
+    "1:05:00  (65 min)",
+    "1:10:00  (70 min)",
+    "1:15:00  (75 min)",
+    "1:20:00  (80 min)",
+    "1:25:00  (85 min)",
+    "1:30:00  (90 min)",
+    "1:35:00  (95 min)",
+    "1:40:00  (100 min)"
+   ],
+   "keys": [
+    "panels[].layers[].over.time_s"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "line",
+   "section": "[line]",
+   "label": "Keep this time in animations",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.time_lock"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "line",
+   "section": "[line]",
+   "label": "Run",
+   "control": "Select",
+   "options": [],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "line",
+   "section": "[line]",
+   "label": "Sections",
+   "control": "Select",
+   "options": [
+    "All, labelled in turn",
+    "The panel's own"
+   ],
+   "keys": [
+    "panels[].layers[].over.which"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "line",
+   "section": "[line]",
+   "label": "Colour",
+   "control": "ColorPicker",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.color"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "line",
+   "section": "[line]",
+   "label": "Line width",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.lw"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "line",
+   "section": "[line]",
+   "label": "End labels",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.labels"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "line",
+   "section": "[line]",
+   "label": "Legend entry (blank: none)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.legend"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "sector",
+   "section": "[sector]",
+   "label": "",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.on"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "sector",
+   "section": "[sector]",
+   "label": "Time",
+   "control": "Select",
+   "options": [
+    "the panel's",
+    "0:00:00  (0 min)",
+    "1:00:00  (60 min)",
+    "1:05:00  (65 min)",
+    "1:10:00  (70 min)",
+    "1:15:00  (75 min)",
+    "1:20:00  (80 min)",
+    "1:25:00  (85 min)",
+    "1:30:00  (90 min)",
+    "1:35:00  (95 min)",
+    "1:40:00  (100 min)"
+   ],
+   "keys": [
+    "panels[].layers[].over.time_s"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "sector",
+   "section": "[sector]",
+   "label": "Keep this time in animations",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.time_lock"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "sector",
+   "section": "[sector]",
+   "label": "Run",
+   "control": "Select",
+   "options": [],
+   "keys": [],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "sector",
+   "section": "[sector]",
+   "label": "Centre",
+   "control": "Select",
+   "options": [
+    "Tracked storm (offset, km)",
+    "Point (model x, y km)"
+   ],
+   "keys": [
+    "panels[].layers[].over.center"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "sector",
+   "section": "[sector]",
+   "label": "Offset x (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.offx"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "sector",
+   "section": "[sector]",
+   "label": "Offset y (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.offy"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "sector",
+   "section": "[sector]",
+   "label": "Azimuth 0",
+   "control": "Select",
+   "options": [
+    "Storm motion (0: ahead, 90: right)",
+    "Grid north (0: north, 90: east)"
+   ],
+   "keys": [
+    "panels[].layers[].over.ref"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "sector",
+   "section": "[sector]",
+   "label": "Azimuth from (\u00b0)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.az0"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "sector",
+   "section": "[sector]",
+   "label": "to (\u00b0)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.az1"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "sector",
+   "section": "[sector]",
+   "label": "Radius (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.rmax"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "sector",
+   "section": "[sector]",
+   "label": "Colour",
+   "control": "ColorPicker",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.color"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "sector",
+   "section": "[sector]",
+   "label": "Line width",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.lw"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "sector",
+   "section": "[sector]",
+   "label": "Line style",
+   "control": "Select",
+   "options": [
+    "Solid",
+    "Dashed",
+    "Dotted",
+    "Dash-dot"
+   ],
+   "keys": [
+    "panels[].layers[].over.ls"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "layer",
+   "kind": "plan",
+   "layer": "sector",
+   "section": "[sector]",
+   "label": "Legend entry (blank: none)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].over.legend"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "inset",
+   "kind": "plan",
+   "layer": "",
+   "section": "Where it sits",
+   "label": "Where",
+   "control": "Select",
+   "options": [
+    "Upper right",
+    "Upper left",
+    "Lower right",
+    "Lower left",
+    "At x, y (left, bottom)"
+   ],
+   "keys": [
+    "panels[].insets[].loc"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "inset",
+   "kind": "plan",
+   "layer": "",
+   "section": "Where it sits",
+   "label": "Width (of the panel)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].insets[].size"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "inset",
+   "kind": "plan",
+   "layer": "",
+   "section": "Where it sits",
+   "label": "Height (blank: as it shows)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].insets[].h"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "inset",
+   "kind": "plan",
+   "layer": "",
+   "section": "Area",
+   "label": "Plan-view area",
+   "control": "Select",
+   "options": [
+    "Follow the tracked storm",
+    "Fixed box",
+    "Whole domain"
+   ],
+   "keys": [
+    "panels[].insets[].opts.domain.mode"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "inset",
+   "kind": "plan",
+   "layer": "",
+   "section": "Area",
+   "label": "Axis coordinates",
+   "control": "Select",
+   "options": [
+    "Model grid x, y",
+    "Relative to the storm"
+   ],
+   "keys": [
+    "panels[].insets[].opts.coords"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "inset",
+   "kind": "plan",
+   "layer": "",
+   "section": "Area",
+   "label": "x min (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].insets[].opts.domain.box[]"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "inset",
+   "kind": "plan",
+   "layer": "",
+   "section": "Area",
+   "label": "x max (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].insets[].opts.domain.box[]"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "inset",
+   "kind": "plan",
+   "layer": "",
+   "section": "Area",
+   "label": "y min (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].insets[].opts.domain.box[]"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "inset",
+   "kind": "plan",
+   "layer": "",
+   "section": "Area",
+   "label": "y max (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].insets[].opts.domain.box[]"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "inset",
+   "kind": "plan",
+   "layer": "",
+   "section": "Box and lines",
+   "label": "Box in the panel",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].insets[].mark"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "inset",
+   "kind": "plan",
+   "layer": "",
+   "section": "Box and lines",
+   "label": "Lines to the inset",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].insets[].connect"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "inset",
+   "kind": "plan",
+   "layer": "",
+   "section": "Box and lines",
+   "label": "Tick labels",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].insets[].ticks"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "inset",
+   "kind": "plan",
+   "layer": "",
+   "section": "Box and lines",
+   "label": "Colour",
+   "control": "ColorPicker",
+   "options": [],
+   "keys": [
+    "panels[].insets[].color"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "inset",
+   "kind": "plan",
+   "layer": "",
+   "section": "Box and lines",
+   "label": "Line width",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].insets[].lw"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "inset",
+   "kind": "plan",
+   "layer": "",
+   "section": "Box and lines",
+   "label": "Line style",
+   "control": "Select",
+   "options": [
+    "Solid",
+    "Dashed",
+    "Dotted",
+    "Dash-dot"
+   ],
+   "keys": [
+    "panels[].insets[].ls"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "inset",
+   "kind": "plan",
+   "layer": "",
+   "section": "",
+   "label": "The panel's layers",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].insets[].layers[].ref"
+   ],
+   "seen_in": "plan figure"
+  },
+  {
+   "level": "panel",
+   "kind": "plan",
+   "layer": "",
+   "section": "Annotations",
+   "label": "Add",
+   "control": "Select",
+   "options": [
+    "Text",
+    "Marker",
+    "Arrow",
+    "Line",
+    "Vertical line",
+    "Horizontal line",
+    "Box",
+    "Circle",
+    "Legend entry"
+   ],
+   "keys": [],
+   "seen_in": "plan figure"
+  }
+ ],
+ "left": [
+  "plan: parcels (not made here)",
+  "plan: boundaries"
+ ]
+}

@@ -2,11 +2,11 @@
 several, e.g. tornadic vs non-tornadic), preview it at its final size, and export the
 image, a stand-alone script, the data and the document.
 
-What is on the page is the shell (figures/shell): the tree, the preview and the inspector, on
-the figure document.  The FigureEditor holds what the shell works with, one mixin a module: the
-widgets its settings are copied from (widgets, style, scene), the runs a figure could add (runs),
-new figures from the viewer's tools (sources, scene), saving and autosave (export), animations
-(anim), templates (style) and the New dialog (quick).
+What is on the page is the shell (figures/shell) on the figure document, in its frame
+(figures/ui): the top bar, the tool rail and its drawer, the preview.  The FigureEditor holds what
+the shell works with, one mixin a module: the runs a figure could add (runs), new figures from the
+viewer's tools (sources, scene), saving and autosave (export), animations (anim), templates
+(style) and the New dialog (quick).
 The data behind a figure (reading the runs, the caches) is FigureData's (render), which
 works without the editor."""
 
@@ -23,12 +23,11 @@ from .scene import FigureScene
 from .shell import FigureShell
 from .sources import FigureSources
 from .style import FigureStyle
-from .widgets import FigureWidgets
 
 
-class FigureEditor(FigureWidgets, FigureRuns, FigureSources, FigureExport, FigureAnimation,
+class FigureEditor(FigureRuns, FigureSources, FigureExport, FigureAnimation,
                    FigureStyle, FigureQuick, FigureScene):
-    shell = None  # (made last: what builds the widgets asks whether there is one)
+    shell = None  # (made last: what is built before it asks whether there is one)
 
     def __init__(self, viewer):
         self.v = viewer
@@ -45,17 +44,14 @@ class FigureEditor(FigureWidgets, FigureRuns, FigureSources, FigureExport, Figur
                 self._status, f'<span class="busy">● {html.escape(text)}</span>')),
             viewer.pools["figser"], lambda: viewer._schedule(partial(self.request, False, False)),
             lambda: viewer.gen["figser"])
-        self._build_panel_widgets()
-        self._build_layer_widgets()
         self._build_scene()
-        self._build_text()
-        self._build_more()
+        self._build_save()
         self._build_anim()
         self._build_style()
         self._build_quick()
         self._scan_roots()
         self.shell = FigureShell(self)
-        self.shell.start(self._default())
+        self.shell.start(self._blank())
 
     @property
     def panel(self):

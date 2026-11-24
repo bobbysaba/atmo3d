@@ -21,7 +21,7 @@ from .v3 import inset_panel
 from .layers import (_fill, _contour, _shade, _vectors, _parcels, parcel_label,
                      sector_outline, _boundaries, extend_of,
                      union_extend, _extends, _ticks, _colorbars, _cbar_style, bar_layer,
-                     _contour_key, _mixed_kinds, bar_key)
+                     _contour_key, _mixed_kinds, bar_key, note_bar)
 from .lines import (_lines, _dists, _profiles, _joints, _azims, azim_range, dist_edges,
                     dist_hist, dist_of, joint_edges, joint_hist, joint_of)
 from .sounding import _sounding, _hodo_view, shared_hodo_half, sounding_layout
@@ -251,6 +251,7 @@ def _draw2(spec, data):
         cax = bar.add_subplot(gs[1])
         c = bar.colorbar(m, cax=cax, orientation="vertical" if side else "horizontal",
                          extend=lay.get("extend", "neither"))
+        note_bar(fig, c.ax, [i for i, _, _ in mappables], "figure")
         if loc in ("left", "top"):
             (c.ax.yaxis if side else c.ax.xaxis).set_ticks_position(loc)
             (c.ax.yaxis if side else c.ax.xaxis).set_label_position(loc)
@@ -584,7 +585,7 @@ def _row_label(ax, text, V, fs):
     """A row's label left of its first panel (beyond the y label), bold as the titles
     are."""
     bold = V.get("axes", {}).get("title_bold", True)
-    ax.annotate(text, xy=(0, 0.5), xycoords=ax.yaxis.label,
+    ax._cv_rowlabel = ax.annotate(text, xy=(0, 0.5), xycoords=ax.yaxis.label,
                 xytext=(-ax.yaxis.labelpad - 0.4 * fs, 0), textcoords="offset points",
                 ha="right", va="center", rotation=90, fontsize=font_size(V, "title"),
                 weight="bold" if bold else "normal")
@@ -604,9 +605,10 @@ def _style_key(h):
 def _scene_legend(ax, handles, labels, lg, V):
     """A 3D scene's legend when other kinds share the figure: its own, smaller, in its corner."""
     loc = lg.get("loc", "upper right")
-    ax.legend(handles, labels, loc="upper right" if loc.startswith("outside") else loc,
-              fontsize=0.85 * font_size(V, "legend"), frameon=lg.get("frame", True), framealpha=0.7,
-              ncol=int(lg.get("ncol", 1) or 1))
+    leg = ax.legend(handles, labels, loc="upper right" if loc.startswith("outside") else loc,
+                    fontsize=0.85 * font_size(V, "legend"), frameon=lg.get("frame", True),
+                    framealpha=0.7, ncol=int(lg.get("ncol", 1) or 1))
+    leg._cv_block = True  # (the block's legend settings: click.part_boxes)
 
 
 def _legends(fig, bv, placed, entries, mixed=False):
@@ -680,10 +682,11 @@ def _legends(fig, bv, placed, entries, mixed=False):
               frameon=lg.get("frame", True), framealpha=0.85, title=lg.get("title") or None,
               title_fontsize=font_size(bv, "legend"))
     if on_fig:
-        fig.legend(handles, labels, **anchor_kw(loc, anchor), **kw)
+        leg = fig.legend(handles, labels, **anchor_kw(loc, anchor), **kw)
     else:  # (the "outside" places belong to the figure's legend)
-        host.legend(handles, labels, **anchor_kw(
+        leg = host.legend(handles, labels, **anchor_kw(
             "best" if loc.startswith("outside") and not anchor else loc, anchor), **kw)
+    leg._cv_block = True  # (drawn from the block's legend settings, not the panel's own)
 
 
 def _share_limits(placed, data, share):
@@ -926,8 +929,9 @@ def _decorate(ax, d, spec, fs, title, letter, ztxt, key):
     if kind == "table":  # (the table fills the panel from its top)
         labels = dict(labels, loc="above left")
 
-    def label(text, opts, color=None):
+    def label(text, opts, color=None, name="letters"):
         t = _anchored(ax, text, opts, fs * 1.2, color)
+        ax.__dict__.setdefault("_cv_tags", []).append((name, t))  # (click.part_boxes)
         if spec.get("label_fit"):  # (fit_labels, once the figure is laid out)
             edge = str(opts.get("loc", "upper left")).split()[0]
             ax.__dict__.setdefault("_cv_labels", []).append((edge, t))
@@ -935,13 +939,15 @@ def _decorate(ax, d, spec, fs, title, letter, ztxt, key):
     if labels.get("on", True):
         label(panel_letter(letter, labels.get("fmt", "{a}")), labels)
     if tlab.get("on", True) and "time_s" in d:
-        label(time_text(d["time_s"], run_time_opts(spec, int(d.get("run", 0)), d["time_s"])), tlab)
+        label(time_text(d["time_s"], run_time_opts(spec, int(d.get("run", 0)), d["time_s"])), tlab,
+              name="time_label")
     zlab = spec.get("z_label", {})
     if zlab.get("on") and ztxt:
-        label(ztxt, zlab)
+        label(ztxt, zlab, name="z_label")
     if rlab.get("on", True) and d.get("run_label"):
         label(str(d["run_label"]), rlab,
-              run_color(spec, int(d.get("run", 0))) if rlab.get("run_color") else None)
+              run_color(spec, int(d.get("run", 0))) if rlab.get("run_color") else None,
+              name="run_label")
     _annotate(ax, key, spec.get("annotations", []), fs)
 
 

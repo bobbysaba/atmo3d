@@ -1,10 +1,11 @@
-"""What the tree of a figure document holds, without widgets.  A node is a string:
+"""The places of a figure document an edit can be made at (what the level switch and the preview
+pick: ui/levels.py), and their names, without widgets.  A node is a string:
 
   figure, runs, kind:<kind>, panel:<id>, layer:<panel id>:<place in the panel>,
-  inset:<panel id>:<inset id>"""
+  inset:<panel id>:<inset id>, row:<r>, col:<c> (a row or column of the grid: ui/lines.py)"""
 
 from .. import draw as figdraw
-from ..cards import TYPE_LABEL
+from ..choices import TYPE_LABEL
 from ..draw.base import _cell
 from ..kinds import KINDS
 
@@ -12,6 +13,11 @@ FIGURE, RUNS, KIND_PREFIX = "figure", "runs", "kind:"
 ENTRY_WORDS = {"dist": "Distribution", "profile": "Profile", "joint": "Joint",
                "azim": "Azimuthal", "table": "Values"}  # (entry_name's)
 KIND_WORDS = {"scene": "3D scenes"}  # (a kind whose name doesn't read as a plural)
+
+
+def is_line(node):
+    """Whether node is a row or a column of the grid."""
+    return node.split(":", 1)[0] in ("row", "col")
 
 
 def in_order(doc):
@@ -99,43 +105,10 @@ def entry_name(lay, fields=None):
                                        _when_word(lay)) if x)
 
 
-def panel_name(doc, p, runs=None):
-    """A panel in words, after its letter: its run and time."""
-    bits = []
-    if len(doc.get("runs") or []) > 1 and p.get("run") is not None:
-        bits.append((runs or run_names(doc)).get(p["run"], "no such run"))
-    if p.get("time_s") is not None:
-        bits.append(f"{float(p['time_s']) / 60:g} min")
-    if p.get("title"):
-        bits.append(f"“{p['title']}”")
-    return " · ".join(bits)
-
-
 def run_names(doc):
     """{run id: its label, or its folder's name}."""
     return {r["id"]: r.get("label") or str(r.get("path", "")).rstrip("/").rsplit("/", 1)[-1]
             for r in doc.get("runs") or []}
-
-
-def tree_items(doc, fields=None):
-    """The rows of the tree, in order: [{id, label, depth}].  Panels sit under All <kind>,
-    their layers under them."""
-    panels, names, runs = in_order(doc), letters(doc), run_names(doc)
-    out = [dict(id=FIGURE, label="Figure", depth=0),
-           dict(id=RUNS, label=f"Runs ({len(doc.get('runs') or [])})", depth=0)]
-    for kind in dict.fromkeys(p["kind"] for p in panels):
-        mine = [p for p in panels if p["kind"] == kind]
-        out.append(dict(id=f"kind:{kind}", label=f"All {kind_name(kind, len(mine))}", depth=0))
-        for p in mine:
-            tail = panel_name(doc, p, runs)
-            out.append(dict(id=f"panel:{p['id']}", depth=1,
-                            label=f"{names[p['id']]}  {tail}" if tail else names[p["id"]]))
-            for j, (_, lay) in enumerate(figdraw.panel_layers(doc, p)):
-                out.append(dict(id=f"layer:{p['id']}:{j}", depth=2, label=layer_name(lay, fields)))
-            for n, ins in enumerate(p.get("insets") or []):
-                out.append(dict(id=f"inset:{p['id']}:{ins['id']}", depth=2,
-                                label=f"Zoom inset {n + 1}"))
-    return out
 
 
 def panel_of(doc, node):
@@ -152,6 +125,9 @@ def outlined(doc, node):
     if node.startswith("kind:"):
         kind = node.partition(":")[2]
         return [p["id"] for p in doc.get("panels") or [] if p["kind"] == kind]
+    if is_line(node):
+        from ..ui import lines
+        return lines.members(doc, node)
     if node.startswith("inset:"):  # (its box in the preview: by its key)
         return [-int(node.rsplit(":", 1)[1])]
     p = panel_of(doc, node)
@@ -164,6 +140,9 @@ def still_there(doc, node):
         return True
     if node.startswith("kind:"):
         return bool(outlined(doc, node))
+    if is_line(node):
+        from ..ui import lines
+        return lines.still_there(doc, node)
     p = panel_of(doc, node)
     if p is None:
         return False
@@ -207,6 +186,9 @@ def scope(doc, node):
         kind = node.partition(":")[2]
         n = len(outlined(doc, node))
         return f"Applies to all {kind_name(kind, n)}"
+    if is_line(node):
+        from ..ui import lines
+        return lines.scope(doc, node)
     if node.startswith("inset:"):
         return f"Applies to {inset_word(doc, node)} only"
     p = panel_of(doc, node)

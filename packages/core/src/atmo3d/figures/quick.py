@@ -15,12 +15,13 @@ import panel as pn
 from .. import config
 from . import spec as fg
 from ..theme import DIALOG_DARK
-from .cards import QUICK_VARY, SIZE_PRESETS, _grid, _hint
+from .choices import QUICK_VARY, SIZE_PRESETS
+from .ui.parts import _grid, _hint
 from .export import make_thumb, saved_list, saved_thumb
 from .times import _nearest_t
 from .kinds import KIND_LABELS, KINDS, MAPS
 from .shell import docedit as de
-from .shell.gridview import main_kind
+from .ui.grid import main_kind
 from ..viewer.fieldmenu import FieldSelect
 
 ALL_FOLDERS = "Newest first, all folders"
@@ -29,6 +30,19 @@ NO_TEMPLATES = "No templates yet"
 PICK = "Pick a saved figure…"
 NEW_STEP = 5  # outputs between a new figure's panels, past the times it starts with
 _THUMB_BOX = 104  # px of a gallery button given to the picture; the name is below it
+
+
+NO_FILL = "None (add layers after)"
+
+
+def with_none(groups):
+    """The field menu's groups with None on top (a figure that draws nothing yet)."""
+    out = type(groups)({"": {NO_FILL: ""}, **groups}) if isinstance(groups, dict) else \
+        {"": {NO_FILL: ""}}
+    for k in ("tips", "off"):
+        if hasattr(groups, k):
+            setattr(out, k, getattr(groups, k))
+    return out
 
 
 def _thumb_css(png=None):
@@ -54,7 +68,8 @@ class FigureQuick:
                                          value="times")
         self.qs_rows = pn.widgets.IntInput(name="Rows", start=1, end=8, value=2)
         self.qs_cols = pn.widgets.IntInput(name="Columns", start=1, end=8, value=3)
-        self.qs_field = FieldSelect(name="Colour fill")
+        self.qs_field = FieldSelect(name="Colour fill", description="None: the panels draw "
+                                    "nothing yet; add layers in the Layers tool")
         self.qs_size = pn.widgets.Select(name="Width", value="", options={
             ("8 in wide" if v == "" else k): v for k, v in SIZE_PRESETS.items()})
         self.qs_note = _hint("")
@@ -98,8 +113,8 @@ class FigureQuick:
             self.qs_earlier_row,
             _grid(self.qs_kind, self.qs_vary, self.qs_field),
             _grid(self.qs_rows, self.qs_cols, self.qs_size), self.qs_note,
-            _hint("Everything else (times, layers, style, labels) is in the tree and the "
-                  "inspector; the new-figure button above the preview shows this again."),
+            _hint("Everything else (layers, times, style, labels) is in the tools on the left; "
+                  "the new-figure button at the top shows this again."),
             pn.Row(self.qs_go, self.qs_skip),
             pn.layout.Divider(margin=(6, 4)),
             _grid((self.qs_tpl, 2), self.qs_tpl_go),
@@ -137,15 +152,14 @@ class FigureQuick:
         kind = main_kind(doc)
         g = self.fields.groups()
         fills = de.guess_fill(doc, kind)["fields"] if kind in MAPS else []
-        self.qs_field.groups = g
+        self.qs_field.groups = with_none(g)
         names = [v for grp in g.values() for v in grp.values()]
-        self.qs_field.value = fills[0] if fills and fills[0] in names else (
-            names[0] if names else None)
+        self.qs_field.value = fills[0] if fills and fills[0] in names else ""
         self.qs_kind.value = kind
         self._quick_show()  # (the panels' choices of this kind first)
         guess = de.guess_fill(doc, kind)
         dims = [d for d in (guess["row_dim"], guess["col_dim"]) if d != "none"]
-        vary = dims[0] if len(dims) == 1 else "times"
+        vary = dims[0] if len(dims) == 1 else "times" if dims else "none"
         self.qs_vary.value = vary if vary in self.qs_vary.options.values() else "times"
         self.qs_rows.value, self.qs_cols.value = guess["rows"], guess["cols"]
         self._list_templates()
@@ -171,13 +185,13 @@ class FigureQuick:
         self.qs_rows.visible = self.qs_cols.visible = KINDS[kind].quick_grid
         note = KINDS[kind].note or (maps and {
             "fields": "Every panel starts with this fill: pick each panel's field in "
-                      "the tree.",
-            "heights": "Pick each panel's height in the tree, or use Fill panels on the Plan "
-                       "views node.",
-            "runs": "A panel per run: add runs on the tree's Runs node.  For a grid such as "
-                    "runs × times, use Fill panels on the Plan views node.",
-            "none": "Every panel is alike: pick one in the tree to change it (its run, time, "
-                    "height …)."}.get(vary)) or ""
+                      "its Layers.",
+            "heights": "Pick each panel's height (Layout, with the panel picked), or use "
+                       "Fill panels (Layout, for the figure).",
+            "runs": "A panel per run: add runs in the Runs tool.  For a grid such as "
+                    "runs × times, use Fill panels (Layout, for the figure).",
+            "none": "Every panel is alike: click one in the preview to change it (its run, "
+                    "time, height …)."}.get(vary)) or ""
         self.qs_note.object = f'<div class="cv-hint">{note}</div>'
         self.qs_note.visible = bool(note)
 
@@ -299,11 +313,8 @@ class FigureQuick:
         kind, vary = self.qs_kind.value, self.qs_vary.value
         s = self._default()
         f = self.qs_field.value
-        if kind in MAPS and f:
-            fill = next((lay for lay in s["layers"] if lay["type"] == "fill"), None)
-            if fill is not None and fill.get("field") != f:
-                s["layers"][s["layers"].index(fill)] = fg.layer_defaults(
-                    "fill", self.fields, f, 1.0)
+        if kind in MAPS:  # (what the panels draw: the fill chosen, or nothing yet)
+            s["layers"] = [fg.layer_defaults("fill", self.fields, f, 1.0)] if f else []
         k = KINDS[kind]
         s["kind"] = kind
         if kind != "plan":

@@ -14,7 +14,7 @@ import panel as pn
 from . import draw as figdraw, spec as fg
 from .batch import (MAX_FRAMES, anim_frame, auto_ends, frame_image, frame_pixels,
                     frame_pool, pixels_image)
-from .cards import _chk, _f
+from .ui.parts import _chk, _f
 
 END = "End of run"
 IMAGE_EXTS = (".gif", ".png", ".pdf", ".svg", ".eps", ".jpg", ".jpeg", ".tif", ".tiff")

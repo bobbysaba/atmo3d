@@ -11,10 +11,8 @@ import panel as pn
 
 from ... import config
 from .. import spec as fg, tablefile
-from ..cards import _grid, _hint
-from ..cards.base import SECTION
+from ..ui.parts import SECTION, _grid, _hint
 from ...theme import DIALOG_DARK
-from .looks import Scope, make_widget, rows_of
 from .multirun import ApplyRuns
 
 
@@ -156,25 +154,23 @@ class ExportDialog:
         return ed.path.value
 
     def _show_rows(self):
-        """The image's settings, from the document."""
-        shell, doc = self.shell, self.shell.doc
-        scope = Scope()
-        kinds = list(dict.fromkeys(p["kind"] for p in doc["panels"]))
+        """The image's settings (the schema's Export rows), from the document."""
+        from ..schema.where import Where
+        from ..ui import drawer as D
+        from ..ui.host import ShellHost
+        dialog, where = self, Where("figure")
 
-        def changed(st, w):
-            shell.edit(lambda d: scope.write(d, st, w.value))
-            self._names()
-            self._fit_shows(by_key)
+        class Host(ShellHost):
+            def edit(self, fn):  # (the dialog's own drawer, and the download's name, follow)
+                super().edit(fn)
+                drawer.refresh()
+                dialog._names()
 
-        by_key = {st.key: make_widget(self.ed, st, scope.value(doc, st), changed)
-                  for st in rows_of("Export", kinds)}
-        self.rows.objects = [_grid(*by_key.values(), n=3)]
-        self._fit_shows(by_key)
-
-    @staticmethod
-    def _fit_shows(by_key):
-        if "export.pad" in by_key and "export.*" in by_key:
-            by_key["export.pad"].visible = by_key["export.*"].value != "full"
+        rows = [r for r in D.rows_at(self.shell.doc, where) if r.section == "Export"]
+        drawer = D.Drawer(Host(self.shell), where, rows, fallback=self.shell.frame.fresh(),
+                          opened=("Export",))
+        self.drawer = drawer
+        self.rows.objects = [drawer.panel]
 
     def _names(self):
         doc = self.shell.doc or {}

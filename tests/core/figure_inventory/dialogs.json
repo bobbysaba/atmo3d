@@ -1,0 +1,423 @@
+{
+ "records": [
+  {
+   "level": "export",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Save as (folder/name on the server, no extension)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [],
+   "seen_in": "export"
+  },
+  {
+   "level": "export",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Format",
+   "control": "Select",
+   "options": [
+    "PNG",
+    "PDF",
+    "SVG",
+    "EPS",
+    "TIFF"
+   ],
+   "keys": [],
+   "seen_in": "export"
+  },
+  {
+   "level": "export",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "DPI",
+   "control": "IntInput",
+   "options": [],
+   "keys": [],
+   "seen_in": "export"
+  },
+  {
+   "level": "export",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Margin when trimmed (in)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [],
+   "seen_in": "export"
+  },
+  {
+   "level": "export",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Image size",
+   "control": "Select",
+   "options": [
+    "Trim white space",
+    "Exact width, trim the height",
+    "Exact width and height"
+   ],
+   "keys": [],
+   "seen_in": "export"
+  },
+  {
+   "level": "export",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Background",
+   "control": "Select",
+   "options": [
+    "White",
+    "Black",
+    "Transparent"
+   ],
+   "keys": [],
+   "seen_in": "export"
+  },
+  {
+   "level": "export",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Also the script and data",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [],
+   "seen_in": "export"
+  },
+  {
+   "level": "export",
+   "kind": "",
+   "layer": "",
+   "section": "Animation (GIF or video)",
+   "label": "Save path",
+   "control": "TextInput",
+   "options": [],
+   "keys": [],
+   "seen_in": "export"
+  },
+  {
+   "level": "export",
+   "kind": "",
+   "layer": "",
+   "section": "Animation (GIF or video)",
+   "label": "Format",
+   "control": "Select",
+   "options": [
+    "GIF",
+    "MP4 video"
+   ],
+   "keys": [],
+   "seen_in": "export"
+  },
+  {
+   "level": "export",
+   "kind": "",
+   "layer": "",
+   "section": "Animation (GIF or video)",
+   "label": "Step (outputs)",
+   "control": "IntInput",
+   "options": [],
+   "keys": [],
+   "seen_in": "export"
+  },
+  {
+   "level": "export",
+   "kind": "",
+   "layer": "",
+   "section": "Animation (GIF or video)",
+   "label": "End time",
+   "control": "Select",
+   "options": [
+    "End of run",
+    "1:20:00",
+    "1:25:00",
+    "1:30:00",
+    "1:35:00"
+   ],
+   "keys": [],
+   "seen_in": "export"
+  },
+  {
+   "level": "export",
+   "kind": "",
+   "layer": "",
+   "section": "Animation (GIF or video)",
+   "label": "Frames per second",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [],
+   "seen_in": "export"
+  },
+  {
+   "level": "export",
+   "kind": "",
+   "layer": "",
+   "section": "Animation (GIF or video)",
+   "label": "DPI",
+   "control": "IntInput",
+   "options": [],
+   "keys": [],
+   "seen_in": "export"
+  },
+  {
+   "level": "export",
+   "kind": "",
+   "layer": "",
+   "section": "Animation (GIF or video)",
+   "label": "Loop",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [],
+   "seen_in": "export"
+  },
+  {
+   "level": "export",
+   "kind": "",
+   "layer": "",
+   "section": "Animation (GIF or video)",
+   "label": "Also save the frames (PNG)",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [],
+   "seen_in": "export"
+  },
+  {
+   "level": "export",
+   "kind": "",
+   "layer": "",
+   "section": "Tables (CSV, LaTeX)",
+   "label": "CSV",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [],
+   "seen_in": "export"
+  },
+  {
+   "level": "export",
+   "kind": "",
+   "layer": "",
+   "section": "Tables (CSV, LaTeX)",
+   "label": "LaTeX",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [],
+   "seen_in": "export"
+  },
+  {
+   "level": "export",
+   "kind": "",
+   "layer": "",
+   "section": "Template",
+   "label": "Template name",
+   "control": "TextInput",
+   "options": [],
+   "keys": [],
+   "seen_in": "export"
+  },
+  {
+   "level": "export",
+   "kind": "",
+   "layer": "",
+   "section": "Apply to other runs",
+   "label": "Runs",
+   "control": "MultiSelect",
+   "options": [
+    "demo/supercell",
+    "demo/supercell_weak"
+   ],
+   "keys": [],
+   "seen_in": "export"
+  },
+  {
+   "level": "export",
+   "kind": "",
+   "layer": "",
+   "section": "Apply to other runs",
+   "label": "Other run folders (one per line)",
+   "control": "TextAreaInput",
+   "options": [],
+   "keys": [],
+   "seen_in": "export"
+  },
+  {
+   "level": "export",
+   "kind": "",
+   "layer": "",
+   "section": "Apply to other runs",
+   "label": "Name",
+   "control": "TextInput",
+   "options": [],
+   "keys": [],
+   "seen_in": "export"
+  },
+  {
+   "level": "export",
+   "kind": "",
+   "layer": "",
+   "section": "Apply to other runs",
+   "label": "First panel's time (min)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [],
+   "seen_in": "export"
+  },
+  {
+   "level": "export",
+   "kind": "",
+   "layer": "",
+   "section": "Apply to other runs",
+   "label": "Save as (optional)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [],
+   "seen_in": "export"
+  },
+  {
+   "level": "export",
+   "kind": "",
+   "layer": "",
+   "section": "Apply to other runs",
+   "label": "Also the script and data",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [],
+   "seen_in": "export"
+  },
+  {
+   "level": "new",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Panels show",
+   "control": "Select",
+   "options": [
+    "Plan views",
+    "Vertical cross-sections",
+    "Time\u2013height (series)",
+    "Time series",
+    "Soundings",
+    "Distributions",
+    "Vertical profiles",
+    "Joint distributions (x vs y)",
+    "Azimuthal means (radius\u2013height)",
+    "Tables (sounding parameters, field statistics)",
+    "3D scene (one picture)"
+   ],
+   "keys": [],
+   "seen_in": "new"
+  },
+  {
+   "level": "new",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Panels differ in",
+   "control": "Select",
+   "options": [
+    "Time",
+    "Field (one time)",
+    "Height (one time)",
+    "Run (one time)",
+    "Nothing (alike panels)"
+   ],
+   "keys": [],
+   "seen_in": "new"
+  },
+  {
+   "level": "new",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Rows",
+   "control": "IntInput",
+   "options": [],
+   "keys": [],
+   "seen_in": "new"
+  },
+  {
+   "level": "new",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Columns",
+   "control": "IntInput",
+   "options": [],
+   "keys": [],
+   "seen_in": "new"
+  },
+  {
+   "level": "new",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Width",
+   "control": "Select",
+   "options": [
+    "8 in wide",
+    "3.25 in wide (one journal column)",
+    "5 in wide",
+    "6.5 in wide (full page width)",
+    "7.5 in wide",
+    "Slide, 13.3 \u00d7 7.5 in"
+   ],
+   "keys": [],
+   "seen_in": "new"
+  },
+  {
+   "level": "new",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Or start from a template",
+   "control": "Select",
+   "options": [
+    "No templates yet"
+   ],
+   "keys": [],
+   "seen_in": "new"
+  },
+  {
+   "level": "new",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Or open a saved figure",
+   "control": "Select",
+   "options": [],
+   "keys": [],
+   "seen_in": "new"
+  },
+  {
+   "level": "new",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Or open one by its path",
+   "control": "TextInput",
+   "options": [],
+   "keys": [],
+   "seen_in": "new"
+  },
+  {
+   "level": "new",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Thumbnails from",
+   "control": "Select",
+   "options": [
+    "Newest first, all folders"
+   ],
+   "keys": [],
+   "seen_in": "new"
+  }
+ ],
+ "left": []
+}

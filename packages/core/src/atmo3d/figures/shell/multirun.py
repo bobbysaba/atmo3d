@@ -15,8 +15,7 @@ import panel as pn
 
 from ... import config
 from .. import batch
-from ..cards import _grid, _hint
-from ..cards.base import SECTION
+from ..ui.parts import SECTION, _grid, _hint
 
 MAX_RUNS = 200  # (runs offered in the list)
 

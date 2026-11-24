@@ -6,11 +6,10 @@ import time
 
 import pytest
 
-from conftest import fresh_shell
+from conftest import at_tool, drawer_text, every_node, fresh_shell
 
-from atmo3d.figures import settings as table
-from atmo3d.figures.shell import docedit as de, looks, nodes
-from atmo3d.figures.shell.gridview import ADDABLE
+from atmo3d.figures.shell import docedit as de, nodes
+from atmo3d.figures.ui.grid import ADDABLE
 
 KINDS = ("dist", "profile", "joint", "azim", "table")
 
@@ -118,28 +117,23 @@ def test_entries_in_words(lay, want):
 
 # ------------------------------------------------------------------ their look
 def test_these_kinds_can_be_added_and_have_sections():
+    from atmo3d.figures import schema as S
     assert set(KINDS) <= set(ADDABLE)
     for kind in KINDS:
-        assert looks.KIND_SECTIONS[kind]
-        assert "Panel labels" in looks.PANEL_KEYS[kind]
-        for section in looks.KIND_SECTIONS[kind]:
-            assert looks.rows_of(section, [kind]), (kind, section)
+        assert S.sections([kind], level="kind"), kind
+        assert "Panel labels" in S.sections([kind], level="panel"), kind
+        for section in S.sections([kind], level="kind"):
+            assert S.rows_of(section, [kind], level="kind"), (kind, section)
 
 
 def test_a_kinds_legend_rows_write_its_own_block():
+    from atmo3d.figures import schema as S
     for block, kind in (("dist", "dist"), ("prof", "profile"), ("joint", "joint"),
                         ("azim", "azim")):
-        rows = looks.rows_of("Legend in the panel", [kind])
-        assert {st.key for st in rows} == {f"{block}.legend", f"{block}.legend_loc",
-                                           f"{block}.legend_ncol", f"{block}.legend_frame"}
-        assert looks.OWN_NAMES[f"{block}.legend"] == "Legend"
-
-
-def test_a_panels_own_rows_are_rows_of_the_table():
-    keys = {st.key for st in (*table.SETTINGS, *looks.LEGEND_ROWS, *looks.EXTRA_ROWS)}
-    for kind in KINDS:
-        for section, own in looks.PANEL_KEYS[kind].items():
-            assert set(own) <= keys, (kind, section)
+        rows = S.rows_of("Legend in the panel", [kind])
+        assert {r.key for r in rows} == {f"look.{block}.legend", f"look.{block}.legend_loc",
+                                         f"look.{block}.legend_ncol", f"look.{block}.legend_frame"}
+        assert S.row(f"look.{block}.legend").label == "Legend"
 
 
 # ------------------------------------------------------------------ the panes, by their widgets
@@ -152,7 +146,7 @@ def shell(shell_viewer):
 
 
 def _walk(shell):
-    return list(shell.inspector.body.select())
+    return list(shell.frame.body.select())
 
 
 def _named(shell, name):
@@ -171,7 +165,19 @@ def _click(shell, name):
 
 
 def _cards(shell):
-    return {c.title: c for c in _walk(shell) if type(c).__name__ == "Card"}
+    """The drawer's sections that show, by title (without what it counts)."""
+    return {c.title.split(" · ")[0]: c for c in _walk(shell)
+            if type(c).__name__ == "Card" and c.visible}
+
+
+def _shown(shell, name):
+    """Whether a control called name shows in the drawer."""
+    import panel as pn
+    for c in _walk(shell):
+        if isinstance(c, pn.Row) and any(getattr(w, "name", None) == name and hasattr(w, "value")
+                                         for w in c.objects):
+            return c.visible
+    return False
 
 
 def _drew(shell):
@@ -195,7 +201,7 @@ def _fresh(shell, kind):
 
 @pytest.mark.parametrize("kind", KINDS)
 def test_a_new_panel_has_an_entry_at_the_viewers_run_and_draws(shell, kind):
-    p = shell.inspector.grid.add_panel(kind, "new column")
+    p = shell.grid.add_panel(kind, "new column")
     assert shell.node == f"panel:{p['id']}"
     assert len(p["layers"]) == 1 and p["layers"][0]["type"] == kind
     assert p["layers"][0]["run"] == shell.doc["runs"][0]["id"]
@@ -205,18 +211,20 @@ def test_a_new_panel_has_an_entry_at_the_viewers_run_and_draws(shell, kind):
 
 def test_every_node_of_these_kinds_shows(shell):
     for kind in KINDS:
-        shell.inspector.grid.add_panel(kind)
+        shell.grid.add_panel(kind)
     _drew(shell)
-    for row in shell.tree.items:
-        shell.select(row["id"])
-        assert shell.inspector.body.objects, row["id"]
+    for tool in ("layout", "layers", "look", "times"):
+        for node in every_node(shell.doc):
+            at_tool(shell, tool, node)
+            assert shell.frame.body.objects, node
+            assert "Could not show" not in drawer_text(shell), (tool, node)
     shell.undo()
     shell.redo()
 
 
 def test_a_distributions_card_edits_the_document_and_undo_goes_back(shell):
     pid = _fresh(shell, "dist")["id"]
-    shell._show(f"panel:{pid}")
+    at_tool(shell, "layers", f"panel:{pid}")
     _named(shell, "Only values from").value = 1.0
     assert de.panel_by_id(shell.doc, pid)["layers"][0]["recipe"]["lo"] == 1.0
     _drew(shell)
@@ -226,34 +234,37 @@ def test_a_distributions_card_edits_the_document_and_undo_goes_back(shell):
 
 def test_what_a_distribution_shows_follows_its_plot(shell):
     _fresh(shell, "dist")
-    shell.select("kind:dist")
-    _cards(shell)["Plot"].collapsed = False
-    assert _named(shell, "Bins")
+    at_tool(shell, "look", "kind:dist")
+    assert _shown(shell, "Bins") and not _shown(shell, "Whiskers")
     _named(shell, "Draw as").value = "ecdf"
     assert shell.doc["kinds"]["dist"]["dist"]["plot"] == "ecdf"
-    assert _named(shell, "Fraction axis from")
+    assert _shown(shell, "Fraction axis from") and not _shown(shell, "Count axis from")
+    assert not _shown(shell, "Bins")
     _named(shell, "Draw as").value = "box"
     assert "Legend in the panel" not in _cards(shell)  # (a box plot has none)
-    assert not [w for w in _walk(shell) if getattr(w, "name", "") == "Bins" and w.visible]
+    assert _shown(shell, "Whiskers") and not _shown(shell, "Bins")
+    assert not _shown(shell, "Fraction axis from")
     _drew(shell)
 
 
 def test_a_panels_own_plot_stays_its_own_and_goes_back(shell):
     pid = _fresh(shell, "dist")["id"]
-    other = shell.inspector.grid.copy_panel(pid)["id"]
-    _cards(shell)["Plot"].collapsed = False
+    other = shell.grid.copy_panel(pid)["id"]
+    at_tool(shell, "look", f"panel:{other}")
     _named(shell, "Draw as").value = "violin"
     assert de.panel_by_id(shell.doc, other)["opts"]["dist"]["plot"] == "violin"
     assert "opts" not in de.panel_by_id(shell.doc, pid)
     _drew(shell)
-    _click(shell, "↺ Draw as")
+    back = next(b for b in _walk(shell) if getattr(b, "description", "") ==
+                "Back to what it inherits: Draw as")
+    back.clicks += 1
     assert "dist" not in (de.panel_by_id(shell.doc, other).get("opts") or {})
 
 
 def test_an_entry_moves_to_another_panel_of_the_kind(shell):
     pid = _fresh(shell, "dist")["id"]
-    other = shell.inspector.grid.copy_panel(pid)["id"]
-    shell.select(f"layer:{pid}:0")
+    other = shell.grid.copy_panel(pid)["id"]
+    at_tool(shell, "layers", f"layer:{pid}:0")
     _named(shell, "In panel").value = other
     assert not de.panel_by_id(shell.doc, pid)["layers"]
     assert len(de.panel_by_id(shell.doc, other)["layers"]) == 2
@@ -263,17 +274,18 @@ def test_an_entry_moves_to_another_panel_of_the_kind(shell):
 def test_one_per_run_and_your_own_profile_data(shell, demo_run):
     pid = _fresh(shell, "profile")["id"]
     shell.add_run(os.path.join(os.path.dirname(demo_run), "supercell_weak"))
-    shell._show(f"panel:{pid}")
+    at_tool(shell, "layers", f"panel:{pid}")
     _click(shell, "One per run")
     assert [x["runs"] for x in de.panel_by_id(shell.doc, pid)["layers"]] == [["r0"], ["r1"]]
     _drew(shell)
-    shell._show(f"layer:{pid}:0")  # (two entries: folded in the panel)
+    at_tool(shell, "layers", f"layer:{pid}:0")  # (two entries: folded in the panel)
     _click(shell, "One per run")
     assert "already" in shell.status.object
-    shell._show(f"panel:{pid}")
+    at_tool(shell, "layers", f"panel:{pid}")
     _click(shell, "+ Your data")
     q = de.panel_by_id(shell.doc, pid)["layers"]
     assert q[-1]["source"] == "table" and q[-1]["type"] == "profile"
+    at_tool(shell, "layers")
     box = next(w for w in _walk(shell)
                if str(getattr(w, "name", "")).startswith("Your data: height"))
     box.value = "z_km,w (m/s)\n0.5,1\n3,20\n"
@@ -285,7 +297,7 @@ def test_one_per_run_and_your_own_profile_data(shell, demo_run):
 def test_a_profiles_values_can_be_edited_and_undone(shell):
     pid = _fresh(shell, "profile")["id"]
     _drew(shell)
-    shell._show(f"layer:{pid}:0")
+    at_tool(shell, "layers", f"layer:{pid}:0")
     sec = next(c for t, c in _cards(shell).items() if t.startswith("Values"))
     sec.collapsed = False
     tab = next(w for w in sec.select() if type(w).__name__ == "Tabulator")
@@ -304,7 +316,7 @@ def test_a_profiles_values_can_be_edited_and_undone(shell):
 def test_a_row_can_be_added_to_a_profiles_values_and_taken_out(shell):
     pid = _fresh(shell, "profile")["id"]
     _drew(shell)
-    shell._show(f"layer:{pid}:0")
+    at_tool(shell, "layers", f"layer:{pid}:0")
     sec = next(c for t, c in _cards(shell).items() if t.startswith("Values"))
     sec.collapsed = False
     tab = next(w for w in sec.select() if type(w).__name__ == "Tabulator")
@@ -332,17 +344,16 @@ def test_a_row_can_be_added_to_a_profiles_values_and_taken_out(shell):
 
 def test_what_a_joint_distribution_shows_follows_its_plot(shell):
     _fresh(shell, "joint")
-    shell.select("kind:joint")
-    _cards(shell)["Plot"].collapsed = False
-    assert _named(shell, "Colormap")
+    at_tool(shell, "look", "kind:joint")
+    assert _shown(shell, "Colormap") and not _shown(shell, "Dot size")
     _named(shell, "Draw as").value = "scatter"
-    assert not [w for w in _walk(shell) if getattr(w, "name", "") == "Colormap" and w.visible]
+    assert not _shown(shell, "Colormap") and _shown(shell, "Dot size")
     _drew(shell)
 
 
 def test_a_new_azimuthal_mean_takes_the_last_ones_recipe(shell):
     pid = _fresh(shell, "azim")["id"]
-    shell._show(f"panel:{pid}")
+    at_tool(shell, "layers", f"panel:{pid}")
     _named(shell, "Radius (km)").value = 12.0
     _click(shell, "+ Azimuthal mean")
     q = de.panel_by_id(shell.doc, pid)["layers"]
@@ -354,7 +365,7 @@ def test_a_tables_height_follows_its_rows_and_values_copy_the_last(shell):
     pid = _fresh(shell, "table")["id"]
     assert shell.can_follow() and shell.doc.get("size_auto")
     tall = shell.doc["size"][1]
-    shell._show(f"panel:{pid}")
+    at_tool(shell, "layers", f"panel:{pid}")
     outs = list(shell.time_opts(0).values())
     _named(shell, "Times (min)").value = ", ".join(f"{t / 60:g}" for t in outs[2:8])
     q = de.panel_by_id(shell.doc, pid)["layers"][0]
@@ -369,6 +380,6 @@ def test_a_tables_height_follows_its_rows_and_values_copy_the_last(shell):
 def test_fit_height_gives_a_kinds_size_at_once(shell):
     _fresh(shell, "dist")
     shell.doc.update(size=[3.0, 3.0], size_auto=False)
-    shell._show("figure")
+    at_tool(shell, "layout", "figure")
     _click(shell, "Fit height")
     assert shell.doc["size_auto"] and shell.doc["size"] == pytest.approx([5.5, 3.9])

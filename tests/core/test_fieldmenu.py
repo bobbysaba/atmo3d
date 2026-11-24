@@ -48,6 +48,12 @@ def test_field_select_acts_like_a_select():
     assert FieldSelect(options={"a": 1}).values == [1]
 
 
+def test_no_name_shows_no_label():
+    # (param would make one up, "FieldSelect00506", and the button would show it)
+    w = FieldSelect(groups=GROUPS, value="w", height=32)
+    assert w.name == "" and w.clone().name == ""
+
+
 def test_a_fields_note_is_its_tooltip():
     from atmo3d.core.fields import FieldDef, Groups, group_options
     defs = [FieldDef("buoy", "Buoyancy", "m/s²", "Thermodynamics", note="No pressure term."),

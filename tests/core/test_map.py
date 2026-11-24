@@ -21,14 +21,20 @@ def _same_image(data, want):
     np.testing.assert_allclose(render.decode_image(data), np.clip(want, lo, hi),
                                atol=1.01 * (hi - lo) / (render.CODE_MAX - 1))
 
+def w(o, key):
+    """The widget of a map layer's control of `key` (its drawer: figures/ui/layer.py)."""
+    return o.drawer.ctl(key).widget
+
+
 def test_map_streamlines_follow_the_wind(viewer, reg):
     v = viewer
     run, F = reg.get()
     v.tslider.value = 4
     o = v.vecs[0]
-    o["on"].value = True
-    o["style"].value = "streamlines"
-    assert o["density"].name == "Streamline density" and not o["ref"].visible
+    w(o, "on").value = True
+    w(o, "style").value = "streamlines"
+    assert w(o, "stream_n").visible and not w(o, "across").visible
+    assert not w(o, "ref").visible
     spec = v._map_spec()
     res = render.compute_map(F, spec)
     sl, heads = res["vecs"][0]["stream"]
@@ -44,10 +50,10 @@ def test_map_streamlines_follow_the_wind(viewer, reg):
     x, y = sl["xs"][0], sl["ys"][0]
     i, j = run.ij(x[1], y[1])
     d = np.array([x[2] - x[1], y[2] - y[1]])
-    w = np.array([u[j, i], vv[j, i]])
-    assert d @ w / (np.linalg.norm(d) * np.linalg.norm(w) + 1e-12) > 0.9
+    uv = np.array([u[j, i], vv[j, i]])
+    assert d @ uv / (np.linalg.norm(d) * np.linalg.norm(uv) + 1e-12) > 0.9
     # back to arrows
-    o["style"].value = "arrows"
+    w(o, "style").value = "arrows"
     res = render.compute_map(F, v._map_spec())
     v._apply_map(res, v._map_spec(), v.gen["map"])
     assert "stream" not in res["vecs"][0] and len(g["sl_src"].data["xs"]) == 0
@@ -60,14 +66,14 @@ def test_map_wind_and_vorticity_vectors_together(viewer, reg):
     v = viewer
     run, F = reg.get()
     v.tslider.value = 4
-    v.vecs[0]["on"].value = True
+    w(v.vecs[0], "on").value = True
     v._add_vec()
     o = v.vecs[1]
-    assert o["q"].value == "hvort" and not o["frame"].visible
-    assert o["ref"].value == vectors.VECTORS["hvort"].ref and "1/s" in o["ref"].name
-    o["q"].value = "wind"
-    assert o["frame"].visible and o["ref"].value == 20.0
-    o["q"].value = "hvort"
+    assert o["vector"] == "hvort" and not w(o, "frame").visible
+    assert o["ref"] == vectors.VECTORS["hvort"].ref and "1/s" in w(o, "ref").name
+    w(o, "vector").value = "wind"
+    assert w(o, "frame").visible and o["ref"] == 20.0 and w(o, "ref").value == 20.0
+    w(o, "vector").value = "hvort"
     spec = v._map_spec()
     res = render.compute_map(F, spec)
     v._apply_map(res, spec, v.gen["map"])
@@ -79,7 +85,7 @@ def test_map_wind_and_vorticity_vectors_together(viewer, reg):
     i, j = run.ij(a["x0"][0], a["y0"][0])
     assert np.sign(a["x1"][0] - a["x0"][0]) == np.sign(xi[j, i]) or abs(xi[j, i]) < 1e-6
     n = len(v.fig.renderers)
-    v._drop_vec(o)
+    v._drop_layer(o)
     assert len(v.vecs) == len(v.vec_r) == 1 and len(v.fig.renderers) == n - 4
 
 
@@ -87,7 +93,8 @@ def test_cross_section_marks_and_style(viewer):
     v = viewer
     v.mode.set("Cross-section")
     o = v.xs_ovs[0]
-    o["color"].value, o["negdash"].value, v.xs_cmap.value = "#fbbf24", False, "viridis"
+    w(o, "color").value, w(o, "neg_dashed").value = "#fbbf24", False
+    w(v.xs_main, "cmap").value = "viridis"
     tap(v, -15.0, -6.0)
     tap(v, 15.0, -1.0)
     wait(lambda: "long" in (v.xs_status.object or ""), msg="section")
@@ -95,8 +102,8 @@ def test_cross_section_marks_and_style(viewer):
     _, _, pr, nr = v.xs_ov_r[0]
     assert pr.glyph.line_color == "#fbbf24" and nr.glyph.line_dash in ("solid", [])
     assert len(v.xs_vec_r[0]["src"].data["x0"]) > 0  # the wind, on by default
-    v.xs_auto.value = False
-    assert v.xs_min.value < v.xs_max.value
+    w(v.xs_main, "auto").value = False
+    assert v.xs_main["vmin"] < v.xs_main["vmax"] and w(v.xs_main, "vmin").visible
     # plot style: limits set the view (and the reset tool's view), clamped to the data
     L, top = v._xs_extent
     v.xs_smin.value, v.xs_smax.value, v.xs_zmax.value = 5.0, 15.0, 1000.0
@@ -126,7 +133,9 @@ def test_cross_section_layers_as_on_the_map(viewer):
     v._xs_add_vec()
     assert len(v.xs_fig.renderers) == n + 6
     assert len(v.xs_fills) == 1 and len(v.xs_ovs) == 2 and len(v.xs_vecs) == 2
-    assert v.xs_vecs[1]["q"].value != "wind" and "level" not in v.xs_vecs[1]
+    assert v.xs_vecs[1]["vector"] != "wind" and "z" not in v.xs_vecs[1].lay
+    groups = v.xs_ovs[0].drawer.host.field_groups()  # (a section's: fields with heights)
+    assert all(v.F[n].ndim == 3 for g in groups.values() for n in g.values() if n in v.F)
     rs = v.xs_fig.renderers
     order = [rs.index(r) for r in (v.xs_poly_r, v.xs_fill_r[0]["img"], v.xs_ov_r[0][2],
                                    v.xs_ov_r[1][2], v.xs_vec_r[0]["seg"],
@@ -138,12 +147,12 @@ def test_cross_section_layers_as_on_the_map(viewer):
     assert f["img"].visible and f["cbar"].title == v.F[spec["fills"][0]["var"]].name
     assert v.xs_drawer.items["vec"][0].name.startswith("Vectors · 2")
     # Filled contours, for the first fill too
-    v.xs_fill_style.value = "contourf"
+    w(v.xs_main, "style").value = "contourf"
     wait(lambda: v.xs_poly_r.visible and len(v.xs_poly.data["xs"]) > 0, msg="bands")
     assert not v.xs_img_r.visible
-    v._xs_drop_vec(v.xs_vecs[1])
-    v._xs_drop_contour(v.xs_ovs[1])
-    v._xs_drop_fill(v.xs_fills[0])
+    v._drop_layer(v.xs_vecs[1])
+    v._drop_layer(v.xs_ovs[1])
+    v._drop_layer(v.xs_fills[0])
     assert len(v.xs_fig.renderers) == n and not v.xs_fill_r and len(v.xs_ov_r) == 1
     assert f["cbar"] not in v.xs_fig.right
 
@@ -293,26 +302,27 @@ def test_map_difference_minus_another_time_or_run(viewer, reg, demo_root):
     run, F = reg.get()
     v.tslider.value = 2
     v.fill_var.value = "winterp"
-    d = v.fill_diff
-    assert not d["run"].visible
-    d["on"].value = True
-    assert d["run"].visible and d["time"].visible and v.fill_cmap.value == "RdBu_r"
+    f = v.map_fill
+    assert not w(f, "minus.run").visible
+    w(f, "minus").value = True
+    assert w(f, "minus.run").visible and w(f, "minus.time_s").visible
+    assert f["cmap"] == w(f, "cmap").value == "RdBu_r"
     weak = os.path.abspath(os.path.join(demo_root, "demo", "supercell_weak"))
-    assert weak in d["run"].options.values()
-    d["time"].value = "prev"
+    assert weak in w(f, "minus.run").options.values()
+    w(f, "minus.time_s").value = "prev"
     wait(lambda: "minus 1:00:00" in (v.map_title.object or ""), msg="difference")
     lvl = float(v.fill_lvl.value)
     want = F.plane("winterp", 2, "height", lvl) - F.plane("winterp", 1, "height", lvl)
     win = render.view_window(run, v.view, v.maxpix)
     _, _, want = render._crop(run, want, win)
     _same_image(v.img_src.data, want)
-    lo, hi = v._last_range
+    lo, hi = f.last
     assert lo == -hi and (lo, hi) == render.diff_range(
         F.plane("winterp", 2, "height", lvl) - F.plane("winterp", 1, "height", lvl))
     assert "difference" in v.cbar_label.axis_label
     # another run at the shown time
     r2, F2 = reg.get(weak)
-    d["time"].value, d["run"].value = "", weak
+    w(f, "minus.time_s").value, w(f, "minus.run").value = "", weak
     wait(lambda: "of " in (v.map_title.object or ""), msg="other run")
     want = F.plane("winterp", 2, "height", lvl) - F2.plane("winterp", 2, "height", lvl)
     _, _, want = render._crop(run, want, win)
@@ -323,13 +333,13 @@ def test_map_difference_minus_another_time_or_run(viewer, reg, demo_root):
     lay = next(iter(s["layers"].values()))
     assert lay["minus"]["run"] is not None and lay["minus"]["time_s"] is None
     assert next(r for r in s["runs"] if r["id"] == lay["minus"]["run"])["path"] == weak
-    assert (lay["vmin"], lay["vmax"]) == tuple(round(x, 6) for x in v._last_range)
+    assert (lay["vmin"], lay["vmax"]) == tuple(round(x, 6) for x in f.last)
     # a time before the first output: an error, not a map
-    v.tslider.value, d["run"].value, d["time"].value = 0, "", "prev"
+    v.tslider.value, w(f, "minus.run").value, w(f, "minus.time_s").value = 0, "", "prev"
     wait(lambda: "no output before" in (v.status.object or ""), msg="error")
     # off: the field's own colours
-    d["on"].value = False
-    assert v.fill_cmap.value == F["winterp"].cmap and not d["run"].visible
+    w(f, "minus").value = False
+    assert f["cmap"] == F["winterp"].cmap and not w(f, "minus.run").visible
 
 
 def test_cross_section_difference(viewer, reg):
@@ -342,9 +352,9 @@ def test_cross_section_difference(viewer, reg):
     tap(v, -15.0, -6.0)
     tap(v, 15.0, -1.0)
     wait(lambda: "long" in (v.xs_status.object or ""), msg="section")
-    v.xs_diff["on"].value = True
-    assert v.xs_cmap.value == "RdBu_r"
-    v.xs_diff["time"].value = "prev"
+    w(v.xs_main, "minus").value = True
+    assert v.xs_main["cmap"] == "RdBu_r"
+    w(v.xs_main, "minus.time_s").value = "prev"
     wait(lambda: "minus 1:00:00" in (v.xs_status.object or ""), msg="difference")
     spec = v.xs_spec()
     s, fi, fj, _ = render.section_coords(run, spec["A"], spec["B"])
@@ -353,7 +363,7 @@ def test_cross_section_difference(viewer, reg):
     want = render.sample_section(run, F.volume("winterp", 2), fi, fj, zq) \
         - render.sample_section(run, F.volume("winterp", 1), fi, fj, zq)
     np.testing.assert_allclose(v.xs_img.data["image"][0], want, atol=1e-5)
-    assert v._xs_range == render.diff_range(want)
+    assert v.xs_main.last == render.diff_range(want)
 
 
 def test_difference_on_another_grid_is_interpolated():

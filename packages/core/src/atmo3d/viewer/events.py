@@ -11,7 +11,6 @@ import panel as pn
 
 from ..core import vectors, volume3d
 from ..core.fields import deriv_options
-from .diff import DIFF_CMAP
 from .zoomview import ZoomImage
 from . import panels
 from .ui import held
@@ -190,6 +189,8 @@ class Events:
             self.v3_drawer.label("sv", f"Vectors · {len(on)}" if on else "Vectors")
 
     def _on_fill_var(self, ev):
+        """The toolbar's field or derivative: the first fill's field (layers.py: with its
+        own colours and range)."""
         if ev.obj is self.fill_op and self._hold:  # (following the Field, below)
             return
         with held(self):
@@ -200,38 +201,13 @@ class Events:
                     self.fill_op.options = opts
                     self.fill_op.value = v if v in opts.values() else ""
             d = self.F[self._fill_name()]
-            self.fill_cmap.value = DIFF_CMAP if self.fill_diff["on"].value else d.cmap
-            self.fill_rev.value = False
-            if d.vrange:
-                self.fill_min.value, self.fill_max.value = d.vrange
-            self.fill_auto.value = True
             self.fill_mode.disabled = self.fill_lvl.disabled = d.ndim == 2
-        self.request_map()
-
-    def _on_fill_auto(self, ev):
-        self._auto_toggled(ev.new, self.fill_min, self.fill_max, self._last_range, "_hold")
-        self.request_map()
-
-    def _auto_toggled(self, on, lo, hi, last, attr):
-        """Auto range on: Min / Max off; off: they start from the range last drawn."""
-        lo.disabled = hi.disabled = on
-        if not on and last is not None:
-            with held(self, attr):
-                lo.value, hi.value = [round(v, 4) for v in last]
-
-    _last_range = None
-
-    _xs_range = None
+        self.map_fill.drawer.put("field", self._fill_name())
 
     def _on_xs_fill(self, ev):
-        with held(self, "_hold_xs"):
-            self.xs_cmap.value, self.xs_rev.value, self.xs_auto.value = \
-                DIFF_CMAP if self.xs_diff["on"].value else self.F[ev.new].cmap, False, True
-        self.request_xsec()
-
-    def _on_xs_auto(self, ev):
-        self._auto_toggled(ev.new, self.xs_min, self.xs_max, self._xs_range, "_hold_xs")
-        self.request_xsec()
+        """The section toolbar's field: its first fill's (layers.py: with its own colours and
+        range)."""
+        self.xs_main.drawer.put("field", ev.new)
 
     def _on_storm(self, ev):
         custom = ev.new == "custom"

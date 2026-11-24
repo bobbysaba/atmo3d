@@ -1,4 +1,5 @@
-"""The three panes and what runs them: the document, the node picked, undo and the preview.
+"""What runs the Figure workspace: the document, the node picked, undo and the preview (its page is
+figures/ui/frame.py's).
 The figure's data and pools are the FigureEditor's."""
 
 import base64
@@ -13,19 +14,17 @@ from functools import partial
 
 import panel as pn
 
-from .. import draw as figdraw, settings as table, spec as fg
-from ...theme import GRID
-from ..click import ClickImage, panel_boxes, place_map, watch_tight
+from .. import draw as figdraw, schema, spec as fg
+from ..click import (ClickImage, panel_boxes, part_at, part_boxes, place_map, watch_parts,
+                     watch_tight)
 from ..draw.base import _cell
 from ..runs import AllFields
 from ..times import _tlabel
 from ...core.run import Cancelled, reporting
-from ...viewer.ui import out_of_flow
+from ...theme import ACCENT
 from . import docedit as de, nodes, scrub, vision
 from .exportview import ExportDialog
-from .inspector import Inspector
 from .placing import Placing
-from .treeview import TreeView
 
 HISTORY = 50  # undo steps kept
 FIT = "max-width:100%;max-height:100%;width:auto;height:auto;"
@@ -65,6 +64,7 @@ class FigureShell:
         self._hist, self._future = [], []
         self._req = 0
         self._boxes = {}  # panel -> where it is in the preview
+        self._parts = []  # (its titles, labels, legends and colorbars: click.part_boxes)
         self._png = None
         self._seen_key, self._seen_png = None, ""  # (the vision preview's last picture)
         self._frames = None  # (the scrubber's: key, offsets, labels, saved frame)
@@ -77,8 +77,6 @@ class FigureShell:
     def _build(self):
         ib = dict(name="", button_type="light", button_style="outline", width=36, height=32,
                   margin=(4, 2))
-        self.tree_btn = pn.widgets.Button(icon="layout-sidebar", description="Show or hide the "
-                                                                             "tree", **ib)
         self.undo_btn = pn.widgets.Button(icon="arrow-back-up", description="Undo", **ib)
         self.redo_btn = pn.widgets.Button(icon="arrow-forward-up", description="Redo", **ib)
         self.new_btn = pn.widgets.Button(
@@ -127,42 +125,15 @@ class FigureShell:
                                self.scr_back, self.scr_keep, margin=0, visible=False,
                                sizing_mode="stretch_width", align="center",
                                styles={"flex": "0 0 auto"})
-        self.tree = TreeView(sizing_mode="stretch_width", margin=(4, 2))
-        self.tree_pane = pn.Column(self.tree, width=240, scroll="y-auto",
-                                   sizing_mode="stretch_height",
-                                   styles={"border-right": f"1px solid {GRID}",
-                                           "flex": "0 0 auto", "overflow-x": "hidden"})
+        from ..ui.grid import Grid
         self.placing = Placing(self)
-        self.inspector = Inspector(self)
+        self.grid = Grid(self)  # (adding, copying and changing panels)
         self.export = ExportDialog(self)
-        # (the tree's button stays over the tree; the rest is right-aligned, Export last)
-        actions = pn.Row(self.new_btn, self.undo_btn, self.redo_btn, self.auto,
-                         self.update, self.exp_btn, margin=0, align="center")
-        toolbar = pn.FlexBox(self.tree_btn, actions, flex_wrap="wrap", align_items="center",
-                             justify_content="space-between", sizing_mode="stretch_width",
-                             styles={"flex": "0 0 auto", "border-bottom": f"1px solid {GRID}"})
-
-        def label(text):
-            return pn.pane.HTML(f'<span class="cv-hint">{text}</span>', margin=(4, 2, 4, 10),
-                                align="center")
-
-        # (these change the preview alone, so they sit on it)
-        view_bar = pn.FlexBox(label("Size"), self.zoom, label("Colours"), self.vision,
-                              label("Mouse"), self.placing.mode, flex_wrap="wrap",
-                              align_items="center", sizing_mode="stretch_width",
-                              styles={"flex": "0 0 auto"})
         self.picture = pn.Column(self.image, margin=0, sizing_mode="stretch_both",
                                  styles={"flex": "1 1 0", "min-height": "0", "overflow": "auto"})
-        preview = pn.Column(view_bar, self.placing.hint, self.picture, self.scrubber, self.status, margin=0,
-                            sizing_mode="stretch_both",
-                            styles={"flex": "1 1 0", "min-width": "0", "min-height": "0"})
-        self.panes = pn.Row(self.tree_pane, preview, self.inspector.panel, margin=0,
-                            sizing_mode="stretch_both",
-                            styles={"flex": "1 1 0", "min-height": "0"})
-        self.panel = pn.Column(toolbar, self.panes, out_of_flow(self.export.dlg), margin=0,
-                               sizing_mode="stretch_both", styles={"min-height": "0"})
-        self.tree_btn.on_click(lambda e: setattr(self.tree_pane, "visible",
-                                                 not self.tree_pane.visible))
+        from ..ui.frame import Frame
+        self.frame = Frame(self)
+        self.panel = self.frame.panel
         self.new_btn.on_click(lambda e: self.new_figure())
         self.exp_btn.on_click(lambda e: self.export.open())
         self.undo_btn.on_click(lambda e: self.undo())
@@ -176,9 +147,9 @@ class FigureShell:
         self.scr_next.on_click(lambda e: self._scrub_by(1))
         self.scr_back.on_click(lambda e: self._scrub_saved())
         self.scr_keep.on_click(lambda e: self.keep_scrub())
-        self.tree.param.watch(lambda e: self.select(e.new[0]) if e.new else None, "pick")
         self.image.param.watch(self._on_click, "click")
         self.image.param.watch(self._on_drag, "drag")
+        self.image.param.watch(self._on_head, "head")
 
     # ------------------------------------------------------------ showing it
     def open(self):
@@ -226,7 +197,7 @@ class FigureShell:
         """A new figure's version-1 spec, as it goes into the document: what it doesn't name at
         its default."""
         ed = self.ed
-        s = table.filled(fg.normalize(spec, ed.run, ed._own_track()))
+        s = schema.filled(fg.normalize(spec, ed.run, ed._own_track()))
         if (s.get("letters") or {}).get("auto"):  # (one panel: no letter)
             s["letters"] = dict(s["letters"], on=figdraw.npanels(s) > 1)
         cb = s["colorbar"]
@@ -304,34 +275,55 @@ class FigureShell:
         self.ed.open_quick()
 
     def _show(self, node):
-        """The tree, the outlines and the inspector for the document, with node picked."""
+        """The outlines and the drawer for the document, with node picked."""
         self.node, self._stale = node, False
         self.placing.pending = None  # (a first click: of what was showing)
-        self.tree.param.update(items=nodes.tree_items(self.doc, self.fields), sel=node)
         self._mark()
-        self.inspector.show(node)
+        self.frame.show(node)
         self.undo_btn.disabled, self.redo_btn.disabled = not self._hist, not self._future
 
     def select(self, node):
-        """Pick node (of the tree, or a panel clicked in the preview)."""
+        """Pick node (the level switch, or a panel clicked in the preview)."""
         if node == self.node or not nodes.still_there(self.doc, node):
             return
         self.node = node
-        self.tree.sel = node
         self._mark()
-        self.inspector.show(node)
+        self.frame.show(node)
 
     def _mark(self):
+        """What is picked outlined in the preview, the grid's headers (that of a row or column
+        picked lit) and a dot on each panel with changes of its own (ui/lines.py)."""
+        from ..ui import gridfirst, lines
         self.image.marks = {str(i): self._boxes[i] for i in nodes.outlined(self.doc, self.node)
                             if i in self._boxes}
+        if self.doc is None:
+            return
+        try:
+            self.image.param.update(
+                heads=lines.heads(self.doc, self._boxes, self.node, self.fields),
+                dots=gridfirst.dots(self.doc, self._boxes, self.fields))
+        except Exception:  # noqa: BLE001  (a figure half made: no headers yet)
+            import traceback
+            traceback.print_exc()
+
+    def _on_head(self, ev):
+        """A row or column header clicked: it is picked."""
+        if ev.new:
+            self.select(str(ev.new[0]))
 
     def _on_click(self, ev):
-        """A click places what Click to says, if anything, else picks the panel."""
+        """A click places what Click to says, if anything; else on a part of the preview (a
+        title, a label, a legend, a colorbar) opens its setting (Frame.go_part); else picks the
+        panel."""
         if not ev.new:
             return
         fx, fy = float(ev.new[0]), float(ev.new[1])
         if self.placing.on:
             self.placing.click(fx, fy)
+            return
+        part = part_at(self._parts, fx, fy)
+        if part is not None:
+            self.frame.go_part(part)
             return
         hit = nodes.pick_at(self._boxes, fx, fy)
         self.select(nodes.FIGURE if hit is None else nodes.node_at(self.doc, hit))
@@ -352,12 +344,12 @@ class FigureShell:
         self._follow_size(snd)
         self._follow_rows(rows)
         self._future = []
-        self.tree.items = nodes.tree_items(self.doc, self.fields)
         self.undo_btn.disabled, self.redo_btn.disabled = False, True
         if node is not None:
             self._show(node if nodes.still_there(self.doc, node) else nodes.FIGURE)
         else:
-            self.inspector.refresh_marks()
+            self.frame.refresh()
+        self._mark()  # (headers and dots: of the document now, at the last drawing's boxes)
         self.request()
 
     def can_follow(self, doc=None):
@@ -382,7 +374,6 @@ class FigureShell:
             now = de.kind_size(doc)
             if now != snd_was and now is not None:
                 doc["size"] = list(now)
-                self.inspector.size_followed(doc["size"])
             if kind != "table":
                 return
         try:
@@ -391,7 +382,6 @@ class FigureShell:
             return
         if abs(h - float(doc["size"][1])) > 0.02:
             doc["size"] = [float(doc["size"][0]), h]
-            self.inspector.size_followed(doc["size"])
 
     def _follow_rows(self, rows):
         """Rows came or went in a figure whose size can't follow its panels (kinds mixed, spans):
@@ -403,7 +393,6 @@ class FigureShell:
         w, h = (float(v) for v in doc["size"])
         doc["size"] = [w, round(h * now / rows, 2)]
         self._said = f"Height {h:g} → {doc['size'][1]:g} in, for {now} rows"
-        self.inspector.size_followed(doc["size"])
 
     def fit_height(self, doc):
         """The estimate of the height (de.fit_height), of the first panel's settings."""
@@ -650,15 +639,22 @@ class FigureShell:
             fig = figdraw.draw(preview_doc(doc, dpi), data)
             code_err = getattr(fig, "_cv_code_error", None)
             watch_tight(fig)
+            watch_parts(fig)
             buf = io.BytesIO()
             figdraw.save(doc, fig, buf, format="png", **fg.save_kw(doc, dpi))
             raw = buf.getvalue()
             wh = struct.unpack(">II", raw[16:24])  # the PNG header's width and height
             boxes = panel_boxes(fig, doc, wh, dpi)
             place = place_map(fig, doc, wh, dpi)
+            try:
+                parts = part_boxes(fig, doc, wh, dpi)
+            except Exception:  # noqa: BLE001  (no parts to click: the panels still are)
+                traceback.print_exc()
+                parts = []
             note = self._note(doc, data, wh, dpi, _time.time() - t0, code_err)
             self.v._schedule(partial(self._apply, g, base64.b64encode(raw).decode(), wh, dpi,
-                                     doc.get("background"), boxes, note, (doc, place, data)))
+                                     doc.get("background"), boxes, note, (doc, place, data),
+                                     parts))
         except Exception as e:  # noqa: BLE001
             traceback.print_exc()
             self.v._schedule(partial(self.say, f"Could not draw: {html.escape(str(e))}", True))
@@ -687,11 +683,12 @@ class FigureShell:
             note += " · no data in an inset"
         return note
 
-    def _apply(self, g, png, wh, dpi, bg, boxes, note, drawn):
+    def _apply(self, g, png, wh, dpi, bg, boxes, note, drawn, parts=()):
         if g != self.v.gen["fig"] or not self.showing:
             return
         self._png = (png, wh, dpi, bg)
         self._boxes = boxes
+        self._parts = list(parts)
         self.placing.took(drawn[0], drawn[1], boxes, drawn[2])
         self._show_image()
         self._mark()
@@ -702,7 +699,7 @@ class FigureShell:
         """The drawn picture (base64 PNG) as the vision preview says (vision.py); the one just
         made is kept for the next look at it."""
         mode = self.vision.value
-        self.vision.styles = {"outline": "2px solid #f59e0b", "border-radius": "4px"} if mode \
+        self.vision.styles = {"outline": f"2px solid {ACCENT}", "border-radius": "4px"} if mode \
             else {}
         if not mode:
             return png
@@ -721,11 +718,26 @@ class FigureShell:
                 "16px 16px;" if bg == "none" else "")
         size = f"width:{w / dpi * 96:.0f}px;max-width:none;" if self.zoom.value == "actual" \
             else FIT
-        self.image.param.update(src=f"data:image/png;base64,{png}",
+        self.image.param.update(zones=[] if self.placing.on else self._zones(),
+                                src=f"data:image/png;base64,{png}",
                                 fit=self.zoom.value != "actual",
                                 css=f"{size}{back}cursor:{self.placing.cursor()};display:block;"
                                     "margin:auto;"
                                     "box-shadow:0 4px 18px rgba(0,0,0,.5)")
+
+    def _zones(self):
+        """The parts a click opens, for the image to outline under the mouse (ClickImage.zones),
+        with words saying what a click there does."""
+        from ..click import PART_WORDS
+        names = nodes.letters(self.doc) if self.doc else {}
+        out = []
+        for q in self._parts:
+            what = PART_WORDS.get(q.part, q.part)
+            what = what[0].upper() + what[1:]
+            if q.panel is not None and q.part != "colorbar":
+                what += f" (panel {names.get(q.panel, '?')})"
+            out.append([*q.box, f"{what}: click for its settings"])
+        return out
 
     def say(self, text, err=False):
         col = ' style="color:#f87171"' if err else ""

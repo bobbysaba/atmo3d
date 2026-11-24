@@ -1,4 +1,4 @@
-"""F2: zoom insets, in the document, in the drawing and in the new layout."""
+"""F2: zoom insets, in the document, in the drawing and in the figure's frame (figures/ui)."""
 import json
 from types import SimpleNamespace
 
@@ -8,8 +8,12 @@ import pytest
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 
 from atmo3d.figures import draw as figdraw, spec as fg
-from atmo3d.figures.shell import docedit as de, findview, nodes
-from atmo3d.figures.shell.looks import InsetScope
+from conftest import at_tool, control, press, row_ctl
+
+from atmo3d.figures import schema as S
+from atmo3d.figures.schema.where import Where
+from atmo3d.figures.shell import docedit as de, nodes
+from atmo3d.figures.ui import find, tools
 
 
 def doc_of(*panels):
@@ -128,9 +132,8 @@ def test_a_run_an_inset_uses_is_in_use():
     assert nodes.runs_used(doc)["r1"] == [0]
 
 
-def test_the_tree_has_an_insets_node():
+def test_an_inset_is_a_place_of_its_own():
     doc = doc_of(panel(0, insets=[dict(id=4)]))
-    assert dict(id="inset:0:4", depth=2, label="Zoom inset 1") in nodes.tree_items(doc)
     assert nodes.still_there(doc, "inset:0:4") and not nodes.still_there(doc, "inset:0:5")
     assert nodes.outlined(doc, "inset:0:4") == [-4]
     assert nodes.panel_of(doc, "inset:0:4")["id"] == 0
@@ -138,14 +141,16 @@ def test_the_tree_has_an_insets_node():
     assert "inset 1 of panel a" in nodes.scope(doc, "inset:0:4")
 
 
-def test_an_insets_scope_reads_through_the_panel_and_writes_its_own():
+def test_an_inset_reads_through_its_panel_and_writes_its_own():
+    from atmo3d.figures import schema as S
+    from atmo3d.figures.schema import where as W
     doc = doc_of(panel(0, opts=dict(coords="storm"), insets=[dict(id=1)]))
-    at = InsetScope("plan", 0, 1)
-    assert at._layers_up(doc, "coords")[-2] == dict(coords="storm")
-    at._targets(doc, "domain")[0]["domain"] = dict(mode="box")
-    assert doc["panels"][0]["insets"][0]["opts"] == dict(domain=dict(mode="box"))
-    assert at.own_keys(doc, ("domain.mode",)) == ["domain.mode"]
-    at.take_back(doc, "domain.mode")
+    at, mode = Where("inset", "plan", 0, 1), S.row("look.domain.mode")
+    assert W.value(doc, S.row("look.coords"), at) == "storm"
+    W.write(doc, mode, at, "box")
+    assert doc["panels"][0]["insets"][0]["opts"]["domain"]["mode"] == "box"
+    assert W.own(doc, mode, at)
+    W.take_back(doc, mode, at)
     assert "opts" not in doc["panels"][0]["insets"][0]
     assert doc["panels"][0]["opts"] == dict(coords="storm")
 
@@ -266,27 +271,12 @@ def _at(shell, pid, u, w):
     return b[0] + u * (b[1] - b[0]), b[3] - w * (b[3] - b[2])
 
 
-def _card(shell, title):
-    card = next(c for c in shell.inspector.body.objects if getattr(c, "title", None) == title)
-    card.collapsed = False
-    return card
-
-
-def _in(card, name):
-    return next(w for w in card.select() if getattr(w, "name", None) == name
-                and hasattr(w, "value"))
-
-
-def _one(shell, name):
-    return next(o for o in shell.inspector.body.objects if getattr(o, "name", "") == name)
-
-
 def _made(shell):
     """A new inset of the first plan view, by the panel's button.  (panel id, inset id)."""
     _drew(shell)
     pid = shell.doc["panels"][0]["id"]
-    shell.select(f"panel:{pid}")
-    _one(shell, "+ Zoom inset").clicks += 1
+    at_tool(shell, "layout", f"panel:{pid}")
+    press(shell, "+ Zoom inset")
     return pid, de.panel_by_id(shell.doc, pid)["insets"][-1]["id"]
 
 
@@ -317,6 +307,7 @@ def test_a_drag_makes_an_inset_clear_of_what_it_shows(shell):
     ins = de.panel_by_id(shell.doc, a)["insets"][0]
     assert shell.node == f"inset:{a}:{ins['id']}" and ins["loc"] == "upper right"
     assert ins["opts"]["domain"]["mode"] in ("box", "storm")
+    assert shell.frame.tool == "layout"  # (where its place and area are)
 
 
 def test_a_small_drag_makes_none(shell):
@@ -342,65 +333,81 @@ def test_drags_change_the_picked_inset(shell):
     assert json.dumps(de.inset_by_id(de.panel_by_id(shell.doc, pid), iid)["opts"]) != was
 
 
-def test_an_insets_cards_write_it_mark_it_and_reset(shell):
+def test_an_insets_settings_write_it_mark_it_and_reset(shell):
     pid, iid = _made(shell)
-    card = _card(shell, "Where it sits")
-    _in(card, "Where").value = "lower left"
+    control(shell, "Where", "layout").value = "lower left"
     ins = de.inset_by_id(de.panel_by_id(shell.doc, pid), iid)
-    assert ins["loc"] == "lower left" and "● 1" in card.header.object
-    look = _card(shell, "Box and lines")
-    _in(look, "Lines to the inset").value = False
-    _in(look, "Tick labels").value = True
+    assert ins["loc"] == "lower left"
+    sec = next(s for d in shell.frame.drawers for s in d.sections if s.title.startswith(
+        "Where it sits"))
+    assert "1 set here" in sec.card.title
+    control(shell, "Lines to the inset", "look").value = False
+    control(shell, "Tick labels").value = True
     ins = de.inset_by_id(de.panel_by_id(shell.doc, pid), iid)
     assert ins["connect"] is False and ins["ticks"] is True
     _drew(shell)
-    reset = next(w for w in look.select() if getattr(w, "name", "").startswith("↺"))
-    reset.clicks += 1
+    look = next(s for d in shell.frame.drawers for s in d.sections if s.title.startswith(
+        "Box and lines"))
+    look.reset.clicks += 1
     ins = de.inset_by_id(de.panel_by_id(shell.doc, pid), iid)
     assert "connect" not in ins and "ticks" not in ins and ins["loc"] == "lower left"
 
 
 def test_an_insets_own_layers_are_edited_apart_from_the_panel(shell):
+    import panel as pn
     pid, iid = _made(shell)
     before = json.dumps(de.panel_by_id(shell.doc, pid)["layers"])
-    _one(shell, "The panel's layers").value = False
-    pane = shell.inspector.insets
-    pane._add_layer(pid, iid, "contour")
+    control(shell, "The panel's layers", "layers").value = False
+    fr = at_tool(shell, "layers")
+    menu = next(w for w in fr.body.select(pn.widgets.MenuButton)
+                if w.name == "+ Add a layer to this inset")
+    menu.clicked = "contour"
     ins = de.inset_by_id(de.panel_by_id(shell.doc, pid), iid)
     assert ins["layers"][-1]["type"] == "contour"
-    row = pane._row(shell.doc, pid, iid, 0, len(ins["layers"]), "plan")
-    row.on.value = False
-    assert json.dumps(de.panel_by_id(shell.doc, pid)["layers"]) == before
+    at_tool(shell, "layers")
+    on, _ = row_ctl(shell, "layer.on", Where("inset", "plan", pid, iid, layer=0))
+    on.widget.value = False
+    assert ins is not None and json.dumps(de.panel_by_id(shell.doc, pid)["layers"]) == before
+    inset = de.inset_by_id(de.panel_by_id(shell.doc, pid), iid)
+    assert figdraw.panel_layers(shell.doc, inset)[0][1]["on"] is False
     _drew(shell)
-    _one(shell, "The panel's layers").value = True
+    control(shell, "The panel's layers", "layers").value = True
     assert "layers" not in de.inset_by_id(de.panel_by_id(shell.doc, pid), iid)
 
 
 def test_find_reaches_an_inset(shell):
     pid, iid = _made(shell)
-    found = findview.search(findview.hits_of(shell), "zoom inset")
-    assert any(h.node == f"inset:{pid}:{iid}" and h.section == "Where it sits" for h in found)
-    assert any(h.label == "Zoom inset" for h in found)
-    shell.inspector.go_to(f"inset:{pid}:{iid}", "Box and lines")
-    assert shell.inspector.body.objects[0].title == "Box and lines"
+    fr = shell.frame
+    fr.find.box.value_input = "lines to the inset"
+    row, where = fr.find.found[0]
+    assert row.id == "insets[].connect" and where == Where("inset", "plan", pid, iid)
+    fr.find.first()
+    assert shell.node == f"inset:{pid}:{iid}" and fr.tool == "look"
+    sec = next(s for d in fr.drawers for s in d.sections if "insets[].connect" in s.ctls)
+    assert not sec.card.collapsed and "outline" in sec.ctls["insets[].connect"].widget.styles
+    assert "Found" in fr.found.object and not fr.find.found
 
 
-def test_every_hit_of_an_inset_opens_where_it_says(shell):
+def test_every_setting_of_an_inset_opens_where_it_says(shell):
     pid, iid = _made(shell)
-    hits = [h for h in findview.hits_of(shell) if h.node == f"inset:{pid}:{iid}"]
-    for section in {h.section for h in hits}:
-        shell.inspector.go_to(f"inset:{pid}:{iid}", section)
-        assert shell.inspector.body.objects[0].title == section
+    fr, at = shell.frame, Where("inset", "plan", pid, iid)
+    rows = [r for r in S.ROWS if at in find.places(shell.doc, r) and tools.tool_of(r)]
+    assert {"insets[].loc", "insets[].connect", "look.domain.mode"} <= {r.id for r in rows}
+    for r in rows:
+        fr.go_to(r, at)
+        assert shell.node == f"inset:{pid}:{iid}" and fr.tool == tools.tool_of(r), r.id
+        assert "Found" in fr.found.object or "isn't shown here" in fr.found.object, r.id
 
 
 def test_removing_a_panels_inset(shell):
     pid, iid = _made(shell)
-    _one(shell, "Remove this inset").clicks += 1
+    at_tool(shell, "layout", f"inset:{pid}:{iid}")
+    press(shell, "Remove this inset")
     assert shell.node == f"panel:{pid}" and not de.panel_by_id(shell.doc, pid)["insets"]
 
 
 def test_a_cross_section_has_insets_too(shell):
-    shell.inspector.grid.add_panel("xsec", "new column")
+    shell.grid.add_panel("xsec", "new column")
     _drew(shell)
     pid = next(p["id"] for p in shell.doc["panels"] if p["kind"] == "xsec")
     shell.placing.mode.value = "inset"
@@ -410,7 +417,9 @@ def test_a_cross_section_has_insets_too(shell):
     _drew(shell)
     assert -ins["id"] in shell._boxes
     to = ins["view"][1] + 1.0
-    _in(_card(shell, "Area"), "To (km)").value = to
+    at_tool(shell, "layout", f"inset:{pid}:{ins['id']}")
+    ctl, _ = row_ctl(shell, "insets[].view")
+    ctl.set([ins["view"][0], to, ins["view"][2], ins["view"][3]])
     assert de.panel_by_id(shell.doc, pid)["insets"][0]["view"][1] == to
 
 

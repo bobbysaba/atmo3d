@@ -6,11 +6,11 @@ from types import SimpleNamespace
 
 import pytest
 
-from conftest import fresh_shell
+from conftest import at_tool, control, drawer_text, every_node, fresh_shell, press
 
-from atmo3d.figures import click as C, draw as figdraw
-from atmo3d.figures.shell import docedit as de, looks, nodes
-from atmo3d.figures.shell.gridview import ADDABLE
+from atmo3d.figures import click as C, draw as figdraw, schema as S
+from atmo3d.figures.shell import docedit as de, nodes
+from atmo3d.figures.ui.grid import ADDABLE
 from atmo3d.figures.shell.placing import fraction_entry
 
 
@@ -65,7 +65,7 @@ def test_a_panels_own_scene_settings_reach_its_view():
 
 def test_scene_is_a_kind_to_add_with_labels_of_a_panel():
     assert "scene" in ADDABLE
-    assert "Panel labels" in looks.PANEL_KEYS["scene"]
+    assert "Panel labels" in S.sections(["scene"], level="panel")
     assert nodes.kind_name("scene", 2) == "3D scenes (2)"
 
 
@@ -193,7 +193,8 @@ def shell(shell_viewer):
 
 
 def _walk(shell):
-    return list(shell.inspector.body.select())
+    """What the frame's drawer shows."""
+    return list(shell.frame.body.select())
 
 
 def _named(shell, name, nth=0):
@@ -256,8 +257,13 @@ def test_a_click_adds_an_annotation_in_axis_units_and_picks_its_panel(shell):
     assert (a["kind"], a["panel"], a["coords"]) == ("text", pid, "data")
     assert a["x"] == pytest.approx(b[4][0] + 0.25 * (b[4][1] - b[4][0]), abs=0.01)
     assert a["y"] == pytest.approx(b[5][0] + 0.75 * (b[5][1] - b[5][0]), abs=0.01)
-    assert shell.node == f"panel:{pid}"
-    assert any(t.startswith("Annotations") for t in _cards(shell))
+    assert shell.node == f"panel:{pid}" and shell.frame.tool == "marks"  # (it opens there)
+    assert "the ones on this panel" in drawer_text(shell)
+    new = next(c for c in shell.frame.body.objects
+               if getattr(c, "title", "").startswith(f"{len(shell.doc['annotations'])}. Text"))
+    assert not new.collapsed
+    assert any(getattr(c, "title", "").startswith(f"{len(shell.doc['annotations'])}. Text")
+               for c in shell.frame.body.objects)
 
 
 def test_without_a_mode_a_click_picks_and_a_drag_does_nothing(shell):
@@ -303,27 +309,28 @@ def test_section_and_area_only_in_a_plan_view(shell):
     shell._on_drag(_event(*_at(shell, pid, 0.25, 0.25), *_at(shell, pid, 0.75, 0.75), 2))
     dom = shell.doc["kinds"]["plan"]["domain"]
     assert dom["mode"] == "box" and dom["box"][1] > dom["box"][0]
-    other = shell.inspector.grid.add_panel("dist", "new column")
+    other = shell.grid.add_panel("dist", "new column")
     _drew(shell)
     was = de.plain(shell.doc["kinds"]["plan"]["domain"])
     shell._on_drag(_event(*_at(shell, other["id"], 0.2, 0.2), *_at(shell, other["id"], 0.8, 0.8), 3))
     assert shell.doc["kinds"]["plan"]["domain"] == was and "plan view" in shell.status.object
 
 
-def test_annotations_on_the_figure_and_on_a_panel_by_their_cards(shell):
+def test_annotations_on_the_figure_and_on_a_panel_in_marks(shell):
+    import panel as pn
+    from atmo3d.figures.choices import ANN_KINDS
     pid = shell.doc["panels"][0]["id"]
-    shell.select(nodes.FIGURE)
-    _cards(shell)["Annotations"].collapsed = False
-    _named(shell, "Add").value = "vline"
-    _click(shell, "+ Add")
+    fr = at_tool(shell, "marks", nodes.FIGURE)
+    kind = next(w for w in fr.body.select(pn.widgets.Select) if w.options == ANN_KINDS)
+    kind.value = "vline"
+    press(shell, "+ Add")
     assert shell.doc["annotations"][-1]["panel"] == -1
-    assert _named(shell, "Panels (blank: all)").value == []
-    _named(shell, "Panels (blank: all)").value = [pid]
+    assert control(shell, "Panels (blank: all)", "marks").value == ""
+    control(shell, "Panels (blank: all)").value = nodes.letters(shell.doc)[pid]
     assert shell.doc["annotations"][-1]["panel"] == pid
-    shell.select(f"panel:{pid}")
-    assert "Annotations (1)" in _cards(shell)
-    _cards(shell)["Annotations (1)"].collapsed = False
-    _click(shell, "+ Add")
+    at_tool(shell, "marks", f"panel:{pid}")
+    assert sum(getattr(c, "title", "")[:2] == "1." for c in fr.body.objects) == 1
+    press(shell, "+ Add")
     assert shell.doc["annotations"][-1]["panel"] == pid
     shell.undo()
     assert len(shell.doc["annotations"]) == 1
@@ -333,57 +340,86 @@ def test_opening_an_annotation_writes_nothing_and_a_gone_panels_stays_gone(shell
     shell.doc["annotations"] = [dict(kind="text", panel=999, coords="data", x=1.0, y=2.0, text="z")]
     shell._show(nodes.FIGURE)
     kept = len(shell._hist)
-    _cards(shell)["Annotations (1)"].collapsed = False
+    at_tool(shell, "marks", nodes.FIGURE)  # (every fold opened)
     assert len(shell._hist) == kept and shell.doc["annotations"][0]["panel"] == 999
     assert any("no such panel" in str(getattr(w, "object", "")) for w in _walk(shell))
 
 
 def test_a_scene_edits_the_document_from_all_scenes_and_from_its_panel(shell):
     pid = _scene_figure(shell)
-    shell._show("kind:scene")
     kept = len(shell._hist)
-    _open_all(shell)
+    at_tool(shell, "look", "kind:scene")
+    at_tool(shell, "layers")
+    at_tool(shell, "layout")
     assert len(shell._hist) == kept  # (opening its sections writes nothing)
+    at_tool(shell, "look")
     _named(shell, "Azimuth (°)").value = 200.0
     assert de.scene_kind_block(shell.doc)["camera"]["azimuth"] == 200.0
+    _named(shell, "Axis labels (x, y, z)").value = "east, north, up"
+    assert de.scene_kind_block(shell.doc)["look"]["labels"][0] == "east"
+    at_tool(shell, "layout")
     _named(shell, "Vertical exaggeration").value = 1.5
     assert de.scene_kind_block(shell.doc)["exag"] == 1.5
-    _named(shell, "x axis label").value = "east"
-    assert de.scene_kind_block(shell.doc)["look"]["labels"][0] == "east"
-    shell._show(f"panel:{pid}")
+    at_tool(shell, "look", f"panel:{pid}")
     _named(shell, "Zoom").value = 1.2
-    assert de.scene_kind_block(shell.doc)["camera"]["zoom"] == 1.2
+    assert de.scene_kind_block(shell.doc)["camera"]["zoom"] == 1.2  # (the only scene's: all)
     _drew(shell)
     assert pid in shell._boxes
 
 
+def test_a_scenes_floor_streamlines_region_and_camera_are_in_their_tools(shell):
+    _scene_figure(shell)
+    at_tool(shell, "layers", "kind:scene")
+    names = {getattr(w, "name", "") for w in _walk(shell)}
+    assert {"Floor", "Streamlines", "Copy the 3D view", "The map's seed box"} <= names
+    assert "Azimuth (°)" not in names and "Region" not in names
+    at_tool(shell, "layout")
+    names = {getattr(w, "name", "") for w in _walk(shell)}
+    assert {"Region", "Top (km)", "The map's 3D box"} <= names
+    at_tool(shell, "look")
+    names = {getattr(w, "name", "") for w in _walk(shell)}
+    assert {"Azimuth (°)", "Lighting", "Camera of the 3D view"} <= names
+    at_tool(shell, "layers")
+    _named(shell, "Floor").value = True
+    assert de.scene_kind_block(shell.doc)["ground"]["on"] is True
+    _click(shell, "The map's seed box")  # (none picked on the map: said)
+    assert "seed box" in shell.status.object
+
+
 def test_a_scenes_lists_add_edit_and_remove_rows(shell):
     _scene_figure(shell)
-    shell._show("kind:scene")
-    _open_all(shell)
+    at_tool(shell, "layers", "kind:scene")
     n = len(de.scene_kind_block(shell.doc)["isos"])
     _click(shell, "+ Isosurface")
-    assert len(de.scene_kind_block(shell.doc)["isos"]) == n + 1
+    isos = de.scene_kind_block(shell.doc)["isos"]
+    assert len(isos) == n + 1 and {"on", "var", "val", "color", "op"} <= set(isos[-1])
+    at_tool(shell, "layers")
     _named(shell, "Value", n).value = 42.0
     assert de.scene_kind_block(shell.doc)["isos"][n]["val"] == 42.0
     _click(shell, "✕", n)
     assert len(de.scene_kind_block(shell.doc)["isos"]) == n
     _click(shell, "+ Vectors")
-    assert de.scene_kind_block(shell.doc)["vecs"][-1]["q"]  # (as its row fills it in)
+    vec = de.scene_kind_block(shell.doc)["vecs"][-1]
+    assert vec["q"] and vec["ref"] and vec["density"]  # (as its row filled it in)
+    shell.undo()
+    assert not de.scene_kind_block(shell.doc)["vecs"] or \
+        de.scene_kind_block(shell.doc)["vecs"][-1] != vec
     _drew(shell)
 
 
 def test_a_bad_box_writes_nothing(shell):
     _scene_figure(shell)
-    shell._show("kind:scene")
-    _open_all(shell)
-    _named(shell, "Region").value = "box"
-    box = de.scene_kind_block(shell.doc)["box"]
-    assert box is not None
+    at_tool(shell, "layout", "kind:scene")
+    _named(shell, "Region").value = "-10, 10, -8, 8"
+    assert de.scene_kind_block(shell.doc)["box"] == [-10.0, 10.0, -8.0, 8.0]
     kept = len(shell._hist)
-    _named(shell, "x max (km)").value = box[0] - 1.0
-    assert len(shell._hist) == kept and de.scene_kind_block(shell.doc)["box"] == box
-    _named(shell, "Region").value = "full"
+    at_tool(shell, "layout")
+    _named(shell, "Region").value = "10, -10, -8, 8"
+    assert len(shell._hist) == kept and de.scene_kind_block(shell.doc)["box"] == [-10.0, 10.0,
+                                                                                   -8.0, 8.0]
+    assert "x max above x min" in shell.status.object
+    at_tool(shell, "layout")
+    _named(shell, "Region").value = ""
     assert de.scene_kind_block(shell.doc)["box"] is None
 
 
@@ -400,24 +436,30 @@ def test_a_click_in_a_scene_is_a_fraction_of_it(shell):
 
 def test_two_scenes_differ_where_one_is_set_and_it_can_go_back(shell):
     pid = _scene_figure(shell)
-    copy = shell.inspector.grid.copy_panel(pid)
+    copy = shell.grid.copy_panel(pid)
     assert shell.node == f"panel:{copy['id']}"
+    at_tool(shell, "look")
     _named(shell, "Azimuth (°)").value = 30.0
     assert de.scene_own(shell.doc, copy["id"])["camera"]["azimuth"] == 30.0
     assert not de.scene_own(shell.doc, pid)
     _drew(shell)
+    at_tool(shell, "layers")
     _click(shell, "↺ Camera")
     assert not de.scene_own(shell.doc, copy["id"])
+    _click(shell, "+ Isosurface")  # (a list of this scene's own: written whole, here)
+    assert "isos" in de.scene_own(shell.doc, copy["id"]) and not de.scene_own(shell.doc, pid)
 
 
 def test_a_new_scene_panel_beside_a_plan_view_draws(shell):
     pytest.importorskip("pyvista")
     shell.doc["export"] = dict(shell.doc.get("export") or {}, dpi=60)
-    p = shell.inspector.grid.add_panel("scene", "new column")
+    p = shell.grid.add_panel("scene", "new column")
     assert p["kind"] == "scene" and p["run"] and p["time_s"] is not None
     assert "scene3d" in shell.doc["kinds"]["scene"]
     _drew(shell)
     assert p["id"] in shell._boxes
-    for row in shell.tree.items:
-        shell.select(row["id"])
-        assert shell.inspector.body.objects, row["id"]
+    for tool in ("layout", "layers", "look", "times"):
+        for node in every_node(shell.doc):
+            at_tool(shell, tool, node)
+            assert shell.frame.body.objects, node
+            assert "Could not show" not in drawer_text(shell), (tool, node)

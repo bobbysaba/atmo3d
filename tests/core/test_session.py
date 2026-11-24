@@ -9,23 +9,29 @@ from atmo3d.viewer.session import FORMAT
 from conftest import wait
 
 
+def w(o, key):
+    """The widget of a map layer's control of `key` (its drawer: figures/ui/layer.py)."""
+    return o.drawer.ctl(key).widget
+
+
 def _set_up(v):
     """A viewer state away from the defaults in every part a session keeps."""
     v.tslider.value = 3
     v.fill_var.value = "winterp"
     v.fill_lvl.value = 2.5
-    v.fill_diff["on"].value = True
-    v.fill_diff["time"].value = "prev"
-    v.fill_auto.value = False
-    v.fill_min.value, v.fill_max.value = -7.0, 7.0
+    f = v.map_fill
+    w(f, "minus").value = True
+    w(f, "minus.time_s").value = "prev"
+    w(f, "auto").value = False
+    w(f, "vmin").value, w(f, "vmax").value = -7.0, 7.0
     v._add_fill()
-    v.fills[0]["var"].value = "thpert"
+    w(v.fills[0], "field").value = "thpert"
     v._add_overlay()
-    v.ovs[1]["levels"].value = "1, 2"
+    w(v.ovs[1], "levels").value = "1, 2"
     o = v.vecs[0]
-    o["on"].value = True
-    o["q"].value = list(o["q"].options.values())[1]
-    o["ref"].value = 12.5
+    w(o, "on").value = True
+    w(o, "vector").value = list(w(o, "vector").options.values())[1]
+    w(o, "ref").value = 12.5
     v.view = (10.0, 40.0, 5.0, 35.0)
     v.fixes = {2: dict(x=20.0, y=21.0, value=float("nan"), source="clicked"),
                3: dict(x=22.0, y=22.0, value=1.0, source="loaded")}
@@ -73,15 +79,60 @@ def test_session_drops_extra_rows_and_skips_what_the_run_lacks(viewer):
     s = v.session_state()
     s["contours"] = s["contours"][:1]
     s["fills"] = []
-    s["fill"]["var"] = "no_such_field"
-    s["contours"][0]["level"] = 1e6  # clamped to the top
+    s["fill"]["field"] = "no_such_field"
+    s["contours"][0]["z"] = 1e6  # clamped to the top
     s["tool"] = "Nonexistent tool"
     keep = v.fill_var.value
     skipped = v.apply_session(s)
     assert len(v.ovs) == 1 and v.fills == []
     assert v.fill_var.value == keep and any("no_such_field" in x for x in skipped)
-    assert v.ovs[0]["level"].value == v.ovs[0]["level"].end
+    assert v.ovs[0]["z"] == w(v.ovs[0], "z").end
     assert v.mode.value is None
+
+
+def test_a_format_2_session_opens(viewer):
+    """A session 1.1.0 saved (FORMAT 2: the layers as their widgets' values, the first fill's
+    difference beside it) opens: its layers as dicts, what it lacks left as it was."""
+    from atmo3d.viewer import session
+    v = viewer
+    old = dict(
+        atmo3d_session=2, run=os.path.abspath(v.run.path), field_names=2,
+        fill=dict(var="winterp", op="", mode="height", level=2.5, style="contourf",
+                  cmap="viridis", rev=True, auto=False, vmin=-7.0, vmax=7.0, nlev=12,
+                  alpha=0.8),
+        diff=dict(on=True, run="", time="prev"),
+        fills=[dict(on=True, var="thpert", mode="height", level=1.0, style="image",
+                    cmap="RdBu_r", rev=False, auto=True, vmin=-5.0, vmax=5.0, alpha=0.6,
+                    clip=False)],
+        contours=[dict(on=True, var="winterp", mode="level", level=3, levels="5, 10",
+                       color="#60a5fa", width=2.0, negdash=False)],
+        vectors=[dict(on=True, q="wind", level=1.5, frame="ground", style="streamlines",
+                      density=30, ref=15.0, color="#fbbf24")],
+        section=dict(points=[[10.0, 10.0], [40.0, 30.0]], var="thpert", style="image",
+                     cmap="magma", rev=False, auto=True, vmin=0.0, vmax=1.0, nlev=15,
+                     ztop=12.0, diff=dict(on=False, run="", time=""),
+                     contours=[dict(on=True, var="winterp", levels="auto", color="#ffffff",
+                                    width=1.4, negdash=True)],
+                     vectors=[dict(on=True, q="wind", frame="ground", density=40, ref=20.0,
+                                   color="#e5e7eb")]))
+    up = session.upgrade(json.loads(json.dumps(old)))
+    assert up["atmo3d_session"] == FORMAT and "diff" not in up
+    assert up["fill"]["field"] == "winterp" and up["fill"]["z"] == 2.5
+    assert up["fill"]["minus"] == dict(run=None, time_s="prev")
+    assert up["vectors"][0]["stream_n"] == 30 and up["contours"][0]["lw"] == 2.0
+    assert up["section"]["fill"]["field"] == "thpert" and up["section"]["fill"]["minus"] is None
+    assert v.apply_session(old) == []
+    f = v.map_fill
+    assert v.fill_var.value == "winterp" and float(v.fill_lvl.value) == 2.5
+    assert (f["style"], f["cmap"], f["reverse"], f["auto"], f["vmin"], f["nlevels"]) == \
+        ("contourf", "viridis", True, False, -7.0, 12)
+    assert f["minus"]["time_s"] == "prev"
+    assert v.fills[0]["field"] == "thpert" and v.fills[0]["clip"] is False
+    o = v.ovs[0]
+    assert (o["mode"], o["z"], o["levels"], o["neg_dashed"]) == ("level", 3, "5, 10", False)
+    assert v.vecs[0]["style"] == "streamlines" and v.vecs[0]["stream_n"] == 30
+    assert v.xs_fill.value == "thpert" and v.xs_main["cmap"] == "magma"
+    assert "minus" not in v.xs_main.lay and v.xs_vecs[0]["across"] == 40
 
 
 def test_session_of_another_run_reopens_the_page(viewer, demo_root, tmp_path):

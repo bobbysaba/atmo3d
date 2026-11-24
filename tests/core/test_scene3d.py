@@ -213,8 +213,8 @@ def test_figure_of_the_3d_view_takes_its_camera(ed):
 def test_scene_editor_preview_draws(ed):
     pytest.importorskip("pyvista")
     ed.from_3d()  # (at the viewer's time: the demo's first output has no storm yet)
-    ed.sc_w["res"].value = 2
-    ed.sc_g["on"].value = True
+    ed.shell.edit(lambda d: (d["kinds"]["scene"]["scene3d"].update(res=2),
+                             d["kinds"]["scene"]["scene3d"].setdefault("ground", {}).update(on=True)))
     spec, data, fig = render(ed)
     d = data[0]
     assert not d.get("missing") and d["nmesh"] >= 1

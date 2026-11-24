@@ -1,12 +1,15 @@
-"""F1: a plan view's own area, in the document, in the drawing and in the new layout."""
+"""F1: a plan view's own area, in the document, in the drawing and in the figure's frame
+(figures/ui)."""
 import time
 from types import SimpleNamespace
 
 import pytest
 
+from conftest import at_tool
+
 from atmo3d.figures import draw as figdraw, spec as fg
-from atmo3d.figures.shell import docedit as de, findview, looks
-from atmo3d.figures.shell.looks import Scope
+from atmo3d.figures.schema.where import Where
+from atmo3d.figures.shell import docedit as de
 
 
 def doc_of(*panels):
@@ -49,29 +52,33 @@ def test_a_panels_own_half_width_alone_leaves_the_rest_to_the_kind():
     assert dom == dict(mode="storm", half=5.0, box=None)
 
 
-def test_scope_reads_writes_and_takes_back_a_panels_area_with_coords():
+def test_a_panels_area_with_coords_is_read_written_and_taken_back():
+    from atmo3d.figures import schema as S
+    from atmo3d.figures.schema import where as W
+    from atmo3d.figures.schema.where import Where
     doc = doc_of(panel(0), panel(1, 1))
-    at = Scope("plan", 1)
-    mode = next(st for st in looks.rows_of("Area", ["plan"]) if st.key == "domain.mode")
-    coords = next(st for st in looks.rows_of("Area", ["plan"]) if st.key == "coords")
-    assert at.value(doc, mode) == "storm"
-    at.write(doc, mode, "full")
-    at.write(doc, coords, "storm")
+    at, other = Where("panel", "plan", 1), Where("panel", "plan", 0)
+    mode, coords = S.row("look.domain.mode"), S.row("look.coords")
+    assert W.value(doc, mode, at) == "storm"
+    W.write(doc, mode, at, "full")
+    W.write(doc, coords, at, "storm")
     assert doc["panels"][1]["opts"] == dict(domain=dict(mode="full"), coords="storm")
-    assert at.value(doc, mode) == "full" and Scope("plan", 0).value(doc, mode) == "storm"
-    assert set(at.own_keys(doc, looks.AREA_OF_A_PANEL)) == {"domain.mode", "coords"}
-    assert looks.panels_differ(doc, "plan", looks.AREA_OF_A_PANEL) == {"b": ["domain.mode", "coords"]}
-    at.take_back(doc, "coords")
-    assert at.own_keys(doc, looks.AREA_OF_A_PANEL) == ["domain.mode"]
-    at.take_back(doc, "domain.mode")
+    assert W.value(doc, mode, at) == "full" and W.value(doc, mode, other) == "storm"
+    assert W.own(doc, mode, at) and W.own(doc, coords, at) and not W.own(doc, mode, other)
+    W.take_back(doc, coords, at)
+    assert W.own(doc, mode, at) and not W.own(doc, coords, at)
+    W.take_back(doc, mode, at)
     assert "opts" not in doc["panels"][1]
 
 
 def test_only_plan_views_have_the_new_area():
-    assert "domain.mode" in looks.PANEL_KEYS["plan"]["Area"]
-    assert looks.PANEL_KEYS["xsec"]["Area"] == ("xsec.ztop", "xsec.coords")
-    for kind in ("sounding", "th", "line", "dist", "profile", "joint", "azim", "table", "scene"):
-        assert "Area" not in looks.PANEL_KEYS[kind], kind
+    from atmo3d.figures import schema as S
+    assert "look.domain.mode" in {r.key for r in S.rows_of("Area", ["plan"], level="panel")}
+    assert {r.key for r in S.rows_of("Height and x axis", ["xsec"], level="panel")} == \
+        {"look.xsec.ztop", "look.xsec.coords"}
+    for kind in ("xsec", "sounding", "th", "line", "dist", "profile", "joint", "azim", "table",
+                 "scene"):
+        assert not S.rows_of("Area", [kind], level="panel"), kind
 
 
 def test_copying_a_panel_keeps_its_area():
@@ -108,15 +115,11 @@ def _at(shell, pid, u, w):
     return b[0] + u * (b[1] - b[0]), b[3] - w * (b[3] - b[2])
 
 
-def _area_card(shell):
-    card = next(c for c in shell.inspector.body.objects if getattr(c, "title", None) == "Area")
-    card.collapsed = False
-    return card
-
-
-def _in(card, name):
-    return next(w for w in card.select() if getattr(w, "name", None) == name
-                and hasattr(w, "value"))
+def _area(shell, pid):
+    """The Area section of panel pid in the Layout tool, open."""
+    at_tool(shell, "layout", f"panel:{pid}")
+    return next(s for d in shell.frame.drawers for s in d.sections
+                if s.title.startswith("Area") and d.where == Where("panel", "plan", pid))
 
 
 def test_dragging_one_panels_area_leaves_the_other(shell):
@@ -133,7 +136,7 @@ def test_dragging_one_panels_area_leaves_the_other(shell):
     assert shell.placing.place[b][4] != pytest.approx(was)
     assert shell.placing.shown_area(b)[0] == pytest.approx(
         de.panel_by_id(shell.doc, b)["opts"]["domain"]["box"][0])
-    assert "● 2" in _area_card(shell).header.object
+    assert "2 set here" in _area(shell, b).card.title
     shell.undo()
     assert "opts" not in de.panel_by_id(shell.doc, b)
 
@@ -152,25 +155,22 @@ def test_dragging_all_panels_skips_and_names_one_with_its_own(shell):
 
 def test_a_panels_area_section_edits_marks_and_resets(shell):
     pid = shell.doc["panels"][1]["id"]
-    shell.select(f"panel:{pid}")
-    card = _area_card(shell)
+    sec = _area(shell, pid)
     start = shell.doc["kinds"]["plan"]["domain"]["mode"]
     other = "storm" if start == "full" else "full"
-    _in(card, "Plan-view area").value = other
+    sec.ctls["look.domain.mode"].widget.value = other
     assert de.panel_by_id(shell.doc, pid)["opts"]["domain"] == dict(mode=other)
-    assert "● 1" in card.header.object
+    assert "1 set here" in sec.card.title
     assert shell.doc["kinds"]["plan"]["domain"]["mode"] == start
-    reset = next(w for w in card.select() if getattr(w, "name", "").startswith("↺"))
-    reset.clicks += 1
+    sec.reset.clicks += 1
     assert "opts" not in de.panel_by_id(shell.doc, pid)
 
 
 def test_a_panels_fixed_box_starts_from_what_it_shows(shell):
     _drew(shell)
     pid = shell.doc["panels"][1]["id"]
-    shell.select(f"panel:{pid}")
     shown = shell.placing.shown_area(pid)
-    _in(_area_card(shell), "Plan-view area").value = "box"
+    _area(shell, pid).ctls["look.domain.mode"].widget.value = "box"
     dom = de.panel_by_id(shell.doc, pid)["opts"]["domain"]
     assert dom["mode"] == "box" and dom["box"] == pytest.approx(shown, abs=0.01)
 
@@ -178,8 +178,13 @@ def test_a_panels_fixed_box_starts_from_what_it_shows(shell):
 def test_find_goes_to_a_panels_area(shell):
     pid = shell.doc["panels"][1]["id"]
     shell.select(f"panel:{pid}")
-    hits = [h for h in findview.hits_of(shell) if h.node == f"panel:{pid}" and h.section == "Area"]
-    assert {"Fixed box", "Plan-view area"} <= {h.label for h in hits}
+    fr = shell.frame
+    fr.find.box.value_input = "area"
+    hits = {r.label: w for r, w in fr.find.found if r.section == "Area"}
+    assert {"Fixed box", "Plan-view area"} <= set(hits)
+    assert hits["Fixed box"] == Where("panel", "plan", pid)  # (the panel picked: first)
+    fr.go_to(next(r for r, _ in fr.find.found if r.label == "Fixed box"), hits["Fixed box"])
+    assert shell.node == f"panel:{pid}" and fr.tool == "layout"
 
 
 def test_the_height_follows_the_tallest_panel_of_a_row(shell):

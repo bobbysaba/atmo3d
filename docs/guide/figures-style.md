@@ -2,11 +2,12 @@
 
 ## Style
 
-Look settings are in folding sections of the inspector. **Where you pick says what they reach**: the
-**Figure** node holds what the whole figure shares (text, panel labels, colorbar, legend, contour key,
-spacing), a kind's node what its panels share (axes and ticks, its plot), and a panel what it
-alone changes. A panel's own value stays when the shared one changes, until you pick *Use the setting
-for all panels*. *Find*, above the inspector, goes to any setting by name.
+Look settings are in folding sections of the **Look** tool. **The level switch at its top says what
+they reach** ([The editor](figures.md#the-editor)): **Figure** holds what the whole figure shares
+(text, panel labels, colorbar, legend), **All plan views** (or another kind) what its panels share
+(axes and ticks, its plot), and a panel what it alone changes. A panel's own value is marked and
+stays when the shared one changes, until you press its **↺**. **Find**, in the top bar, goes to any
+setting by name. The contour key is in **Marks** and the spacing in **Layout**.
 
 Each shows only what reaches that kind's picture, so a few settings are not there for every kind:
 
@@ -22,7 +23,7 @@ Each shows only what reaches that kind's picture, so a few settings are not ther
 
 ### Style preset
 
-**Apply a style**, on the Figure node, sets the look of the whole figure in one
+**Apply a style preset** (Look, at the figure) sets the look of the whole figure in one
 go. It applies once: anything you change afterwards stays changed, and ↶ takes it back.
 
 | Preset | Fonts and labels | Frame lines | Export and width |
@@ -56,7 +57,7 @@ across; **x tick every** and **y tick every**; **Frame width**; **Grid style** (
 dashed, solid); and checkboxes for *Tick marks*, *Minor ticks*, *Grid lines* and *Equal x/y
 scale*.
 
-One panel can have labels of its own: pick the panel in the tree and fill in *x
+One panel can have labels of its own: click the panel in the preview and fill in *x
 label* or *y label* (blank: the labels here; a single space: no label).
 
 ### Panel labels
@@ -69,7 +70,7 @@ or above its left or right corner), *Size* (blank: 1.2 × the base size), *Bold*
   (a figure of one panel starts without one) until you tick or untick them yourself.
 - **Time label**: *Text* with `{min}` (minutes from time zero), `{model}` (model minutes),
   `{s}` (seconds) or `{hms}` (h:mm:ss), e.g. `t = {min:g} min`. Time zero is set for each
-  run, on the tree's [**Runs** node](figures-panels.md#runs). A figure saved with a *Minutes
+  run, in the [**Runs** tool](figures-panels.md#runs). A figure saved with a *Minutes
   counted from* still shows that box, which adds to the runs' time zeros; at 0 it goes away.
 - **Height label** (for panels at several heights): *Text* with `{z}` (the height, km)
   or `{k}` (the model level), e.g. `{z:g} km AGL`; blank gives `z = … km` or `k = …`.
@@ -92,7 +93,7 @@ Hidden for time series, soundings, distributions and vertical profiles, which ha
 | **Colorbars** | *One for the figure*, *per row*, *per column*, *per panel*, or *None*. |
 | **Where** | Below, right, above or left. |
 | **Length**, **Thickness**, **Gap** | Fractions (0–1) of the panel. Thickness is honoured above matplotlib's usual cap. |
-| **Label of bars with none of their own** | Blank: the units. A card's own label comes first, so clear that one for this to show. `$…$` is maths. |
+| **Label of bars with none of their own** | Blank: the units. A layer's own label comes first, so clear that one for this to show. `$…$` is maths. |
 | **Label side**, **Bold label**, **Label size** | Auto, above / left, or below / right. |
 | **Ticks of bars with none of their own** | e.g. `0:60:10` (blank: automatic). |
 | **Tick format**, **Tick size** | e.g. `%.1f`, `%d`, `%.0e`. |
@@ -112,16 +113,24 @@ To set the label, ticks or arrows of every bar at once, use the fill layer under
 (or **All cross-sections**), which clears what single panels set. The label and ticks here are for
 the bars that have none of their own.
 
+**Click a colorbar in the preview** to go to its settings: a figure's one bar opens *Colorbars*
+here at **Figure**; a bar per row or column opens that row or column's *Colorbar label*; a
+panel's own bar opens that panel's. A shared bar lists the panels it serves and offers **Jump to**
+the controlling panel's fill (its colours), *All colorbars* and that panel's own colorbar
+settings. A joint distribution's or azimuthal mean's own bar opens its *Colorbar label* in *Plot*.
+
 ### Legend
 
 What this section offers follows the panels. Time series, soundings, distributions,
 profiles, joint distributions and azimuthal means each draw their own legend: **Legends on**
 *Each panel* gives *Legend* (for soundings, *Legend (one sounding)*: several soundings always
-have one), *At*, *Columns* and *Frame*. These belong to the kind of panel, on its node or on one panel. Box plots and violins have no legend,
+have one), *At*, *Columns* and *Frame* (*Legend in the panel*). These belong to the kind of panel, at *All time
+series* (say) or at one panel. Box plots and violins have no legend,
 and a time–height panel lists only your own [legend entries](#legend-entries), so the section
 is hidden without them.
 
-Plan views, sections and 3D scenes have **Layer legend on** a panel or on the figure, with its position (*At*, and
+Plan views, sections and 3D scenes have a layer legend (**Legends on**, at the figure): in a panel or
+on the figure, with its position (*At*, and
 *Anchor x, y* to place it anywhere: the *At* corner of the legend sits at that point, in
 fractions of the panel, or of the figure for a figure legend; below 0 or above 1 is
 outside, e.g. *At: upper left*, *Anchor: 1.02, 1* just right of the panel), the panel
@@ -136,19 +145,20 @@ panel, unticking *Panels' own legends* does the same. Either way a panel whose o
 *Legend* is *Yes* keeps its own (and a figure legend gathers it only when listed in
 *From panels*), so one panel can have a legend and the others none. The *outside*
 positions make room beside the panels. A hodograph's key has its own settings
-(*Hodograph → Key at*, *Key columns*, *Key frame*). For one panel alone, pick it in the tree, then *Legend of
-this panel* (shown or not, where and its anchor, columns, frame; a sounding's apply to
-both its skew-T legend and its hodograph key).
+(*Hodograph → Key at*, *Key columns*, *Key frame*). For one panel alone, click it in the preview, then
+*Legend in the panel* (shown or not, where, columns, frame; a sounding's apply to both its
+skew-T legend and its hodograph key).
 
 ### Contour key
 
-Nested circles labelled with a contour layer's levels (a key for unlabelled contours):
+In **Marks**, at the figure. Nested circles labelled with a contour layer's levels (a key for
+unlabelled contours):
 which layer, the label, the position in figure fractions from the lower left, the size,
 and a frame.
 
 ### Spacing
 
-Extra space *between columns* and *between rows* (a fraction of a panel), and the padding
+In **Layout**, at the figure. Extra space *between columns* and *between rows* (a fraction of a panel), and the padding
 *around panels* in x and y (inches).
 
 ### matplotlib style
@@ -159,9 +169,11 @@ colours and lines. The fonts and sizes stay the editor's. For a dark figure also
 
 ## Annotate
 
-**Annotations**, on the Figure node or on a panel, adds text, markers, arrows, lines, boxes and
-circles. On the Figure node, each goes in every panel or in the panels listed; on a panel, in that
-panel. Annotations follow a panel that is copied or removed.
+**Annotations**, in the **Marks** tool, adds text, markers, arrows, lines, boxes and circles: pick
+one in the list and **+ Add**. Each is a fold with its settings and ✕. At the figure, each goes in
+every panel or in the panels listed, and Marks lists them all; at a panel, it goes in that panel,
+and Marks lists the ones drawn there. Annotations follow a panel that is copied or removed; one
+whose panels were all removed says so (set its panels again).
 
 ### Legend entries
 
@@ -179,8 +191,8 @@ apart.)
 
 ### Placing by clicking
 
-Instead of typing positions, pick an item from the *Mouse* list above the preview and
-click the figure:
+Instead of typing positions, pick an item from the *Click* list above the preview and
+click the figure (the new annotation opens in Marks):
 
 - in a skew-T, a click gives a temperature and pressure;
 - a section's A and B can be placed on a plan view the same way (add a *Section line*
@@ -190,12 +202,14 @@ click the figure:
 
 *Drag: move an annotation* moves one: grab it by its text, marker, centre or middle; grab
 an end of a line or arrow to move that end. *Drag a box: plan-view area* sets the area the
-plan views show.
+plan views show, *Drag: area of one plan view* one panel's (Layout opens at its *Area*), and
+*Drag: new zoom inset*, *Drag: what an inset zooms in on* and *Drag: where an inset sits* make
+and place a zoom inset.
 
 ### Your own code
 
 For anything the editor has no setting for, write Python that runs after the figure is
-drawn. It sees
+drawn (Look, at the figure: *Your own code*). It sees
 
 | Name | What |
 |---|---|

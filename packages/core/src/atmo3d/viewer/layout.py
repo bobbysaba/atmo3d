@@ -226,9 +226,7 @@ class Layout:
         """The Cross-section panel."""
         d = self.xs_drawer = Drawer()
         # as on the map: the fill's style in the fill's pill, what goes over it in the next
-        xs_style = d.add("style", "Style", self.xs_fill_style, self.xs_cmap, self.xs_rev,
-                         self.xs_auto, self.xs_min, self.xs_max, self.xs_nlev,
-                         *self.xs_diff.values())
+        xs_style = d.add("style", "Style", self.xs_main.row)  # (its first fill: layers.py)
         xs_more = d.add("fills", "More fills", pn.Column(
             self.xs_fill_list, self.xs_fill_add, margin=0, sizing_mode="stretch_width"))
         xs_cont = d.add("ov", "Contours", pn.Column(
@@ -338,9 +336,7 @@ class Layout:
 
     def _map_toolbar(self):
         d = self.map_drawer = Drawer()
-        style = d.add("style", "Style", self.fill_style, self.fill_cmap, self.fill_rev,
-                      self.fill_auto, self.fill_min, self.fill_max, self.fill_nlev,
-                      self.fill_alpha, *self.fill_diff.values())
+        style = d.add("style", "Style", self.map_fill.row)  # (the first fill: layers.py)
         more = d.add("fills", "More fills", pn.Column(self.fill_list, self.fill_add, margin=0,
                                                       sizing_mode="stretch_width"))
         cont = d.add("ov", "Contours", pn.Column(self.ov_list, self.ov_add, margin=0,

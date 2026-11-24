@@ -1,6 +1,7 @@
-"""The figure editor, on the figure document (spec/doc.py): a toolbar, a tree of
-what the figure holds, the preview and an inspector of the one thing picked in the tree.
-Where you click says what an edit reaches: a panel alone, or all panels of a kind."""
+"""The figure editor, on the figure document (spec/doc.py): the document, undo, drawing and the
+preview (frame.py), and the edits (docedit.py).  Its page is figures/ui's frame: the tools'
+drawers, and the level switch saying what an edit reaches (a panel alone, all panels of a
+kind, the figure)."""
 
 from .frame import FigureShell
 

@@ -6,12 +6,13 @@ import json
 
 import pytest
 
-from conftest import fresh_shell
+from conftest import at_tool, control, drawer_text, every_node, fresh_shell, press
 
 from atmo3d.figures import draw as figdraw
 from atmo3d.figures.kinds import KINDS
-from atmo3d.figures.shell import docedit as de, gridview, nodes
-from atmo3d.figures.shell.gridview import grid_map
+from atmo3d.figures.shell import docedit as de, nodes
+from atmo3d.figures.ui import grid as gridview
+from atmo3d.figures.ui.grid import grid_map
 
 
 def sounding(run="r0", t=600.0):
@@ -278,11 +279,17 @@ def shell(shell_viewer):
 
 
 def _named(shell, name):
-    """The widget called `name` in the inspector, however deep."""
-    for w in shell.inspector.body.select():
+    """The widget called `name` in the frame's drawer, however deep."""
+    for w in shell.frame.body.select():
         if getattr(w, "name", None) == name and hasattr(w, "value"):
             return w
     raise AssertionError(f"no {name}")
+
+
+def _sections(shell):
+    """The titles of the drawer's sections that show (without what they count)."""
+    import panel as pn
+    return [c.title.split(" · ")[0] for c in shell.frame.body.select(pn.Card) if c.visible]
 
 
 def _drew(shell):
@@ -293,7 +300,7 @@ def _drew(shell):
 
 def test_a_sounding_panel_joins_a_grid_of_plan_views(shell):
     n = len(shell.doc["panels"])
-    p = shell.inspector.grid.add_panel("sounding", "new column")
+    p = shell.grid.add_panel("sounding", "new column")
     assert shell.node == f"panel:{p['id']}" and len(shell.doc["panels"]) == n + 1
     assert set(shell.doc["kinds"]) >= {"plan", "sounding"}
     assert p["layers"][0]["type"] == "sounding" and p["opts"]["letters"]["loc"] == "above left"
@@ -309,22 +316,29 @@ def test_a_sounding_panel_joins_a_grid_of_plan_views(shell):
 
 
 def test_every_node_of_a_mixed_figure_shows(shell):
-    shell.inspector.grid.add_panel("sounding", "new column")
-    for row in shell.tree.items:
-        shell.select(row["id"])
-        assert shell.inspector.body.objects, row["id"]
+    shell.grid.add_panel("sounding", "new column")
+    from conftest import at_tool, drawer_text
+    for tool in ("layout", "layers", "look", "marks", "times"):
+        for node in every_node(shell.doc):
+            at_tool(shell, tool, node)
+            assert shell.frame.body.objects, node
+            assert "Could not show" not in drawer_text(shell), (tool, node)
 
 
 def test_a_plan_view_joins_a_figure_of_soundings(shell):
     shell.ed.from_soundings()
-    p = shell.inspector.grid.add_panel("plan", "new column")
-    assert p["layers"] and p["section"] in shell.doc["sections"]
+    p = shell.grid.add_panel("plan", "new column")
+    # (the first plan view of a figure with no layers draws nothing yet: its layers are the
+    # user's to add)
+    assert not p["layers"] and not shell.doc.get("layers")
+    assert p["section"] in shell.doc["sections"]
     assert p["opts"]["letters"]["loc"] == "lower left"
     assert "2 panels" in _drew(shell)
 
 
 def test_the_place_boxes_move_and_span_a_panel(shell):
-    p = shell.inspector.grid.add_panel("sounding", "new column")
+    p = shell.grid.add_panel("sounding", "new column")
+    at_tool(shell, "layout")
     _named(shell, "Rows tall").value = 2
     assert de.panel_by_id(shell.doc, p["id"])["cell"][2] == 2
     _drew(shell)
@@ -333,11 +347,11 @@ def test_the_place_boxes_move_and_span_a_panel(shell):
 
 
 def test_the_place_boxes_refuse_what_cant_be(shell):
-    shell.select("panel:0")
+    from conftest import control
     was = de.panel_by_id(shell.doc, 0)["cell"]
-    _named(shell, "Columns wide").value = 2
+    control(shell, "Columns wide", "layout", "panel:0").value = 2
     assert de.panel_by_id(shell.doc, 0)["cell"] == was
-    assert any("is there" in str(getattr(o, "object", "")) for o in shell.inspector.body.select())
+    assert "is there" in shell.status.object
 
 
 def test_changing_a_panels_type_keeps_its_cell(shell):
@@ -345,7 +359,7 @@ def test_changing_a_panels_type_keeps_its_cell(shell):
     pid = shell.doc["panels"][0]["id"]
     was = list(de.panel_by_id(shell.doc, pid)["cell"])
     n = len(shell.doc["panels"])
-    made = shell.inspector.grid.set_kind([pid], "sounding")
+    made = shell.grid.set_kind([pid], "sounding")
     assert made[0]["kind"] == "sounding" and made[0]["cell"] == was
     assert len(shell.doc["panels"]) == n
     shell.undo()
@@ -353,7 +367,7 @@ def test_changing_a_panels_type_keeps_its_cell(shell):
 
 
 def test_the_figure_type_changes_every_panel(shell):
-    shell.select("figure")
+    at_tool(shell, "layout", "figure")
     n = len(shell.doc["panels"])
     _named(shell, "Figure type").value = "sounding"
     assert {p["kind"] for p in shell.doc["panels"]} == {"sounding"}
@@ -362,12 +376,12 @@ def test_the_figure_type_changes_every_panel(shell):
     _named(shell, "Rows").value = shell.doc["grid"]["rows"] + 1  # (no error, no going back)
     assert shell.doc["grid"]["rows"] == _named(shell, "Rows").value
     k = len(de.free_cells(shell.doc))
-    shell.inspector.grid.fill_empty("sounding")
+    shell.grid.fill_empty("sounding")
     assert len(shell.doc["panels"]) == n + k and not de.free_cells(shell.doc)
 
 
 def test_the_figure_type_reaches_panels_set_aside_and_keeps_times(shell):
-    shell.select("figure")
+    at_tool(shell, "layout", "figure")
     n = len(shell.doc["panels"])
     assert n > 1
     last = max(shell.doc["panels"], key=lambda p: p["cell"][:2])
@@ -384,7 +398,7 @@ def test_the_figure_type_reaches_panels_set_aside_and_keeps_times(shell):
 
 
 def test_the_grid_boxes_on_the_figure_node(shell):
-    shell.select("figure")
+    at_tool(shell, "layout", "figure")
     n = len(shell._hist)
     panels = len(shell.doc["panels"])
     _named(shell, "Columns").value = 1
@@ -392,8 +406,7 @@ def test_the_grid_boxes_on_the_figure_node(shell):
     assert shell.doc["grid"] == dict(shell.doc["grid"], rows=1, cols=1)  # (it takes what's asked)
     assert len(shell.doc["panels"]) == 1
     assert len(shell.doc[de.OFF_GRID]) == panels - 1
-    assert "not drawn" in " ".join(str(getattr(o, "object", ""))
-                                   for o in shell.inspector.body.select())
+    assert "not drawn" in drawer_text(shell)  # (the drawer anew: the grid changed)
     while len(shell._hist) > n:
         shell.undo()
     assert len(shell.doc["panels"]) == panels
@@ -407,9 +420,9 @@ def test_the_grid_boxes_on_the_figure_node(shell):
 
 
 def test_a_soundings_card_edits_its_entry(shell):
-    p = shell.inspector.grid.add_panel("sounding", "new column")
+    p = shell.grid.add_panel("sounding", "new column")
     pid = p["id"]
-    shell.select(f"layer:{pid}:0")
+    at_tool(shell, "layers", f"layer:{pid}:0")
     time = _named(shell, "Time")
     new = [v for v in time.options.values() if v != time.value][0]
     time.value = new
@@ -422,22 +435,31 @@ def test_a_soundings_card_edits_its_entry(shell):
 
 
 def test_a_time_that_is_no_output_stays_until_another_is_picked(shell):
-    p = shell.inspector.grid.add_panel("sounding", "new column")
+    p = shell.grid.add_panel("sounding", "new column")
     pid = p["id"]
     shell.edit(lambda d: de.panel_by_id(d, pid)["layers"][0].update(time_s=4001.0))
-    shell.select(f"layer:{pid}:0")
+    at_tool(shell, "layers", f"layer:{pid}:0")
     assert _named(shell, "Time").value == 4001.0
     assert de.panel_by_id(shell.doc, pid)["layers"][0]["time_s"] == 4001.0
 
 
 def test_the_panel_adds_copies_moves_and_removes_soundings(shell):
-    ins = shell.inspector
-    p = ins.grid.add_panel("sounding", "new column")
+    p = shell.grid.add_panel("sounding", "new column")
     pid = p["id"]
-    ins.panes["sounding"].add_entry(pid)
+    at_tool(shell, "layers")
+    press(shell, "+ Sounding")
     assert len(de.panel_by_id(shell.doc, pid)["layers"]) == 2
-    other = ins.panes["sounding"].add_panel()
-    shell.select(f"layer:{pid}:1")
+    assert shell.frame.folds.get(f"p:{pid}:1")  # (the new one open)
+    at_tool(shell, "layers")
+    press(shell, "⧉")  # (a copy of the first, after it)
+    assert len(de.panel_by_id(shell.doc, pid)["layers"]) == 3
+    at_tool(shell, "layers")
+    press(shell, "✕", 2)
+    assert len(de.panel_by_id(shell.doc, pid)["layers"]) == 2
+    at_tool(shell, "layers", "kind:sounding")
+    press(shell, "+ Sounding panel")
+    other = de.panel_by_id(shell.doc, int(shell.node.split(":")[1]))
+    at_tool(shell, "layers", f"layer:{pid}:1")
     _named(shell, "In panel").value = other["id"]
     assert shell.node == f"panel:{other['id']}"
     assert len(de.panel_by_id(shell.doc, other["id"])["layers"]) == 2
@@ -445,31 +467,24 @@ def test_the_panel_adds_copies_moves_and_removes_soundings(shell):
 
 
 def test_the_kinds_sections_follow_the_layout_and_write_the_kind(shell):
-    p = shell.inspector.grid.add_panel("sounding", "new column")
-    shell.select("kind:sounding")
-
-    def sections():
-        return [c.title for c in shell.inspector.body.objects if hasattr(c, "collapsed")]
-
-    assert {"Skew-T", "Hodograph", "Sounding panels"} <= set(sections())
-    for c in shell.inspector.body.objects:
-        if getattr(c, "title", "") == "Sounding panels":
-            c.collapsed = False
+    p = shell.grid.add_panel("sounding", "new column")
+    at_tool(shell, "look", "kind:sounding")
+    assert {"Skew-T", "Hodograph", "Sounding panels"} <= set(_sections(shell))
+    assert _named(shell, "Inset at")  # (the hodograph an inset: where it is)
     _named(shell, "Sounding layout").value = "skewt"
     assert shell.doc["kinds"]["sounding"]["skewt"]["layout"] == "skewt"
-    assert "Hodograph" not in sections()
+    assert "Hodograph" not in _sections(shell)
+    _named(shell, "Sounding layout").value = "side"
+    assert "Hodograph" in _sections(shell) and "Skew-T" in _sections(shell)
+    _named(shell, "Sounding layout").value = "skewt"
     assert "skewt" not in (de.panel_by_id(shell.doc, p["id"]).get("opts") or {})
     assert figdraw.resolve(shell.doc)["skewt"]["layout"] == "skewt"
 
 
 def test_a_panels_own_look_stays_in_it(shell):
-    ins = shell.inspector
-    a = ins.grid.add_panel("sounding", "new column")
-    b = ins.grid.copy_panel(a["id"])
-    shell.select(f"panel:{a['id']}")
-    for c in ins.body.objects:
-        if getattr(c, "title", "") == "Skew-T":
-            c.collapsed = False
+    a = shell.grid.add_panel("sounding", "new column")
+    b = shell.grid.copy_panel(a["id"])
+    at_tool(shell, "look", f"panel:{a['id']}")
     _named(shell, "Bottom (hPa)").value = 900.0
     res = figdraw.resolve(shell.doc)
 
@@ -481,19 +496,21 @@ def test_a_panels_own_look_stays_in_it(shell):
 
 
 def test_a_panels_chips_say_which_of_two_settings_alike(shell):
-    p = shell.inspector.grid.add_panel("sounding", "new column")
-    names = [o.name for o in shell.inspector.body.select() if str(getattr(o, "name", "")).startswith("↺")]
-    assert {"↺ Letter Where", "↺ Time label Where"} <= set(names)
+    p = shell.grid.add_panel("sounding", "new column")
+    at_tool(shell, "look")
+    own = {rid for d in shell.frame.drawers for sec in d.sections
+           for rid, (line, back) in sec.lines.items() if back.visible
+           and next(r.label for r in sec.rows if r.id == rid) == "Where"}
+    assert {"look.letters.loc", "look.time_label.loc"} <= own, own  # (two rows, each its ↺)
     assert p["opts"]["letters"]["loc"] == "above left"
 
 
 def test_a_figure_of_soundings_keeps_its_size_until_what_it_depends_on_changes(shell):
     shell.ed.from_soundings()
     shell.doc.update(size=[5.5, 5.5], size_auto=True)
-    shell.select("panel:0")
-    _named(shell, "Title").value = "x"
+    control(shell, "Title", "layout", "panel:0").value = "x"
     assert shell.doc["size"] == [5.5, 5.5]
-    shell.inspector.panes["sounding"].add_panel()
+    shell.grid.add_panel("sounding")
     assert shell.doc["size"] == [10.5, 5.0]
 
 
@@ -502,13 +519,13 @@ def test_a_shared_layer_of_another_kind_says_so_on_all_plan_views(shell):
     shell.edit(lambda d: d["panels"].append(dict(
         id=99, kind="xsec", cell=list(de.next_cell(d)) + [1, 1], run="r0", time_s=3600.0, title="",
         layers=[dict(ref=lid, over={})], insets=[], section=None)))
-    shell.select("kind:plan")
-    said = [o for o in shell.inspector.body.select() if "another kind" in str(getattr(o, "object", ""))]
-    assert said
+    from conftest import at_tool, drawer_text
+    at_tool(shell, "layers", "kind:plan")
+    assert "of another kind" in drawer_text(shell)
 
 
 def test_panels_of_a_kind_keep_outer_tick_labels_of_their_own(shell):
-    shell.inspector.grid.add_panel("sounding", "new column")
+    shell.grid.add_panel("sounding", "new column")
     res = figdraw.resolve(shell.doc)
     data = shell.ed.data.panel_data(json.loads(json.dumps(shell.doc, default=float)))
     fig = figdraw.draw(json.loads(json.dumps(shell.doc, default=float)), data)

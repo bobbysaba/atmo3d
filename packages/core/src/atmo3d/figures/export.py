@@ -119,6 +119,17 @@ def make_thumb(spec_path):
 class FigureExport:
     _save_gen = 0  # (a save waiting for series goes on only if still the last)
 
+    def _build_save(self):
+        """Where the figure is saved (the Export dialog's box copies it), whether the script and
+        data go with it, and the line saying how saving went."""
+        import panel as pn  # (here: `atmo3d render` imports this module without Panel)
+        self._fig_dir = config.figures_dir(self.run.path)  # followed while the box is in it
+        self.path = pn.widgets.TextInput(
+            name="Save as (folder/name on the server, no extension)",
+            value=os.path.join(self._fig_dir, "figure"), sizing_mode="stretch_width")
+        self.save_more = pn.widgets.Checkbox(name="Also the script and data")
+        self.msg = pn.pane.HTML(sizing_mode="stretch_width", margin=(0, 8))
+
     # ------------------------------------------------------------ export
     def config_changed(self):
         new = config.figures_dir(self.run.path)

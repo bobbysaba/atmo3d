@@ -9,7 +9,6 @@ from .. import draw as figdraw
 from ..click import (DRAG, PLACE, TWO, axis_digits, dragged_to, grab_annotation, locate, moved_annotation,
                      placed_item, to_data)
 from . import docedit as de, nodes
-from .looks import panels_differ
 
 FRACTION_KINDS = ("scene", "table")  # (annotations by fractions of the panel)
 HINTS = dict(
@@ -22,7 +21,7 @@ HINTS = dict(
     area_panel="Drag a box in a plan view: that panel alone shows that area. Its Area section "
                "takes it back.",
     inset="Drag a box in a plan view or cross-section over what to zoom in on: a new inset shows "
-          "it, in the corner furthest from it. It is under the panel in the tree.",
+          "it, in the corner furthest from it, and Layout opens at it.",
     inset_area="Drag a box in a panel: its inset (the one picked, if the panel has several) zooms "
                "in on that.",
     inset_place="Drag a box in a panel: its inset (the one picked, if the panel has several) sits "
@@ -163,9 +162,12 @@ class Placing:
         a = placed_item(mode, pid, first, x, y)
         if pid in self.fractions:
             a["coords"] = "axes"
-        shell.inspector.annots.append(a, node=f"panel:{pid}")
+        from ..ui.actions import append_annotation
+        shell.frame.tool = "marks"  # (the new one open there)
+        shell.frame._lit()
+        append_annotation(shell, a, node=f"panel:{pid}")
         letter = nodes.letters(shell.doc)[pid]
-        shell.say(f"Added {mode} in panel {letter}: see its Annotations.")
+        shell.say(f"Added {mode} in panel {letter}: see Marks.")
 
     def _section(self, pid, p1, p2):
         """A-B from two clicks in a plan view (in its axis units: grid or storm km)."""
@@ -199,12 +201,16 @@ class Placing:
         ys = sorted((p1[1] + d[1], p2[1] + d[1]))
         where = "x {:.2f} – {:.2f}, y {:.2f} – {:.2f} km".format(*xs, *ys)
         if own:
-            shell.inspector.folds[f"look:{pid}:plan:Area"] = True
+            from ..schema.where import Where
+            shell.frame.folds[(Where("panel", "plan", pid), "Area")] = True
+            shell.frame.tool = "layout"  # (where a panel's area is)
+            shell.frame._lit()
             shell.edit(lambda doc: de.set_area(doc, [*xs, *ys], pid=pid), node=f"panel:{pid}")
             shell.say(f"Area of panel {nodes.letters(shell.doc)[pid]} alone: {where}.")
             return
         shell.edit(lambda doc: de.set_area(doc, [*xs, *ys]), node=shell.node)
-        keep = list(panels_differ(shell.doc, "plan", OWN_OF_THE_AREA))
+        from ..ui.actions import own_area
+        keep = own_area(shell.doc, OWN_OF_THE_AREA)
         shell.say(f"Area of all plan views: {where}." + (
             f" Panel{'s' if len(keep) > 1 else ''} {', '.join(keep)} keep"
             f"{'' if len(keep) > 1 else 's'} an area of {'their' if len(keep) > 1 else 'its'} own."
@@ -248,8 +254,10 @@ class Placing:
         if mode == NEW_INSET:
             made = []
             shell.edit(lambda d: made.append(de.add_inset(d, pid, box, lims, centre)))
+            shell.frame.tool = "layout"  # (where an inset's place and area are)
+            shell.frame._lit()
             shell._show(f"inset:{pid}:{made[0]['id']}")
-            shell.say(f"New zoom inset in panel {letter}: under it in the tree.")
+            shell.say(f"New zoom inset in panel {letter}: its place and area are in Layout.")
             return
         ins = self._inset_of(p)
         if ins is None:

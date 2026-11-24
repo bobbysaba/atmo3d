@@ -37,6 +37,16 @@ processes and renders figures.
   1500 parcels; about 35 MB). `atmo3d/demo.py` copies it into the cache once.
   `tests/cm1/test_real_demo.py` checks it; to rebuild it from a new run:
   `python tools/make_real_demo.py RUN demo_data/supercell --force`.
+- **WoFS demo data.** `tools/make_wofs_demo.py ROOT OUT` cuts a WoFS experiment down to
+  a few members and cycles (default members 1–3, 2 h every 15 min), the fields atmo3d
+  reads and 16-bit packed values, the whole domain kept (about 23 MB a member file).
+  It is too large for the repository (about 600 MB) and is not in `demo_data/`;
+  `ATMO3D_WOFS_ROOT=OUT pytest -m real tests/wofs/test_real_wofs.py` checks a build.
+- **Radar demo data.** `tools/make_radar_demo.py SRC OUT` copies a folder of CfRadial
+  volumes with every sweep, ray and gate kept, minus the padding rays past the sweep
+  table and three receiver QC fields, 16-bit packed (about 19 MB a volume, from
+  250–285 MB). Like the WoFS demo it is not in `demo_data/`;
+  `ATMO3D_RADAR_ROOT=OUT pytest -m real tests/radar/test_real_radar.py` checks a build.
 - **Isolation.** Tests use a throwaway settings file and write only into temporary
   folders. The pressure-decomposition tests work on copies of demo files.
 - **Browser tests** need Firefox (on `PATH`, or `$FIREFOX`). Screenshots go to
@@ -73,7 +83,8 @@ Files in `tests/core/` unless the row says otherwise.
 | `test_streamlines.py` | The 3D streamline tracer on analytic winds, and the 3D pane's restyle echo |
 | `test_sounding.py` | Soundings, comparison styles, zoom and the hover data |
 | `test_tracking.py` | Automatic and hand-placed tracking, save and load, storm-following soundings |
-| `test_session.py` | Session files: save, load, rows and values a run cannot take, another run's session; soundings, section, 3D, series and distributions back |
+| `test_session.py` | Session files: save, load, rows and values a run cannot take, another run's session; soundings, section, 3D, series and distributions back; a FORMAT 2 (1.1.0) session |
+| `test_viewer_layers.py`, `test_viewer_layer_drawer.py` | The map's and section's layers on the schema and their drawer, without a viewer |
 | `test_export.py` | netCDF export: values == the volumes / map planes, heights, box, stop, missing times, the dialog, `atmo3d export` |
 | `test_series.py`, `test_dist.py` | Series (cache, time–height, files) and distributions |
 | `cm1/test_parcels.py` | Parcel output: reads, lattice, selections, sets, trajectory cache, heads, wraps, split files; the Parcels panel |
@@ -145,7 +156,10 @@ core/                     model output, no UI
 
 viewer/                   the interactive page (Panel / Bokeh)
   app.py                  the Viewer (built from the mixins below), wiring; the page
-  widgets.py              Viewer mixin: the drawers' controls and the run picker
+  widgets.py              Viewer mixin: the toolbars' and drawers' controls, the run picker
+  layers.py               Viewer mixin: the map's and the section's layers (fill, more fills,
+                          contours, vectors): dicts in a figure layer's form, their controls
+                          the figures' layer component (figures/ui/layer.py)
   mapview.py              Viewer mixin: the map, storm motion and the map job
   layout.py               Viewer mixin: panels, top bar, toolbars, the main column
   events.py               Viewer mixin: time, playback, tool modes, map clicks and drags
@@ -196,37 +210,43 @@ figures/                  the Figure workspace
   batch.py                `atmo3d render`: saved figures and templates drawn
                           without the viewer (images, bundles, GIFs); the GIF frame
                           helpers anim.py uses
-  shell/                  the editor on the document: what is on the page
-    nodes.py              what the tree holds, what a node reaches (no widgets)
-    treeview.py           the tree: one widget, rows drawn in the browser
+  schema/                 every setting of a figure, one row each (no widgets): its key,
+                          control, section, kinds, levels, default, help
+    look.py, layer.py, doc.py
+                          look rows, layer rows by layer type, the document's own rows
+    where.py              a row read, written, taken back at a place (figure, kind, panel,
+                          inset, layer)
+    fills.py              what a row sets beside itself (a field: its colours)
+    viewer.py             the viewer's map and section layers as rows (level "viewer"),
+                          and FORMAT 2 sessions' layers read into them
+  ui/                     the Figure workspace's page, on the schema
+    frame.py              the frame: top bar, tool rail, one drawer, the preview
+    tools.py              the tools' drawers (Layout, Layers, Look, Marks, Times, Runs)
+    levels.py             the level switch: what an edit reaches
+    drawer.py, controls.py
+                          one generic drawer of schema rows; a widget per control kind
+    find.py               Find over the schema
+    grid.py, fill.py, runs.py, actions.py, entries.py, scene.py
+                          the grid's actions, Fill panels, the Runs tool, adding layers and
+                          annotations, a panel's entries, a 3D scene's items
+    values.py, seriesvals.py
+                          the Values table of a series or profile (your edits of its points)
+    host.py, parts.py     what the controls ask of the figure (fields, runs); small widgets
+    layer.py              the same drawer on one viewer layer (the map's and section's)
+  shell/                  the editor on the document, without the page's widgets
+    nodes.py              the places an edit can be made at, and their names
     docedit.py            changes to a document: layers shared or a panel's, what differs,
                           heights, time zero, filling panels, the grid, size (no widgets)
-    layerrow.py           a layer in the inspector: a card on the document (CardHost)
-    looks.py              look settings at the node's scope, from the settings table
-    gridview.py, planview.py, xsecview.py, entryview.py, seriesview.py, statsview.py,
-    sceneview.py, insetview.py, annotview.py
-                          what each node shows in the inspector
-    inspector.py          the settings of what is picked
-    findview.py           Find, and what is marked as changed
+    bars.py               which colorbar speaks for a layer, and its settings
     placing.py            clicks and drags in the preview
     exportview.py, multirun.py
                           the Export dialog; saving for other runs
     scrub.py, vision.py   the preview's time slider and colour-vision preview
-    frame.py              FigureShell: panes, document, undo, preview
+    frame.py              FigureShell: the document, undo, the preview
   editor.py               FigureEditor: what the shell works with, one mixin a module below
-  cards/                  constants, widget helpers and the cards the inspector embeds
-                          (cards.<name> for any module's)
-    base.py               choices, constants and small widget helpers
-    layercard.py          LayerCard
-    seriescard.py         SeriesCard, SoundingCard
-    distcard.py           DistCard, AnnotationRow
-  settings.py             table of figure-level settings: spec key, widget, section, kinds,
-                          default
-  widgets.py, style.py, scene.py
-                          editor mixins: the widgets settings are copied from (looks clones
-                          them, none is on the page), templates, what a scene takes from the
-                          viewer
-  runs.py                 editor mixin: runs a figure could add, track words; RunLists for cards
+  choices.py              the choice lists ({shown: saved}) of the schema's controls
+  style.py, scene.py      editor mixins: templates; what a scene takes from the viewer
+  runs.py                 editor mixin: runs a figure could add, track words; AllFields
   sources.py              editor mixin: new figures from the viewer's tools, a new panel's
                           entries (their data: render.py)
   export.py               editor mixin: saving, reopening, autosave

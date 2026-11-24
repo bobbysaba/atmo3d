@@ -27,12 +27,14 @@ section, e.g. `t = 90 min · Reflectivity + w — Temperature perturbation · A 
 
 The panel's toolbar works like [the map's](map.md#the-toolbar): the fill field with its
 **Style ▾**, then **More fills ▾**, **Contours ▾** and **Vectors ▾**. Each list of rows
-adds a layer with *Add …* and removes it with ✕, and a row's checkbox hides it without
-losing its settings.
+adds a layer with *Add …* and removes it with ✕, and a row's **Drawn** box hides it
+without losing its settings. The controls are the map's (and a figure layer's), with the
+fields that have heights in their field lists.
 
 - **Style** and **More fills** (up to three): the same controls as on the map —
-  pixels or filled contours, colormap, *Reverse*, *Auto range* (or *Min* and *Max*),
-  *Opacity*, and for more fills *Clear outside range*. Each fill has a colorbar of its
+  *Draw as* (pixels or filled contours, with *Contour intervals*), colormap, *Reverse*,
+  *Auto range* (or *Min* and *Max*), and for more fills *Opacity* and *Clear outside
+  range*. Each fill has a colorbar of its
   own. A diverging colormap stays white at zero ([The map](map.md#style-the-fill)).
   The first fill's *Style* also has **Difference: minus another time or run**, as on
   the map: the section through the other run (the same A and B, in km) is subtracted.

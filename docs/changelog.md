@@ -5,6 +5,10 @@ has a matching git tag.
 
 ## Unreleased
 
+- **Field menus**: a field picker without a label (the map's and the cross-section's fill)
+  no longer shows a made-up name such as "FieldSelect00506" above it, and the menu and its
+  sections open beside the item hovered, in a toolbar pill or a floating window too, not
+  shifted away from it.
 - **Tests in parallel**: `pytest -n auto` (pytest-xdist, now in the environment and the
   `test` extra) runs the suite in one worker per CPU the job may use, at most 8; plain
   `pytest` still runs them one at a time. See [Developing](developing.md#tests).
@@ -12,6 +16,70 @@ has a matching git tag.
   (`tests/cm1/`, `tests/wofs/`, `tests/radar/`, `tests/example/`), so `pytest tests/wofs`
   runs one package's tests; the `tests/<package>-tests.txt` lists are gone.
   `tools/new_datatype.py` writes a new type's test into `tests/<name>/`.
+- **Figure workspace, new layout**: laid out as the viewer. A top bar (the runs, **Find**, New,
+  undo and redo, Auto-redraw, Redraw, Export), a tool rail (**Layout**, **Layers**, **Look**,
+  **Marks**, **Times**, **Runs**) with one drawer open at a time, and the preview with its time
+  slider. The tree and the inspector are gone: a switch at the top of the drawer (*Figure · All
+  plan views · Panel b · Layer*) says where a change goes and follows the panel clicked in the
+  preview. Every setting the old editor had is still there, at every level it could be set at,
+  drawn from one table of settings (a test checks none is lost). See [Figures](guide/figures.md#the-editor).
+  - **Find** is in the top bar: it opens the setting's tool at the panel picked (else the
+    figure), its section open and the setting marked; it reaches the runs' settings too.
+  - What a panel sets for itself is marked, with ↺ to take it back; a shared layer changed in a
+    panel offers *↺ Use the shared settings*. At the figure, and a kind's own settings at the
+    kind, a section counts what differs from a new figure, and its reset goes back to a new
+    figure's.
+  - Soundings, series, distributions, profiles, joint distributions, azimuthal means and
+    tables list their entries in Layers at the panel (add, move, copy, *In panel*, *One per
+    run*); a 3D scene's surfaces, floor, vectors, streamlines and parcels are in Layers too.
+    Sections are in Layers (all of them at *All cross-sections*, a panel's above its layers).
+  - Annotations, the contour key and the maximum and minimum marks are in **Marks**; one placed
+    by clicking opens there, one whose panels were all removed says so. A panel's area dragged,
+    or a new zoom inset dragged, opens Layout at it.
+  - The **Runs** tool lists each run's label, colour, time zero and storm track (the viewer's,
+    a track file found beside the run or typed, and the storm in it), how several runs line up,
+    adding and removing one.
+  - Changing the grid's rows or columns redraws the grid map and lists the panels set aside at
+    once. The Export dialog's image settings are the same table's as everything else.
+  - The Figures guide is rewritten for the new layout.
+  - Its accent is the viewer's cyan in place of amber: the mark on a setting a panel sets
+    for itself, the box dragged on the preview, its dots, and the outline of the
+    colour-vision preview.
+- **Figure workspace, grid first**: the grid is the editor. Headers above the preview's columns
+  and beside its rows name what each differs in (a run, a time, a height, a field); clicking one
+  picks that row or column, and an edit made there is written to each of its panels (its time,
+  look, titles, its share of the figure). Chips above the preview list the layers all plan views
+  share, each opening it. A dot marks a panel with changes of its own, listed in its Layers with
+  **Use the shared ones**. *What the grid varies* (Layout, at the figure) lists each row's and
+  column's value, editable in place. A plan view or cross-section added to a free cell starts as
+  a copy of the one beside it, at its own row's and column's run and time. See
+  [Rows and columns](guide/figures-panels.md#picking-a-row-or-a-column).
+- **Figure workspace, click a part of the preview**: clicking a panel's title, an axis label,
+  a row label, a panel label, a legend, a colorbar, or the figure's title or legend opens that
+  setting where it is set (its tool, the place that owns it, its section open, the setting
+  outlined), as Find does; the part under the mouse is outlined. A colorbar opens at the figure,
+  its row or column, or its panel, as its mode says; a shared one says which panels it serves and
+  whose colours it shows, with **Jump to** buttons for that panel's fill, all colorbars and the
+  panel's own colorbar settings. Clicking elsewhere in a panel still picks it, and the *Click*
+  list's placing still comes first. See [Figures](guide/figures.md#the-editor).
+- **The map's and the cross-section's layers on the figures' controls**: the Style drawer, More
+  fills, Contours and Vectors of the map and of the Cross-section tool are now the same
+  component as a figure's layers, from the same table of settings, so the names, ranges and
+  help match (*Drawn*, *Draw as*, *Contour intervals*, *Line width*, ...). Settings show only
+  where they apply: *Min* and *Max* when *Auto range* is off, *Contour intervals* for filled
+  contours, *Minus run* and *Minus time* with a difference, *Arrows across* or *Streamline
+  density* by the vectors' style (each keeps its value). Opacity and line width are number
+  boxes (steps of 0.05 and 0.25) where they were sliders. See [The map](guide/map.md#style-the-fill).
+- **Sessions keep the layers as they are drawn** (session FORMAT 3): the map's and the section's
+  layers are saved in a figure layer's own keys (`field`, `z`, `reverse`, `minus`, ...). Sessions
+  saved by 1.1.0 and earlier still open (read into the new form when loaded); a session saved
+  now does not open in 1.1.0.
+- **New figures start empty**: the Figure workspace opens on one plan view at the map's time
+  that draws nothing, and the New dialog's colour fill starts at *None*: what the panels show
+  is yours to add in the Layers tool. A fill chosen there is the panels' only layer (no
+  contours or vectors added with it); the first plan view or cross-section added to a figure
+  with no layers draws nothing either. Figures sent from the viewer's tools, templates, saved
+  figures and `atmo3d render` are as before.
 
 ## 1.1.0 (2026-11-20)
 

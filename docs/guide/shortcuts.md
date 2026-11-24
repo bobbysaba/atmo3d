@@ -70,8 +70,12 @@
 | Do | Result |
 |---|---|
 | ↶ ↷ | Undo and redo any change. |
+| Click a panel in the preview | Pick it: the open tool shows its settings. |
+| A tool on the rail | Open its drawer; again closes it. |
+| *Find a setting…* (top bar) | Open the tool and section of any setting. |
 | *Click …* list, then click the preview | Place an annotation, a section's A and B, or a point on a skew-T. |
 | Drag between two points | Place a two-point item (arrow, line, box). |
 | *Drag: move an annotation* | Move one by its text, marker, centre or end. |
 | *Drag a box: plan-view area* | Set the area the plan views show. |
+| *Drag: new zoom inset* | Make a zoom inset of the box dragged. |
 | **Actual size** | See the figure as large as it prints. |

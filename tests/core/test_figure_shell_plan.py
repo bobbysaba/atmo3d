@@ -1,6 +1,7 @@
-"""Plan views in the figure editor's new layout: what a shared edit and a panel's edit reach,
-overrides, moving layers, a panel's height, time zero, the Fill panels tool, the look settings,
-what stays open across undo, and the quick start."""
+"""Plan views in the figure editor: what a shared edit and a panel's edit reach, overrides,
+moving layers, a panel's height, time zero, the Fill panels tool, the look settings, what stays
+open across undo, and the quick start; on the demo run through the frame's tools
+(figures/ui)."""
 import copy
 import json
 import os
@@ -8,10 +9,12 @@ import os
 import numpy as np
 import pytest
 
-from conftest import fresh_shell, new_spec
+from conftest import at_tool, control, drawer_text, fresh_shell, new_spec, press, row_ctl
 
 from atmo3d.figures import draw as figdraw
-from atmo3d.figures.shell import docedit as de, looks
+from atmo3d.figures.schema.where import Where
+from atmo3d.figures.shell import docedit as de
+from atmo3d.figures.ui import actions
 
 
 def small():
@@ -385,67 +388,63 @@ def test_titles_of_rows_and_columns_go_on_top_and_left():
     assert "rowlabel" not in cells[(0, 1)]
 
 
-# ------------------------------------------------------------------ look at each scope
-class _St:
-    """A row of the settings table, enough for Scope."""
-
-    def __init__(self, key, default=None):
-        from atmo3d.figures.settings import RAW
-        self.key, self.default, self.as_ = key, default, RAW
+# ------------------------------------------------------------------ look at each level
+def _look(key):
+    from atmo3d.figures import schema as S
+    return S.row(f"look.{key}")
 
 
 def test_look_goes_to_the_style_the_kind_or_the_panel():
+    from atmo3d.figures.schema import where as W
     doc = small()
     doc["style"]["font"] = dict(size=10.0)
     doc["kinds"]["plan"] = dict(axes=dict(xlabel="x"))
-    figure, kind, one = looks.Scope(), looks.Scope("plan"), looks.Scope("plan", 1)
-    figure.write(doc, _St("font.size"), 12.0)
+    figure, kind, one = Where("figure"), Where("kind", "plan"), Where("panel", "plan", 1)
+    W.write(doc, _look("font.size"), figure, 12.0)
     assert doc["style"]["font"]["size"] == 12.0
-    kind.write(doc, _St("axes.xlabel"), "km")
+    W.write(doc, _look("axes.xlabel"), kind, "km")
     assert doc["kinds"]["plan"]["axes"]["xlabel"] == "km"
-    one.write(doc, _St("axes.xlabel"), "own")
+    W.write(doc, _look("axes.xlabel"), one, "own")
     assert panel(doc, 1)["opts"]["axes"]["xlabel"] == "own"
-    assert one.value(doc, _St("axes.xlabel")) == "own"
-    assert kind.value(doc, _St("axes.xlabel")) == "km"
-    assert looks.Scope("plan", 0).value(doc, _St("axes.xlabel")) == "km"
-    assert one.value(doc, _St("font.size")) == 12.0
+    assert W.value(doc, _look("axes.xlabel"), one) == "own"
+    assert W.value(doc, _look("axes.xlabel"), kind) == "km"
+    assert W.value(doc, _look("axes.xlabel"), Where("panel", "plan", 0)) == "km"
+    assert W.value(doc, _look("font.size"), one) == 12.0
 
 
 def test_look_of_a_kinds_block_from_the_figure_reaches_every_kind():
+    from atmo3d.figures.schema import where as W
     doc = small()
     doc["kinds"] = dict(plan=dict(axes={}), sounding=dict(axes={}))
-    looks.Scope().write(doc, _St("axes.title_bold"), False)
+    W.write(doc, _look("axes.title_bold"), Where("figure"), False)
     assert doc["kinds"]["sounding"]["axes"]["title_bold"] is False
     assert doc["kinds"]["plan"]["axes"]["title_bold"] is False
 
 
 def test_look_a_panels_own_goes_back():
+    from atmo3d.figures.schema import where as W
     doc = small()
-    one = looks.Scope("plan", 1)
-    one.write(doc, _St("axes.xlabel"), "own")
-    assert one.own_keys(doc, ["axes.xlabel", "axes.ylabel"]) == ["axes.xlabel"]
-    assert looks.panels_differ(doc, "plan", ["axes.xlabel"]) == {"b": ["axes.xlabel"]}
-    one.take_back(doc, "axes.xlabel")
+    one = Where("panel", "plan", 1)
+    W.write(doc, _look("axes.xlabel"), one, "own")
+    assert W.own(doc, _look("axes.xlabel"), one) and not W.own(doc, _look("axes.ylabel"), one)
+    assert not W.own(doc, _look("axes.xlabel"), Where("panel", "plan", 0))
+    W.take_back(doc, _look("axes.xlabel"), one)
     assert "opts" not in panel(doc, 1)
 
 
 def test_letters_set_by_hand_stop_following_the_panel_count():
+    from atmo3d.figures.schema import where as W
     doc = small()
     doc["style"]["letters"] = dict(on=True, auto=True)
-    looks.Scope().write(doc, _St("letters.on"), False)
+    W.write(doc, _look("letters.on"), Where("figure"), False)
     assert doc["style"]["letters"] == dict(on=False, auto=False)
 
 
-def test_every_section_named_has_rows_and_no_row_names_a_panel_by_place():
-    for sec in (*looks.FIGURE_SECTIONS, *looks.KIND_SECTIONS["plan"]):
-        rows = looks.rows_of(sec, ["plan"])
-        assert rows, sec
-        assert not {st.key for st in rows} & {"legend.panel", "legend.panels", "xsec.ztop"}
-    keys = {st.key for rows in [looks.rows_of(s, ["plan"]) for s in looks.PANEL_KEYS["plan"]]
-            for st in rows}
-    extras = {st.key for st in looks.EXTRA_ROWS}  # (a section's extras: the fixed box)
-    for wanted in looks.PANEL_KEYS["plan"].values():
-        assert set(wanted) <= keys | extras
+def test_every_section_of_a_plan_view_has_rows():
+    from atmo3d.figures import schema as S
+    for level in ("figure", "kind", "panel", "inset"):
+        for sec in S.sections(["plan"], level=level):
+            assert S.rows_of(sec, ["plan"], level=level), (level, sec)
 
 
 # ------------------------------------------------------------------ on the demo run
@@ -454,13 +453,6 @@ def test_every_section_named_has_rows_and_no_row_names_a_panel_by_place():
 @pytest.fixture
 def shell(shell_viewer):
     return fresh_shell(shell_viewer)
-
-
-def named(col, name):
-    for w in col.select():
-        if getattr(w, "name", None) == name and hasattr(w, "value"):
-            return w
-    raise AssertionError(f"no {name}")
 
 
 def in_panel_doc(shell, pid):
@@ -476,16 +468,18 @@ def own_bars(shell):
     shell._take(d)
 
 
+def first_shared(shell):
+    return de.shared_ids(shell.doc, "plan")[0]
+
+
 def test_all_plan_views_edits_the_shared_layer_and_a_panel_its_override(shell):
     own_bars(shell)
-    lid = next(iter(shell.doc["layers"]))
-    shell.select("kind:plan")
-    named(shell.inspector.body, "Min").value = 5.0
+    lid = first_shared(shell)
+    control(shell, "Min", "layers", "kind:plan").value = 5.0
     assert shell.doc["layers"][lid]["vmin"] == 5.0
     assert in_panel_doc(shell, 1)["layers"][0]["over"] == {}
-    shell.select("layer:1:0")
-    assert "panel b only" in shell.inspector.head.object
-    box = named(shell.inspector.body, "Min")
+    box = control(shell, "Min", "layers", "layer:1:0")
+    assert "panel b only" in shell.frame.levels.said.object
     assert box.value == 5.0
     box.value = 10.0
     assert in_panel_doc(shell, 1)["layers"][0]["over"] == dict(vmin=10.0)
@@ -495,55 +489,51 @@ def test_all_plan_views_edits_the_shared_layer_and_a_panel_its_override(shell):
 
 def test_changing_a_setting_writes_only_that_setting(shell):
     own_bars(shell)
-    shell.select("layer:2:0")
-    named(shell.inspector.body, "Max").value = 33.0
+    control(shell, "Max", "layers", "layer:2:0").value = 33.0
     assert in_panel_doc(shell, 2)["layers"][0]["over"] == dict(vmax=33.0)  # (no other key)
-    shell.select("kind:plan")
     before = copy.deepcopy(shell.doc["layers"])
-    named(shell.inspector.body, "Max").value = 44.0
-    lid = next(iter(before))
+    control(shell, "Max", "layers", "kind:plan").value = 44.0
+    lid = first_shared(shell)
     before[lid]["vmax"] = 44.0
     assert shell.doc["layers"] == before
 
 
 def test_a_shared_edit_says_who_differs_and_all_as_shared_clears_them(shell):
     own_bars(shell)
-    shell.select("layer:1:0")
-    named(shell.inspector.body, "Max").value = 33.0
-    shell.select("kind:plan")
-    words = " ".join(str(getattr(o, "object", "")) for o in shell.inspector.body.select())
-    assert "1 panel differs (b)" in words
-    next(w for w in shell.inspector.body.select()
-         if getattr(w, "name", "") == "↺ All as shared").clicks += 1
+    control(shell, "Max", "layers", "layer:1:0").value = 33.0
+    at_tool(shell, "layers", "kind:plan")
+    assert "1 panel differs (b)" in drawer_text(shell)
+    press(shell, "↺ All as shared")
     assert in_panel_doc(shell, 1)["layers"][0]["over"] == {}
-    words = " ".join(str(getattr(o, "object", "")) for o in shell.inspector.body.select())
-    assert "differs" not in words
+    at_tool(shell, "layers")
+    assert "differs" not in drawer_text(shell)
 
 
 def test_an_override_is_marked_and_taken_back_one_by_one(shell):
     own_bars(shell)
-    shell.select("layer:1:0")
-    named(shell.inspector.body, "Max").value = 33.0
-    named(shell.inspector.body, "Min").value = 3.0
-    box = named(shell.inspector.body, "Max")
-    assert "box-shadow" in box.styles
-    chips = [w.name for w in shell.inspector.body.select()
-             if str(getattr(w, "name", "")).startswith("↺")]
-    assert set(chips) == {"↺ Max", "↺ Min", "↺ All"}
-    next(w for w in shell.inspector.body.select() if getattr(w, "name", "") == "↺ Max").clicks += 1
+    at_tool(shell, "layers", "layer:1:0")
+    vmax, back_max = row_ctl(shell, "layer.vmax~fill")
+    vmin, back_min = row_ctl(shell, "layer.vmin~fill")
+    vmax.widget.value = 33.0
+    vmin.widget.value = 3.0
+    assert "box-shadow" in vmax.widget.styles and back_max.visible and back_min.visible
+    assert any(b.name == "↺ Use the shared settings" and b.visible
+               for b in shell.frame.body.select() if hasattr(b, "clicks"))
+    back_max.clicks += 1
     assert in_panel_doc(shell, 1)["layers"][0]["over"] == dict(vmin=3.0)
-    assert named(shell.inspector.body, "Max").value == shell.doc["layers"]["l0"]["vmax"]
+    assert row_ctl(shell, "layer.vmax~fill")[0].get() == shell.doc["layers"]["l0"]["vmax"]
 
 
-def test_a_layer_copied_added_moved_removed_from_all_plan_views(shell):
-    shell.select("kind:plan")
-    plan = shell.inspector.plan
+def test_a_layer_added_from_all_plan_views_reaches_every_panel(shell):
+    import panel as pn
+    fr = at_tool(shell, "layers", "kind:plan")
     n = len(shell.doc["layers"])
-    plan.add_shared("contour")
+    menu = next(w for w in fr.body.select(pn.widgets.MenuButton) if "Add a layer" in w.name)
+    menu.clicked = "contour"
     assert len(shell.doc["layers"]) == n + 1
     new = list(shell.doc["layers"])[-1]
     assert all(p["layers"][-1]["ref"] == new for p in shell.doc["panels"])
-    assert shell.inspector.folds[f"s:{new}"] is True  # (open)
+    assert fr.folds[f"s:{new}"] is True  # (open)
     assert shell.node == "kind:plan"
     shell.undo()
     assert new not in shell.doc["layers"]
@@ -552,88 +542,91 @@ def test_a_layer_copied_added_moved_removed_from_all_plan_views(shell):
 
 def test_in_panels_buttons(shell):
     from panel.widgets import CheckButtonGroup
-    shell.select("kind:plan")
-    pick = next(w for w in shell.inspector.body.select() if isinstance(w, CheckButtonGroup))
-    assert pick.value == [p["id"] for p in sorted(shell.doc["panels"], key=lambda p: p["id"])]
+    fr = at_tool(shell, "layers", "kind:plan")
+    pick = next(w for w in fr.body.select() if isinstance(w, CheckButtonGroup))
+    assert sorted(pick.value) == sorted(p["id"] for p in shell.doc["panels"])
     pick.value = [i for i in pick.value if i != 3]
     assert in_panel_doc(shell, 3)["layers"][0]["over"]["on"] is False
     assert "Could not draw" not in shell.status.object
 
 
 def test_a_panels_run_time_and_height(shell):
-    shell.select("panel:1")
-    body = shell.inspector.body
-    time = named(body, "Time")
+    time = control(shell, "Time", "times", "panel:1")
     other = next(t for t in time.options.values() if t != time.value)
     time.value = other
     assert in_panel_doc(shell, 1)["time_s"] == other
-    named(shell.inspector.body, "Own height (blank: its layers')").value = "4"
+    control(shell, "Own height (blank: its layers')", "layout", "panel:1").value = 4.0
     pan = in_panel_doc(shell, 1)
     assert pan["z"] == 4.0
     assert figdraw.panel_layers(shell.doc, pan)[0][1]["z"] == 4.0
-    named(shell.inspector.body, "Own height (blank: its layers')").value = ""
+    control(shell, "Own height (blank: its layers')", "layout").value = None
     assert "z" not in in_panel_doc(shell, 1)
     assert "Could not draw" not in shell.status.object
 
 
 def test_a_layer_of_this_panel_alone(shell):
-    shell.select("panel:2")
+    import panel as pn
+    fr = at_tool(shell, "layers", "panel:2")
     n = len(in_panel_doc(shell, 2)["layers"])
-    shell.inspector.plan.add_own(2, "shade")
+    menu = next(w for w in fr.body.select(pn.widgets.MenuButton)
+                if w.name == "+ Add a layer to this panel")
+    menu.clicked = "shade"
     pan = in_panel_doc(shell, 2)
     assert len(pan["layers"]) == n + 1 and "ref" not in pan["layers"][-1]
     assert len(in_panel_doc(shell, 1)["layers"]) == n
+    assert fr.folds[f"p:2:{n}"] is True  # (open)
     assert "Could not draw" not in shell.status.object
 
 
 def test_a_layers_own_time_in_a_panel(shell):
-    shell.select("layer:1:0")
-    time = named(shell.inspector.body, "Time")
+    time = control(shell, "Time", "layers", "layer:1:0")
     assert time.value == ""
     pick = next(v for v in time.options.values() if v != "")
     time.value = pick
     assert in_panel_doc(shell, 1)["layers"][0]["over"]["time_s"] == pick
-    time.value = ""
+    control(shell, "Time", "layers").value = ""
     assert "time_s" not in in_panel_doc(shell, 1)["layers"][0]["over"]
 
 
 def test_what_is_open_stays_open_across_undo_and_redo(shell):
-    shell.select("kind:plan")
-    ins = shell.inspector
-    first, second = list(shell.doc["layers"])[:2]
-    assert ins.folds.get(f"s:{first}") is None
-    named(ins.body, "Max").value = 44.0
-    row_open = [w for w in ins.body.select() if getattr(w, "name", "") == "Min"]
-    assert row_open  # (the first starts open)
-    ins.folds[f"s:{first}"] = False
-    ins.folds[f"s:{second}"] = True
-    ins.show("kind:plan")
-    named(ins.body, "Levels (e.g. 10, 20 or -6:6:2)").value = "1, 2"
+    import panel as pn
+    fr = at_tool(shell, "layers", "kind:plan")
+    first, second = de.shared_ids(shell.doc, "plan")[:2]
+
+    def folded():
+        return {c.title.split(". ", 1)[0]: c.collapsed for c in fr.body.objects
+                if isinstance(c, pn.Card) and c.title[:2] in ("1.", "2.")}
+
+    fr.folds[f"s:{first}"] = False
+    fr.folds[f"s:{second}"] = True
+    fr.show("kind:plan")
+    assert folded() == {"1": True, "2": False}
+    levels, _ = row_ctl(shell, "layer.levels", Where("kind", "plan", layer=second))
+    levels.widget.value = "1, 2"
     shell.undo()
-    assert [w for w in ins.body.select()
-            if getattr(w, "name", "") == "Levels (e.g. 10, 20 or -6:6:2)"]
-    assert not [w for w in ins.body.select() if getattr(w, "name", "") == "Min"]
+    assert folded() == {"1": True, "2": False}
     shell.redo()
-    assert named(ins.body, "Levels (e.g. 10, 20 or -6:6:2)").value == "1, 2"
+    assert shell.doc["layers"][second]["levels"] in ("1, 2", [1.0, 2.0])
+    assert row_ctl(shell, "layer.levels", Where("kind", "plan", layer=second))[0].get() \
+        == levels.get()
 
 
-def test_a_cards_section_left_open_stays_open(shell):
+def test_a_section_left_open_stays_open(shell):
     own_bars(shell)
-    shell.select("layer:1:0")
-    ins = shell.inspector
-    sec = next(w for w in ins.body.select() if getattr(w, "title", "") == "Difference")
-    sec.collapsed = False
-    named(ins.body, "Max").value = 33.0
+    fr = at_tool(shell, "layers", "layer:1:0")
+    sec = next(s for d in fr.drawers for s in d.sections if s.title.startswith("Difference"))
+    sec.card.collapsed = False
+    control(shell, "Max", "layers").value = 33.0
     shell.undo()
-    assert not next(w for w in ins.body.select()
-                    if getattr(w, "title", "") == "Difference").collapsed
+    sec = next(s for d in fr.drawers for s in d.sections if s.title.startswith("Difference"))
+    assert not sec.card.collapsed
 
 
 def test_fill_panels_tool(shell):
-    ins = shell.inspector
-    ins.folds["fill"] = True
-    ins.show("figure")
-    f = ins.plan.widgets
+    fr = shell.frame
+    fr.folds["fill"] = True
+    at_tool(shell, "layout", "figure")
+    f = fr.fill_ws
     assert (f["rows"].value, f["cols"].value, f["col_dim"].value) == (2, 3, "times")
     f["rows"].value, f["cols"].value = 1, 3
     f["every"].value = 2
@@ -643,8 +636,8 @@ def test_fill_panels_tool(shell):
     assert times == sorted(times)
     assert "3 panels" in shell.status.object and "Could not draw" not in shell.status.object
     assert shell.doc["size"][1] < 6.0  # (the height followed)
-    assert ins.size_ws[1].value == shell.doc["size"][1]
-    words = " ".join(str(getattr(o, "object", "")) for o in ins.body.select())
+    assert list(row_ctl(shell, "size")[0].get()) == list(shell.doc["size"])
+    words = drawer_text(shell)
     assert "3 panels filled" in words and "Undo brings them back" in words
     shell.undo()
     assert len(shell.doc["panels"]) == 6 and shell.doc["grid"]["rows"] == 2
@@ -697,55 +690,36 @@ def test_the_quick_start_sits_outside_the_new_layout(shell):
     assert any(o is quick for o in shell.v.fig_ws.objects)
 
 
-def test_look_sections_open_when_asked_and_write_at_their_scope(shell):
-    ins = shell.inspector
-    ins.folds["look:None:None:Text"] = True
-    ins.show("figure")
-    box = named(ins.body, shell.ed.fsize.name)
-    assert box is not shell.ed.fsize
+def test_look_writes_at_the_place_picked(shell):
+    box = control(shell, "Base size (pt)", "look", "figure")
     box.value = 14.0
     assert shell.doc["style"]["font"]["size"] == 14.0
-    assert shell.ed.fsize.value != 14.0  # (the old editor's stays as it is)
     assert "Could not draw" not in shell.status.object
-    ins.folds["look:None:plan:Axes and ticks"] = True
-    ins.show("kind:plan")
-    named(ins.body, shell.ed.xlabel.name).value = "east (km)"
+    control(shell, "x label", "look", "kind:plan").value = "east (km)"
     assert shell.doc["kinds"]["plan"]["axes"]["xlabel"] == "east (km)"
-    ins.folds["look:2:plan:Axes and ticks"] = True
-    shell.select("panel:2")
-    named(ins.body, shell.ed.xlabel.name).value = "own"
+    control(shell, "x label", "look", "panel:2").value = "own"
     assert in_panel_doc(shell, 2)["opts"]["axes"]["xlabel"] == "own"
-    shell.select("kind:plan")
-    words = " ".join(str(getattr(o, "object", "")) for o in ins.body.select())
-    assert "Set in a panel alone" in words
-    shell.select("panel:2")
-    chip = next(w for w in ins.body.select()
-                if str(getattr(w, "name", "")).startswith("↺ x label"))
-    chip.clicks += 1
+    at_tool(shell, "look", "kind:plan")
+    assert "Set in a panel alone, so changes here skip it: panel c." in drawer_text(shell)
+    at_tool(shell, "look", "panel:2")
+    row_ctl(shell, "look.axes.xlabel")[1].clicks += 1
     assert "opts" not in in_panel_doc(shell, 2)
 
 
 def test_area_of_all_plan_views(shell):
-    ins = shell.inspector
-    ins.folds["look:None:plan:Area"] = True
-    ins.show("kind:plan")
-    named(ins.body, "x min (km)")
-    named(ins.body, shell.ed.dom.name).value = "full"
+    control(shell, "Plan-view area", "layout", "kind:plan").value = "full"
     assert shell.doc["kinds"]["plan"]["domain"]["mode"] == "full"
     assert "Could not draw" not in shell.status.object
 
 
-def test_time_zero_from_the_runs_node_keeps_panels_lined_up(shell, demo_run):
+def test_time_zero_from_the_runs_tool_keeps_panels_lined_up(shell, demo_run):
     other = os.path.join(os.path.dirname(demo_run), "supercell_weak")
     shell.select("runs")
     shell.add_run(other)
     rid = shell.doc["runs"][1]["id"]
     in_panel_doc(shell, 1)["run"] = rid
     before = in_panel_doc(shell, 1)["time_s"]
-    shell.inspector.show("runs")
-    boxes = [w for w in shell.inspector.body.select()
-             if getattr(w, "name", "") == "Time zero (min)"]
-    boxes[1].value = 5.0
+    control(shell, "Time zero (min)", "runs", n=1).value = 5.0
     assert in_panel_doc(shell, 1)["time_s"] == before + 300.0
     assert in_panel_doc(shell, 0)["time_s"] != before + 300.0
     shell.undo()
@@ -755,14 +729,14 @@ def test_time_zero_from_the_runs_node_keeps_panels_lined_up(shell, demo_run):
 def test_runs_lined_up_by_output_number(shell, demo_run):
     other = os.path.join(os.path.dirname(demo_run), "supercell_weak")
     shell.add_run(other, node="runs")
-    match = named(shell.inspector.body, shell.ed.time_match.name)
-    match.value = "output"
+    control(shell, "Line runs up by", "runs").value = "output"
     assert shell.doc["style"]["time_match"] == "output"
     assert all(r.get("outputs_s") for r in shell.doc["runs"])
-    boxes = [w for w in shell.inspector.body.select()
+    at_tool(shell, "runs")
+    boxes = [w for w in shell.frame.body.select()
              if getattr(w, "name", "") == "Time zero (min)"]
     assert [b.disabled for b in boxes] == [False, True]
-    named(shell.inspector.body, shell.ed.time_match.name).value = "time"
+    control(shell, "Line runs up by").value = "time"
     assert "time_match" not in shell.doc["style"]
     assert not any(r.get("outputs_s") for r in shell.doc["runs"])
 
@@ -782,12 +756,17 @@ def test_copy_a_shared_layers_look(shell):
     a, b = ids[0], ids[1]
     was = doc["layers"][b]
     assert doc["layers"][a]["type"] != was["type"]
-    plan = shell.inspector.panes["plan"]
-    plan.copy_look(a, [b])  # (another type: nothing)
+    actions.copy_look(shell, a, [b])  # (another type: nothing)
     assert doc["layers"][b] == was
     lid = de.add_shared(doc, "plan", dict(doc["layers"][a], cmap="viridis"))
-    plan.copy_look(a, [lid])
+    at_tool(shell, "layers", "kind:plan")
+    card = next(c for c in shell.frame.body.objects if getattr(c, "title", "") ==
+                "Copy a layer's look")
+    card.collapsed = False
+    src = next(w for w in card.select() if getattr(w, "name", "") == "Copy the look of")
+    to = next(w for w in card.select() if getattr(w, "name", "") == "To layers")
+    src.value, to.value = a, [lid]
+    next(w for w in card.select() if getattr(w, "name", "") == "Copy").clicks += 1
     assert shell.doc["layers"][lid]["cmap"] == shell.doc["layers"][a]["cmap"]
     shell.undo()
     assert shell.doc["layers"][lid]["cmap"] == "viridis"
-

@@ -19,7 +19,8 @@ group: **More fills**, **Contours** and **Vectors**.
 | **Style ▾** | The fill's look (below). |
 
 Each ▾ pill opens its controls in a drawer under the toolbar; click the pill again to
-close it. A pill names what is in it: a drawer with one layer on says which field and
+close it. A layer's controls are the same ones, with the same names, as a figure layer's
+([Figure layers](figures-layers.md)): a setting learnt in one is found in the other. A pill names what is in it: a drawer with one layer on says which field and
 level (*Contours · w 3 km*); with several on it gives the count (*Vectors · 2*).
 
 ### Level modes
@@ -35,9 +36,9 @@ level (*Contours · w 3 km*); with several on it gives the count (*Vectors · 2*
 
 ### Style (the fill)
 
-- **Pixels** draw each grid cell as it is; **Filled contours** draw bands with
-  *Contour intervals* (4 to 30, default 15). Pixels are faster to redraw and show the
-  data without smoothing.
+- **Draw as**: *Pixels* draw each grid cell as it is; *Filled contours* draw bands, with
+  *Contour intervals* (4 to 30, default 15; shown for filled contours only). Pixels are
+  faster to redraw and show the data without smoothing.
 - **Colormap**, with **Reverse**. The list holds `reflectivity` (the stepped NWS-style
   radar colours, below 5 dBZ transparent), perceptual maps (`viridis`, `turbo`, `magma`,
   `cividis`, …), diverging maps (`RdBu_r`, `PuOr_r`, `BrBG`, `coolwarm`, `seismic`,
@@ -46,9 +47,9 @@ level (*Contours · w 3 km*); with several on it gives the count (*Vectors · 2*
 - **Auto range** picks the colour range. A field with a fixed range in its definition
   (θ′ is ±6 K, for example) keeps it. Otherwise the range runs from the 0.5th to the
   99.5th percentile of the values in the picture, and for a diverging field it is
-  symmetric about zero (±the 99.5th percentile of the absolute value). Untick it to type
-  your own **Min** and **Max**; the boxes start from the range last drawn.
-- **Opacity** from 0.1 to 1, to see the layers below through the fill.
+  symmetric about zero (±the 99.5th percentile of the absolute value). Untick it and
+  **Min** and **Max** appear, starting from the range last drawn, to type your own.
+- **Opacity** from 0.1 to 1 (steps of 0.05), to see the layers below through the fill.
 - **Difference: minus another time or run** draws the fill minus the same field (and
   level) at another time and/or in another run: *Minus time* is the shown time, **the
   output before** it (a change over one output interval) or a fixed time; *Minus run* is
@@ -70,7 +71,7 @@ level (*Contours · w 3 km*); with several on it gives the count (*Vectors · 2*
 *More fills* draws up to three further fills over the first, one row each, with a
 colorbar of its own for each. Use them to show two fields at once without hiding the
 first, e.g. reflectivity with updraft ≥ 5 m/s on top. *Add fill* adds a row; ✕ removes
-one; the checkbox at the start of a row switches it on and off without losing its settings.
+one; a row's **Drawn** box switches it on and off without losing its settings.
 
 A row has the field and level (as in the toolbar), *Draw as* (pixels or filled contours),
 colormap, *Reverse*, *Auto range*, *Min* and *Max*, and *Opacity* (default 0.7). **Clear
@@ -97,7 +98,7 @@ The first row starts as w at 3 km with levels `5, 15, 25`. The second you add st
 ## Vectors
 
 *Vectors* draws arrows or streamlines, up to three layers. The first row starts off (tick
-its checkbox to show it); the others you add start on.
+its **Drawn** box to show it); the others you add start on.
 
 | Setting | Meaning |
 |---|---|
@@ -105,7 +106,8 @@ its checkbox to show it); the others you add start on.
 | **Height (km AGL)** | The height of the plane, in steps of 0.05. |
 | **Frame** | Wind only: *Ground-relative*, *Grid-relative* or *Storm-relative*. Grid-relative is what CM1 writes; the others add back `umove`/`vmove` (and subtract the storm motion for storm-relative). Storm-relative uses the *Storm motion* chosen in the Sounding panel ([Soundings](soundings.md)). It starts as grid-relative when the run has `umove`/`vmove`, else ground-relative. |
 | **Draw as** | *Arrows*, or *Streamlines* (instantaneous lines through the plane's flow, with an arrowhead on each). |
-| **Arrows across** | How many arrows fit across the view (8 to 50, default 24). With streamlines this becomes *Streamline density*: higher puts the lines closer together. |
+| **Arrows across** | How many arrows fit across the view (8 to 50, default 24). |
+| **Streamline density** | With streamlines, in place of *Arrows across* (8 to 50, default 24): higher puts the lines closer together. Each keeps its own value when you switch between arrows and streamlines. |
 | **Ref. arrow** | The magnitude drawn one arrow spacing long, in the vector's units (m/s, 1/s or 10⁻⁴ s⁻²). Picking another vector resets it to a typical value (20 m/s for the wind, 0.02 1/s for the vorticity, 1 for the baroclinic generation). Not used for streamlines. |
 | Color | The arrow or line colour. |
 

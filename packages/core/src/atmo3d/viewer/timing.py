@@ -269,18 +269,18 @@ class Timing:
                 x0, x1, y0, y1 = v.view
                 X0, X1, Y0, Y1 = v.extent
                 zoom = max((X1 - X0) / max(x1 - x0, 1e-9), (Y1 - Y0) / max(y1 - y0, 1e-9))
-                nov = sum(o["on"].value for o in v.ovs)
-                nvec = sum(o["on"].value for o in v.vecs)
-                nfill = sum(o["on"].value for o in v.fills)
+                nov = sum(bool(o["on"]) for o in v.ovs)
+                nvec = sum(bool(o["on"]) for o in v.vecs)
+                nfill = sum(bool(o["on"]) for o in v.fills)
                 return dict(field=v._fill_name(), level=f"{v.fill_mode.value} "
-                            f"{v.fill_lvl.value:g}", style=v.fill_style.value,
+                            f"{v.fill_lvl.value:g}", style=v.map_fill["style"],
                             fills=nfill, contours=nov, vectors=nvec, zoom=round(zoom, 2))
             if view == "snd":
                 return dict(points=len(v.points))
             if view == "xs":
                 return dict(field=v.xs_fill.value,
-                            contours=sum(o["on"].value for o in v.xs_ovs),
-                            vectors=sum(o["on"].value for o in v.xs_vecs))
+                            contours=sum(bool(o["on"]) for o in v.xs_ovs),
+                            vectors=sum(bool(o["on"]) for o in v.xs_vecs))
             if view == "3d":
                 return dict(isosurfaces=sum(o["on"].value for o in v.isos),
                             streamlines=bool(v.st_on.value))

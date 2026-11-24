@@ -6,11 +6,11 @@ import time
 
 import pytest
 
-from conftest import fresh_shell
+from conftest import at_tool, control, drawer_text, every_node, fresh_shell, press
 
 from atmo3d.figures import spec as fg
-from atmo3d.figures.shell import docedit as de, looks, nodes
-from atmo3d.figures.shell.gridview import ADDABLE
+from atmo3d.figures.shell import docedit as de, nodes
+from atmo3d.figures.ui.grid import ADDABLE
 
 
 def series(run="r0", **more):
@@ -248,21 +248,19 @@ def test_a_figure_of_series_has_an_automatic_size_for_its_grid():
 
 # ------------------------------------------------------------------ look rows
 def test_a_cross_sections_height_is_its_own():
-    keys = {st.key for st in looks.rows_of("Area", ["xsec"])}
-    assert {"xsec.ztop", "xsec.coords"} <= keys and "domain.mode" not in keys
-    assert not {st.key for st in looks.rows_of("Area", ["plan"])} & {"xsec.ztop", "xsec.coords"}
-
-
-@pytest.mark.parametrize("kind", ["xsec", "th", "line"])
-def test_every_panel_key_is_a_row(kind):
-    rows = {st.key for sec in looks.PANEL_KEYS[kind]
-            for st in looks.rows_of(sec, [kind], looks.PANEL_KEYS[kind][sec])}
-    assert rows and rows <= {k for keys in looks.PANEL_KEYS[kind].values() for k in keys}
+    from atmo3d.figures import schema as S
+    keys = {r.key for r in S.rows_of("Height and x axis", ["xsec"], level="panel")}
+    assert keys == {"look.xsec.ztop", "look.xsec.coords"}
+    plan = {r.key for sec in S.sections(["plan"], level="panel")
+            for r in S.rows_of(sec, ["plan"], level="panel")}
+    assert not plan & keys
 
 
 def test_a_time_series_has_its_own_panel_legend():
-    keys = {st.key for st in looks.rows_of("Legend in the panel", ["line"])}
-    assert keys == {"ts.legend", "ts.legend_loc", "ts.legend_ncol", "ts.legend_frame"}
+    from atmo3d.figures import schema as S
+    keys = {r.key for r in S.rows_of("Legend in the panel", ["line"])}
+    assert keys == {"look.ts.legend", "look.ts.legend_loc", "look.ts.legend_ncol",
+                    "look.ts.legend_frame"}
 
 
 # ------------------------------------------------------------------ the panes, by their widgets
@@ -275,14 +273,17 @@ def shell(shell_viewer):
 
 
 def _named(shell, name):
-    for w in shell.inspector.body.select():
+    """A control of the frame's drawer (its Layers tool's, unless another is open)."""
+    at_tool(shell, shell.frame.tool or "layers")
+    for w in shell.frame.body.select():
         if getattr(w, "name", None) == name and hasattr(w, "value"):
             return w
     raise AssertionError(f"no {name}")
 
 
 def _click(shell, name):
-    for w in shell.inspector.body.select():
+    at_tool(shell, shell.frame.tool or "layers")
+    for w in shell.frame.body.select():
         if getattr(w, "name", None) == name and hasattr(w, "clicks"):
             w.clicks += 1
             return
@@ -303,9 +304,9 @@ def test_these_kinds_can_be_added_to_any_figure():
 
 
 def test_a_cross_section_joins_plan_views_and_edits_its_section(shell):
-    p = shell.inspector.grid.add_panel("xsec", "new column")
+    p = shell.grid.add_panel("xsec", "new column")
     assert shell.node == f"panel:{p['id']}" and "Could not draw" not in _drew(shell)
-    _named(shell, "Half-length (km)").value = 5.0
+    control(shell, "Half-length (km)", "layers").value = 5.0
     assert shell.doc["sections"][p["section"]]["half"] == 5.0
     _drew(shell)
     shell.undo()
@@ -313,53 +314,80 @@ def test_a_cross_section_joins_plan_views_and_edits_its_section(shell):
 
 
 def test_a_cross_section_keeps_a_layer_apart_from_plan_views(shell):
-    p = shell.inspector.grid.add_panel("xsec", "new column")
-    shell.select("kind:xsec")
+    p = shell.grid.add_panel("xsec", "new column")
     was = p["layers"][0]["ref"]
-    _click(shell, "Keep apart")
+    at_tool(shell, "layers", "kind:xsec")
+    press(shell, "Keep apart")
     assert de.panel_by_id(shell.doc, p["id"])["layers"][0]["ref"] != was
     assert de.panels_of(shell.doc, "plan")[0]["layers"][0]["ref"] == was
 
 
 def test_a_copied_cross_section_says_it_shares_and_can_part(shell):
-    p = shell.inspector.grid.add_panel("xsec", "new column")
-    c = shell.inspector.grid.copy_panel(p["id"])
+    p = shell.grid.add_panel("xsec", "new column")
+    c = shell.grid.copy_panel(p["id"])
     assert c["section"] == p["section"]
-    _click(shell, "Keep apart")
+    at_tool(shell, "layers", f"panel:{c['id']}")
+    assert "show this section too" in drawer_text(shell) or "shows this section too" in \
+        drawer_text(shell)
+    press(shell, "Keep apart")
     assert de.panel_by_id(shell.doc, c["id"])["section"] != p["section"]
 
 
 def test_a_cross_section_height_is_set_for_all_and_for_one(shell):
-    p = shell.inspector.grid.add_panel("xsec", "new column")
-    shell.select("kind:xsec")
-    next(c for c in shell.inspector.body.select() if getattr(c, "title", "") ==
-         "Height and x axis").collapsed = False
-    _named(shell, "Top (km)").value = 8.0
+    p = shell.grid.add_panel("xsec", "new column")
+    control(shell, "Top (km)", "look", "kind:xsec").value = 8.0
     assert shell.doc["kinds"]["xsec"]["xsec"]["ztop"] == 8.0
-    shell.select(f"panel:{p['id']}")
-    next(c for c in shell.inspector.body.select() if getattr(c, "title", "") ==
-         "Height and x axis").collapsed = False
-    _named(shell, "Top (km)").value = 4.0
+    control(shell, "Top (km)", "look", f"panel:{p['id']}").value = 4.0
     assert de.panel_by_id(shell.doc, p["id"])["opts"]["xsec"]["ztop"] == 4.0
     _drew(shell)
 
 
-def test_a_time_height_panel_starts_empty_and_takes_a_series(shell):
-    p = shell.inspector.grid.add_panel("th", "new column")
-    assert p["layers"] == [] and "Could not draw" not in _drew(shell)
-    _click(shell, "+ Series")
-    q = de.panel_by_id(shell.doc, p["id"])
-    assert q["layers"][0]["type"] == "series" and q["run"] == q["layers"][0]["runs"][0]
+def test_a_cross_section_per_run_and_a_new_section_of_its_own(shell, demo_run):
+    import os
+    p = shell.grid.add_panel("xsec", "new column")
+    shell.add_run(os.path.join(os.path.dirname(demo_run), "supercell_weak"),
+                  node=f"panel:{p['id']}")
+    at_tool(shell, "layout", f"panel:{p['id']}")
+    n = len(shell.doc["panels"])
+    press(shell, "One per run")
+    assert len(shell.doc["panels"]) == n + 1
+    other = shell.doc["panels"][-1]
+    assert other["kind"] == "xsec" and other["run"] != p["run"]
+    secs, was = len(shell.doc["sections"]), p["section"]
+    at_tool(shell, "layers", f"panel:{p['id']}")
+    press(shell, "+ Section")
+    assert len(shell.doc["sections"]) == secs + 1
+    assert de.panel_by_id(shell.doc, p["id"])["section"] not in (was, None)
     _drew(shell)
 
 
+def test_all_cross_sections_list_the_sections(shell):
+    p = shell.grid.add_panel("xsec", "new column")
+    at_tool(shell, "layers", "kind:xsec")
+    assert "Cross-section panels" in drawer_text(shell)
+    n = len(shell.doc["sections"])
+    press(shell, "+ Section")
+    assert len(shell.doc["sections"]) == n + 1
+    new = list(shell.doc["sections"])[-1]
+    assert shell.frame.folds[f"sec:{new}"] is True
+    fr = at_tool(shell, "layers")
+    assert "No cross-section shows it" in drawer_text(shell)
+    import panel as pn
+    card = next(c for c in fr.body.objects if isinstance(c, pn.Card) and
+                "No cross-section shows it" in " ".join(str(o.object) for o in
+                                                         c.select(pn.pane.HTML)))
+    next(b for b in card.select(pn.widgets.Button) if b.name == "✕").clicks += 1
+    assert new not in shell.doc["sections"] and p["section"] in shell.doc["sections"]
+
+
 def test_a_time_series_panel_takes_a_series_and_your_data(shell):
-    p = shell.inspector.grid.add_panel("line", "new column")
+    p = shell.grid.add_panel("line", "new column")
     _click(shell, "+ Series")
     _click(shell, "+ Your data")
     q = de.panel_by_id(shell.doc, p["id"])
     assert q["layers"][0]["runs"] is None and q["layers"][1]["source"] == "table"
-    box = next(w for w in shell.inspector.body.select()
+    at_tool(shell, "layers")
+    box = next(w for w in shell.frame.body.select()
                if str(getattr(w, "name", "")).startswith("Your data: time"))
     box.value = "time_min,rain (mm)\n0,1\n30,5\n"
     q = de.panel_by_id(shell.doc, p["id"])
@@ -368,9 +396,10 @@ def test_a_time_series_panel_takes_a_series_and_your_data(shell):
 
 
 def test_a_series_moves_to_another_panel(shell):
-    a = shell.inspector.grid.add_panel("line", "new column")
+    a = shell.grid.add_panel("line", "new column")
+    at_tool(shell, "layers")
     _click(shell, "+ Series")
-    b = shell.inspector.grid.add_panel("line", "new row")
+    b = shell.grid.add_panel("line", "new row")
     shell.select(f"layer:{a['id']}:0")
     _named(shell, "In panel").value = b["id"]
     assert not de.panel_by_id(shell.doc, a["id"])["layers"]
@@ -379,11 +408,30 @@ def test_a_series_moves_to_another_panel(shell):
 
 def test_every_node_of_these_kinds_shows(shell):
     for kind in ("xsec", "th", "line"):
-        p = shell.inspector.grid.add_panel(kind)
+        p = shell.grid.add_panel(kind)
         if kind != "xsec":
             _click(shell, "+ Series")
         assert p["id"] in nodes.letters(shell.doc)
     _drew(shell)
-    for row in shell.tree.items:
-        shell.select(row["id"])
-        assert shell.inspector.body.objects, row["id"]
+    for tool in ("layout", "layers", "look", "times"):
+        for node in every_node(shell.doc):
+            at_tool(shell, tool, node)
+            assert shell.frame.body.objects, node
+            assert "Could not show" not in drawer_text(shell), (tool, node)
+
+
+def test_a_time_height_panel_has_one_series_with_no_copy(shell, demo_run):
+    import os
+    p = shell.grid.add_panel("th", "new column")
+    at_tool(shell, "layers")
+    assert "Nothing is computed until there is one" in drawer_text(shell)
+    _click(shell, "+ Series")
+    q = de.panel_by_id(shell.doc, p["id"])
+    assert len(q["layers"]) == 1 and q["layers"][0]["runs"] == [shell.doc["runs"][0]["id"]]
+    at_tool(shell, "layers")
+    assert "shows one series" in drawer_text(shell)
+    names = {getattr(w, "name", "") for w in shell.frame.body.select()}
+    assert "⧉" not in names and "In panel" not in names and "+ Series" not in names
+    shell.add_run(os.path.join(os.path.dirname(demo_run), "supercell_weak"))
+    _click(shell, "One per run")
+    assert len(de.panels_of(shell.doc, "th")) == 2

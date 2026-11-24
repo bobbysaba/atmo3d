@@ -175,7 +175,7 @@ def test_panel_legend_anchor():
 
 
 def test_anchor_text_round_trip():
-    from atmo3d.figures.cards import _xy, _xy_text
+    from atmo3d.figures.schema import _xy, _xy_text
     assert _xy("1.02, -0.1") == [1.02, -0.1] and _xy("1") is None and _xy("") is None
     assert _xy_text([1.02, 1.0]) == "1.02, 1" and _xy_text(None) == ""
 

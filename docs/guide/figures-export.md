@@ -1,6 +1,6 @@
 # Export, animations and the script
 
-**Export**, above the preview, saves the figure ([Figures](figures.md#saving)), and its dialog also
+**Export**, in the top bar, saves the figure ([Figures](figures.md#saving)), and its dialog also
 holds animations, tables as text, templates, and saving the figure for other runs. Saved figures
 reopen from the [New dialog](figures.md#the-new-dialog).
 
@@ -180,7 +180,8 @@ as they were. To redraw: `python name.py`. To reopen it in the viewer, open its 
 
 ## Style presets (in scripts)
 
-In the editor, the presets are in [*Apply a style*](figures-style.md#style-preset), on the Figure node. In a
+In the editor, the presets are in [*Apply a style preset*](figures-style.md#style-preset) (Look, at the
+figure). In a
 script, `atmo3d.figures.spec.apply_style(spec, name)` returns a copy of a figure's spec with
 a preset applied, e.g. to restyle a saved figure's `_spec.json` for a journal or a talk (an
 exported figure script does not import atmo3d):

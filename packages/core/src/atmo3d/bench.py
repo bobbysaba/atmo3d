@@ -321,25 +321,24 @@ class Bench:
         top = float(v.fill_lvl.end or 1.0)
         lvl = float(v.fill_lvl.value)
         self.act("map: level +1 km", "map", lambda: self._set(v.fill_lvl, min(lvl + 1, top)))
-        self.act("map: filled contours", "map", lambda: self._set(v.fill_style, "contourf"))
-        self.act("map: back to pixels", "map", lambda: self._set(v.fill_style, "image"))
+        put = lambda o, k, x: o.drawer.put(k, x)  # noqa: E731  (a map layer's: layers.py)
+        self.act("map: filled contours", "map", lambda: put(v.map_fill, "style", "contourf"))
+        self.act("map: back to pixels", "map", lambda: put(v.map_fill, "style", "mesh"))
         if v.ovs:
             o = v.ovs[0]
-            on = o["on"].value
+            on = bool(o["on"])
             self.act(f"map: contours {'off' if on else 'on'}", "map",
-                     lambda: self._set(o["on"], not on))
+                     lambda: put(o, "on", not on))
             self.act(f"map: contours {'on' if on else 'off'}", "map",
-                     lambda: self._set(o["on"], on))
+                     lambda: put(o, "on", on))
         if v.vecs:
             o = v.vecs[0]
-            self.act("map: wind vectors on", "map", lambda: self._set(o["on"], True))
-            if "style" in o and "streamlines" in _values(o["style"]):
-                was = o["style"].value
-                self.act("map: streamlines", "map",
-                         lambda: self._set(o["style"], "streamlines"))
-                self._set(o["style"], was)
-                _wait_idle(v)
-            self.act("map: vectors off", "map", lambda: self._set(o["on"], False))
+            self.act("map: wind vectors on", "map", lambda: put(o, "on", True))
+            was = o["style"]
+            self.act("map: streamlines", "map", lambda: put(o, "style", "streamlines"))
+            put(o, "style", was)
+            _wait_idle(v)
+            self.act("map: vectors off", "map", lambda: put(o, "on", False))
         if f2:
             self.act(f"map: switch field to {f2} (first read)", "map",
                      lambda: self._set(v.fill_var, f2))

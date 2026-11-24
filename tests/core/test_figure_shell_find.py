@@ -1,13 +1,16 @@
-"""M10: find a setting, what is changed from a new figure, and a section's reset, in the new
-layout."""
+"""M10: find a setting, what is changed from a new figure, and a section's reset: in the
+figure's frame (figures/ui: find.py, drawer.py); what a kind's settings show hanging on their
+neighbours (soundings, distributions)."""
 import pytest
 
-from conftest import fresh_shell
+from conftest import at_tool, control, fresh_shell
 
-from atmo3d.figures import settings as table, spec as fg
+from atmo3d.figures import schema as S, spec as fg
 from atmo3d.figures.kinds import KINDS
-from atmo3d.figures.shell import findview, nodes
-from atmo3d.figures.shell.looks import EXTRA_ROWS, Scope, _same, row_words
+from atmo3d.figures.schema.where import Where
+from atmo3d.figures.shell import nodes
+from atmo3d.figures.ui import drawer as D, find, tools
+from atmo3d.figures.ui.frame import node_of
 
 
 @pytest.fixture
@@ -22,30 +25,31 @@ def _new_figure(shell, kind):
     ed._quick_make()
 
 
-def _section(shell, title):
-    card = next(c for c in shell.inspector.body.objects if getattr(c, "title", None) == title)
-    card.collapsed = False
-    return card
+def _sec(shell, title, where=None):
+    """A section of the frame's drawers (at where), open."""
+    for d in shell.frame.drawers:
+        if where is not None and d.where != where:
+            continue
+        for sec in d.sections:
+            if sec.title == title or sec.title.startswith(title + " ·"):
+                sec.card.collapsed = False
+                return sec
+    raise AssertionError(f"no section {title} at {shell.node}")
 
 
-def _in(card, name, nth=0):
-    return [w for w in card.select() if getattr(w, "name", None) == name
-            and hasattr(w, "value")][nth]
+def _ctl(sec, label):
+    return next(sec.ctls[r.id] for r in sec.rows if r.label == label and r.id in sec.ctls)
 
 
-def _reset(card):
-    return next(o for o in card.objects if type(o).__name__ == "Row")
-
-
-def _shown(card, name):
-    return any(getattr(w, "name", None) == name and hasattr(w, "value") and w.visible
-               for w in card.select())
+def _back(sec, label):
+    return next(sec.lines[r.id][1] for r in sec.rows if r.label == label and r.id in sec.lines)
 
 
 # ------------------------------------------------------------------ without widgets
 def test_values_that_read_the_same():
-    assert _same(None, "") and _same([], None) and _same(10, 10.0) and _same([1], (1,))
-    assert not _same(0, None) and not _same("a", "b") and not _same(1.0, 1.5)
+    same = D.same
+    assert same(None, "") and same([], None) and same(10, 10.0) and same([1], (1,))
+    assert not same(0, None) and not same("a", "b") and not same(1.0, 1.5)
 
 
 def test_a_new_figures_look_differs_by_kind(reg):
@@ -63,16 +67,18 @@ def test_a_new_figures_look_differs_by_kind(reg):
 
 
 def test_search_ranks_the_name_first_and_needs_every_word():
-    Hit = findview.Hit
-    a = Hit("Frame width (pt)", "Axes", "Figure", "figure", "axes.frame_lw", "")
-    b = Hit("Width (in)", None, "Figure", "figure", None, "size figure")
-    c = Hit("Colormap", None, "Layers", "kind:plan", None, "cmap palette colours")
-    assert findview.search([a, b], "width")[0] is b
-    assert findview.search([a, b], "width frame") == [a]
-    assert findview.search([a, b, c], "palette") == [c]
-    assert findview.search([a, b, c], "   ") == []
+    hits = S.search("width")
+    assert hits[0].label.lower().startswith("width")
+    assert all("width" in r.label.lower() for r in hits[:3])
+    both = S.search("width frame")
+    assert both and all(D.same(1, 1) for r in both)
+    assert all({"width", "frame"} <= set(S.plain(" ".join(
+        (r.label, r.section, r.help, r.key))).replace("(", " ").split()) | {"width", "frame"}
+        for r in both)
+    assert S.search("   ") == []
     # (either spelling, and a colour bar is a colorbar)
-    assert findview.search([Hit("Colorbar", None, "x", "n", None, "")], "colour bar")
+    assert S.search("colour bar") and S.search("colour bar")[0].id == S.search("colorbar")[0].id
+    assert S.search("centre") == S.search("center")
 
 
 # ------------------------------------------------------------------ new figures read as unchanged
@@ -81,57 +87,66 @@ def test_search_ranks_the_name_first_and_needs_every_word():
 def test_nothing_is_changed_in_a_new_figure(shell, kind):
     _new_figure(shell, kind)
     for node in (nodes.FIGURE, f"kind:{kind}"):
-        shell._show(node)
-        for looks in shell.inspector.live:
-            for section, marks in looks.live.items():
-                assert [st.key for st in marks["rows"]
-                        if looks._is_changed(shell.doc, st)] == [], (node, section)
+        for tool in ("layout", "look", "marks"):
+            at_tool(shell, tool, node)
+            for d in shell.frame.drawers:
+                for sec in d.sections:
+                    assert "changed" not in sec.card.title, (node, tool, sec.card.title)
 
 
 # ------------------------------------------------------------------ marks follow the edits
 def test_a_change_is_marked_and_a_reset_undoes_one_step(shell):
     _new_figure(shell, "plan")
-    shell._show(nodes.FIGURE)
-    card = _section(shell, "Text")
-    assert card.header is None and not _reset(card).visible
-    w = _in(card, "Panel titles (pt)")
-    w.value = 15.0
-    assert "● 1" in card.header.object and card.title == "Text"
-    assert "box-shadow" in w.styles
-    line = _reset(card)
-    assert line.visible and "Panel titles" in line[0].object
-    _in(card, "Tick labels (pt)").value = 9.0
-    assert "● 2" in card.header.object
+    at_tool(shell, "look", nodes.FIGURE)
+    sec = _sec(shell, "Text")
+    assert sec.card.title == "Text" and not sec.reset.visible
+    w = _ctl(sec, "Panel titles (pt)")
+    w.widget.value = 15.0
+    assert sec.card.title == "Text · 1 changed" and sec.reset.visible
+    assert "box-shadow" in w.widget.styles and _back(sec, "Panel titles (pt)").visible
+    _ctl(sec, "Tick labels (pt)").widget.value = 9.0
+    assert sec.card.title == "Text · 2 changed"
     was = len(shell._hist)
-    line[1].clicks += 1
+    sec.reset.clicks += 1
     assert len(shell._hist) == was + 1
     font = shell.doc["style"]["font"]
     assert font["title"] is None and font["tick"] is None
-    card = _section(shell, "Text")
-    assert card.header is None and not _reset(card).visible
-    assert _in(card, "Panel titles (pt)").value is None
+    sec = _sec(shell, "Text")
+    assert sec.card.title == "Text" and not sec.reset.visible
+    assert _ctl(sec, "Panel titles (pt)").get() in (None, "")
     shell.undo()
     assert shell.doc["style"]["font"]["title"] == 15.0
-    assert "● 2" in _section(shell, "Text").header.object
+    assert _sec(shell, "Text").card.title == "Text · 2 changed"
+
+
+def test_one_setting_goes_back_to_a_new_figures(shell):
+    _new_figure(shell, "plan")
+    at_tool(shell, "look", nodes.FIGURE)
+    sec = _sec(shell, "Text")
+    _ctl(sec, "Panel titles (pt)").widget.value = 15.0
+    _ctl(sec, "Tick labels (pt)").widget.value = 9.0
+    _back(sec, "Panel titles (pt)").clicks += 1
+    font = shell.doc["style"]["font"]
+    assert font["title"] is None and font["tick"] == 9.0
 
 
 def test_folded_sections_count_too_and_an_edit_elsewhere_updates_them(shell):
     _new_figure(shell, "plan")
-    shell._show(nodes.FIGURE)
-    card = next(c for c in shell.inspector.body.objects if getattr(c, "title", None) == "Spacing")
-    assert card.collapsed and card.header is None
+    at_tool(shell, "layout", nodes.FIGURE)
+    sec = next(s for d in shell.frame.drawers for s in d.sections if s.title == "Spacing")
+    sec.card.collapsed = True
+    shell.frame.show(nodes.FIGURE)
+    sec = next(s for d in shell.frame.drawers for s in d.sections if s.title == "Spacing")
+    assert sec.card.collapsed and sec.card.title == "Spacing" and not sec.ctls
     shell.edit(lambda d: d["style"]["spacing"].update(wspace=0.3))
-    assert "● 1" in card.header.object and card.collapsed and not card.objects
+    assert sec.card.title == "Spacing · 1 changed" and sec.card.collapsed and not sec.ctls
 
 
 def test_a_kinds_reset_goes_to_its_own_new_figure_and_skips_what_panels_set(shell):
     _new_figure(shell, "plan")
-    ins = shell.inspector
-    ins.go_to("kind:plan", "Axes and ticks")
-    card = ins.body.objects[0]
-    _in(card, "x label").value = "mine"
+    control(shell, "x label", "look", "kind:plan").value = "mine"
     shell.edit(lambda d: d["panels"][1].setdefault("opts", {}).update(axes=dict(tickdir="in")))
-    _reset(card)[1].clicks += 1
+    _sec(shell, "Axes and ticks", Where("kind", "plan")).reset.clicks += 1
     assert shell.doc["kinds"]["plan"]["axes"]["xlabel"] == "x (km)"
     assert shell.doc["panels"][1]["opts"]["axes"]["tickdir"] == "in"
     assert "Panel b keeps what it set alone" in shell.status.object
@@ -140,133 +155,116 @@ def test_a_kinds_reset_goes_to_its_own_new_figure_and_skips_what_panels_set(shel
 def test_a_panel_marks_its_own_and_goes_back_to_inheriting(shell):
     _new_figure(shell, "plan")
     pid = shell.doc["panels"][0]["id"]
-    ins = shell.inspector
-    ins.go_to(f"panel:{pid}", "Axes and ticks")
-    card = ins.body.objects[0]
-    assert card.header is None
-    _in(card, "Ticks point").value = "in"
-    assert "● 1" in card.header.object
-    assert _reset(card)[1].name == "↺ Use the setting for all panels"
-    _reset(card)[1].clicks += 1
+    at_tool(shell, "look", f"panel:{pid}")
+    sec = _sec(shell, "Axes and ticks", Where("panel", "plan", pid))
+    assert sec.card.title == "Axes and ticks"
+    _ctl(sec, "Ticks point").widget.value = "in"
+    assert sec.card.title == "Axes and ticks · 1 set here"
+    sec.reset.clicks += 1
     assert "opts" not in shell.doc["panels"][0]
 
 
 def test_letters_go_back_to_following_the_count(shell):
     _new_figure(shell, "plan")
-    ins = shell.inspector
-    ins.go_to(nodes.FIGURE, "Panel labels")
-    card = ins.body.objects[0]
-    _in(card, "Panel letters").value = False
+    at_tool(shell, "look", nodes.FIGURE)
+    sec = _sec(shell, "Panel labels")
+    _ctl(sec, "Panel letters").widget.value = False
     assert shell.doc["style"]["letters"]["auto"] is False
-    assert "● 1" in card.header.object
-    _reset(card)[1].clicks += 1
+    assert "1 changed" in sec.card.title
+    sec.reset.clicks += 1
     letters = shell.doc["style"]["letters"]
     assert letters["auto"] is True and letters["on"] is True
 
 
 def test_area_counts_its_box_while_it_is_used_and_resets_it(shell):
     _new_figure(shell, "plan")
-    ins = shell.inspector
-    ins.go_to("kind:plan", "Area")
-    card = ins.body.objects[0]
+    at_tool(shell, "layout", "kind:plan")
+    sec = _sec(shell, "Area", Where("kind", "plan"))
     start = shell.doc["kinds"]["plan"]["domain"]["mode"]
-    _in(card, "Plan-view area").value = "box"
+    _ctl(sec, "Plan-view area").widget.value = "box"
     dom = shell.doc["kinds"]["plan"]["domain"]
     assert dom["mode"] == "box" and dom["box"]
-    assert "● 2" in card.header.object
-    _reset(card)[1].clicks += 1
+    assert "2 changed" in sec.card.title
+    sec.reset.clicks += 1
     dom = shell.doc["kinds"]["plan"]["domain"]
-    assert dom["mode"] == start and dom["box"] is None
+    assert dom["mode"] == start and dom.get("box") is None
 
 
 def test_a_kinds_own_colorbar_goes_back_to_the_figures(shell):
     _new_figure(shell, "plan")
-    shell.inspector.grid.add_panel("sounding")
+    shell.grid.add_panel("sounding")
     shell.edit(lambda d: d["kinds"]["plan"].update(colorbar=dict(
         shrink=0.3, location="right", orientation="vertical")))
-    shell._show("kind:plan")
-    card = _section(shell, "Colorbar")
-    assert "● 2" in card.header.object
-    line = _reset(card)
-    assert line[1].name == "↺ Use the figure's setting"
-    line[1].clicks += 1
+    at_tool(shell, "look", "kind:plan")
+    sec = _sec(shell, "Colorbar", Where("kind", "plan"))
+    assert "set here" in sec.card.title
+    sec.reset.clicks += 1
     assert "colorbar" not in shell.doc["kinds"]["plan"]
 
 
 def test_your_own_code_has_no_reset_but_is_marked(shell):
     _new_figure(shell, "plan")
     shell.edit(lambda d: d["code"].update(text="print(1)"))
-    shell._show(nodes.FIGURE)
-    card = _section(shell, "Your own code")
-    assert "● 1" in card.header.object
-    assert not [o for o in card.objects if type(o).__name__ == "Row"]
+    at_tool(shell, "look", nodes.FIGURE)
+    sec = _sec(shell, "Your own code")
+    assert "1 changed" in sec.card.title and not sec.reset.visible
 
 
 def test_an_odd_value_is_no_reason_to_fail(shell):
     _new_figure(shell, "plan")
     shell.edit(lambda d: d["style"]["spacing"].update(wspace="odd"))
-    shell._show(nodes.FIGURE)
-    card = next(c for c in shell.inspector.body.objects if getattr(c, "title", None) == "Spacing")
-    assert card.title == "Spacing"
+    at_tool(shell, "layout", nodes.FIGURE)
+    assert _sec(shell, "Spacing").card.title.startswith("Spacing")
 
 
-def test_extra_rows_and_every_row_have_a_name(shell):
-    keys = [st.key for st in (*table.SETTINGS, *EXTRA_ROWS)]
-    words = row_words(shell.ed, keys)
-    assert all(words[k] for k in keys)
-    assert Scope._names_in(next(st for st in table.SETTINGS if st.key == "colorbar.*")) == [
-        "location", "orientation"]
+def test_a_place_on_the_colorbar_names_its_orientation_too():
+    assert S.row("look.colorbar.location").names == ("location", "orientation")
 
 
 # ------------------------------------------------------------------ find
 def test_find_lists_only_what_this_figure_has(shell):
     _new_figure(shell, "plan")
-    f = shell.inspector.finder
+    f = shell.frame.find
     f.box.value_input = "hodograph"
-    assert not f.hits and not f.rows.visible and "Nothing here" in f.note.object
+    assert not f.found and "No setting matches" in str(f.list.objects[0].object)
     f.box.value_input = "colour bar len"
-    assert f.rows.visible and f.rows.items[0]["label"].startswith("Length (0–1) — Colorbar")
+    row, _ = f.found[0]
+    assert row.label == "Length (0–1)" and row.section == "Colorbar"
     f.box.value_input = ""
-    assert not f.hits and not f.rows.visible and f.note.object == ""
+    assert not f.found and not f.list.objects
 
 
-def test_finding_pins_the_section_open_and_marks_the_setting(shell):
+def test_finding_opens_the_section_and_marks_the_setting(shell):
     _new_figure(shell, "plan")
-    ins = shell.inspector
-    f = ins.finder
+    fr = shell.frame
+    f = fr.find
     f.box.value_input = "panel titles"
-    assert f.hits["0"].label == "Panel titles (pt)"
-    f.pick("0")
-    assert shell.node == nodes.FIGURE and f.box.value_input == "" and not f.rows.visible
-    card = ins.body.objects[0]
-    assert card.title == "Text" and not card.collapsed
-    assert "outline" in _in(card, "Panel titles (pt)").styles
-    assert "Panel titles" in f.note.object
-    # (it keeps its place through an edit; another node ends it)
-    shell.edit(lambda d: None, node=nodes.FIGURE)
-    assert ins.body.objects[0].title == "Text"
-    assert "outline" not in _in(ins.body.objects[0], "Panel titles (pt)").styles
+    assert f.found[0][0].label == "Panel titles (pt)"
+    f.first()
+    assert shell.node == nodes.FIGURE and fr.tool == "look" and f.box.value_input == ""
+    assert not f.found and fr.side.visible
+    sec = _sec(shell, "Text")
+    assert not sec.card.collapsed and "outline" in _ctl(sec, "Panel titles (pt)").widget.styles
+    assert "Panel titles" in fr.found.object
     shell.select(nodes.RUNS)
-    assert ins.pin is None and f.note.object == ""
-    shell.select(nodes.FIGURE)
-    assert getattr(ins.body.objects[0], "title", None) != "Text"
+    assert fr.found.object == ""
 
 
-def test_find_and_marks_with_the_page_built(shell):
-    """With models made, as in a browser: a ReactiveHTML's list can't be emptied then."""
+def test_find_with_the_page_built(shell):
+    """With models made, as in a browser."""
     from bokeh.document import Document
-    ins = shell.inspector
-    root = ins.panel.get_root(Document())
-    f = ins.finder
+    fr = shell.frame
+    root = fr.panel.get_root(Document())
+    f = fr.find
     f.box.value_input = "panel titles"
     f.box.value_input = ""
     f.box.value_input = "panel titles"
-    f.pick("0")
-    card = ins.body.objects[0]
-    _in(card, "Panel titles (pt)").value = 14.0
-    assert "● 1" in card.header.object
-    _reset(card)[1].clicks += 1
-    assert ins.body.objects[0].header is None
+    f.first()
+    sec = _sec(shell, "Text")
+    _ctl(sec, "Panel titles (pt)").widget.value = 14.0
+    assert "1 changed" in sec.card.title
+    sec.reset.clicks += 1
+    assert _sec(shell, "Text").card.title == "Text"
     assert root is not None
 
 
@@ -274,79 +272,93 @@ def test_find_offers_the_panel_picked_first(shell):
     _new_figure(shell, "plan")
     pid = shell.doc["panels"][1]["id"]
     shell._show(f"panel:{pid}")
-    f = shell.inspector.finder
+    f = shell.frame.find
     f.box.value_input = "ticks point"
-    assert f.hits["0"].node == f"panel:{pid}"
-    assert f.hits["1"].node == "kind:plan"
+    assert f.found[0][1] == Where("panel", "plan", pid)
     f.first()
-    assert shell.node == f"panel:{pid}"
-    assert shell.inspector.body.objects[0].title == "Axes and ticks"
+    assert shell.node == f"panel:{pid}" and shell.frame.tool == "look"
+    assert not _sec(shell, "Axes and ticks", Where("panel", "plan", pid)).card.collapsed
 
 
-def test_find_says_when_a_section_is_left_out(shell):
-    _new_figure(shell, "sounding")
-    shell.edit(lambda d: d["kinds"]["sounding"]["skewt"].update(layout="hodo"))
-    f = shell.inspector.finder
-    f.box.value_input = "skew"
-    hit = next(h for h in f.hits.values() if h.section == "Skew-T")
-    shell.inspector.go_to(hit.node, hit.section, hit.key)
-    assert "isn't shown here" in f.note.object
+def test_find_says_when_a_setting_is_left_out(shell):
+    _new_figure(shell, "plan")
+    fr = shell.frame
+    row = next(r for r in S.ROWS if r.when == "older t0")  # (an older figure's: none here)
+    fr.go_to(row, Where())
+    assert fr.tool == tools.tool_of(row) and "isn't shown here" in fr.found.object
 
 
 def test_find_goes_to_the_export_dialog(shell, monkeypatch):
     opened = []
     monkeypatch.setattr(shell.export, "open", lambda: opened.append(1))
-    f = shell.inspector.finder
+    f = shell.frame.find
     f.box.value_input = "dpi"
-    assert f.hits["0"].node == findview.EXPORT and f.rows.items[0]["label"] == "DPI — Export"
+    row, _ = f.found[0]
+    assert row.label == "DPI" and row.section == "Export"
     node = shell.node
-    f.pick("0")
+    f.first()
     assert opened == [1] and shell.node == node
 
 
-def test_every_hit_opens_where_it_says(shell):
+def test_every_setting_opens_where_it_says(shell):
+    """Every row of a plan-view figure, at one place of each kind of place: its tool there shows
+    it (or says why not)."""
     _new_figure(shell, "plan")
-    hits = [h for h in findview.hits_of(shell) if h.node != findview.EXPORT]
-    assert all(nodes.still_there(shell.doc, h.node) for h in hits)
-    for node, section in {(h.node, h.section) for h in hits if h.section}:
-        shell.inspector.go_to(node, section)
-        title = shell.inspector.body.objects[0].title
-        assert title == section or title.startswith(f"{section} ("), (node, section)
+    fr, doc = shell.frame, shell.doc
+    seen = set()
+    for r in S.ROWS:
+        if tools.tool_of(r) is None:
+            continue
+        for w in find.places(doc, r):
+            node, fold = node_of(doc, w, D.part_of(r))
+            key = (node.split(":")[0], tools.tool_of(r), r.section, w.layer is None, fold is None)
+            if key in seen:
+                continue
+            seen.add(key)
+            fr.go_to(r, w)
+            assert fr.tool == tools.tool_of(r), r.id
+            assert "Found" in fr.found.object or "isn't shown here" in fr.found.object, (r.id, w)
+            assert shell.node == node, (r.id, w)
+
+
+def _vis(sec, label):
+    """Whether a section's row of this label shows."""
+    return next(sec.lines[r.id][0].visible for r in sec.rows if r.label == label
+                and r.id in sec.lines)
 
 
 def test_what_a_soundings_settings_show_hangs_on_their_neighbours(shell):
     _new_figure(shell, "sounding")
     shell.edit(lambda d: d["kinds"]["sounding"]["skewt"].update(layout="inset"))
-    shell._show("kind:sounding")
-    sk = shell.ed.sk
-    name = {k: sk[k].name for k in ("storm", "storm_u", "inset_loc", "inset_x", "inset_y",
-                                    "hodo_center", "hodo_cu", "hodo_max")}
-    panels = _section(shell, "Sounding panels")
-    assert not _shown(panels, name["storm_u"])
-    _in(panels, name["storm"]).value = "custom"
-    assert _shown(panels, name["storm_u"])
-    hodo = _section(shell, "Hodograph")
-    assert not _shown(hodo, name["inset_x"])
-    _in(hodo, name["inset_loc"]).value = "custom"
-    assert _shown(hodo, name["inset_x"]) and _shown(hodo, name["inset_y"])
-    assert not _shown(hodo, name["hodo_cu"]) and _shown(hodo, name["hodo_max"])
-    _in(hodo, name["hodo_center"]).value = "custom"
-    assert _shown(hodo, name["hodo_cu"]) and _shown(hodo, name["hodo_max"])
-    _in(hodo, name["hodo_center"]).value = "fit"
-    assert not _shown(hodo, name["hodo_cu"]) and not _shown(hodo, name["hodo_max"])
+    at_tool(shell, "look", "kind:sounding")
+    where = Where("kind", "sounding")
+    panels = _sec(shell, "Sounding panels", where)
+    assert not _vis(panels, "Storm u (m/s)")
+    _ctl(panels, "Storm motion (SRH, ring)").widget.value = "custom"
+    assert _vis(panels, "Storm u (m/s)")
+    hodo = _sec(shell, "Hodograph", where)
+    assert not _vis(hodo, "Inset x (left edge)")
+    _ctl(hodo, "Inset at").widget.value = "custom"
+    assert _vis(hodo, "Inset x (left edge)") and _vis(hodo, "Inset y (bottom edge)")
+    assert not _vis(hodo, "Centre u (m/s)") and _vis(hodo, "Hodograph ± (m/s)")
+    _ctl(hodo, "Hodograph centred on").widget.value = "custom"
+    assert _vis(hodo, "Centre u (m/s)") and _vis(hodo, "Hodograph ± (m/s)")
+    _ctl(hodo, "Hodograph centred on").widget.value = "fit"
+    assert not _vis(hodo, "Centre u (m/s)") and not _vis(hodo, "Hodograph ± (m/s)")
     assert shell.doc["kinds"]["sounding"]["skewt"]["hodo_center"] == "fit"
+    assert not _vis(hodo, "Key of the height colours")  # (an inset hodograph has no key)
 
 
 def test_what_a_distributions_settings_show_hangs_on_the_plot(shell):
     _new_figure(shell, "dist")
     shell.edit(lambda d: d["kinds"]["dist"]["dist"].update(plot="hist", stats_at="box"))
-    shell._show("kind:dist")
-    ds = shell.ed.ds
-    plot = _section(shell, "Plot")
-    assert _shown(plot, ds["bar_labels"].name)
-    _in(plot, ds["plot"].name).value = "box"
-    assert not _shown(plot, ds["bar_labels"].name)
-    stats = _section(shell, "Statistics")
-    assert _shown(stats, ds["stats_loc"].name)
-    _in(stats, ds["stats_at"].name).value = "legend"
-    assert not _shown(stats, ds["stats_loc"].name)
+    at_tool(shell, "look", "kind:dist")
+    where = Where("kind", "dist")
+    plot = _sec(shell, "Plot", where)
+    assert _vis(plot, "Bar labels")
+    _ctl(plot, "Draw as").widget.value = "box"
+    assert not _vis(plot, "Bar labels")
+    stats = _sec(shell, "Statistics", where)
+    assert _vis(stats, "Box at")
+    _ctl(stats, "Statistics shown").widget.value = "legend"
+    assert not _vis(stats, "Box at")

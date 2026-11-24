@@ -17,11 +17,13 @@ from bokeh.transform import transform
 from ..core.services import pdecomp
 from ..core import render, vectors
 from ..core.run import FileBusy, MissingAtTime, carry
-from ..core.fields import CMAPS, palette
+from ..core.fields import palette
+from ..figures.schema import viewer as V
 from ..theme import ACCENT, BG, GROUND, MUTED
+from .layers import Layer, minus_spec
+from .mapview import IMAGE
 from .numinput import FloatInput
 from .ui import EMPTY_LINES, EMPTY_VEC, _cbar_label, _html, style_fig
-from .widgets import _layer_row
 from .fieldmenu import FieldSelect
 
 
@@ -76,19 +78,12 @@ class SectionPanel:
         self.xs_fill = FieldSelect(groups=g3,
                                     value=F.role("refl") or next(iter(F.defs)),
                                     width=220, height=32, margin=(4, 2))
-        self.xs_fill_style = pn.widgets.RadioButtonGroup(
-            options={"Pixels": "image", "Filled contours": "contourf"}, value="image",
-            button_type="primary", button_style="outline", width=230, margin=(5, 10, 8, 10))
-        self.xs_cmap = pn.widgets.Select(name="Colormap", options=CMAPS,
-                                         value=F[self.xs_fill.value].cmap, width=150)
-        self.xs_rev = pn.widgets.Checkbox(name="Reverse", value=False, margin=(5, 10, 14, 10))
-        self.xs_auto = pn.widgets.Checkbox(name="Auto range", value=True,
-                                           margin=(5, 10, 14, 10))
-        self.xs_min = FloatInput(name="Min", value=0.0, width=90, disabled=True)
-        self.xs_max = FloatInput(name="Max", value=1.0, width=90, disabled=True)
-        self.xs_nlev = pn.widgets.IntSlider(name="Contour intervals", start=4, end=30,
-                                            value=15, width=160)
-        self.xs_diff = self._diff_widgets()  # (minus another time or run)
+        # the first fill: its field the toolbar's, the rest the Style drawer (layers.py)
+        d = F[self.xs_fill.value]
+        lo, hi = d.vrange or (0.0, 1.0)
+        self.xs_main = Layer(self, "fill", V.new("fill", "xsec", field=self.xs_fill.value,
+                                                 cmap=d.cmap, vmin=lo, vmax=hi),
+                             skip=("field",), kind="xsec")
         # more fills, contours and vectors: a row each in their drawers, as on the map
         self.xs_fills, self.xs_ovs, self.xs_vecs = [], [], []
         self.xs_fill_list, self.xs_ov_list, self.xs_vec_list = (
@@ -143,8 +138,8 @@ class SectionPanel:
             if len(pts) == 2 else dict(x=[], y=[])
         self._update_items()
 
-    # ---- more fills, contours and vectors (rows as on the map: Widgets, app._wire_*)
-    _xs_wired = False  # (Viewer._wire wires the first rows)
+    # ---- more fills, contours and vectors (rows as on the map: layers.py)
+    _xs_wired = False  # (Viewer._wire: the page is wired, a row added redraws the section)
 
     def _xs_place(self, new, after):
         """Put renderers `new` right after renderer `after` in the section plot."""
@@ -159,10 +154,9 @@ class SectionPanel:
     def _xs_ov_top(self):
         return self.xs_ov_r[-1][3] if self.xs_ov_r else self._xs_fill_top()
 
-    def _xs_added(self, o, wire):
-        """A row added from the page: wire it and redraw the section."""
+    def _xs_added(self):
+        """A row added from the page: the section drawn again."""
         if self._xs_wired:
-            wire(o, xs=True)
             self.request_xsec()
 
     def _xs_add_fill(self):
@@ -171,16 +165,9 @@ class SectionPanel:
         n = len(self.xs_fills)
         if n >= self.FILL_MAX:
             return
-        F = self.F
-        var = F.role("w") or self.xs_fill.value
-        o = self._fill_widgets(F.groups(ndim=3), var)
-        o["row"] = _layer_row(n, o["on"], o["var"], o["style"], o["cmap"], o["rev"],
-                              o["auto"], o["vmin"], o["vmax"], o["alpha"], o["clip"],
-                              o["drop"])
-        o["drop"].on_click(lambda e: self._xs_drop_fill(o))
-        self.xs_fills.append(o)
-        self.xs_fill_list.append(o["row"])
-        self.xs_fill_add.disabled = n + 1 >= self.FILL_MAX
+        lay, _ = self._new_fill(kind="xsec")
+        self._add_row(Layer(self, "more", lay, n, "Remove this fill", kind="xsec"),
+                      self.xs_fills, self.xs_fill_list, self.xs_fill_add, self.FILL_MAX)
         fig = self.xs_fig
         mapper = LinearColorMapper(palette=palette("viridis"), low=0, high=1,
                                    nan_color="#00000000")
@@ -201,11 +188,7 @@ class SectionPanel:
         fig.add_layout(cbar, "right")
         self.xs_fill_r.append(dict(mapper=mapper, src=src, poly_src=poly_src, img=img,
                                    poly=poly, cbar=cbar))
-        self._xs_added(o, self._wire_fill)
-
-    def _xs_drop_fill(self, o):
-        self._drop_row(o, self.xs_fills, self.xs_fill_list, self.xs_fill_add, self.xs_fill_r,
-                       self.xs_fig, lambda g: (g["img"], g["poly"]), self.request_xsec)
+        self._xs_added()
 
     def _xs_add_contour(self, on=True):
         """One more contour layer: its row in Contours, its lines on the section."""
@@ -214,14 +197,10 @@ class SectionPanel:
             return
         var, levels = (self._xs_ov_next[n] if n < len(self._xs_ov_next)
                        else (self.xs_fill.value, "auto"))
-        o = self._contour_widgets(self.xs_ovs, self.F.groups(ndim=3), var, levels)
-        o["on"].value = on
-        o["row"] = _layer_row(n, o["on"], o["var"], o["levels"], o["color"], o["width"],
-                              o["negdash"], o["drop"])
-        o["drop"].on_click(lambda e: self._xs_drop_contour(o))
-        self.xs_ovs.append(o)
-        self.xs_ov_list.append(o["row"])
-        self.xs_ov_add.disabled = n + 1 >= self.OV_MAX
+        lay = self._new_contour(self.xs_ovs, var, levels, kind="xsec")
+        lay["on"] = on
+        self._add_row(Layer(self, "contour", lay, n, "Remove this contour", kind="xsec"),
+                      self.xs_ovs, self.xs_ov_list, self.xs_ov_add, self.OV_MAX)
         fig = self.xs_fig
         ps, ns = ColumnDataSource(dict(EMPTY_LINES)), ColumnDataSource(dict(EMPTY_LINES))
         pr = fig.multi_line("xs", "ys", source=ps, line_color="#ffffff", line_width=1.4)
@@ -229,11 +208,7 @@ class SectionPanel:
                             line_dash="dashed")
         self._xs_place([pr, nr], self._xs_ov_top())
         self.xs_ov_r.append((ps, ns, pr, nr))
-        self._xs_added(o, self._wire_overlay)
-
-    def _xs_drop_contour(self, o):
-        self._drop_row(o, self.xs_ovs, self.xs_ov_list, self.xs_ov_add, self.xs_ov_r,
-                       self.xs_fig, lambda g: g[2:], self.request_xsec)
+        self._xs_added()
 
     def _xs_add_vec(self):
         """One more vector layer: its row in Vectors, its arrows on the section (the
@@ -241,15 +216,9 @@ class SectionPanel:
         n = len(self.xs_vecs)
         if n >= self.VEC_MAX:
             return
-        o = self._vec_row(self.xs_vecs, self.VEC_COLORS, True, 0.0, 28, (8, 60),
-                          styles=False)
-        del o["level"]  # (a section has every height)
-        o["row"] = _layer_row(n, o["on"], o["q"], o["frame"], o["density"], o["ref"],
-                              o["color"], o["drop"])
-        o["drop"].on_click(lambda e: self._xs_drop_vec(o))
-        self.xs_vecs.append(o)
-        self.xs_vec_list.append(o["row"])
-        self.xs_vec_add.disabled = n + 1 >= self.VEC_MAX
+        lay = self._new_vec(self.xs_vecs, kind="xsec")  # (no height: a section has every one)
+        self._add_row(Layer(self, "vectors", lay, n, "Remove these vectors", kind="xsec"),
+                      self.xs_vecs, self.xs_vec_list, self.xs_vec_add, self.VEC_MAX)
         fig = self.xs_fig
         src = ColumnDataSource(dict(EMPTY_VEC))
         seg = fig.segment("x0", "y0", "x1", "y1", source=src, line_color="#e5e7eb",
@@ -259,18 +228,14 @@ class SectionPanel:
         prev = self.xs_vec_r[-1]["head"] if self.xs_vec_r else self._xs_ov_top()
         self._xs_place([seg, head], prev)
         self.xs_vec_r.append(dict(src=src, seg=seg, head=head))
-        self._xs_added(o, self._wire_vec)
-
-    def _xs_drop_vec(self, o):
-        self._drop_row(o, self.xs_vecs, self.xs_vec_list, self.xs_vec_add, self.xs_vec_r,
-                       self.xs_fig, lambda g: (g["seg"], g["head"]), self.request_xsec)
+        self._xs_added()
 
     def _xs_names(self, spec=None):
-        """The fields the section draws (of its spec, or of the widgets)."""
+        """The fields the section draws (of its spec, or of its layers)."""
         if spec is not None:
             return [spec["fill"]] + [o["var"] for o in spec["fills"] + spec["ov"] if o["on"]]
-        return [self.xs_fill.value] + [o["var"].value for o in self.xs_fills + self.xs_ovs
-                                       if o["on"].value]
+        return [self.xs_fill.value] + [o["field"] for o in self.xs_fills + self.xs_ovs
+                                       if o["on"]]
 
     def request_xsec(self):
         if self._applying:  # (a session going back: once, at its end)
@@ -288,40 +253,41 @@ class SectionPanel:
         self.pools["xs"].submit(self._xs_job, spec, g)
 
     def xs_spec(self):
-        """What the section draws, from its widgets (also the Figure workspace's
+        """What the section draws, from its layers (layers.py; also the Figure workspace's
         'figure from this section')."""
         try:  # synced from the browser once the figure has been drawn
             w, h = self.xs_fig.inner_width or 800, self.xs_fig.inner_height or 360
         except Exception:  # noqa: BLE001
             w, h = 800, 360
+        m = self.xs_main
         spec = dict(t=self.t, A=self.xs_pts[0], B=self.xs_pts[1], fill=self.xs_fill.value,
                     ztop=float(self.xs_ztop.value), px=(w, h), storm=self._storm_motion(),
-                    style=self.xs_fill_style.value, nlev=int(self.xs_nlev.value),
-                    cmap=self.xs_cmap.value, rev=self.xs_rev.value, auto=self.xs_auto.value,
-                    vmin=self.xs_min.value or 0.0, vmax=self.xs_max.value or 0.0,
-                    fills=[dict(on=o["on"].value, var=o["var"].value, style=o["style"].value,
-                                cmap=o["cmap"].value, rev=o["rev"].value,
-                                auto=o["auto"].value, vmin=o["vmin"].value or 0.0,
-                                vmax=o["vmax"].value or 0.0, nlev=15, alpha=o["alpha"].value,
-                                clip=o["clip"].value) for o in self.xs_fills],
-                    ov=[dict(on=o["on"].value, var=o["var"].value, levels=o["levels"].value,
-                             color=o["color"].value, width=o["width"].value,
-                             negdash=o["negdash"].value) for o in self.xs_ovs],
-                    vecs=[dict(on=o["on"].value, q=o["q"].value, frame=o["frame"].value,
-                               density=int(o["density"].value),
-                               ref=o["ref"].value or vectors.VECTORS[o["q"].value].ref,
-                               color=o["color"].value) for o in self.xs_vecs],
-                    fstorm=self._field_storm(self.t)[0],
-                    minus=self._minus_spec(self.xs_diff))
+                    style=IMAGE.get(m["style"], m["style"]), nlev=int(m["nlevels"] or 15),
+                    cmap=m["cmap"], rev=bool(m["reverse"]), auto=bool(m["auto"]),
+                    vmin=m["vmin"] or 0.0, vmax=m["vmax"] or 0.0,
+                    fills=[dict(on=bool(o["on"]), var=o["field"],
+                                style=IMAGE.get(o["style"], o["style"]), cmap=o["cmap"],
+                                rev=bool(o["reverse"]), auto=bool(o["auto"]),
+                                vmin=o["vmin"] or 0.0, vmax=o["vmax"] or 0.0, nlev=15,
+                                alpha=float(o["alpha"]), clip=bool(o["clip"]))
+                           for o in self.xs_fills],
+                    ov=[dict(on=bool(o["on"]), var=o["field"], levels=o["levels"],
+                             color=o["color"], width=float(o["lw"]),
+                             negdash=bool(o["neg_dashed"])) for o in self.xs_ovs],
+                    vecs=[dict(on=bool(o["on"]), q=o["vector"], frame=o["frame"],
+                               density=int(o["across"]),
+                               ref=o["ref"] or vectors.VECTORS[o["vector"]].ref,
+                               color=o["color"]) for o in self.xs_vecs],
+                    fstorm=self._field_storm(self.t)[0], minus=minus_spec(m.lay))
         spec["fnote"] = self._storm_note(self._xs_names(spec), self.t)
         return spec
 
     def _xs_fields(self, spec=None):
-        """(names, shown): the native fields a section reads (of its spec, or of the
-        widgets), and the fields it shows (what F.fits sizes)."""
+        """(names, shown): the native fields a section reads (of its spec, or of its
+        layers), and the fields it shows (what F.fits sizes)."""
         F = self.F
         qs = ([o["q"] for o in spec["vecs"] if o["on"]] if spec is not None else
-              [o["q"].value for o in self.xs_vecs if o["on"].value])
+              [o["vector"] for o in self.xs_vecs if o["on"]])
         shown = self._xs_names(spec)
         names = []
         for n in shown:
@@ -449,7 +415,7 @@ class SectionPanel:
         F = self.F
         d = F[spec["fill"]]
         s, zq, fill = res["s"], res["zq"], res["fill"]
-        self._xs_range = (fill["lo"], fill["hi"])
+        self.xs_main.last = (fill["lo"], fill["hi"])  # (Auto range off starts there)
         self.xs_mapper.update(palette=fill["palette"], low=fill["lo"], high=fill["hi"])
         image = fill["style"] == "image"
         if image:
@@ -473,8 +439,8 @@ class SectionPanel:
                 r["poly"].glyph.fill_alpha = f["alpha"]
             r["img"].visible, r["poly"].visible = image, not image
         for o, f, fres in zip(self.xs_fills, spec["fills"], res["fills"]):
-            if fres is not None and o["var"].value == f["var"]:
-                o["last"] = (fres["lo"], fres["hi"])  # (Auto range off starts from it)
+            if fres is not None and o["field"] == f["var"]:
+                o.last = (fres["lo"], fres["hi"])  # (Auto range off starts from it)
         for o, ores, (ps, ns, pr, nr) in zip(spec["ov"], res["ov"], self.xs_ov_r):
             ps.data, ns.data = (ores["pos"], ores["neg"]) if ores else \
                 (dict(EMPTY_LINES), dict(EMPTY_LINES))

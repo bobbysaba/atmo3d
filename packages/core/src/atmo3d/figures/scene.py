@@ -1,19 +1,12 @@
 """Figure editor: what a 3D scene figure takes from the viewer (from_3d, its camera as the user left
-it, its parcel sets), and the widgets the shell's scene settings are copied from.
+it, its parcel sets), and the first isosurface, vectors and parcels a scene's Add gives.
 
 A mixin of the FigureEditor (figures/editor.py)."""
 
-import numpy as np
-import panel as pn
-
 from . import draw as figdraw, spec as fg
-from ..core import vectors, volume3d
 from ..core.services import parcels as P
-from ..viewer.numinput import FloatInput
-from .cards import (SCENE_ARROWS, SCENE_BARS, SCENE_BG, SCENE_FLOOR_CMAPS,
-                    SCENE_FLOOR_RANGE, SCENE_LIGHTS, SCENE_PROJ, SCENE_RES, SCENE_STREAM_BY,
-                    SCENE_STREAM_DIR, SCENE_VIEWS, _auto, _chk, _dark, _f, _hex, parcel_pick)
-from ..viewer.fieldmenu import FieldSelect
+from .choices import _dark
+from .sources import parcel_pick
 
 ISO_MAX = VEC_MAX = PAR_MAX = 6
 
@@ -38,84 +31,10 @@ def next_vec(run, vecs):
 
 
 class FigureScene:
-    """The widgets of a 3D scene figure, and what it takes from the viewer."""
+    """What a 3D scene figure takes from the viewer."""
 
     def _build_scene(self):
-        F, run = self.fields, self.run
-        floor0 = F.role("cref") or F.role("refl") or next(iter(F.defs))
-        # (keys: the spec's; scene3d, ground, stream, camera and look)
-        self.sc_w = dict(
-            ztop=_f("Top (km MSL)" if run.terrain else "Top (km)",
-                    min(15.0, float(np.floor(volume3d.top_height(run)))), step=0.5,
-                    start=0.5),
-            exag=_f("Vertical exaggeration", 2.0, step=0.5, start=0.25),
-            smooth=_f("Smoothing σ (grid cells)", 0.75, step=0.25, start=0.0),
-            res=pn.widgets.Select(name="Resolution", options=SCENE_RES, value=0,
-                                  description="Auto: coarser for a large region (about 12 "
-                                              "million grid points at most)"))
-        self.sc_region = pn.widgets.Select(name="Region", options={
-            "Whole domain": "full", "Fixed box": "box"})
-        self.sc_box = [_f(n, None, step=0.5) for n in ("x min (km)", "x max (km)",
-                                                       "y min (km)", "y max (km)")]
-        self.sc_g = dict(
-            on=_chk("Floor", True),
-            var=FieldSelect(name="Field", groups=F.groups(), value=floor0),
-            z=_f("Height (km; 0: lowest level)", 0.0, step=0.25, start=0.0),
-            cmap=pn.widgets.Select(name="Colormap", options=SCENE_FLOOR_CMAPS,
-                                   value="Field default"),
-            rev=_chk("Reverse", False),
-            range=pn.widgets.Select(name="Range", options=SCENE_FLOOR_RANGE, value="data"),
-            lo=_f("Min", 0.0), hi=_f("Max", 1.0))
-        self.sc_s = dict(
-            on=_chk("Streamlines", False),
-            z=_f("Seed height (km)", 0.5, step=0.1, start=0.0),
-            n=pn.widgets.IntInput(name="Seeds across (n × n)", start=2, end=40, value=12),
-            length=_f("Max length (km)", 40.0, step=5.0, start=1.0),
-            dir=pn.widgets.Select(name="Direction", options=SCENE_STREAM_DIR),
-            frame=pn.widgets.Select(name="Frame", options=vectors.frames(self.run),
-                                    value=vectors.frame_of(self.run, "storm")),
-            color_by=pn.widgets.Select(name="Colour by", options=SCENE_STREAM_BY))
-        self.sc_c = dict(
-            preset=pn.widgets.Select(name="View", options=SCENE_VIEWS, value="oblique"),
-            azimuth=_auto("Azimuth (°)", description="The compass bearing the camera "
-                                                     "stands at from the middle (0: north, "
-                                                     "90: east). Blank: the view's"),
-            elevation=_auto("Elevation (°)", description="Above the horizon (90: straight "
-                                                         "down). Blank: the view's"),
-            zoom=_f("Zoom", 1.0, step=0.1, start=0.1,
-                    description="1: the whole region fits; 2: twice as close"),
-            projection=pn.widgets.Select(name="Projection", options=SCENE_PROJ),
-            view_angle=_f("View angle (°)", 30.0, step=5.0, start=5.0, end=120.0,
-                          description="Perspective only: smaller is flatter (a long lens)"))
-        self.sc_l = dict(
-            lighting=pn.widgets.Select(name="Lighting", options=SCENE_LIGHTS),
-            background=pn.widgets.Select(name="Background", options=SCENE_BG, value=""),
-            outline_color=pn.widgets.ColorPicker(name="Box colour", value="#475569"),
-            tube=_f("Line thickness", 1.0, step=0.25, start=0.1,
-                    description="Streamline tubes and line arrows (1: the default)"),
-            arrows=pn.widgets.Select(name="Vectors as", options=SCENE_ARROWS),
-            shine=_f("Shine", 0.3, step=0.1, start=0.0, end=1.0,
-                     description="The surfaces' specular highlight (0: matte)"),
-            ambient=_f("Ambient light", 0.25, step=0.05, start=0.0, end=1.0,
-                       description="How light the shadowed sides stay"),
-            floor_bar=pn.widgets.Select(name="Floor colorbar", options=SCENE_BARS),
-            stream_bar=pn.widgets.Select(name="Streamline colorbar", options=SCENE_BARS,
-                                         value="right"),
-            parcel_bar=pn.widgets.Select(name="Parcel colorbar", options=SCENE_BARS,
-                                         value="left"),
-            outline=_chk("Box outline", True), ticks=_chk("Axis ticks", True),
-            legend=_chk("Legend", True), seed_box=_chk("Seed box outline", True))
-        self.sc_anim = dict(
-            follow=pn.widgets.Select(name="Box in animations", options={
-                "Stays where it is": "fixed", "Follows the track": "track"},
-                description="A fixed box moved each frame by as far as the run's track "
-                            "has moved since the first frame"),
-            orbit=_f("Camera orbit (°)", 0.0, step=15.0, start=-3600.0, end=3600.0,
-                     description="How far the camera turns round the region over the "
-                                 "whole animation (360: once round; negative: the other "
-                                 "way)"))
-        self.sc_labels = [pn.widgets.TextInput(name=f"{a} axis label", value=f"{a} (km)")
-                          for a in "xyz"]
+        """Follow the 3D workspace's camera."""
         # the 3D workspace's camera as the user leaves it (plotly's relayout after a drag)
         self._cam3d = None
         v = self.v
@@ -209,26 +128,3 @@ class FigureScene:
         s["colorbar"] = dict(s["colorbar"], mode="none")
         s["letters"] = dict(s["letters"], on=False)
         self.shell.open_new(s)
-
-def _put(ws, d):
-    """Widgets ws take the values of d (by key; blank-able numbers may be None; a
-    choice a list lacks leaves the widget as it is)."""
-    for k, x in ws.items():
-        if k not in d:
-            continue
-        v = d[k]
-        if isinstance(x, pn.widgets.ColorPicker):
-            v = _hex(v)
-        elif isinstance(x, pn.widgets.Checkbox):
-            v = bool(v)
-        elif isinstance(x, pn.widgets.IntInput):
-            v = int(v)
-        elif isinstance(x, FloatInput):
-            v = None if v is None else float(v)
-        elif isinstance(x, (pn.widgets.Select, FieldSelect)):
-            vals = [y for g in x.groups.values() for y in g.values()] if x.groups \
-                else list(x.values)
-            if v not in vals:
-                continue
-        x.value = v
-

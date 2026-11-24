@@ -1,0 +1,3860 @@
+{
+ "records": [
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Width (in)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "size[]",
+    "size_auto"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Height (in)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "size[]",
+    "size_auto"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Size",
+   "control": "Select",
+   "options": [
+    "Custom",
+    "3.25 in wide (one journal column)",
+    "5 in wide",
+    "6.5 in wide (full page width)",
+    "7.5 in wide",
+    "Slide, 13.3 \u00d7 7.5 in"
+   ],
+   "keys": [
+    "size[]",
+    "size_auto"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Figure title",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "suptitle"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Figure type",
+   "control": "Select",
+   "options": [
+    "Plan views",
+    "Soundings",
+    "Vertical cross-sections",
+    "Time\u2013height (series)",
+    "Time series",
+    "Distributions",
+    "Vertical profiles",
+    "Joint distributions (x vs y)",
+    "Azimuthal means (radius\u2013height)",
+    "Tables (sounding parameters, field statistics)",
+    "3D scene (one picture)"
+   ],
+   "keys": [
+    "annotations[].color",
+    "annotations[].coords",
+    "annotations[].kind",
+    "annotations[].ls",
+    "annotations[].lw",
+    "annotations[].panel",
+    "annotations[].r",
+    "annotations[].size",
+    "annotations[].text",
+    "annotations[].x",
+    "annotations[].x2",
+    "annotations[].y",
+    "annotations[].y2",
+    "kinds.plan.axes.equal",
+    "kinds.plan.axes.frame_lw",
+    "kinds.plan.axes.minor",
+    "kinds.plan.axes.tickdir",
+    "kinds.plan.axes.ticklabels",
+    "kinds.plan.axes.ticks",
+    "kinds.plan.axes.title_bold",
+    "kinds.plan.axes.title_loc",
+    "kinds.plan.axes.xlabel",
+    "kinds.plan.axes.ylabel",
+    "kinds.plan.coords",
+    "kinds.plan.domain.box",
+    "kinds.plan.domain.half",
+    "kinds.plan.domain.mode",
+    "kinds.plan.xsec.coords",
+    "kinds.plan.xsec.dz",
+    "kinds.plan.xsec.ztop",
+    "layers.*.arrowsize",
+    "layers.*.barb_len",
+    "layers.*.barb_units",
+    "layers.*.clabel",
+    "layers.*.cmap",
+    "layers.*.color",
+    "layers.*.density",
+    "layers.*.extend",
+    "layers.*.field",
+    "layers.*.frame",
+    "layers.*.key",
+    "layers.*.legend",
+    "layers.*.levels",
+    "layers.*.lw",
+    "layers.*.mask_below",
+    "layers.*.mode",
+    "layers.*.neg_dashed",
+    "layers.*.nlevels",
+    "layers.*.on",
+    "layers.*.reverse",
+    "layers.*.scale",
+    "layers.*.slw",
+    "layers.*.spacing",
+    "layers.*.style",
+    "layers.*.type",
+    "layers.*.units",
+    "layers.*.vector",
+    "layers.*.vmax",
+    "layers.*.vmin",
+    "layers.*.white_first",
+    "layers.*.width",
+    "layers.*.z",
+    "layers.*.zspacing",
+    "panels[].kind",
+    "panels[].layers[].ref",
+    "panels[].section",
+    "sections.s0.a",
+    "sections.s0.ahead",
+    "sections.s0.angle",
+    "sections.s0.avg",
+    "sections.s0.b",
+    "sections.s0.cx",
+    "sections.s0.cy",
+    "sections.s0.half",
+    "sections.s0.label",
+    "sections.s0.mwin",
+    "sections.s0.off",
+    "sections.s0.offset[]",
+    "sections.s0.orient",
+    "sections.s0.pos",
+    "sections.s0.right",
+    "sections.s0.x",
+    "sections.s0.x0",
+    "sections.s0.x1",
+    "sections.s0.y",
+    "sections.s0.y0",
+    "sections.s0.y1",
+    "size[]"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Rows",
+   "control": "IntInput",
+   "options": [],
+   "keys": [
+    "grid.rows",
+    "size[]"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Columns",
+   "control": "IntInput",
+   "options": [],
+   "keys": [
+    "grid.cols"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Column widths",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "grid.widths[]"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Row heights",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "grid.heights[]"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Add a panel of",
+   "control": "Select",
+   "options": [
+    "Plan views",
+    "Soundings",
+    "Vertical cross-sections",
+    "Time\u2013height (series)",
+    "Time series",
+    "Distributions",
+    "Vertical profiles",
+    "Joint distributions (x vs y)",
+    "Azimuthal means (radius\u2013height)",
+    "Tables (sounding parameters, field statistics)",
+    "3D scene (one picture)"
+   ],
+   "keys": [],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "At",
+   "control": "Select",
+   "options": [
+    "A new row",
+    "A new column"
+   ],
+   "keys": [],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Apply a style preset",
+   "control": "MenuButton",
+   "options": [],
+   "keys": [],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Text",
+   "label": "Font",
+   "control": "Select",
+   "options": [
+    "sans-serif",
+    "serif",
+    "DejaVu Sans",
+    "Liberation Sans",
+    "Source Sans Pro",
+    "Roboto",
+    "Open Sans",
+    "Noto Sans",
+    "DejaVu Serif",
+    "Liberation Serif",
+    "STIXGeneral"
+   ],
+   "keys": [
+    "style.font.family"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Text",
+   "label": "Math & units font",
+   "control": "Select",
+   "options": [
+    "DejaVu Sans",
+    "Like the text font",
+    "STIX Sans",
+    "STIX (Times-like)",
+    "Computer Modern (LaTeX)"
+   ],
+   "keys": [
+    "style.font.math"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Text",
+   "label": "Base size (pt)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.font.size"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Text",
+   "label": "Tick labels (pt)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.font.tick"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Text",
+   "label": "Axis labels (pt)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.font.label"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Text",
+   "label": "Panel titles (pt)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.font.title"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Text",
+   "label": "Figure title (pt)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.font.suptitle"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Text",
+   "label": "Legends (pt)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.font.legend"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Where",
+   "control": "Select",
+   "options": [
+    "Center",
+    "Left",
+    "Right"
+   ],
+   "keys": [
+    "kinds.scene.axes.title_loc"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Bold",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.scene.axes.title_bold"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Shrink these labels to fit narrow panels",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "style.label_fit"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Panel letters",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "style.letters.auto",
+    "style.letters.on"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Style",
+   "control": "Select",
+   "options": [
+    "a",
+    "(a)",
+    "a)",
+    "A",
+    "(A)"
+   ],
+   "keys": [
+    "style.letters.fmt"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Size (pt)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.letters.size"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "White box",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "style.letters.box"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Time label",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "style.time_label.on"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Text",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "style.time_label.fmt"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Run name",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "style.run_label.on"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "In the run's colour",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "style.run_label.run_color"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Legend",
+   "label": "Layer legend on",
+   "control": "Select",
+   "options": [
+    "A panel",
+    "The figure"
+   ],
+   "keys": [
+    "style.legend.where"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Legend",
+   "label": "At",
+   "control": "Select",
+   "options": [
+    "upper left",
+    "upper right",
+    "lower left",
+    "lower right",
+    "upper center",
+    "lower center",
+    "center left",
+    "center right"
+   ],
+   "keys": [
+    "style.legend.loc"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Legend",
+   "label": "Title",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "style.legend.title"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Legend",
+   "label": "Columns",
+   "control": "IntInput",
+   "options": [],
+   "keys": [
+    "style.legend.ncol"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Legend",
+   "label": "Frame",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "style.legend.frame"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Legend",
+   "label": "Anchor x, y (blank: none)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Contour key",
+   "label": "Of the layer",
+   "control": "Select",
+   "options": [
+    "First contours"
+   ],
+   "keys": [],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Maximum and minimum",
+   "label": "Of the layer",
+   "control": "Select",
+   "options": [
+    "First fill"
+   ],
+   "keys": [],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Spacing",
+   "label": "Between columns",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.spacing.wspace"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Spacing",
+   "label": "Between rows",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.spacing.hspace"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Spacing",
+   "label": "Around panels, x (in)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.spacing.w_pad"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Spacing",
+   "label": "Around panels, y (in)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.spacing.h_pad"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "matplotlib style",
+   "label": "matplotlib style (blank: none)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "style.mplstyle"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Your own code",
+   "label": "Run the code",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "code.on"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Your own code",
+   "label": "",
+   "control": "CodeEditor",
+   "options": [],
+   "keys": [],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Your own code",
+   "label": "Python, run after the figure is drawn",
+   "control": "TextAreaInput",
+   "options": [],
+   "keys": [
+    "code.text"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Your own code",
+   "label": "Plain text box (if the highlighted editor stays blank, e.g. without internet)",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Add",
+   "control": "Select",
+   "options": [
+    "Text",
+    "Marker",
+    "Arrow",
+    "Line",
+    "Vertical line",
+    "Horizontal line",
+    "Box",
+    "Circle",
+    "Legend entry"
+   ],
+   "keys": [],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Kind",
+   "control": "Select",
+   "options": [
+    "Text",
+    "Marker",
+    "Arrow",
+    "Line",
+    "Vertical line",
+    "Horizontal line",
+    "Box",
+    "Circle",
+    "Legend entry"
+   ],
+   "keys": [
+    "annotations[].kind",
+    "annotations[].marker"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Panels (blank: all)",
+   "control": "MultiChoice",
+   "options": [
+    "a"
+   ],
+   "keys": [
+    "annotations[].panel"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Position in",
+   "control": "Select",
+   "options": [
+    "Axis units (km, min)",
+    "Panel fraction (0\u20131)"
+   ],
+   "keys": [
+    "annotations[].coords"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "x",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].x"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "y",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].y"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Text",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "annotations[].text"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Size",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].size"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Bold",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "annotations[].bold"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Colour",
+   "control": "ColorPicker",
+   "options": [],
+   "keys": [
+    "annotations[].color"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Line width",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].lw"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Marker",
+   "control": "Select",
+   "options": [
+    "\u00d7",
+    "+",
+    "\u25cf",
+    "\u25cb",
+    "\u25a1",
+    "\u2605",
+    "\u25b2"
+   ],
+   "keys": [
+    "annotations[].marker"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "x to",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].x2"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "y to",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].y2"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Line style",
+   "control": "Select",
+   "options": [
+    "Solid",
+    "Dashed",
+    "Dotted",
+    "Dash-dot"
+   ],
+   "keys": [
+    "annotations[].ls"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Radius",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].r"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Looks like",
+   "control": "Select",
+   "options": [
+    "Line",
+    "Marker",
+    "Line and marker",
+    "Filled box"
+   ],
+   "keys": [
+    "annotations[].look"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "runs",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Label",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "runs[].label"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "runs",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Colour",
+   "control": "ColorPicker",
+   "options": [],
+   "keys": [
+    "runs[].color"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "runs",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Time zero (min)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "runs[].t0_min"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "runs",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Viewer's track",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "runs[].track"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "runs",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Track file",
+   "control": "Select",
+   "options": [
+    "None",
+    "demo_supercell.csv",
+    "demo_supercell_weak.csv",
+    "Type a path\u2026"
+   ],
+   "keys": [
+    "runs[].track"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "runs",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Track file path (blank: none)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "runs[].track"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "runs",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Storm",
+   "control": "Select",
+   "options": [],
+   "keys": [],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "runs",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Add a run",
+   "control": "Select",
+   "options": [
+    "demo/supercell_weak"
+   ],
+   "keys": [],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Isosurfaces",
+   "label": "",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.isos[].on"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Isosurfaces",
+   "label": "Value",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.isos[].val"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Isosurfaces",
+   "label": "Colour",
+   "control": "ColorPicker",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.isos[].color"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Isosurfaces",
+   "label": "Opacity",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.isos[].op"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Floor",
+   "label": "Colormap",
+   "control": "Select",
+   "options": [
+    "Field default",
+    "reflectivity",
+    "turbo",
+    "viridis",
+    "magma",
+    "inferno",
+    "plasma",
+    "cividis",
+    "RdBu_r",
+    "PuOr_r",
+    "BrBG",
+    "coolwarm",
+    "seismic",
+    "cmo.balance",
+    "cmo.curl",
+    "cmo.thermal",
+    "cmo.haline",
+    "cmo.deep",
+    "cmo.rain",
+    "cmo.ice",
+    "cmo.amp",
+    "YlGnBu",
+    "YlOrRd",
+    "Spectral_r",
+    "Greys_r",
+    "cubehelix"
+   ],
+   "keys": [
+    "kinds.scene.scene3d.ground.cmap"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Floor",
+   "label": "Range",
+   "control": "Select",
+   "options": [
+    "From the data",
+    "Field default",
+    "Custom"
+   ],
+   "keys": [
+    "kinds.scene.scene3d.ground.range"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Floor",
+   "label": "Floor",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.ground.on"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Floor",
+   "label": "Reverse",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.ground.rev"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Vectors",
+   "label": "",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.vecs[].on"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Vectors",
+   "label": "Vector",
+   "control": "Select",
+   "options": [
+    "Wind",
+    "Horizontal vorticity",
+    "Baroclinic generation"
+   ],
+   "keys": [
+    "kinds.scene.scene3d.vecs[].q",
+    "kinds.scene.scene3d.vecs[].ref"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Vectors",
+   "label": "Height (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.vecs[].level"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Vectors",
+   "label": "Frame",
+   "control": "Select",
+   "options": [
+    "Ground-relative",
+    "Grid-relative",
+    "Storm-relative"
+   ],
+   "keys": [
+    "kinds.scene.scene3d.vecs[].frame"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Vectors",
+   "label": "Arrows across",
+   "control": "IntInput",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.vecs[].density"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Vectors",
+   "label": "Ref. length (m/s)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.vecs[].ref"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Vectors",
+   "label": "Colour",
+   "control": "ColorPicker",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.vecs[].color"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Streamlines",
+   "label": "Seed height (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.stream.z"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Streamlines",
+   "label": "Seeds across (n \u00d7 n)",
+   "control": "IntInput",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.stream.n"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Streamlines",
+   "label": "Max length (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.stream.length"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Streamlines",
+   "label": "Direction",
+   "control": "Select",
+   "options": [
+    "Forward",
+    "Backward",
+    "Both"
+   ],
+   "keys": [
+    "kinds.scene.scene3d.stream.dir"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Streamlines",
+   "label": "Frame",
+   "control": "Select",
+   "options": [
+    "Ground-relative",
+    "Grid-relative",
+    "Storm-relative"
+   ],
+   "keys": [
+    "kinds.scene.scene3d.stream.frame"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Streamlines",
+   "label": "Colour by",
+   "control": "Select",
+   "options": [
+    "Height",
+    "Vertical velocity"
+   ],
+   "keys": [
+    "kinds.scene.scene3d.stream.color_by"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Streamlines",
+   "label": "Streamlines",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.stream.on"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Region and resolution",
+   "label": "Region",
+   "control": "Select",
+   "options": [
+    "Whole domain",
+    "Fixed box"
+   ],
+   "keys": [
+    "kinds.scene.scene3d.box",
+    "kinds.scene.scene3d.box[]"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Region and resolution",
+   "label": "Top (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.ztop"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Region and resolution",
+   "label": "Vertical exaggeration",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.exag"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Region and resolution",
+   "label": "Smoothing \u03c3 (grid cells)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.smooth"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Region and resolution",
+   "label": "Resolution",
+   "control": "Select",
+   "options": [
+    "Auto",
+    "Full",
+    "1/2",
+    "1/3",
+    "1/4"
+   ],
+   "keys": [
+    "kinds.scene.scene3d.res"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Camera",
+   "label": "View",
+   "control": "Select",
+   "options": [
+    "From the southwest",
+    "From above",
+    "From the south",
+    "From the north",
+    "From the west",
+    "From the east"
+   ],
+   "keys": [
+    "kinds.scene.scene3d.camera.preset"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Camera",
+   "label": "Azimuth (\u00b0)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.camera.azimuth"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Camera",
+   "label": "Elevation (\u00b0)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.camera.elevation"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Camera",
+   "label": "Zoom",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.camera.zoom"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Camera",
+   "label": "Projection",
+   "control": "Select",
+   "options": [
+    "Perspective",
+    "Orthographic (no foreshortening)"
+   ],
+   "keys": [
+    "kinds.scene.scene3d.camera.projection"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Camera",
+   "label": "View angle (\u00b0)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.camera.view_angle"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Look",
+   "label": "Lighting",
+   "control": "Select",
+   "options": [
+    "Light kit (soft, from several sides)",
+    "Three lights",
+    "Headlight (from the camera)"
+   ],
+   "keys": [
+    "kinds.scene.scene3d.look.aa",
+    "kinds.scene.scene3d.look.ambient",
+    "kinds.scene.scene3d.look.arrows",
+    "kinds.scene.scene3d.look.background",
+    "kinds.scene.scene3d.look.floor_bar",
+    "kinds.scene.scene3d.look.labels[]",
+    "kinds.scene.scene3d.look.legend",
+    "kinds.scene.scene3d.look.lighting",
+    "kinds.scene.scene3d.look.outline",
+    "kinds.scene.scene3d.look.outline_color",
+    "kinds.scene.scene3d.look.parcel_bar",
+    "kinds.scene.scene3d.look.peels",
+    "kinds.scene.scene3d.look.seed_box",
+    "kinds.scene.scene3d.look.shine",
+    "kinds.scene.scene3d.look.stream_bar",
+    "kinds.scene.scene3d.look.ticks",
+    "kinds.scene.scene3d.look.tube"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Look",
+   "label": "Background",
+   "control": "Select",
+   "options": [
+    "The figure's (Export)",
+    "White",
+    "Black",
+    "Transparent"
+   ],
+   "keys": [
+    "kinds.scene.scene3d.look.aa",
+    "kinds.scene.scene3d.look.ambient",
+    "kinds.scene.scene3d.look.arrows",
+    "kinds.scene.scene3d.look.background",
+    "kinds.scene.scene3d.look.floor_bar",
+    "kinds.scene.scene3d.look.labels[]",
+    "kinds.scene.scene3d.look.legend",
+    "kinds.scene.scene3d.look.lighting",
+    "kinds.scene.scene3d.look.outline",
+    "kinds.scene.scene3d.look.outline_color",
+    "kinds.scene.scene3d.look.parcel_bar",
+    "kinds.scene.scene3d.look.peels",
+    "kinds.scene.scene3d.look.seed_box",
+    "kinds.scene.scene3d.look.shine",
+    "kinds.scene.scene3d.look.stream_bar",
+    "kinds.scene.scene3d.look.ticks",
+    "kinds.scene.scene3d.look.tube"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Look",
+   "label": "Vectors as",
+   "control": "Select",
+   "options": [
+    "3D arrows (scaled by length)",
+    "Lines (as the 3D view)"
+   ],
+   "keys": [
+    "kinds.scene.scene3d.look.aa",
+    "kinds.scene.scene3d.look.ambient",
+    "kinds.scene.scene3d.look.arrows",
+    "kinds.scene.scene3d.look.background",
+    "kinds.scene.scene3d.look.floor_bar",
+    "kinds.scene.scene3d.look.labels[]",
+    "kinds.scene.scene3d.look.legend",
+    "kinds.scene.scene3d.look.lighting",
+    "kinds.scene.scene3d.look.outline",
+    "kinds.scene.scene3d.look.outline_color",
+    "kinds.scene.scene3d.look.parcel_bar",
+    "kinds.scene.scene3d.look.peels",
+    "kinds.scene.scene3d.look.seed_box",
+    "kinds.scene.scene3d.look.shine",
+    "kinds.scene.scene3d.look.stream_bar",
+    "kinds.scene.scene3d.look.ticks",
+    "kinds.scene.scene3d.look.tube"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Look",
+   "label": "Shine",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.look.aa",
+    "kinds.scene.scene3d.look.ambient",
+    "kinds.scene.scene3d.look.arrows",
+    "kinds.scene.scene3d.look.background",
+    "kinds.scene.scene3d.look.floor_bar",
+    "kinds.scene.scene3d.look.labels[]",
+    "kinds.scene.scene3d.look.legend",
+    "kinds.scene.scene3d.look.lighting",
+    "kinds.scene.scene3d.look.outline",
+    "kinds.scene.scene3d.look.outline_color",
+    "kinds.scene.scene3d.look.parcel_bar",
+    "kinds.scene.scene3d.look.peels",
+    "kinds.scene.scene3d.look.seed_box",
+    "kinds.scene.scene3d.look.shine",
+    "kinds.scene.scene3d.look.stream_bar",
+    "kinds.scene.scene3d.look.ticks",
+    "kinds.scene.scene3d.look.tube"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Look",
+   "label": "Ambient light",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.look.aa",
+    "kinds.scene.scene3d.look.ambient",
+    "kinds.scene.scene3d.look.arrows",
+    "kinds.scene.scene3d.look.background",
+    "kinds.scene.scene3d.look.floor_bar",
+    "kinds.scene.scene3d.look.labels[]",
+    "kinds.scene.scene3d.look.legend",
+    "kinds.scene.scene3d.look.lighting",
+    "kinds.scene.scene3d.look.outline",
+    "kinds.scene.scene3d.look.outline_color",
+    "kinds.scene.scene3d.look.parcel_bar",
+    "kinds.scene.scene3d.look.peels",
+    "kinds.scene.scene3d.look.seed_box",
+    "kinds.scene.scene3d.look.shine",
+    "kinds.scene.scene3d.look.stream_bar",
+    "kinds.scene.scene3d.look.ticks",
+    "kinds.scene.scene3d.look.tube"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Look",
+   "label": "Line thickness",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.look.aa",
+    "kinds.scene.scene3d.look.ambient",
+    "kinds.scene.scene3d.look.arrows",
+    "kinds.scene.scene3d.look.background",
+    "kinds.scene.scene3d.look.floor_bar",
+    "kinds.scene.scene3d.look.labels[]",
+    "kinds.scene.scene3d.look.legend",
+    "kinds.scene.scene3d.look.lighting",
+    "kinds.scene.scene3d.look.outline",
+    "kinds.scene.scene3d.look.outline_color",
+    "kinds.scene.scene3d.look.parcel_bar",
+    "kinds.scene.scene3d.look.peels",
+    "kinds.scene.scene3d.look.seed_box",
+    "kinds.scene.scene3d.look.shine",
+    "kinds.scene.scene3d.look.stream_bar",
+    "kinds.scene.scene3d.look.ticks",
+    "kinds.scene.scene3d.look.tube"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Look",
+   "label": "Floor colorbar",
+   "control": "Select",
+   "options": [
+    "Below",
+    "Right",
+    "Left",
+    "Above",
+    "None"
+   ],
+   "keys": [
+    "kinds.scene.scene3d.look.aa",
+    "kinds.scene.scene3d.look.ambient",
+    "kinds.scene.scene3d.look.arrows",
+    "kinds.scene.scene3d.look.background",
+    "kinds.scene.scene3d.look.floor_bar",
+    "kinds.scene.scene3d.look.labels[]",
+    "kinds.scene.scene3d.look.legend",
+    "kinds.scene.scene3d.look.lighting",
+    "kinds.scene.scene3d.look.outline",
+    "kinds.scene.scene3d.look.outline_color",
+    "kinds.scene.scene3d.look.parcel_bar",
+    "kinds.scene.scene3d.look.peels",
+    "kinds.scene.scene3d.look.seed_box",
+    "kinds.scene.scene3d.look.shine",
+    "kinds.scene.scene3d.look.stream_bar",
+    "kinds.scene.scene3d.look.ticks",
+    "kinds.scene.scene3d.look.tube"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Look",
+   "label": "Streamline colorbar",
+   "control": "Select",
+   "options": [
+    "Below",
+    "Right",
+    "Left",
+    "Above",
+    "None"
+   ],
+   "keys": [
+    "kinds.scene.scene3d.look.aa",
+    "kinds.scene.scene3d.look.ambient",
+    "kinds.scene.scene3d.look.arrows",
+    "kinds.scene.scene3d.look.background",
+    "kinds.scene.scene3d.look.floor_bar",
+    "kinds.scene.scene3d.look.labels[]",
+    "kinds.scene.scene3d.look.legend",
+    "kinds.scene.scene3d.look.lighting",
+    "kinds.scene.scene3d.look.outline",
+    "kinds.scene.scene3d.look.outline_color",
+    "kinds.scene.scene3d.look.parcel_bar",
+    "kinds.scene.scene3d.look.peels",
+    "kinds.scene.scene3d.look.seed_box",
+    "kinds.scene.scene3d.look.shine",
+    "kinds.scene.scene3d.look.stream_bar",
+    "kinds.scene.scene3d.look.ticks",
+    "kinds.scene.scene3d.look.tube"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Look",
+   "label": "Parcel colorbar",
+   "control": "Select",
+   "options": [
+    "Below",
+    "Right",
+    "Left",
+    "Above",
+    "None"
+   ],
+   "keys": [
+    "kinds.scene.scene3d.look.aa",
+    "kinds.scene.scene3d.look.ambient",
+    "kinds.scene.scene3d.look.arrows",
+    "kinds.scene.scene3d.look.background",
+    "kinds.scene.scene3d.look.floor_bar",
+    "kinds.scene.scene3d.look.labels[]",
+    "kinds.scene.scene3d.look.legend",
+    "kinds.scene.scene3d.look.lighting",
+    "kinds.scene.scene3d.look.outline",
+    "kinds.scene.scene3d.look.outline_color",
+    "kinds.scene.scene3d.look.parcel_bar",
+    "kinds.scene.scene3d.look.peels",
+    "kinds.scene.scene3d.look.seed_box",
+    "kinds.scene.scene3d.look.shine",
+    "kinds.scene.scene3d.look.stream_bar",
+    "kinds.scene.scene3d.look.ticks",
+    "kinds.scene.scene3d.look.tube"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Look",
+   "label": "Box colour",
+   "control": "ColorPicker",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.look.aa",
+    "kinds.scene.scene3d.look.ambient",
+    "kinds.scene.scene3d.look.arrows",
+    "kinds.scene.scene3d.look.background",
+    "kinds.scene.scene3d.look.floor_bar",
+    "kinds.scene.scene3d.look.labels[]",
+    "kinds.scene.scene3d.look.legend",
+    "kinds.scene.scene3d.look.lighting",
+    "kinds.scene.scene3d.look.outline",
+    "kinds.scene.scene3d.look.outline_color",
+    "kinds.scene.scene3d.look.parcel_bar",
+    "kinds.scene.scene3d.look.peels",
+    "kinds.scene.scene3d.look.seed_box",
+    "kinds.scene.scene3d.look.shine",
+    "kinds.scene.scene3d.look.stream_bar",
+    "kinds.scene.scene3d.look.ticks",
+    "kinds.scene.scene3d.look.tube"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Look",
+   "label": "x axis label",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.look.aa",
+    "kinds.scene.scene3d.look.ambient",
+    "kinds.scene.scene3d.look.arrows",
+    "kinds.scene.scene3d.look.background",
+    "kinds.scene.scene3d.look.floor_bar",
+    "kinds.scene.scene3d.look.labels[]",
+    "kinds.scene.scene3d.look.legend",
+    "kinds.scene.scene3d.look.lighting",
+    "kinds.scene.scene3d.look.outline",
+    "kinds.scene.scene3d.look.outline_color",
+    "kinds.scene.scene3d.look.parcel_bar",
+    "kinds.scene.scene3d.look.peels",
+    "kinds.scene.scene3d.look.seed_box",
+    "kinds.scene.scene3d.look.shine",
+    "kinds.scene.scene3d.look.stream_bar",
+    "kinds.scene.scene3d.look.ticks",
+    "kinds.scene.scene3d.look.tube"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Look",
+   "label": "y axis label",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.look.aa",
+    "kinds.scene.scene3d.look.ambient",
+    "kinds.scene.scene3d.look.arrows",
+    "kinds.scene.scene3d.look.background",
+    "kinds.scene.scene3d.look.floor_bar",
+    "kinds.scene.scene3d.look.labels[]",
+    "kinds.scene.scene3d.look.legend",
+    "kinds.scene.scene3d.look.lighting",
+    "kinds.scene.scene3d.look.outline",
+    "kinds.scene.scene3d.look.outline_color",
+    "kinds.scene.scene3d.look.parcel_bar",
+    "kinds.scene.scene3d.look.peels",
+    "kinds.scene.scene3d.look.seed_box",
+    "kinds.scene.scene3d.look.shine",
+    "kinds.scene.scene3d.look.stream_bar",
+    "kinds.scene.scene3d.look.ticks",
+    "kinds.scene.scene3d.look.tube"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Look",
+   "label": "z axis label",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.look.aa",
+    "kinds.scene.scene3d.look.ambient",
+    "kinds.scene.scene3d.look.arrows",
+    "kinds.scene.scene3d.look.background",
+    "kinds.scene.scene3d.look.floor_bar",
+    "kinds.scene.scene3d.look.labels[]",
+    "kinds.scene.scene3d.look.legend",
+    "kinds.scene.scene3d.look.lighting",
+    "kinds.scene.scene3d.look.outline",
+    "kinds.scene.scene3d.look.outline_color",
+    "kinds.scene.scene3d.look.parcel_bar",
+    "kinds.scene.scene3d.look.peels",
+    "kinds.scene.scene3d.look.seed_box",
+    "kinds.scene.scene3d.look.shine",
+    "kinds.scene.scene3d.look.stream_bar",
+    "kinds.scene.scene3d.look.ticks",
+    "kinds.scene.scene3d.look.tube"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Look",
+   "label": "Box outline",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.look.aa",
+    "kinds.scene.scene3d.look.ambient",
+    "kinds.scene.scene3d.look.arrows",
+    "kinds.scene.scene3d.look.background",
+    "kinds.scene.scene3d.look.floor_bar",
+    "kinds.scene.scene3d.look.labels[]",
+    "kinds.scene.scene3d.look.legend",
+    "kinds.scene.scene3d.look.lighting",
+    "kinds.scene.scene3d.look.outline",
+    "kinds.scene.scene3d.look.outline_color",
+    "kinds.scene.scene3d.look.parcel_bar",
+    "kinds.scene.scene3d.look.peels",
+    "kinds.scene.scene3d.look.seed_box",
+    "kinds.scene.scene3d.look.shine",
+    "kinds.scene.scene3d.look.stream_bar",
+    "kinds.scene.scene3d.look.ticks",
+    "kinds.scene.scene3d.look.tube"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Look",
+   "label": "Axis ticks",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.look.aa",
+    "kinds.scene.scene3d.look.ambient",
+    "kinds.scene.scene3d.look.arrows",
+    "kinds.scene.scene3d.look.background",
+    "kinds.scene.scene3d.look.floor_bar",
+    "kinds.scene.scene3d.look.labels[]",
+    "kinds.scene.scene3d.look.legend",
+    "kinds.scene.scene3d.look.lighting",
+    "kinds.scene.scene3d.look.outline",
+    "kinds.scene.scene3d.look.outline_color",
+    "kinds.scene.scene3d.look.parcel_bar",
+    "kinds.scene.scene3d.look.peels",
+    "kinds.scene.scene3d.look.seed_box",
+    "kinds.scene.scene3d.look.shine",
+    "kinds.scene.scene3d.look.stream_bar",
+    "kinds.scene.scene3d.look.ticks",
+    "kinds.scene.scene3d.look.tube"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Look",
+   "label": "Legend",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.look.aa",
+    "kinds.scene.scene3d.look.ambient",
+    "kinds.scene.scene3d.look.arrows",
+    "kinds.scene.scene3d.look.background",
+    "kinds.scene.scene3d.look.floor_bar",
+    "kinds.scene.scene3d.look.labels[]",
+    "kinds.scene.scene3d.look.legend",
+    "kinds.scene.scene3d.look.lighting",
+    "kinds.scene.scene3d.look.outline",
+    "kinds.scene.scene3d.look.outline_color",
+    "kinds.scene.scene3d.look.parcel_bar",
+    "kinds.scene.scene3d.look.peels",
+    "kinds.scene.scene3d.look.seed_box",
+    "kinds.scene.scene3d.look.shine",
+    "kinds.scene.scene3d.look.stream_bar",
+    "kinds.scene.scene3d.look.ticks",
+    "kinds.scene.scene3d.look.tube"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Look",
+   "label": "Seed box outline",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.look.aa",
+    "kinds.scene.scene3d.look.ambient",
+    "kinds.scene.scene3d.look.arrows",
+    "kinds.scene.scene3d.look.background",
+    "kinds.scene.scene3d.look.floor_bar",
+    "kinds.scene.scene3d.look.labels[]",
+    "kinds.scene.scene3d.look.legend",
+    "kinds.scene.scene3d.look.lighting",
+    "kinds.scene.scene3d.look.outline",
+    "kinds.scene.scene3d.look.outline_color",
+    "kinds.scene.scene3d.look.parcel_bar",
+    "kinds.scene.scene3d.look.peels",
+    "kinds.scene.scene3d.look.seed_box",
+    "kinds.scene.scene3d.look.shine",
+    "kinds.scene.scene3d.look.stream_bar",
+    "kinds.scene.scene3d.look.ticks",
+    "kinds.scene.scene3d.look.tube"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Animation",
+   "label": "Box in animations",
+   "control": "Select",
+   "options": [
+    "Stays where it is",
+    "Follows the track"
+   ],
+   "keys": [
+    "kinds.scene.scene3d.follow"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "kind",
+   "kind": "scene",
+   "layer": "",
+   "section": "Animation",
+   "label": "Camera orbit (\u00b0)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.orbit"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "",
+   "label": "Title",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].title"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "",
+   "label": "Row label (left)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].rowlabel"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "",
+   "label": "Run",
+   "control": "Select",
+   "options": [
+    "1. supercell"
+   ],
+   "keys": [],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "",
+   "label": "Time",
+   "control": "Select",
+   "options": [
+    "0:00:00  (0 min)",
+    "1:00:00  (60 min)",
+    "1:05:00  (65 min)",
+    "1:10:00  (70 min)",
+    "1:15:00  (75 min)",
+    "1:20:00  (80 min)",
+    "1:25:00  (85 min)",
+    "1:30:00  (90 min)",
+    "1:35:00  (95 min)",
+    "1:40:00  (100 min)"
+   ],
+   "keys": [
+    "panels[].time_s"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Isosurfaces",
+   "label": "",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.isos[].on"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Isosurfaces",
+   "label": "Value",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.isos[].val"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Isosurfaces",
+   "label": "Colour",
+   "control": "ColorPicker",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.isos[].color"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Isosurfaces",
+   "label": "Opacity",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.isos[].op"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Floor",
+   "label": "Colormap",
+   "control": "Select",
+   "options": [
+    "Field default",
+    "reflectivity",
+    "turbo",
+    "viridis",
+    "magma",
+    "inferno",
+    "plasma",
+    "cividis",
+    "RdBu_r",
+    "PuOr_r",
+    "BrBG",
+    "coolwarm",
+    "seismic",
+    "cmo.balance",
+    "cmo.curl",
+    "cmo.thermal",
+    "cmo.haline",
+    "cmo.deep",
+    "cmo.rain",
+    "cmo.ice",
+    "cmo.amp",
+    "YlGnBu",
+    "YlOrRd",
+    "Spectral_r",
+    "Greys_r",
+    "cubehelix"
+   ],
+   "keys": [
+    "kinds.scene.scene3d.ground.cmap"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Floor",
+   "label": "Range",
+   "control": "Select",
+   "options": [
+    "From the data",
+    "Field default",
+    "Custom"
+   ],
+   "keys": [
+    "kinds.scene.scene3d.ground.range"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Floor",
+   "label": "Floor",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.ground.on"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Floor",
+   "label": "Reverse",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.ground.rev"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Vectors",
+   "label": "",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.vecs[].on"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Vectors",
+   "label": "Vector",
+   "control": "Select",
+   "options": [
+    "Wind",
+    "Horizontal vorticity",
+    "Baroclinic generation"
+   ],
+   "keys": [
+    "kinds.scene.scene3d.vecs[].q",
+    "kinds.scene.scene3d.vecs[].ref"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Vectors",
+   "label": "Height (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.vecs[].level"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Vectors",
+   "label": "Frame",
+   "control": "Select",
+   "options": [
+    "Ground-relative",
+    "Grid-relative",
+    "Storm-relative"
+   ],
+   "keys": [
+    "kinds.scene.scene3d.vecs[].frame"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Vectors",
+   "label": "Arrows across",
+   "control": "IntInput",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.vecs[].density"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Vectors",
+   "label": "Ref. length (m/s)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.vecs[].ref"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Vectors",
+   "label": "Colour",
+   "control": "ColorPicker",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.vecs[].color"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Streamlines",
+   "label": "Seed height (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.stream.z"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Streamlines",
+   "label": "Seeds across (n \u00d7 n)",
+   "control": "IntInput",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.stream.n"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Streamlines",
+   "label": "Max length (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.stream.length"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Streamlines",
+   "label": "Direction",
+   "control": "Select",
+   "options": [
+    "Forward",
+    "Backward",
+    "Both"
+   ],
+   "keys": [
+    "kinds.scene.scene3d.stream.dir"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Streamlines",
+   "label": "Frame",
+   "control": "Select",
+   "options": [
+    "Ground-relative",
+    "Grid-relative",
+    "Storm-relative"
+   ],
+   "keys": [
+    "kinds.scene.scene3d.stream.frame"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Streamlines",
+   "label": "Colour by",
+   "control": "Select",
+   "options": [
+    "Height",
+    "Vertical velocity"
+   ],
+   "keys": [
+    "kinds.scene.scene3d.stream.color_by"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Streamlines",
+   "label": "Streamlines",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.stream.on"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Region and resolution",
+   "label": "Region",
+   "control": "Select",
+   "options": [
+    "Whole domain",
+    "Fixed box"
+   ],
+   "keys": [
+    "kinds.scene.scene3d.box",
+    "kinds.scene.scene3d.box[]"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Region and resolution",
+   "label": "Top (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.ztop"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Region and resolution",
+   "label": "Vertical exaggeration",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.exag"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Region and resolution",
+   "label": "Smoothing \u03c3 (grid cells)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.smooth"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Region and resolution",
+   "label": "Resolution",
+   "control": "Select",
+   "options": [
+    "Auto",
+    "Full",
+    "1/2",
+    "1/3",
+    "1/4"
+   ],
+   "keys": [
+    "kinds.scene.scene3d.res"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Camera",
+   "label": "View",
+   "control": "Select",
+   "options": [
+    "From the southwest",
+    "From above",
+    "From the south",
+    "From the north",
+    "From the west",
+    "From the east"
+   ],
+   "keys": [
+    "kinds.scene.scene3d.camera.preset"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Camera",
+   "label": "Azimuth (\u00b0)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.camera.azimuth"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Camera",
+   "label": "Elevation (\u00b0)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.camera.elevation"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Camera",
+   "label": "Zoom",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.camera.zoom"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Camera",
+   "label": "Projection",
+   "control": "Select",
+   "options": [
+    "Perspective",
+    "Orthographic (no foreshortening)"
+   ],
+   "keys": [
+    "kinds.scene.scene3d.camera.projection"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Camera",
+   "label": "View angle (\u00b0)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.camera.view_angle"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Look",
+   "label": "Lighting",
+   "control": "Select",
+   "options": [
+    "Light kit (soft, from several sides)",
+    "Three lights",
+    "Headlight (from the camera)"
+   ],
+   "keys": [
+    "kinds.scene.scene3d.look.aa",
+    "kinds.scene.scene3d.look.ambient",
+    "kinds.scene.scene3d.look.arrows",
+    "kinds.scene.scene3d.look.background",
+    "kinds.scene.scene3d.look.floor_bar",
+    "kinds.scene.scene3d.look.labels[]",
+    "kinds.scene.scene3d.look.legend",
+    "kinds.scene.scene3d.look.lighting",
+    "kinds.scene.scene3d.look.outline",
+    "kinds.scene.scene3d.look.outline_color",
+    "kinds.scene.scene3d.look.parcel_bar",
+    "kinds.scene.scene3d.look.peels",
+    "kinds.scene.scene3d.look.seed_box",
+    "kinds.scene.scene3d.look.shine",
+    "kinds.scene.scene3d.look.stream_bar",
+    "kinds.scene.scene3d.look.ticks",
+    "kinds.scene.scene3d.look.tube"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Look",
+   "label": "Background",
+   "control": "Select",
+   "options": [
+    "The figure's (Export)",
+    "White",
+    "Black",
+    "Transparent"
+   ],
+   "keys": [
+    "kinds.scene.scene3d.look.aa",
+    "kinds.scene.scene3d.look.ambient",
+    "kinds.scene.scene3d.look.arrows",
+    "kinds.scene.scene3d.look.background",
+    "kinds.scene.scene3d.look.floor_bar",
+    "kinds.scene.scene3d.look.labels[]",
+    "kinds.scene.scene3d.look.legend",
+    "kinds.scene.scene3d.look.lighting",
+    "kinds.scene.scene3d.look.outline",
+    "kinds.scene.scene3d.look.outline_color",
+    "kinds.scene.scene3d.look.parcel_bar",
+    "kinds.scene.scene3d.look.peels",
+    "kinds.scene.scene3d.look.seed_box",
+    "kinds.scene.scene3d.look.shine",
+    "kinds.scene.scene3d.look.stream_bar",
+    "kinds.scene.scene3d.look.ticks",
+    "kinds.scene.scene3d.look.tube"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Look",
+   "label": "Vectors as",
+   "control": "Select",
+   "options": [
+    "3D arrows (scaled by length)",
+    "Lines (as the 3D view)"
+   ],
+   "keys": [
+    "kinds.scene.scene3d.look.aa",
+    "kinds.scene.scene3d.look.ambient",
+    "kinds.scene.scene3d.look.arrows",
+    "kinds.scene.scene3d.look.background",
+    "kinds.scene.scene3d.look.floor_bar",
+    "kinds.scene.scene3d.look.labels[]",
+    "kinds.scene.scene3d.look.legend",
+    "kinds.scene.scene3d.look.lighting",
+    "kinds.scene.scene3d.look.outline",
+    "kinds.scene.scene3d.look.outline_color",
+    "kinds.scene.scene3d.look.parcel_bar",
+    "kinds.scene.scene3d.look.peels",
+    "kinds.scene.scene3d.look.seed_box",
+    "kinds.scene.scene3d.look.shine",
+    "kinds.scene.scene3d.look.stream_bar",
+    "kinds.scene.scene3d.look.ticks",
+    "kinds.scene.scene3d.look.tube"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Look",
+   "label": "Shine",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.look.aa",
+    "kinds.scene.scene3d.look.ambient",
+    "kinds.scene.scene3d.look.arrows",
+    "kinds.scene.scene3d.look.background",
+    "kinds.scene.scene3d.look.floor_bar",
+    "kinds.scene.scene3d.look.labels[]",
+    "kinds.scene.scene3d.look.legend",
+    "kinds.scene.scene3d.look.lighting",
+    "kinds.scene.scene3d.look.outline",
+    "kinds.scene.scene3d.look.outline_color",
+    "kinds.scene.scene3d.look.parcel_bar",
+    "kinds.scene.scene3d.look.peels",
+    "kinds.scene.scene3d.look.seed_box",
+    "kinds.scene.scene3d.look.shine",
+    "kinds.scene.scene3d.look.stream_bar",
+    "kinds.scene.scene3d.look.ticks",
+    "kinds.scene.scene3d.look.tube"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Look",
+   "label": "Ambient light",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.look.aa",
+    "kinds.scene.scene3d.look.ambient",
+    "kinds.scene.scene3d.look.arrows",
+    "kinds.scene.scene3d.look.background",
+    "kinds.scene.scene3d.look.floor_bar",
+    "kinds.scene.scene3d.look.labels[]",
+    "kinds.scene.scene3d.look.legend",
+    "kinds.scene.scene3d.look.lighting",
+    "kinds.scene.scene3d.look.outline",
+    "kinds.scene.scene3d.look.outline_color",
+    "kinds.scene.scene3d.look.parcel_bar",
+    "kinds.scene.scene3d.look.peels",
+    "kinds.scene.scene3d.look.seed_box",
+    "kinds.scene.scene3d.look.shine",
+    "kinds.scene.scene3d.look.stream_bar",
+    "kinds.scene.scene3d.look.ticks",
+    "kinds.scene.scene3d.look.tube"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Look",
+   "label": "Line thickness",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.look.aa",
+    "kinds.scene.scene3d.look.ambient",
+    "kinds.scene.scene3d.look.arrows",
+    "kinds.scene.scene3d.look.background",
+    "kinds.scene.scene3d.look.floor_bar",
+    "kinds.scene.scene3d.look.labels[]",
+    "kinds.scene.scene3d.look.legend",
+    "kinds.scene.scene3d.look.lighting",
+    "kinds.scene.scene3d.look.outline",
+    "kinds.scene.scene3d.look.outline_color",
+    "kinds.scene.scene3d.look.parcel_bar",
+    "kinds.scene.scene3d.look.peels",
+    "kinds.scene.scene3d.look.seed_box",
+    "kinds.scene.scene3d.look.shine",
+    "kinds.scene.scene3d.look.stream_bar",
+    "kinds.scene.scene3d.look.ticks",
+    "kinds.scene.scene3d.look.tube"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Look",
+   "label": "Floor colorbar",
+   "control": "Select",
+   "options": [
+    "Below",
+    "Right",
+    "Left",
+    "Above",
+    "None"
+   ],
+   "keys": [
+    "kinds.scene.scene3d.look.aa",
+    "kinds.scene.scene3d.look.ambient",
+    "kinds.scene.scene3d.look.arrows",
+    "kinds.scene.scene3d.look.background",
+    "kinds.scene.scene3d.look.floor_bar",
+    "kinds.scene.scene3d.look.labels[]",
+    "kinds.scene.scene3d.look.legend",
+    "kinds.scene.scene3d.look.lighting",
+    "kinds.scene.scene3d.look.outline",
+    "kinds.scene.scene3d.look.outline_color",
+    "kinds.scene.scene3d.look.parcel_bar",
+    "kinds.scene.scene3d.look.peels",
+    "kinds.scene.scene3d.look.seed_box",
+    "kinds.scene.scene3d.look.shine",
+    "kinds.scene.scene3d.look.stream_bar",
+    "kinds.scene.scene3d.look.ticks",
+    "kinds.scene.scene3d.look.tube"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Look",
+   "label": "Streamline colorbar",
+   "control": "Select",
+   "options": [
+    "Below",
+    "Right",
+    "Left",
+    "Above",
+    "None"
+   ],
+   "keys": [
+    "kinds.scene.scene3d.look.aa",
+    "kinds.scene.scene3d.look.ambient",
+    "kinds.scene.scene3d.look.arrows",
+    "kinds.scene.scene3d.look.background",
+    "kinds.scene.scene3d.look.floor_bar",
+    "kinds.scene.scene3d.look.labels[]",
+    "kinds.scene.scene3d.look.legend",
+    "kinds.scene.scene3d.look.lighting",
+    "kinds.scene.scene3d.look.outline",
+    "kinds.scene.scene3d.look.outline_color",
+    "kinds.scene.scene3d.look.parcel_bar",
+    "kinds.scene.scene3d.look.peels",
+    "kinds.scene.scene3d.look.seed_box",
+    "kinds.scene.scene3d.look.shine",
+    "kinds.scene.scene3d.look.stream_bar",
+    "kinds.scene.scene3d.look.ticks",
+    "kinds.scene.scene3d.look.tube"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Look",
+   "label": "Parcel colorbar",
+   "control": "Select",
+   "options": [
+    "Below",
+    "Right",
+    "Left",
+    "Above",
+    "None"
+   ],
+   "keys": [
+    "kinds.scene.scene3d.look.aa",
+    "kinds.scene.scene3d.look.ambient",
+    "kinds.scene.scene3d.look.arrows",
+    "kinds.scene.scene3d.look.background",
+    "kinds.scene.scene3d.look.floor_bar",
+    "kinds.scene.scene3d.look.labels[]",
+    "kinds.scene.scene3d.look.legend",
+    "kinds.scene.scene3d.look.lighting",
+    "kinds.scene.scene3d.look.outline",
+    "kinds.scene.scene3d.look.outline_color",
+    "kinds.scene.scene3d.look.parcel_bar",
+    "kinds.scene.scene3d.look.peels",
+    "kinds.scene.scene3d.look.seed_box",
+    "kinds.scene.scene3d.look.shine",
+    "kinds.scene.scene3d.look.stream_bar",
+    "kinds.scene.scene3d.look.ticks",
+    "kinds.scene.scene3d.look.tube"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Look",
+   "label": "Box colour",
+   "control": "ColorPicker",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.look.aa",
+    "kinds.scene.scene3d.look.ambient",
+    "kinds.scene.scene3d.look.arrows",
+    "kinds.scene.scene3d.look.background",
+    "kinds.scene.scene3d.look.floor_bar",
+    "kinds.scene.scene3d.look.labels[]",
+    "kinds.scene.scene3d.look.legend",
+    "kinds.scene.scene3d.look.lighting",
+    "kinds.scene.scene3d.look.outline",
+    "kinds.scene.scene3d.look.outline_color",
+    "kinds.scene.scene3d.look.parcel_bar",
+    "kinds.scene.scene3d.look.peels",
+    "kinds.scene.scene3d.look.seed_box",
+    "kinds.scene.scene3d.look.shine",
+    "kinds.scene.scene3d.look.stream_bar",
+    "kinds.scene.scene3d.look.ticks",
+    "kinds.scene.scene3d.look.tube"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Look",
+   "label": "x axis label",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.look.aa",
+    "kinds.scene.scene3d.look.ambient",
+    "kinds.scene.scene3d.look.arrows",
+    "kinds.scene.scene3d.look.background",
+    "kinds.scene.scene3d.look.floor_bar",
+    "kinds.scene.scene3d.look.labels[]",
+    "kinds.scene.scene3d.look.legend",
+    "kinds.scene.scene3d.look.lighting",
+    "kinds.scene.scene3d.look.outline",
+    "kinds.scene.scene3d.look.outline_color",
+    "kinds.scene.scene3d.look.parcel_bar",
+    "kinds.scene.scene3d.look.peels",
+    "kinds.scene.scene3d.look.seed_box",
+    "kinds.scene.scene3d.look.shine",
+    "kinds.scene.scene3d.look.stream_bar",
+    "kinds.scene.scene3d.look.ticks",
+    "kinds.scene.scene3d.look.tube"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Look",
+   "label": "y axis label",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.look.aa",
+    "kinds.scene.scene3d.look.ambient",
+    "kinds.scene.scene3d.look.arrows",
+    "kinds.scene.scene3d.look.background",
+    "kinds.scene.scene3d.look.floor_bar",
+    "kinds.scene.scene3d.look.labels[]",
+    "kinds.scene.scene3d.look.legend",
+    "kinds.scene.scene3d.look.lighting",
+    "kinds.scene.scene3d.look.outline",
+    "kinds.scene.scene3d.look.outline_color",
+    "kinds.scene.scene3d.look.parcel_bar",
+    "kinds.scene.scene3d.look.peels",
+    "kinds.scene.scene3d.look.seed_box",
+    "kinds.scene.scene3d.look.shine",
+    "kinds.scene.scene3d.look.stream_bar",
+    "kinds.scene.scene3d.look.ticks",
+    "kinds.scene.scene3d.look.tube"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Look",
+   "label": "z axis label",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.look.aa",
+    "kinds.scene.scene3d.look.ambient",
+    "kinds.scene.scene3d.look.arrows",
+    "kinds.scene.scene3d.look.background",
+    "kinds.scene.scene3d.look.floor_bar",
+    "kinds.scene.scene3d.look.labels[]",
+    "kinds.scene.scene3d.look.legend",
+    "kinds.scene.scene3d.look.lighting",
+    "kinds.scene.scene3d.look.outline",
+    "kinds.scene.scene3d.look.outline_color",
+    "kinds.scene.scene3d.look.parcel_bar",
+    "kinds.scene.scene3d.look.peels",
+    "kinds.scene.scene3d.look.seed_box",
+    "kinds.scene.scene3d.look.shine",
+    "kinds.scene.scene3d.look.stream_bar",
+    "kinds.scene.scene3d.look.ticks",
+    "kinds.scene.scene3d.look.tube"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Look",
+   "label": "Box outline",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.look.aa",
+    "kinds.scene.scene3d.look.ambient",
+    "kinds.scene.scene3d.look.arrows",
+    "kinds.scene.scene3d.look.background",
+    "kinds.scene.scene3d.look.floor_bar",
+    "kinds.scene.scene3d.look.labels[]",
+    "kinds.scene.scene3d.look.legend",
+    "kinds.scene.scene3d.look.lighting",
+    "kinds.scene.scene3d.look.outline",
+    "kinds.scene.scene3d.look.outline_color",
+    "kinds.scene.scene3d.look.parcel_bar",
+    "kinds.scene.scene3d.look.peels",
+    "kinds.scene.scene3d.look.seed_box",
+    "kinds.scene.scene3d.look.shine",
+    "kinds.scene.scene3d.look.stream_bar",
+    "kinds.scene.scene3d.look.ticks",
+    "kinds.scene.scene3d.look.tube"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Look",
+   "label": "Axis ticks",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.look.aa",
+    "kinds.scene.scene3d.look.ambient",
+    "kinds.scene.scene3d.look.arrows",
+    "kinds.scene.scene3d.look.background",
+    "kinds.scene.scene3d.look.floor_bar",
+    "kinds.scene.scene3d.look.labels[]",
+    "kinds.scene.scene3d.look.legend",
+    "kinds.scene.scene3d.look.lighting",
+    "kinds.scene.scene3d.look.outline",
+    "kinds.scene.scene3d.look.outline_color",
+    "kinds.scene.scene3d.look.parcel_bar",
+    "kinds.scene.scene3d.look.peels",
+    "kinds.scene.scene3d.look.seed_box",
+    "kinds.scene.scene3d.look.shine",
+    "kinds.scene.scene3d.look.stream_bar",
+    "kinds.scene.scene3d.look.ticks",
+    "kinds.scene.scene3d.look.tube"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Look",
+   "label": "Legend",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.look.aa",
+    "kinds.scene.scene3d.look.ambient",
+    "kinds.scene.scene3d.look.arrows",
+    "kinds.scene.scene3d.look.background",
+    "kinds.scene.scene3d.look.floor_bar",
+    "kinds.scene.scene3d.look.labels[]",
+    "kinds.scene.scene3d.look.legend",
+    "kinds.scene.scene3d.look.lighting",
+    "kinds.scene.scene3d.look.outline",
+    "kinds.scene.scene3d.look.outline_color",
+    "kinds.scene.scene3d.look.parcel_bar",
+    "kinds.scene.scene3d.look.peels",
+    "kinds.scene.scene3d.look.seed_box",
+    "kinds.scene.scene3d.look.shine",
+    "kinds.scene.scene3d.look.stream_bar",
+    "kinds.scene.scene3d.look.ticks",
+    "kinds.scene.scene3d.look.tube"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Look",
+   "label": "Seed box outline",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.look.aa",
+    "kinds.scene.scene3d.look.ambient",
+    "kinds.scene.scene3d.look.arrows",
+    "kinds.scene.scene3d.look.background",
+    "kinds.scene.scene3d.look.floor_bar",
+    "kinds.scene.scene3d.look.labels[]",
+    "kinds.scene.scene3d.look.legend",
+    "kinds.scene.scene3d.look.lighting",
+    "kinds.scene.scene3d.look.outline",
+    "kinds.scene.scene3d.look.outline_color",
+    "kinds.scene.scene3d.look.parcel_bar",
+    "kinds.scene.scene3d.look.peels",
+    "kinds.scene.scene3d.look.seed_box",
+    "kinds.scene.scene3d.look.shine",
+    "kinds.scene.scene3d.look.stream_bar",
+    "kinds.scene.scene3d.look.ticks",
+    "kinds.scene.scene3d.look.tube"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Animation",
+   "label": "Box in animations",
+   "control": "Select",
+   "options": [
+    "Stays where it is",
+    "Follows the track"
+   ],
+   "keys": [
+    "kinds.scene.scene3d.follow"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Animation",
+   "label": "Camera orbit (\u00b0)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.scene.scene3d.orbit"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Where",
+   "control": "Select",
+   "options": [
+    "Center",
+    "Left",
+    "Right"
+   ],
+   "keys": [
+    "panels[].opts.axes.title_loc"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Bold",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.axes.title_bold"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Panel letters",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.letters.on"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Size (pt)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].opts.letters.size"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "White box",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.letters.box"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Time label",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.time_label.on"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Text",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].opts.time_label.fmt"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Run name",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.run_label.on"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "In the run's colour",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.run_label.run_color"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Add",
+   "control": "Select",
+   "options": [
+    "Text",
+    "Marker",
+    "Arrow",
+    "Line",
+    "Vertical line",
+    "Horizontal line",
+    "Box",
+    "Circle",
+    "Legend entry"
+   ],
+   "keys": [],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Kind",
+   "control": "Select",
+   "options": [
+    "Text",
+    "Marker",
+    "Arrow",
+    "Line",
+    "Vertical line",
+    "Horizontal line",
+    "Box",
+    "Circle",
+    "Legend entry"
+   ],
+   "keys": [
+    "annotations[].kind",
+    "annotations[].marker"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Panels (blank: all)",
+   "control": "MultiChoice",
+   "options": [
+    "a"
+   ],
+   "keys": [
+    "annotations[].panel"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Position in",
+   "control": "Select",
+   "options": [
+    "Axis units (km, min)",
+    "Panel fraction (0\u20131)"
+   ],
+   "keys": [
+    "annotations[].coords"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "x",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].x"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "y",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].y"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Text",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "annotations[].text"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Size",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].size"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Bold",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "annotations[].bold"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Colour",
+   "control": "ColorPicker",
+   "options": [],
+   "keys": [
+    "annotations[].color"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Line width",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].lw"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Marker",
+   "control": "Select",
+   "options": [
+    "\u00d7",
+    "+",
+    "\u25cf",
+    "\u25cb",
+    "\u25a1",
+    "\u2605",
+    "\u25b2"
+   ],
+   "keys": [
+    "annotations[].marker"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "x to",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].x2"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "y to",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].y2"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Line style",
+   "control": "Select",
+   "options": [
+    "Solid",
+    "Dashed",
+    "Dotted",
+    "Dash-dot"
+   ],
+   "keys": [
+    "annotations[].ls"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Radius",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].r"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Looks like",
+   "control": "Select",
+   "options": [
+    "Line",
+    "Marker",
+    "Line and marker",
+    "Filled box"
+   ],
+   "keys": [
+    "annotations[].look"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "",
+   "label": "Panel type",
+   "control": "Select",
+   "options": [
+    "Plan views",
+    "Soundings",
+    "Vertical cross-sections",
+    "Time\u2013height (series)",
+    "Time series",
+    "Distributions",
+    "Vertical profiles",
+    "Joint distributions (x vs y)",
+    "Azimuthal means (radius\u2013height)",
+    "Tables (sounding parameters, field statistics)",
+    "3D scene (one picture)"
+   ],
+   "keys": [
+    "annotations[].color",
+    "annotations[].coords",
+    "annotations[].kind",
+    "annotations[].ls",
+    "annotations[].lw",
+    "annotations[].panel",
+    "annotations[].r",
+    "annotations[].size",
+    "annotations[].text",
+    "annotations[].x",
+    "annotations[].x2",
+    "annotations[].y",
+    "annotations[].y2",
+    "kinds.plan.axes.equal",
+    "kinds.plan.axes.frame_lw",
+    "kinds.plan.axes.minor",
+    "kinds.plan.axes.tickdir",
+    "kinds.plan.axes.ticklabels",
+    "kinds.plan.axes.ticks",
+    "kinds.plan.axes.title_bold",
+    "kinds.plan.axes.title_loc",
+    "kinds.plan.axes.xlabel",
+    "kinds.plan.axes.ylabel",
+    "kinds.plan.coords",
+    "kinds.plan.domain.box",
+    "kinds.plan.domain.half",
+    "kinds.plan.domain.mode",
+    "kinds.plan.xsec.coords",
+    "kinds.plan.xsec.dz",
+    "kinds.plan.xsec.ztop",
+    "layers.*.arrowsize",
+    "layers.*.barb_len",
+    "layers.*.barb_units",
+    "layers.*.clabel",
+    "layers.*.cmap",
+    "layers.*.color",
+    "layers.*.density",
+    "layers.*.extend",
+    "layers.*.field",
+    "layers.*.frame",
+    "layers.*.key",
+    "layers.*.legend",
+    "layers.*.levels",
+    "layers.*.lw",
+    "layers.*.mask_below",
+    "layers.*.mode",
+    "layers.*.neg_dashed",
+    "layers.*.nlevels",
+    "layers.*.on",
+    "layers.*.reverse",
+    "layers.*.scale",
+    "layers.*.slw",
+    "layers.*.spacing",
+    "layers.*.style",
+    "layers.*.type",
+    "layers.*.units",
+    "layers.*.vector",
+    "layers.*.vmax",
+    "layers.*.vmin",
+    "layers.*.white_first",
+    "layers.*.width",
+    "layers.*.z",
+    "layers.*.zspacing",
+    "panels[].kind",
+    "panels[].layers[].ref",
+    "panels[].section",
+    "sections.s0.a",
+    "sections.s0.ahead",
+    "sections.s0.angle",
+    "sections.s0.avg",
+    "sections.s0.b",
+    "sections.s0.cx",
+    "sections.s0.cy",
+    "sections.s0.half",
+    "sections.s0.label",
+    "sections.s0.mwin",
+    "sections.s0.off",
+    "sections.s0.offset[]",
+    "sections.s0.orient",
+    "sections.s0.pos",
+    "sections.s0.right",
+    "sections.s0.x",
+    "sections.s0.x0",
+    "sections.s0.x1",
+    "sections.s0.y",
+    "sections.s0.y0",
+    "sections.s0.y1",
+    "size[]"
+   ],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "",
+   "label": "Row",
+   "control": "IntInput",
+   "options": [],
+   "keys": [],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "",
+   "label": "Column",
+   "control": "IntInput",
+   "options": [],
+   "keys": [],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "",
+   "label": "Rows tall",
+   "control": "IntInput",
+   "options": [],
+   "keys": [],
+   "seen_in": "scene figure"
+  },
+  {
+   "level": "panel",
+   "kind": "scene",
+   "layer": "",
+   "section": "",
+   "label": "Columns wide",
+   "control": "IntInput",
+   "options": [],
+   "keys": [],
+   "seen_in": "scene figure"
+  }
+ ],
+ "left": []
+}

@@ -143,7 +143,7 @@ def test_animation_moves_edited_times_but_locked_layers():
 
 
 def test_annotation_in_several_panels():
-    from atmo3d.figures.cards.distcard import parse_panels, panels_text
+    from atmo3d.figures.schema import parse_panels, panels_text
     from atmo3d.figures.draw.base import ann_on
     assert [parse_panels(t) for t in ("", "all", "0", "2", "1, 3-4", "a, c-d", "b")] == \
         [-1, -1, -1, 1, [0, 2, 3], [0, 2, 3], 1]

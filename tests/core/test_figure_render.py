@@ -172,14 +172,10 @@ def test_editor_storm_select_picks_the_runs_storm(ed, demo_root, tmp_path):
 
     def put(d):
         d["runs"][0]["track"] = p
+    from conftest import at_tool
     shell.edit(put, node=nodes.RUNS)
-    shell.select(nodes.RUNS)
-
-    def walk(o):
-        yield o
-        for c in getattr(o, "objects", None) or []:
-            yield from walk(c)
-    ws = [w for o in shell.inspector.body.objects for w in walk(o)]
+    at_tool(shell, "runs", nodes.RUNS)
+    ws = list(shell.frame.body.select())
     storm = next(w for w in ws if isinstance(w, pn.widgets.Select) and w.name == "Storm")
     assert storm.visible and storm.options == ["A", "B"] and storm.value == "A"
     storm.value = "B"

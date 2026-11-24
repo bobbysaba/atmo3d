@@ -1,0 +1,3224 @@
+{
+ "records": [
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Width (in)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "size[]",
+    "size_auto"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Height (in)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "size[]",
+    "size_auto"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Size",
+   "control": "Select",
+   "options": [
+    "Custom",
+    "3.25 in wide (one journal column)",
+    "5 in wide",
+    "6.5 in wide (full page width)",
+    "7.5 in wide",
+    "Slide, 13.3 \u00d7 7.5 in"
+   ],
+   "keys": [
+    "size[]",
+    "size_auto"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Figure title",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "suptitle"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Figure type",
+   "control": "Select",
+   "options": [
+    "Plan views",
+    "Soundings",
+    "Vertical cross-sections",
+    "Time\u2013height (series)",
+    "Time series",
+    "Distributions",
+    "Vertical profiles",
+    "Joint distributions (x vs y)",
+    "Azimuthal means (radius\u2013height)",
+    "Tables (sounding parameters, field statistics)",
+    "3D scene (one picture)"
+   ],
+   "keys": [
+    "annotations[].color",
+    "annotations[].coords",
+    "annotations[].kind",
+    "annotations[].ls",
+    "annotations[].lw",
+    "annotations[].panel",
+    "annotations[].r",
+    "annotations[].size",
+    "annotations[].text",
+    "annotations[].x",
+    "annotations[].x2",
+    "annotations[].y",
+    "annotations[].y2",
+    "kinds.plan.axes.equal",
+    "kinds.plan.axes.frame_lw",
+    "kinds.plan.axes.minor",
+    "kinds.plan.axes.tickdir",
+    "kinds.plan.axes.ticklabels",
+    "kinds.plan.axes.ticks",
+    "kinds.plan.axes.title_bold",
+    "kinds.plan.axes.title_loc",
+    "kinds.plan.axes.xlabel",
+    "kinds.plan.axes.ylabel",
+    "kinds.plan.coords",
+    "kinds.plan.domain.box",
+    "kinds.plan.domain.half",
+    "kinds.plan.domain.mode",
+    "kinds.plan.xsec.coords",
+    "kinds.plan.xsec.dz",
+    "kinds.plan.xsec.ztop",
+    "layers.*.arrowsize",
+    "layers.*.barb_len",
+    "layers.*.barb_units",
+    "layers.*.clabel",
+    "layers.*.cmap",
+    "layers.*.color",
+    "layers.*.density",
+    "layers.*.extend",
+    "layers.*.field",
+    "layers.*.frame",
+    "layers.*.key",
+    "layers.*.legend",
+    "layers.*.levels",
+    "layers.*.lw",
+    "layers.*.mask_below",
+    "layers.*.mode",
+    "layers.*.neg_dashed",
+    "layers.*.nlevels",
+    "layers.*.on",
+    "layers.*.reverse",
+    "layers.*.scale",
+    "layers.*.slw",
+    "layers.*.spacing",
+    "layers.*.style",
+    "layers.*.type",
+    "layers.*.units",
+    "layers.*.vector",
+    "layers.*.vmax",
+    "layers.*.vmin",
+    "layers.*.white_first",
+    "layers.*.width",
+    "layers.*.z",
+    "layers.*.zspacing",
+    "panels[].id",
+    "panels[].kind",
+    "panels[].layers[].color",
+    "panels[].layers[].label",
+    "panels[].layers[].recipe.field",
+    "panels[].layers[].recipe.hi",
+    "panels[].layers[].recipe.lo",
+    "panels[].layers[].recipe.region",
+    "panels[].layers[].recipe.vmode",
+    "panels[].layers[].recipe.yfield",
+    "panels[].layers[].recipe.yhi",
+    "panels[].layers[].recipe.ylo",
+    "panels[].layers[].recipe.z",
+    "panels[].layers[].ref",
+    "panels[].layers[].run",
+    "panels[].layers[].time_s",
+    "panels[].layers[].time_s1",
+    "panels[].layers[].type",
+    "panels[].run",
+    "panels[].section",
+    "panels[].time_s",
+    "sections.s0.a",
+    "sections.s0.ahead",
+    "sections.s0.angle",
+    "sections.s0.avg",
+    "sections.s0.b",
+    "sections.s0.cx",
+    "sections.s0.cy",
+    "sections.s0.half",
+    "sections.s0.label",
+    "sections.s0.mwin",
+    "sections.s0.off",
+    "sections.s0.offset[]",
+    "sections.s0.orient",
+    "sections.s0.pos",
+    "sections.s0.right",
+    "sections.s0.x",
+    "sections.s0.x0",
+    "sections.s0.x1",
+    "sections.s0.y",
+    "sections.s0.y0",
+    "sections.s0.y1",
+    "size[]"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Rows",
+   "control": "IntInput",
+   "options": [],
+   "keys": [
+    "grid.rows",
+    "size[]"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Columns",
+   "control": "IntInput",
+   "options": [],
+   "keys": [
+    "grid.cols",
+    "size[]"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Column widths",
+   "control": "TextInput",
+   "options": [],
+   "keys": [],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Row heights",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "grid.heights[]"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Add a panel of",
+   "control": "Select",
+   "options": [
+    "Plan views",
+    "Soundings",
+    "Vertical cross-sections",
+    "Time\u2013height (series)",
+    "Time series",
+    "Distributions",
+    "Vertical profiles",
+    "Joint distributions (x vs y)",
+    "Azimuthal means (radius\u2013height)",
+    "Tables (sounding parameters, field statistics)",
+    "3D scene (one picture)"
+   ],
+   "keys": [],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "At",
+   "control": "Select",
+   "options": [
+    "A new row",
+    "A new column"
+   ],
+   "keys": [],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Apply a style preset",
+   "control": "MenuButton",
+   "options": [],
+   "keys": [],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Text",
+   "label": "Font",
+   "control": "Select",
+   "options": [
+    "sans-serif",
+    "serif",
+    "DejaVu Sans",
+    "Liberation Sans",
+    "Source Sans Pro",
+    "Roboto",
+    "Open Sans",
+    "Noto Sans",
+    "DejaVu Serif",
+    "Liberation Serif",
+    "STIXGeneral"
+   ],
+   "keys": [
+    "style.font.family"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Text",
+   "label": "Math & units font",
+   "control": "Select",
+   "options": [
+    "DejaVu Sans",
+    "Like the text font",
+    "STIX Sans",
+    "STIX (Times-like)",
+    "Computer Modern (LaTeX)"
+   ],
+   "keys": [
+    "style.font.math"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Text",
+   "label": "Base size (pt)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.font.size"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Text",
+   "label": "Tick labels (pt)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.font.tick"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Text",
+   "label": "Axis labels (pt)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.font.label"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Text",
+   "label": "Panel titles (pt)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.font.title"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Text",
+   "label": "Figure title (pt)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.font.suptitle"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Text",
+   "label": "Legends (pt)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.font.legend"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Where",
+   "control": "Select",
+   "options": [
+    "Center",
+    "Left",
+    "Right"
+   ],
+   "keys": [
+    "kinds.joint.axes.title_loc"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Bold",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.joint.axes.title_bold"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Shrink these labels to fit narrow panels",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "style.label_fit"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Panel letters",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "style.letters.auto",
+    "style.letters.on"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Style",
+   "control": "Select",
+   "options": [
+    "a",
+    "(a)",
+    "a)",
+    "A",
+    "(A)"
+   ],
+   "keys": [
+    "style.letters.fmt"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Size (pt)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.letters.size"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "White box",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "style.letters.box"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Time label",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "style.time_label.on"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Text",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "style.time_label.fmt"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Legend",
+   "label": "Legends on",
+   "control": "Select",
+   "options": [
+    "Each panel",
+    "The figure"
+   ],
+   "keys": [
+    "style.legend.where"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Legend",
+   "label": "Panels' own legends",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "style.legend.own"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Contour key",
+   "label": "Of the layer",
+   "control": "Select",
+   "options": [
+    "First contours"
+   ],
+   "keys": [],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Maximum and minimum",
+   "label": "Of the layer",
+   "control": "Select",
+   "options": [
+    "First fill"
+   ],
+   "keys": [],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Spacing",
+   "label": "Between columns",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.spacing.wspace"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Spacing",
+   "label": "Between rows",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.spacing.hspace"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Spacing",
+   "label": "Around panels, x (in)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.spacing.w_pad"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Spacing",
+   "label": "Around panels, y (in)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "style.spacing.h_pad"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "matplotlib style",
+   "label": "matplotlib style (blank: none)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "style.mplstyle"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Your own code",
+   "label": "Run the code",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "code.on"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Your own code",
+   "label": "Python, run after the figure is drawn",
+   "control": "TextAreaInput",
+   "options": [],
+   "keys": [
+    "code.text"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Your own code",
+   "label": "Plain text box (if the highlighted editor stays blank, e.g. without internet)",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Add",
+   "control": "Select",
+   "options": [
+    "Text",
+    "Marker",
+    "Arrow",
+    "Line",
+    "Vertical line",
+    "Horizontal line",
+    "Box",
+    "Circle",
+    "Legend entry"
+   ],
+   "keys": [],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Kind",
+   "control": "Select",
+   "options": [
+    "Text",
+    "Marker",
+    "Arrow",
+    "Line",
+    "Vertical line",
+    "Horizontal line",
+    "Box",
+    "Circle",
+    "Legend entry"
+   ],
+   "keys": [
+    "annotations[].kind",
+    "annotations[].marker"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Panels (blank: all)",
+   "control": "MultiChoice",
+   "options": [
+    "a",
+    "b"
+   ],
+   "keys": [
+    "annotations[].panel"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Position in",
+   "control": "Select",
+   "options": [
+    "Axis units (km, min)",
+    "Panel fraction (0\u20131)"
+   ],
+   "keys": [
+    "annotations[].coords"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "x",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].x"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "y",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].y"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Text",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "annotations[].text"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Size",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].size"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Bold",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "annotations[].bold"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Colour",
+   "control": "ColorPicker",
+   "options": [],
+   "keys": [
+    "annotations[].color"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Line width",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].lw"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Marker",
+   "control": "Select",
+   "options": [
+    "\u00d7",
+    "+",
+    "\u25cf",
+    "\u25cb",
+    "\u25a1",
+    "\u2605",
+    "\u25b2"
+   ],
+   "keys": [
+    "annotations[].marker"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "x to",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].x2"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "y to",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].y2"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Line style",
+   "control": "Select",
+   "options": [
+    "Solid",
+    "Dashed",
+    "Dotted",
+    "Dash-dot"
+   ],
+   "keys": [
+    "annotations[].ls"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Radius",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].r"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "figure",
+   "kind": "",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Looks like",
+   "control": "Select",
+   "options": [
+    "Line",
+    "Marker",
+    "Line and marker",
+    "Filled box"
+   ],
+   "keys": [
+    "annotations[].look"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "runs",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Label",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "runs[].label"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "runs",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Colour",
+   "control": "ColorPicker",
+   "options": [],
+   "keys": [
+    "runs[].color"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "runs",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Time zero (min)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "runs[].t0_min"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "runs",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Viewer's track",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "runs[].track"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "runs",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Track file",
+   "control": "Select",
+   "options": [
+    "None",
+    "demo_supercell.csv",
+    "demo_supercell_weak.csv",
+    "Type a path\u2026"
+   ],
+   "keys": [
+    "runs[].track"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "runs",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Track file path (blank: none)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "runs[].track"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "runs",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Storm",
+   "control": "Select",
+   "options": [],
+   "keys": [],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "runs",
+   "kind": "",
+   "layer": "",
+   "section": "",
+   "label": "Add a run",
+   "control": "Select",
+   "options": [
+    "demo/supercell_weak"
+   ],
+   "keys": [],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "kind",
+   "kind": "joint",
+   "layer": "",
+   "section": "Plot",
+   "label": "x from",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.joint.joint.xmin"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "kind",
+   "kind": "joint",
+   "layer": "",
+   "section": "Plot",
+   "label": "x to",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.joint.joint.xmax"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "kind",
+   "kind": "joint",
+   "layer": "",
+   "section": "Plot",
+   "label": "y from",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.joint.joint.ymin"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "kind",
+   "kind": "joint",
+   "layer": "",
+   "section": "Plot",
+   "label": "y to",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.joint.joint.ymax"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "kind",
+   "kind": "joint",
+   "layer": "",
+   "section": "Plot",
+   "label": "Draw as",
+   "control": "Select",
+   "options": [
+    "2D histogram",
+    "Scatter",
+    "Density contours"
+   ],
+   "keys": [
+    "kinds.joint.joint.plot"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "kind",
+   "kind": "joint",
+   "layer": "",
+   "section": "Plot",
+   "label": "Histogram of",
+   "control": "Select",
+   "options": [
+    "Count",
+    "PDF (density)",
+    "Fraction"
+   ],
+   "keys": [
+    "kinds.joint.joint.norm"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "kind",
+   "kind": "joint",
+   "layer": "",
+   "section": "Plot",
+   "label": "Bins (each axis)",
+   "control": "IntInput",
+   "options": [],
+   "keys": [
+    "kinds.joint.joint.bins"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "kind",
+   "kind": "joint",
+   "layer": "",
+   "section": "Plot",
+   "label": "Colormap",
+   "control": "Select",
+   "options": [
+    "HomeyerRainbow",
+    "ChaseSpectral",
+    "NWSRef",
+    "NWSVel",
+    "LangRainbow12",
+    "SpectralExtended",
+    "Carbone42",
+    "Theodore16",
+    "BuDRd18",
+    "reflectivity",
+    "turbo",
+    "viridis",
+    "magma",
+    "inferno",
+    "plasma",
+    "cividis",
+    "RdBu_r",
+    "PuOr_r",
+    "BrBG",
+    "coolwarm",
+    "seismic",
+    "cmo.balance",
+    "cmo.curl",
+    "cmo.thermal",
+    "cmo.haline",
+    "cmo.deep",
+    "cmo.rain",
+    "cmo.ice",
+    "cmo.amp",
+    "YlGnBu",
+    "YlOrRd",
+    "Spectral_r",
+    "Greys_r",
+    "cubehelix",
+    "Greys",
+    "gray_r",
+    "Blues",
+    "Reds",
+    "Purples",
+    "PuOr"
+   ],
+   "keys": [
+    "kinds.joint.joint.cmap"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "kind",
+   "kind": "joint",
+   "layer": "",
+   "section": "Plot",
+   "label": "Colorbar label",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "kinds.joint.joint.cbar_label"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "kind",
+   "kind": "joint",
+   "layer": "",
+   "section": "Plot",
+   "label": "Contours enclosing (%)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "kinds.joint.joint.pcts"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "kind",
+   "kind": "joint",
+   "layer": "",
+   "section": "Plot",
+   "label": "Log colours",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.joint.joint.log"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "kind",
+   "kind": "joint",
+   "layer": "",
+   "section": "Plot",
+   "label": "Reverse",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.joint.joint.reverse"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "kind",
+   "kind": "joint",
+   "layer": "",
+   "section": "Plot",
+   "label": "Colorbar",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.joint.joint.colorbar"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "kind",
+   "kind": "joint",
+   "layer": "",
+   "section": "Plot",
+   "label": "Contours over",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.joint.joint.contours"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "kind",
+   "kind": "joint",
+   "layer": "",
+   "section": "Plot",
+   "label": "Contour labels",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.joint.joint.contour_labels"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "kind",
+   "kind": "joint",
+   "layer": "",
+   "section": "Plot",
+   "label": "Fit line",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.joint.joint.fit"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "kind",
+   "kind": "joint",
+   "layer": "",
+   "section": "Plot",
+   "label": "1:1 line",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.joint.joint.one_one"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "kind",
+   "kind": "joint",
+   "layer": "",
+   "section": "Plot",
+   "label": "Zero lines",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.joint.joint.zero_line"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "kind",
+   "kind": "joint",
+   "layer": "",
+   "section": "Plot",
+   "label": "Line width",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.joint.joint.lw"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "kind",
+   "kind": "joint",
+   "layer": "",
+   "section": "Statistics",
+   "label": "Statistics of each (blank: none)",
+   "control": "MultiChoice",
+   "options": [
+    "n",
+    "r",
+    "r\u00b2",
+    "fit",
+    "means"
+   ],
+   "keys": [
+    "kinds.joint.joint.stats[]"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "kind",
+   "kind": "joint",
+   "layer": "",
+   "section": "Statistics",
+   "label": "Box at",
+   "control": "Select",
+   "options": [
+    "upper left",
+    "upper right",
+    "lower left",
+    "lower right",
+    "upper center",
+    "lower center",
+    "center left",
+    "center right"
+   ],
+   "keys": [
+    "kinds.joint.joint.stats_loc"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "kind",
+   "kind": "joint",
+   "layer": "",
+   "section": "Legend in the panel",
+   "label": "Legend",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.joint.joint.legend"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "kind",
+   "kind": "joint",
+   "layer": "",
+   "section": "Legend in the panel",
+   "label": "At",
+   "control": "Select",
+   "options": [
+    "best",
+    "upper left",
+    "upper right",
+    "lower left",
+    "lower right",
+    "upper center",
+    "lower center",
+    "center left",
+    "center right"
+   ],
+   "keys": [
+    "kinds.joint.joint.legend_loc"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "kind",
+   "kind": "joint",
+   "layer": "",
+   "section": "Legend in the panel",
+   "label": "Columns",
+   "control": "IntInput",
+   "options": [],
+   "keys": [
+    "kinds.joint.joint.legend_ncol"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "kind",
+   "kind": "joint",
+   "layer": "",
+   "section": "Legend in the panel",
+   "label": "Frame",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.joint.joint.legend_frame"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "kind",
+   "kind": "joint",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "x label",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "kinds.joint.axes.xlabel"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "kind",
+   "kind": "joint",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "y label",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "kinds.joint.axes.ylabel"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "kind",
+   "kind": "joint",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "Tick labels on",
+   "control": "Select",
+   "options": [
+    "All panels",
+    "Outer panels",
+    "No panels"
+   ],
+   "keys": [
+    "kinds.joint.axes.ticklabels"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "kind",
+   "kind": "joint",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "Share limits (panels of a kind)",
+   "control": "Select",
+   "options": [
+    "No",
+    "x",
+    "y",
+    "x and y"
+   ],
+   "keys": [
+    "kinds.joint.axes.share"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "kind",
+   "kind": "joint",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "Tick marks",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.joint.axes.ticks"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "kind",
+   "kind": "joint",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "Minor ticks",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.joint.axes.minor"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "kind",
+   "kind": "joint",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "Ticks point",
+   "control": "Select",
+   "options": [
+    "Out",
+    "In",
+    "Across"
+   ],
+   "keys": [
+    "kinds.joint.axes.tickdir"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "kind",
+   "kind": "joint",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "x tick every",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.joint.axes.xstep"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "kind",
+   "kind": "joint",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "y tick every",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.joint.axes.ystep"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "kind",
+   "kind": "joint",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "Frame width (pt)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "kinds.joint.axes.frame_lw"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "kind",
+   "kind": "joint",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "Grid lines",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "kinds.joint.axes.grid"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "kind",
+   "kind": "joint",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "Grid style",
+   "control": "Select",
+   "options": [
+    "dotted",
+    "dashed",
+    "solid"
+   ],
+   "keys": [
+    "kinds.joint.axes.grid_ls"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "",
+   "label": "Title",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].title"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "",
+   "label": "Row label (left)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].rowlabel"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "[joint]",
+   "label": "",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "[joint]",
+   "label": "In panel",
+   "control": "Select",
+   "options": [
+    "a",
+    "b"
+   ],
+   "keys": [
+    "panels[].layers[].color",
+    "panels[].layers[].label",
+    "panels[].layers[].recipe.field",
+    "panels[].layers[].recipe.hi",
+    "panels[].layers[].recipe.lo",
+    "panels[].layers[].recipe.region",
+    "panels[].layers[].recipe.vmode",
+    "panels[].layers[].recipe.yfield",
+    "panels[].layers[].recipe.yhi",
+    "panels[].layers[].recipe.ylo",
+    "panels[].layers[].recipe.z",
+    "panels[].layers[].run",
+    "panels[].layers[].time_s",
+    "panels[].layers[].time_s1",
+    "panels[].layers[].type"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "[joint]",
+   "label": "Run",
+   "control": "Select",
+   "options": [],
+   "keys": [],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "[joint]",
+   "label": "Time",
+   "control": "Select",
+   "options": [
+    "0:00:00  (0 min)",
+    "1:00:00  (60 min)",
+    "1:05:00  (65 min)",
+    "1:10:00  (70 min)",
+    "1:15:00  (75 min)",
+    "1:20:00  (80 min)",
+    "1:25:00  (85 min)",
+    "1:30:00  (90 min)",
+    "1:35:00  (95 min)",
+    "1:40:00  (100 min)"
+   ],
+   "keys": [
+    "panels[].layers[].time_s"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "[joint]",
+   "label": "To (a time window)",
+   "control": "Select",
+   "options": [
+    "\u2014 (this time only)",
+    "0:00:00  (0 min)",
+    "1:00:00  (60 min)",
+    "1:05:00  (65 min)",
+    "1:10:00  (70 min)",
+    "1:15:00  (75 min)",
+    "1:20:00  (80 min)",
+    "1:25:00  (85 min)",
+    "1:30:00  (90 min)",
+    "1:35:00  (95 min)",
+    "1:40:00  (100 min)"
+   ],
+   "keys": [],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "[joint]",
+   "label": "Keep this time in animations",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].time_lock"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "[joint]",
+   "label": "Vertical",
+   "control": "Select",
+   "options": [
+    "At a height",
+    "Layer (every level)",
+    "Every level (whole depth)"
+   ],
+   "keys": [
+    "panels[].layers[].recipe.vmode",
+    "panels[].layers[].recipe.z",
+    "panels[].layers[].recipe.z0",
+    "panels[].layers[].recipe.z1"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "[joint]",
+   "label": "Height (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].recipe.z"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "[joint]",
+   "label": "Region",
+   "control": "Select",
+   "options": [
+    "Around tracked storm",
+    "Whole domain",
+    "Fixed box (map view)"
+   ],
+   "keys": [
+    "panels[].layers[].recipe.offset[]",
+    "panels[].layers[].recipe.radius",
+    "panels[].layers[].recipe.region"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "[joint]",
+   "label": "Only x from",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].recipe.lo"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "[joint]",
+   "label": "to",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].recipe.hi"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "[joint]",
+   "label": "Only y from",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].recipe.ylo"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "[joint]",
+   "label": "Automatic colour",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].color"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "[joint]",
+   "label": "Legend text (blank: automatic)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].label"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Plot",
+   "label": "x from",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].opts.joint.xmin"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Plot",
+   "label": "x to",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].opts.joint.xmax"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Plot",
+   "label": "y from",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].opts.joint.ymin"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Plot",
+   "label": "y to",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].opts.joint.ymax"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Plot",
+   "label": "Draw as",
+   "control": "Select",
+   "options": [
+    "2D histogram",
+    "Scatter",
+    "Density contours"
+   ],
+   "keys": [
+    "panels[].opts.joint.plot"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Plot",
+   "label": "Histogram of",
+   "control": "Select",
+   "options": [
+    "Count",
+    "PDF (density)",
+    "Fraction"
+   ],
+   "keys": [
+    "panels[].opts.joint.norm"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Plot",
+   "label": "Bins (each axis)",
+   "control": "IntInput",
+   "options": [],
+   "keys": [
+    "panels[].opts.joint.bins"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Plot",
+   "label": "Colormap",
+   "control": "Select",
+   "options": [
+    "HomeyerRainbow",
+    "ChaseSpectral",
+    "NWSRef",
+    "NWSVel",
+    "LangRainbow12",
+    "SpectralExtended",
+    "Carbone42",
+    "Theodore16",
+    "BuDRd18",
+    "reflectivity",
+    "turbo",
+    "viridis",
+    "magma",
+    "inferno",
+    "plasma",
+    "cividis",
+    "RdBu_r",
+    "PuOr_r",
+    "BrBG",
+    "coolwarm",
+    "seismic",
+    "cmo.balance",
+    "cmo.curl",
+    "cmo.thermal",
+    "cmo.haline",
+    "cmo.deep",
+    "cmo.rain",
+    "cmo.ice",
+    "cmo.amp",
+    "YlGnBu",
+    "YlOrRd",
+    "Spectral_r",
+    "Greys_r",
+    "cubehelix",
+    "Greys",
+    "gray_r",
+    "Blues",
+    "Reds",
+    "Purples",
+    "PuOr"
+   ],
+   "keys": [
+    "panels[].opts.joint.cmap"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Plot",
+   "label": "Colorbar label",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].opts.joint.cbar_label"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Plot",
+   "label": "Contours enclosing (%)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].opts.joint.pcts"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Plot",
+   "label": "Log colours",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.joint.log"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Plot",
+   "label": "Reverse",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.joint.reverse"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Plot",
+   "label": "Colorbar",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.joint.colorbar"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Plot",
+   "label": "Contours over",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.joint.contours"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Plot",
+   "label": "Contour labels",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.joint.contour_labels"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Plot",
+   "label": "Fit line",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.joint.fit"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Plot",
+   "label": "1:1 line",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.joint.one_one"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Plot",
+   "label": "Zero lines",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.joint.zero_line"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Plot",
+   "label": "Line width",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].opts.joint.lw"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Statistics",
+   "label": "Statistics of each (blank: none)",
+   "control": "MultiChoice",
+   "options": [
+    "n",
+    "r",
+    "r\u00b2",
+    "fit",
+    "means"
+   ],
+   "keys": [
+    "panels[].opts.joint.stats[]"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Statistics",
+   "label": "Box at",
+   "control": "Select",
+   "options": [
+    "upper left",
+    "upper right",
+    "lower left",
+    "lower right",
+    "upper center",
+    "lower center",
+    "center left",
+    "center right"
+   ],
+   "keys": [
+    "panels[].opts.joint.stats_loc"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Legend in the panel",
+   "label": "Legend",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.joint.legend"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Legend in the panel",
+   "label": "At",
+   "control": "Select",
+   "options": [
+    "best",
+    "upper left",
+    "upper right",
+    "lower left",
+    "lower right",
+    "upper center",
+    "lower center",
+    "center left",
+    "center right"
+   ],
+   "keys": [
+    "panels[].opts.joint.legend_loc"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Legend in the panel",
+   "label": "Columns",
+   "control": "IntInput",
+   "options": [],
+   "keys": [
+    "panels[].opts.joint.legend_ncol"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Legend in the panel",
+   "label": "Frame",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.joint.legend_frame"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "x label",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].opts.axes.xlabel"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "y label",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].opts.axes.ylabel"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "Tick marks",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.axes.ticks"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "Minor ticks",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.axes.minor"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "Ticks point",
+   "control": "Select",
+   "options": [
+    "Out",
+    "In",
+    "Across"
+   ],
+   "keys": [
+    "panels[].opts.axes.tickdir"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "x tick every",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].opts.axes.xstep"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "y tick every",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].opts.axes.ystep"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "Frame width (pt)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].opts.axes.frame_lw"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "Grid lines",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.axes.grid"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Axes and ticks",
+   "label": "Grid style",
+   "control": "Select",
+   "options": [
+    "dotted",
+    "dashed",
+    "solid"
+   ],
+   "keys": [
+    "panels[].opts.axes.grid_ls"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Where",
+   "control": "Select",
+   "options": [
+    "Center",
+    "Left",
+    "Right"
+   ],
+   "keys": [
+    "panels[].opts.axes.title_loc"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Bold",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.axes.title_bold"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Panel letters",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.letters.on"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Size (pt)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].opts.letters.size"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "White box",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.letters.box"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Time label",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].opts.time_label.on"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Panel labels",
+   "label": "Text",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].opts.time_label.fmt"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Add",
+   "control": "Select",
+   "options": [
+    "Text",
+    "Marker",
+    "Arrow",
+    "Line",
+    "Vertical line",
+    "Horizontal line",
+    "Box",
+    "Circle",
+    "Legend entry"
+   ],
+   "keys": [],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Kind",
+   "control": "Select",
+   "options": [
+    "Text",
+    "Marker",
+    "Arrow",
+    "Line",
+    "Vertical line",
+    "Horizontal line",
+    "Box",
+    "Circle",
+    "Legend entry"
+   ],
+   "keys": [
+    "annotations[].kind",
+    "annotations[].marker"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Panels (blank: all)",
+   "control": "MultiChoice",
+   "options": [
+    "a",
+    "b"
+   ],
+   "keys": [
+    "annotations[].panel"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Position in",
+   "control": "Select",
+   "options": [
+    "Axis units (km, min)",
+    "Panel fraction (0\u20131)"
+   ],
+   "keys": [
+    "annotations[].coords"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "x",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].x"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "y",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].y"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Text",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "annotations[].text"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Size",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].size"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Bold",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "annotations[].bold"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Colour",
+   "control": "ColorPicker",
+   "options": [],
+   "keys": [
+    "annotations[].color"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Line width",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].lw"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Marker",
+   "control": "Select",
+   "options": [
+    "\u00d7",
+    "+",
+    "\u25cf",
+    "\u25cb",
+    "\u25a1",
+    "\u2605",
+    "\u25b2"
+   ],
+   "keys": [
+    "annotations[].marker"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "x to",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].x2"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "y to",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].y2"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Line style",
+   "control": "Select",
+   "options": [
+    "Solid",
+    "Dashed",
+    "Dotted",
+    "Dash-dot"
+   ],
+   "keys": [
+    "annotations[].ls"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Radius",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "annotations[].r"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Annotations (9)",
+   "label": "Looks like",
+   "control": "Select",
+   "options": [
+    "Line",
+    "Marker",
+    "Line and marker",
+    "Filled box"
+   ],
+   "keys": [
+    "annotations[].look"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "",
+   "label": "Panel type",
+   "control": "Select",
+   "options": [
+    "Plan views",
+    "Soundings",
+    "Vertical cross-sections",
+    "Time\u2013height (series)",
+    "Time series",
+    "Distributions",
+    "Vertical profiles",
+    "Joint distributions (x vs y)",
+    "Azimuthal means (radius\u2013height)",
+    "Tables (sounding parameters, field statistics)",
+    "3D scene (one picture)"
+   ],
+   "keys": [
+    "annotations[].color",
+    "annotations[].coords",
+    "annotations[].kind",
+    "annotations[].ls",
+    "annotations[].lw",
+    "annotations[].panel",
+    "annotations[].r",
+    "annotations[].size",
+    "annotations[].text",
+    "annotations[].x",
+    "annotations[].x2",
+    "annotations[].y",
+    "annotations[].y2",
+    "kinds.plan.axes.equal",
+    "kinds.plan.axes.frame_lw",
+    "kinds.plan.axes.minor",
+    "kinds.plan.axes.tickdir",
+    "kinds.plan.axes.ticklabels",
+    "kinds.plan.axes.ticks",
+    "kinds.plan.axes.title_bold",
+    "kinds.plan.axes.title_loc",
+    "kinds.plan.axes.xlabel",
+    "kinds.plan.axes.ylabel",
+    "kinds.plan.coords",
+    "kinds.plan.domain.box",
+    "kinds.plan.domain.half",
+    "kinds.plan.domain.mode",
+    "kinds.plan.xsec.coords",
+    "kinds.plan.xsec.dz",
+    "kinds.plan.xsec.ztop",
+    "layers.*.arrowsize",
+    "layers.*.barb_len",
+    "layers.*.barb_units",
+    "layers.*.clabel",
+    "layers.*.cmap",
+    "layers.*.color",
+    "layers.*.density",
+    "layers.*.extend",
+    "layers.*.field",
+    "layers.*.frame",
+    "layers.*.key",
+    "layers.*.legend",
+    "layers.*.levels",
+    "layers.*.lw",
+    "layers.*.mask_below",
+    "layers.*.mode",
+    "layers.*.neg_dashed",
+    "layers.*.nlevels",
+    "layers.*.on",
+    "layers.*.reverse",
+    "layers.*.scale",
+    "layers.*.slw",
+    "layers.*.spacing",
+    "layers.*.style",
+    "layers.*.type",
+    "layers.*.units",
+    "layers.*.vector",
+    "layers.*.vmax",
+    "layers.*.vmin",
+    "layers.*.white_first",
+    "layers.*.width",
+    "layers.*.z",
+    "layers.*.zspacing",
+    "panels[].cell[]",
+    "panels[].id",
+    "panels[].kind",
+    "panels[].layers[].color",
+    "panels[].layers[].label",
+    "panels[].layers[].recipe.field",
+    "panels[].layers[].recipe.hi",
+    "panels[].layers[].recipe.lo",
+    "panels[].layers[].recipe.region",
+    "panels[].layers[].recipe.vmode",
+    "panels[].layers[].recipe.yfield",
+    "panels[].layers[].recipe.yhi",
+    "panels[].layers[].recipe.ylo",
+    "panels[].layers[].recipe.z",
+    "panels[].layers[].ref",
+    "panels[].layers[].run",
+    "panels[].layers[].time_s",
+    "panels[].layers[].time_s1",
+    "panels[].layers[].type",
+    "panels[].run",
+    "panels[].section",
+    "panels[].time_s",
+    "sections.s0.a",
+    "sections.s0.ahead",
+    "sections.s0.angle",
+    "sections.s0.avg",
+    "sections.s0.b",
+    "sections.s0.cx",
+    "sections.s0.cy",
+    "sections.s0.half",
+    "sections.s0.label",
+    "sections.s0.mwin",
+    "sections.s0.off",
+    "sections.s0.offset[]",
+    "sections.s0.orient",
+    "sections.s0.pos",
+    "sections.s0.right",
+    "sections.s0.x",
+    "sections.s0.x0",
+    "sections.s0.x1",
+    "sections.s0.y",
+    "sections.s0.y0",
+    "sections.s0.y1"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "",
+   "label": "Row",
+   "control": "IntInput",
+   "options": [],
+   "keys": [],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "",
+   "label": "Column",
+   "control": "IntInput",
+   "options": [],
+   "keys": [
+    "panels[].cell[]"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "",
+   "label": "Rows tall",
+   "control": "IntInput",
+   "options": [],
+   "keys": [],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "",
+   "label": "Columns wide",
+   "control": "IntInput",
+   "options": [],
+   "keys": [],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "layer",
+   "kind": "joint",
+   "layer": "joint",
+   "section": "[joint]",
+   "label": "",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "layer",
+   "kind": "joint",
+   "layer": "joint",
+   "section": "[joint]",
+   "label": "In panel",
+   "control": "Select",
+   "options": [
+    "a",
+    "b"
+   ],
+   "keys": [
+    "panels[].layers[].color",
+    "panels[].layers[].label",
+    "panels[].layers[].recipe.field",
+    "panels[].layers[].recipe.hi",
+    "panels[].layers[].recipe.lo",
+    "panels[].layers[].recipe.region",
+    "panels[].layers[].recipe.vmode",
+    "panels[].layers[].recipe.yfield",
+    "panels[].layers[].recipe.yhi",
+    "panels[].layers[].recipe.ylo",
+    "panels[].layers[].recipe.z",
+    "panels[].layers[].run",
+    "panels[].layers[].time_s",
+    "panels[].layers[].time_s1",
+    "panels[].layers[].type"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "layer",
+   "kind": "joint",
+   "layer": "joint",
+   "section": "[joint]",
+   "label": "Run",
+   "control": "Select",
+   "options": [],
+   "keys": [],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "layer",
+   "kind": "joint",
+   "layer": "joint",
+   "section": "[joint]",
+   "label": "Time",
+   "control": "Select",
+   "options": [
+    "0:00:00  (0 min)",
+    "1:00:00  (60 min)",
+    "1:05:00  (65 min)",
+    "1:10:00  (70 min)",
+    "1:15:00  (75 min)",
+    "1:20:00  (80 min)",
+    "1:25:00  (85 min)",
+    "1:30:00  (90 min)",
+    "1:35:00  (95 min)",
+    "1:40:00  (100 min)"
+   ],
+   "keys": [
+    "panels[].layers[].time_s"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "layer",
+   "kind": "joint",
+   "layer": "joint",
+   "section": "[joint]",
+   "label": "To (a time window)",
+   "control": "Select",
+   "options": [
+    "\u2014 (this time only)",
+    "0:00:00  (0 min)",
+    "1:00:00  (60 min)",
+    "1:05:00  (65 min)",
+    "1:10:00  (70 min)",
+    "1:15:00  (75 min)",
+    "1:20:00  (80 min)",
+    "1:25:00  (85 min)",
+    "1:30:00  (90 min)",
+    "1:35:00  (95 min)",
+    "1:40:00  (100 min)"
+   ],
+   "keys": [],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "layer",
+   "kind": "joint",
+   "layer": "joint",
+   "section": "[joint]",
+   "label": "Keep this time in animations",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].time_lock"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "layer",
+   "kind": "joint",
+   "layer": "joint",
+   "section": "[joint]",
+   "label": "Vertical",
+   "control": "Select",
+   "options": [
+    "At a height",
+    "Layer (every level)",
+    "Every level (whole depth)"
+   ],
+   "keys": [
+    "panels[].layers[].recipe.vmode",
+    "panels[].layers[].recipe.z",
+    "panels[].layers[].recipe.z0",
+    "panels[].layers[].recipe.z1"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "layer",
+   "kind": "joint",
+   "layer": "joint",
+   "section": "[joint]",
+   "label": "Height (km)",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].recipe.z"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "layer",
+   "kind": "joint",
+   "layer": "joint",
+   "section": "[joint]",
+   "label": "Region",
+   "control": "Select",
+   "options": [
+    "Around tracked storm",
+    "Whole domain",
+    "Fixed box (map view)"
+   ],
+   "keys": [
+    "panels[].layers[].recipe.offset[]",
+    "panels[].layers[].recipe.radius",
+    "panels[].layers[].recipe.region"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "layer",
+   "kind": "joint",
+   "layer": "joint",
+   "section": "[joint]",
+   "label": "Only x from",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].recipe.lo"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "layer",
+   "kind": "joint",
+   "layer": "joint",
+   "section": "[joint]",
+   "label": "to",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].recipe.hi"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "layer",
+   "kind": "joint",
+   "layer": "joint",
+   "section": "[joint]",
+   "label": "Only y from",
+   "control": "FloatInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].recipe.ylo"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "layer",
+   "kind": "joint",
+   "layer": "joint",
+   "section": "[joint]",
+   "label": "Automatic colour",
+   "control": "Checkbox",
+   "options": [],
+   "keys": [
+    "panels[].layers[].color"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "layer",
+   "kind": "joint",
+   "layer": "joint",
+   "section": "[joint]",
+   "label": "Legend text (blank: automatic)",
+   "control": "TextInput",
+   "options": [],
+   "keys": [
+    "panels[].layers[].label"
+   ],
+   "seen_in": "joint figure"
+  },
+  {
+   "level": "panel",
+   "kind": "joint",
+   "layer": "",
+   "section": "Annotations",
+   "label": "Add",
+   "control": "Select",
+   "options": [
+    "Text",
+    "Marker",
+    "Arrow",
+    "Line",
+    "Vertical line",
+    "Horizontal line",
+    "Box",
+    "Circle",
+    "Legend entry"
+   ],
+   "keys": [],
+   "seen_in": "joint figure"
+  }
+ ],
+ "left": []
+}

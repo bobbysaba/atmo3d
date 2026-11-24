@@ -114,6 +114,9 @@ class FieldSelect(JSComponent):
         groups = Groups(groups or {})  # (a copy that keeps the notes)
         groups.tips, groups.off = tips, off
         params.pop("tree", None)  # (made from groups: a clone() passes its own too)
+        # no name given: none shown (param would make up "FieldSelect00506" and the
+        # button would show it as its label)
+        params.setdefault("name", "")
         params.setdefault("docs_link", derived_docs_link())
         params.setdefault("height", 52 if params.get("name") else 32)
         params.setdefault("margin", (5, 10))  # (a widget's, as the Select's was)
@@ -205,18 +208,31 @@ export function render({ model, el }) {
   function hasCur(n) {
     return n.c ? n.c.some(hasCur) : n.v === model.value
   }
-  function place(box, x, y, flipFrom) {
-    // fixed position at (x, y), kept in the window (flipped left of flipFrom if needed)
+  function moveTo(box, x, y) {
+    // put the box's top left corner at (x, y) in the window.  A transformed or
+    // contained ancestor (a layout, a floating panel) makes position: fixed count from
+    // it rather than from the window: what the box lands off by is taken back
     box.style.left = x + 'px'; box.style.top = y + 'px'
-    box.style.maxHeight = (window.innerHeight - 16) + 'px'
     const r = box.getBoundingClientRect()
+    const dx = r.left - x, dy = r.top - y
+    if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) {
+      box.style.left = (x - dx) + 'px'; box.style.top = (y - dy) + 'px'
+    }
+  }
+  function place(box, x, y, flipFrom) {
+    // at (x, y) in the window, kept in it (flipped left of flipFrom if needed)
+    box.style.maxHeight = (window.innerHeight - 16) + 'px'
+    moveTo(box, x, y)
+    const r = box.getBoundingClientRect()
+    let nx = x, ny = y
     if (r.right > window.innerWidth - 4) {
-      const left = flipFrom !== undefined ? flipFrom - r.width + 2 : window.innerWidth - 4 - r.width
-      box.style.left = Math.max(4, left) + 'px'
+      nx = Math.max(4, flipFrom !== undefined ? flipFrom - r.width + 2
+                                              : window.innerWidth - 4 - r.width)
     }
     if (r.bottom > window.innerHeight - 8) {
-      box.style.top = Math.max(8, window.innerHeight - 8 - r.height) + 'px'
+      ny = Math.max(8, window.innerHeight - 8 - r.height)
     }
+    if (nx !== x || ny !== y) moveTo(box, nx, ny)
   }
   function closeFrom(level) {
     while (subs.length > level) {

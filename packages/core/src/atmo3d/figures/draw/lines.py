@@ -636,6 +636,7 @@ def _joints(ax, d, spec, fs):
             m = ax.pcolormesh(ex, ey, Hm.T, cmap=cm, norm=nm, rasterized=True)
             if o.get("colorbar", True):
                 cb = ax.figure.colorbar(m, ax=ax, pad=0.02, fraction=0.06, aspect=30)
+                ax._cv_own_bar = cb.ax  # (the panel's own: click.part_boxes)
                 cb.set_label(o.get("cbar_label") or DIST_NORM_LABEL.get(norm, "count"))
                 cb.ax.tick_params(labelsize=fs * 0.8)
             handles.append(Patch(facecolor=cm(0.6), label=lab))
@@ -751,6 +752,7 @@ def _azims(ax, d, spec, fs):
                 m = ax.pcolormesh(xe, ze, vm, cmap=cm, vmin=lo, vmax=hi, rasterized=True)
             if o.get("colorbar", True):
                 cb = ax.figure.colorbar(m, ax=ax, pad=0.02, fraction=0.06, aspect=30)
+                ax._cv_own_bar = cb.ax  # (the panel's own: click.part_boxes)
                 cb.set_label(o.get("cbar_label") or str(d.get("A0_cl", "")))
                 cb.ax.tick_params(labelsize=fs * 0.8)
             handles.append(Patch(facecolor=cm(0.7), label=lab))

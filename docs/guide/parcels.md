@@ -235,18 +235,18 @@ Sessions keep the section, 3D and plot settings too.
 
 ## In figures
 
-Plan-view and cross-section figures take a **Parcels** layer. *From the map* and *From
-the cross-section* (Figure editor) add one layer for each of the viewer's sets, drawn as
-the viewer draws them: colour, tails, heads, line width, opacity, and on a section the
-distance and which tails. On the kind's node, *Parcels* in *Add a layer* adds the next set not drawn
-yet; a panel's own layers can add one too.
+Plan-view and cross-section figures take a **Parcels** layer. A figure made from the map or the
+cross-section gets one layer for each of the viewer's sets, drawn as the viewer draws them:
+colour, tails, heads, line width, opacity, and on a section the distance and which tails. In
+Layers, at *All plan views* (or *All cross-sections*), *Parcels* in *+ Add a layer* adds the next set
+not drawn yet; a panel's own layers can add one too.
 
 A layer keeps the **rule** that chose its set (the time, box, height range, point and
 radius, value range and cap), not the parcels themselves. The figure chooses them again
 from the parcel output of the layer's run when it is drawn, so a saved figure, a
 template and `atmo3d-render` need only the rule (an exported script keeps the arrays it
 drew, as for every layer). *Parcels*
-on the layer's card swaps in another set of the viewer or a saved set (`parcels/` under
+on the layer swaps in another set of the viewer or a saved set (`parcels/` under
 the run's exports folder).
 
 Each panel draws the tails up to its own time (or all parcel times, the last minutes,
@@ -264,7 +264,7 @@ plan view, the parts of tails well outside the panel are left out. When a layer 
 nothing to draw (no parcel output in its run, no parcels meeting the rule), the
 preview's note says so.
 
-A **3D scene** figure draws parcel sets too (*Parcels*, on the scene): tails as lines and
+A **3D scene** figure draws parcel sets too (*Parcels*, in Layers at the scene): tails as lines and
 heads as balls at the scene's time, only inside the scene's region and below its top
 (the lines break where they leave it). *Copy the 3D view* and the photo icon on the 3D
 box in the items tray bring the viewer's sets along when the 3D view shows them (*In
@@ -275,8 +275,8 @@ parcels are drawn, computes no isosurfaces again.
 
 ### Parcel series
 
-A **time-series** panel draws a parcel variable over the parcel times: **+ Parcels**
-(with parcel output) adds the viewer's next set not drawn yet (or a saved set), with *w* to
+A **time-series** panel draws a parcel variable over the parcel times: **+ Parcels** (Layers,
+at the panel, with parcel output) adds the viewer's next set not drawn yet (or a saved set), with *w* to
 start. It picks its **Run**,
 *Parcels* (another viewer set or a saved one), *Variable* and *Plot*: the value, or
 *d/dt along the parcel*, *Change since the set's time* or *∫ dt since the set's time*
@@ -287,17 +287,17 @@ percentile, mean ± 1 sd), shaded like an ensemble band; *Parcels' own lines* dr
 many parcels too (spread through the set, up to 500), faint or as other lines. A parcel
 that left the domain drops out of the centre and band from then on.
 
-The card has the series cards' look (colour, line, width, markers, y axis, axis label,
+A parcel series has the other series' look (colour, line, width, markers, y axis, axis label,
 label, panel, time zero, added to its run's) and shares panels and y axes with them by units. Its times
 are the parcel times, so its line is finer than the series computed at the 3D output
 times beside it. Like a layer, it keeps the set's rule and chooses the parcels again
 when drawn; a template moves the rule's time as for a layer. Nothing is computed in the
 background: the parcels' values are read (and cached) when the figure is drawn. In a
-time–height figure the card is kept but not drawn.
+time–height figure it is kept but not drawn.
 
 **+ w budget** (with *w*, *b* and *vpg* in the parcel output) adds the [w
-budget](#the-w-budget) of the viewer's next set in a new panel, a card for each term in
+budget](#the-w-budget) of the viewer's next set in a new panel, a series for each term in
 its own colour (mean over the parcels, no band): *Rates* (Dw/Dt, b, vpg and Dw/Dt − b −
 vpg, m s⁻²) or *Integrated since the set's time* (Δw and the time integrals of the
-others, m s⁻¹, all on one axis). The cards are ordinary parcel series cards: add a band,
+others, m s⁻¹, all on one axis). They are ordinary parcel series: add a band,
 change the centre, or move one to another panel.

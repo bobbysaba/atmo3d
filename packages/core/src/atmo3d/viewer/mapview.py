@@ -22,6 +22,7 @@ from ..core import render, track as trk, vectors
 from ..core.run import Cancelled, FileBusy, MissingAtTime, reporting
 from ..core.fields import deriv_name, palette
 from ..theme import ACCENT, BG, GRID, MUTED
+from .layers import minus_spec
 from .ui import EMPTY_LINES, EMPTY_VEC, KEEP_ASPECT_JS, _cbar_label, _html, style_fig
 
 
@@ -31,6 +32,9 @@ const c = value, d = src.data
 if (!(c > 0)) return "NaN"
 return (d.lo[0] + (c - 1) / 65534 * (d.hi[0] - d.lo[0])).toFixed(3)
 """
+
+
+IMAGE = {"mesh": "image"}  # (a layer's style as the map job's: its pixels are an image)
 
 
 def _code_mapper(pal):
@@ -234,7 +238,7 @@ class MapView:
 
     def _storm_vecs(self):
         """Is a storm-relative wind shown on the map?"""
-        return any(o["on"].value and o["q"].value == "wind" and o["frame"].value == "storm"
+        return any(o["on"] and o["vector"] == "wind" and o["frame"] == "storm"
                    for o in self.vecs)
 
     def _storm_note(self, names, t):
@@ -254,8 +258,7 @@ class MapView:
         return deriv_name(self.fill_op.value, self.fill_var.value)
 
     def _shown_names(self):
-        return [self._fill_name()] + [o["var"].value for o in self.fills + self.ovs
-                                        if o["on"].value]
+        return [self._fill_name()] + [o["field"] for o in self.fills + self.ovs if o["on"]]
 
     def _storm_fields_shown(self):
         names = self._shown_names()
@@ -270,32 +273,31 @@ class MapView:
         return tuple(self.results[0][2]["kin"]["storm"])
 
     def _map_spec(self):
-        def lv(mode_w, lvl_w):
-            return mode_w.value, float(lvl_w.value)
+        """What the map job draws (render.compute_map's spec), from the map's layers
+        (layers.py)."""
+        def fill(o, nlev):
+            return dict(var=o["field"], mode=o["mode"], level=float(o["z"] or 0.0),
+                        style=IMAGE.get(o["style"], o["style"]), cmap=o["cmap"],
+                        rev=bool(o["reverse"]), auto=bool(o["auto"]),
+                        vmin=o["vmin"] or 0.0, vmax=o["vmax"] or 0.0, nlev=nlev,
+                        alpha=float(o["alpha"]))
 
-        fm, fl = lv(self.fill_mode, self.fill_lvl)
+        f = self.map_fill
         return dict(
             t=self.t, view=self.view, maxpix=self.maxpix, storm=self._storm_motion(),
             fstorm=self._field_storm(self.t)[0],
-            fill=dict(var=self._fill_name(), mode=fm, level=fl, style=self.fill_style.value,
-                      cmap=self.fill_cmap.value, rev=self.fill_rev.value,
-                      auto=self.fill_auto.value, vmin=self.fill_min.value or 0.0,
-                      vmax=self.fill_max.value or 0.0, nlev=self.fill_nlev.value,
-                      alpha=self.fill_alpha.value, minus=self._minus_spec(self.fill_diff)),
-            fills=[dict(on=o["on"].value, var=o["var"].value, mode=o["mode"].value,
-                        level=float(o["level"].value), style=o["style"].value,
-                        cmap=o["cmap"].value, rev=o["rev"].value, auto=o["auto"].value,
-                        vmin=o["vmin"].value or 0.0, vmax=o["vmax"].value or 0.0, nlev=15,
-                        alpha=o["alpha"].value, clip=o["clip"].value) for o in self.fills],
-            ov=[dict(on=o["on"].value, var=o["var"].value, mode=o["mode"].value,
-                     level=float(o["level"].value), levels=o["levels"].value,
-                     color=o["color"].value, width=o["width"].value,
-                     negdash=o["negdash"].value) for o in self.ovs],
-            vecs=[dict(on=o["on"].value, q=o["q"].value, level=float(o["level"].value),
-                       frame=o["frame"].value, style=o["style"].value,
-                       density=int(o["density"].value),
-                       ref=o["ref"].value or vectors.VECTORS[o["q"].value].ref,
-                       color=o["color"].value) for o in self.vecs],
+            fill=dict(fill(f, int(f["nlevels"] or 15)), minus=minus_spec(f.lay)),
+            fills=[dict(fill(o, 15), on=bool(o["on"]), clip=bool(o["clip"]))
+                   for o in self.fills],
+            ov=[dict(on=bool(o["on"]), var=o["field"], mode=o["mode"],
+                     level=float(o["z"] or 0.0), levels=o["levels"], color=o["color"],
+                     width=float(o["lw"]), negdash=bool(o["neg_dashed"])) for o in self.ovs],
+            vecs=[dict(on=bool(o["on"]), q=o["vector"], level=float(o["z"] or 0.0),
+                       frame=o["frame"], style=o["style"],
+                       density=int(o["stream_n"] if o["style"] == "streamlines"
+                                   else o["across"]),
+                       ref=o["ref"] or vectors.VECTORS[o["vector"]].ref,
+                       color=o["color"]) for o in self.vecs],
         )
 
     def request_map(self):
@@ -399,7 +401,7 @@ class MapView:
         F, run = self.F, self.run
         fill, fs = res.get("fill"), spec["fill"]
         if fill:
-            self._last_range = (fill["lo"], fill["hi"])
+            self.map_fill.last = (fill["lo"], fill["hi"])  # (Auto range off starts there)
             self.mapper.update(palette=fill["palette"], low=fill["lo"], high=fill["hi"])
             self.code_mapper.palette = fill["palette"]
             if fill["style"] == "image":
@@ -431,8 +433,8 @@ class MapView:
                 g["poly"].glyph.fill_alpha = f["alpha"]
             g["img"].visible, g["poly"].visible = image, not image
         for o, f, fres in zip(self.fills, spec["fills"], res["fills"]):
-            if fres is not None and o["var"].value == f["var"]:
-                o["last"] = (fres["lo"], fres["hi"])  # (Auto range off starts from it)
+            if fres is not None and o["field"] == f["var"]:
+                o.last = (fres["lo"], fres["hi"])  # (Auto range off starts from it)
         for o, ores, (ps, ns, pr, nr) in zip(spec["ov"], res["ov"], self.ov_r):
             if ores is None:
                 ps.data, ns.data = dict(EMPTY_LINES), dict(EMPTY_LINES)

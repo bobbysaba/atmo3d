@@ -9,11 +9,12 @@ area to the box dragged.
 A mixin of the FigureEditor (figures/editor.py), and the clickable image."""
 
 import math
+from dataclasses import dataclass
 
 import param
 from panel.reactive import ReactiveHTML
 
-from .cards import ANN_FIELDS
+from .choices import ANN_FIELDS
 from .draw.base import ann_on
 from .kinds import LINEAR
 from .spec.doc import is_doc
@@ -38,6 +39,12 @@ class ClickImage(ReactiveHTML):
     fractions}, so showing what is selected redraws nothing (a dict: Panel 1.7.5 can't
     empty a list parameter that holds lists).  fit: the image's own box takes the height it
     is given, so a css of max-height:100% keeps the whole image in view.
+    heads: the grid's row and column headers (ui/lines.heads: [node, label, a, b, axis, lit]),
+    drawn in a margin above (columns: a, b their left and right) and to the left (rows: their
+    top and bottom) of the image; clicking one sets head = [node, n].  dots: {name: [x, y]}
+    fractions where a dot marks a panel with changes of its own.  zones: the parts a click opens
+    (part_boxes: [left, right, top, bottom, words]); the one under the mouse is outlined, dashed,
+    with its words as the tooltip (none while a drag or Click to is on: the shell sends none).
     src and css are set on the image by scripts, not in the template: a template that
     changes is rendered again, which could leave a second image (a stale preview)."""
 
@@ -48,6 +55,10 @@ class ClickImage(ReactiveHTML):
     drag = param.List(default=[])
     marks = param.Dict(default={})
     fit = param.Boolean(default=False)
+    heads = param.List(default=[])
+    head = param.List(default=[])
+    dots = param.Dict(default={})
+    zones = param.List(default=[])
 
     _template = (
         '<div id="wrap" style="position:relative;line-height:0">'
@@ -55,20 +66,69 @@ class ClickImage(ReactiveHTML):
         'onmousedown="${script(\'down\')}" onmousemove="${script(\'move\')}" '
         'onmouseup="${script(\'up\')}" onmouseleave="${script(\'leave\')}"/>'
         '<div id="box" style="position:absolute;display:none;pointer-events:none;'
-        'border:1px dashed #f59e0b;background:rgba(245,158,11,0.12)"></div>'
-        '<div id="over" style="position:absolute;left:0;top:0;pointer-events:none"></div></div>')
+        'border:1px solid #22d3ee;background:rgba(34,211,238,0.12)"></div>'
+        '<div id="over" style="position:absolute;left:0;top:0;pointer-events:none"></div>'
+        '<div id="hov" style="position:absolute;display:none;pointer-events:none;'
+        'box-sizing:border-box;border:1px dashed #22d3ee;border-radius:3px"></div>'
+        '<div id="tabs" style="position:absolute;left:0;top:0"></div></div>')
     _scripts = {
         "render": """
             if (data.src) img.src = data.src;
             img.style.cssText = data.css;
             wrap.style.height = data.fit ? '100%' : '';
-            new ResizeObserver(() => self.marks()).observe(img);
+            self.heads();
+            new ResizeObserver(() => { self.marks(); self.heads(); }).observe(img);
         """,
+        "heads": """
+            const cols = data.heads.some(h => h[4] === 'col');
+            const rows = data.heads.some(h => h[4] === 'row');
+            wrap.style.boxSizing = 'border-box';
+            wrap.style.paddingTop = cols ? '26px' : '0';
+            wrap.style.paddingLeft = rows ? '84px' : '0';
+            tabs.replaceChildren(...data.heads.map(([node, label, a, b, axis, lit]) => {
+                const d = document.createElement('div');
+                const W = img.offsetWidth, H = img.offsetHeight;
+                const L = img.offsetLeft, T = img.offsetTop;
+                let css = 'position:absolute;box-sizing:border-box;cursor:pointer;'
+                    + 'font:12px/20px sans-serif;text-align:center;overflow:hidden;'
+                    + 'white-space:nowrap;text-overflow:ellipsis;border-radius:6px;'
+                    + 'padding:0 6px;user-select:none;'
+                    + (lit ? 'background:rgba(34,211,238,.25);color:#a5f3fc;'
+                              + 'border:1px solid #22d3ee;'
+                           : 'background:rgba(148,163,184,.12);color:#cbd5e1;'
+                              + 'border:1px solid rgba(148,163,184,.35);');
+                if (axis === 'col')
+                    css += 'left:' + (L + a * W + 2) + 'px;top:' + (T - 24) + 'px;width:'
+                        + Math.max(20, (b - a) * W - 4) + 'px;height:22px;';
+                else
+                    css += 'left:' + Math.max(0, L - 82) + 'px;width:78px;top:'
+                        + (T + ((a + b) / 2) * H - 11) + 'px;height:22px;';
+                d.style.cssText = css;
+                d.textContent = label;
+                d.title = (axis === 'col' ? 'This column' : 'This row') + ': ' + label
+                    + ' (click: its settings, written to each of its panels)';
+                d.onclick = () => {
+                    state.h = (state.h || 0) + 1;
+                    data.head = [node, state.h];
+                };
+                return d;
+            }));
+            self.marks();
+        """,
+        "dots": "self.marks();",
         "fit": "wrap.style.height = data.fit ? '100%' : '';",
         "src": "if (data.src) img.src = data.src;",
         "css": "img.style.cssText = data.css;",
         "marks": """
-            over.replaceChildren(...Object.values(data.marks).map(([l, r, t, b]) => {
+            const dots = Object.values(data.dots).map(([x, y]) => {
+                const d = document.createElement('div');
+                d.style.cssText = 'position:absolute;width:9px;height:9px;border-radius:50%;'
+                    + 'background:#22d3ee;box-shadow:0 0 0 2px rgba(0,0,0,.55);'
+                    + 'left:' + (img.offsetLeft + x * img.offsetWidth - 12) + 'px;'
+                    + 'top:' + (img.offsetTop + y * img.offsetHeight + 3) + 'px';
+                return d;
+            });
+            over.replaceChildren(...dots, ...Object.values(data.marks).map(([l, r, t, b]) => {
                 const d = document.createElement('div');
                 d.style.cssText = 'position:absolute;box-sizing:border-box;'
                     + 'border:2px solid #22d3ee;box-shadow:0 0 0 1px rgba(0,0,0,.45);'
@@ -85,9 +145,30 @@ class ClickImage(ReactiveHTML):
             e.preventDefault();
             state.d = [e.clientX, e.clientY];
         """,
+        "zones": "hov.style.display = 'none'; img.title = '';",
         "move": """
             const e = state.event;
-            if (!state.d || !data.band) return;
+            if (!state.d) {
+                const r = img.getBoundingClientRect();
+                if (!r.width || !r.height) return;
+                const fx = (e.clientX - r.left) / r.width, fy = (e.clientY - r.top) / r.height;
+                const z = data.zones.find(q => q[0] <= fx && fx <= q[1] && q[2] <= fy
+                                          && fy <= q[3]);
+                if (!z) {
+                    hov.style.display = 'none';
+                    img.title = '';
+                    return;
+                }
+                hov.style.left = (img.offsetLeft + z[0] * img.offsetWidth) + 'px';
+                hov.style.top = (img.offsetTop + z[2] * img.offsetHeight) + 'px';
+                hov.style.width = ((z[1] - z[0]) * img.offsetWidth) + 'px';
+                hov.style.height = ((z[3] - z[2]) * img.offsetHeight) + 'px';
+                hov.style.display = 'block';
+                img.title = z[4];
+                return;
+            }
+            hov.style.display = 'none';
+            if (!data.band) return;
             const w = wrap.getBoundingClientRect();
             const x0 = Math.min(state.d[0], e.clientX), y0 = Math.min(state.d[1], e.clientY);
             box.style.left = (x0 - w.left) + 'px';
@@ -112,6 +193,7 @@ class ClickImage(ReactiveHTML):
         "leave": """
             state.d = null;
             box.style.display = 'none';
+            hov.style.display = 'none';
         """}
 
 
@@ -140,6 +222,120 @@ def panel_boxes(fig, spec, size_px, dpi):
         out[i] = [(min(e.x0 for e in boxes) / f - x0) / W, (max(e.x1 for e in boxes) / f - x0) / W,
                   (y1 - max(e.y1 for e in boxes) / f) / H, (y1 - min(e.y0 for e in boxes) / f) / H]
     return out
+
+
+@dataclass(frozen=True)
+class Part:
+    """A part of the preview a click opens the settings of: its box ([left, right, top, bottom]
+    fractions of the image, as panel_boxes'), the panel it is of (None: the figure's), what it is
+    (PART_WORDS), and of a colorbar the panels it serves (the first: whose colours it shows) and
+    the colorbar mode it was drawn by (shared, row, col, each, figure)."""
+    box: tuple
+    panel: object
+    part: str
+    panels: tuple = ()
+    mode: str = ""
+
+
+PART_WORDS = {"title": "the panel's title", "xlabel": "the x label", "ylabel": "the y label",
+              "rowlabel": "the row label", "letters": "the panel letter",
+              "time_label": "the time label", "run_label": "the run name",
+              "z_label": "the height label", "legend": "the legend",
+              "own legend": "the panel's legend", "figure legend": "the figure's legend",
+              "suptitle": "the figure title", "colorbar": "the colorbar",
+              "own colorbar": "the panel's colorbar"}
+PAD_PX = 3  # (how near a part's drawn box, in pixels of the image, a click still hits it)
+
+
+def _shown(t):
+    """Whether artist t is drawn and, a text, says something."""
+    if t is None or not t.get_visible():
+        return False
+    get = getattr(t, "get_text", None)
+    return not callable(get) or bool(str(get()).strip())
+
+
+def _figures(fig):
+    """fig and its subfigures, all the way down."""
+    out = [fig]
+    for sf in getattr(fig, "subfigs", ()):
+        out += _figures(sf)
+    return out
+
+
+def _parts_of(fig):
+    """[(artist, tight, panel, part, panels, mode)] of figure fig that a click opens (tight: its
+    box with its ticks and labels, a colorbar's)."""
+    found = []
+    for pid, ax in (getattr(fig, "_cv_axes", None) or {}).items():
+        tags = list(getattr(ax, "_cv_tags", ()))
+        taken = {id(t) for _, t in tags}
+        found += [(t, False, pid, name, (), "") for name, t in tags]
+        for t in (ax.title, getattr(ax, "_left_title", None), getattr(ax, "_right_title", None)):
+            if t is not None and id(t) not in taken:
+                found.append((t, False, pid, "title", (), ""))
+        if not getattr(ax, "_cv_hodo", False) and ax.name != "3d":
+            found += [(ax.xaxis.label, False, pid, "xlabel", (), ""),
+                      (ax.yaxis.label, False, pid, "ylabel", (), "")]
+        found.append((getattr(ax, "_cv_rowlabel", None), False, pid, "rowlabel", (), ""))
+        for a in (ax, *getattr(ax, "_cv_more", ())):
+            leg = a.get_legend()
+            if leg is not None:
+                part = "legend" if getattr(leg, "_cv_block", False) else "own legend"
+                found.append((leg, False, pid, part, (), ""))
+        own = getattr(ax, "_cv_own_bar", None)
+        if own is not None:
+            found.append((own, True, pid, "own colorbar", (pid,), "own"))
+    for sf in _figures(fig):
+        found.append((getattr(sf, "_suptitle", None), False, None, "suptitle", (), ""))
+        found += [(leg, False, None, "figure legend", (), "") for leg in sf.legends]
+    for cax, ids, mode in getattr(fig, "_cv_bars", ()):
+        found.append((cax, True, ids[0] if ids else None, "colorbar", tuple(ids), mode))
+    return found
+
+
+def watch_parts(fig):
+    """Record, each time fig is drawn, where its parts (_parts_of) are in the picture drawn
+    (fig._cv_parts_px: [(x0, x1, y0, y1 pixels from the lower left, panel, part, panels, mode)]):
+    a text's place is laid out at the dpi it is drawn at, so it is read in the draw itself, and in
+    savefig's last draw (of a trimmed box: bbox_inches "tight") the pixels are the image's."""
+    def seen(event):
+        out = []
+        r = event.renderer
+        for art, tight, pid, part, ids, mode in _parts_of(fig):
+            if not _shown(art):
+                continue
+            try:
+                e = art.get_tightbbox(r) if tight else art.get_window_extent(r)
+            except Exception:  # noqa: BLE001  (an artist not laid out: not clickable)
+                continue
+            if e is not None and e.width > 0 and e.height > 0:
+                out.append((e.x0, e.x1, e.y0, e.y1, pid, part, ids, mode))
+        fig._cv_parts_px = out
+
+    fig.canvas.mpl_connect("draw_event", seen)
+
+
+def part_boxes(fig, spec, size_px, dpi):
+    """[Part] of the preview just saved from fig (watch_parts must watch it first): each panel's
+    title, axis labels, row label, panel labels (letter, time, run, height), legend and own
+    colorbar, the figure's title and legend, and the colorbars (fig._cv_bars:
+    draw/layers.note_bar), smallest first so a click on one inside another (a legend in a
+    colorbar's box) is on the small one.  spec and dpi: as panel_boxes' (not needed: the pixels
+    are the image's)."""
+    W, H = max(size_px[0], 1), max(size_px[1], 1)
+    px, py = PAD_PX / W, PAD_PX / H
+    out = [Part((x0 / W - px, x1 / W + px, 1 - y1 / H - py, 1 - y0 / H + py), pid, part, ids,
+                mode)
+           for x0, x1, y0, y1, pid, part, ids, mode in getattr(fig, "_cv_parts_px", ())]
+    out.sort(key=lambda q: (q.box[1] - q.box[0]) * (q.box[3] - q.box[2]))
+    return out
+
+
+def part_at(parts, fx, fy):
+    """The first of parts (part_boxes) holding a point of the preview, or None."""
+    return next((q for q in parts or () if q.box[0] <= fx <= q.box[1]
+                 and q.box[2] <= fy <= q.box[3]), None)
 
 
 def place_map(fig, spec, size_px, dpi):

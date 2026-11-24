@@ -177,6 +177,7 @@ def fresh_editor(v, t=None):
     v.tslider.value = v._t_new
     v.pools["figser"].shutdown(wait=False)  # (the new editor makes its own)
     v.figed = new = editor.FigureEditor(v)
+    _old_start(new)
     v.fig_ws.objects = [out_of_flow(new.quick) if o is old.quick
                         else new.shell.panel if o is old.shell.panel else o
                         for o in v.fig_ws.objects]
@@ -185,11 +186,103 @@ def fresh_editor(v, t=None):
     return new
 
 
+def _old_start(ed):
+    """The tests are written on the figures the editor made before new figures started empty
+    (docs-dev/figures-ui-plan.md, Phase 3): the page's figure a 2 x 3 grid in time of
+    reflectivity with w contours, and a New dialog's plan view or section with a fill chosen
+    drawing the w contours and (off) vectors too.  test_figure_blank.py checks the real start."""
+    from atmo3d.figures import spec as fg
+    ed.shell.start(ed._default())
+    made = ed._quick_spec
+
+    def quick_spec():
+        s = made()
+        if s["kind"] in ("plan", "xsec") and s["layers"]:
+            s["layers"] = s["layers"][:1] + fg.default_spec(ed.run, ed.F, ed.v.t)["layers"][1:]
+        return s
+    ed._quick_spec = quick_spec
+
+
 def fresh_shell(v, t=None):
     """A new editor's figure shell on viewer v, opened (the Figure workspace shown)."""
     ed = fresh_editor(v, t)
     ed.shell.open()
     return ed.shell
+
+
+def at_tool(sh, tool, node=None):
+    """The figure frame with its `tool` open at `node` (None: what is picked), every fold of
+    its drawer open (lists, then their sections: made as they open)."""
+    import panel as pn
+    fr = sh.frame
+    if fr.tool != tool:
+        fr.open_tool(tool)
+    if node is not None and node != sh.node:
+        sh.select(node)
+    elif fr.tool is not None:
+        fr.show(sh.node)
+    for _ in range(4):
+        shut = [c for c in fr.body.select(pn.Card) if c.collapsed]
+        if not shut:
+            break
+        for c in shut:
+            c.collapsed = False
+    return fr
+
+
+def every_node(doc):
+    """Every place of figure document doc an edit can be made at, in reading order: the figure,
+    the runs, then each kind, its panels, their layers and insets."""
+    from atmo3d.figures import draw as figdraw
+    from atmo3d.figures.shell import nodes
+    panels = nodes.in_order(doc)
+    out = [nodes.FIGURE, nodes.RUNS]
+    for kind in dict.fromkeys(p["kind"] for p in panels):
+        out.append(nodes.KIND_PREFIX + kind)
+        for p in (p for p in panels if p["kind"] == kind):
+            out.append(f"panel:{p['id']}")
+            out += [f"layer:{p['id']}:{j}" for j in range(len(figdraw.panel_layers(doc, p)))]
+            out += [f"inset:{p['id']}:{ins['id']}" for ins in p.get("insets") or []]
+    return out
+
+
+def control(sh, name, tool=None, node=None, n=0):
+    """The n-th widget called `name` in the frame's drawer (tool at node: at_tool's first)."""
+    if tool is not None:
+        at_tool(sh, tool, node)
+    got = [w for w in sh.frame.body.select()
+           if getattr(w, "name", None) == name and hasattr(w, "value")]
+    if len(got) <= n:
+        raise AssertionError(f"no {name} in {sh.frame.tool} at {sh.node}")
+    return got[n]
+
+
+def row_ctl(sh, row_id, where=None):
+    """The control of schema row row_id in the frame's drawers (at where, if given; its
+    section opened), and its ↺ button."""
+    for d in sh.frame.drawers:
+        if where is not None and d.where != where:
+            continue
+        for sec in d.sections:
+            if row_id in {r.id for r in sec.rows}:
+                sec.card.collapsed = False
+                return sec.ctls[row_id], sec.lines[row_id][1]
+    raise AssertionError(f"no row {row_id} in {sh.frame.tool} at {sh.node}")
+
+
+def drawer_text(sh):
+    """Every hint and heading the frame's drawer shows, in one string."""
+    import panel as pn
+    return " ".join(str(o.object or "") for o in sh.frame.body.select(pn.pane.HTML))
+
+
+def press(sh, name, n=0):
+    """Click the n-th button called `name` in the frame's drawer."""
+    import panel as pn
+    got = [b for b in sh.frame.body.select(pn.widgets.Button) if b.name == name]
+    if len(got) <= n:
+        raise AssertionError(f"no button {name} in {sh.frame.tool} at {sh.node}")
+    got[n].clicks += 1
 
 
 @pytest.fixture(scope="module")
@@ -215,7 +308,7 @@ def two_plans(shell_viewer, _two_plans_kept):
         return sh
     ed.open_quick()
     ed._quick_make()
-    sh.inspector.grid.add_panel("plan", "new column")
+    sh.grid.add_panel("plan", "new column")
     kept.update(doc=json.dumps(sh.doc, default=float), hist=list(sh._hist), base=sh._base,
                 node=sh.node)
     return sh
@@ -261,16 +354,17 @@ def set_look(ed, kind, block, **values):
     ed.shell.edit(lambda d: d["kinds"][kind][block].update(values))
 
 
-def put(s, widget, value):
-    """Spec s with the setting of widget name `widget` (settings.py) as if typed there."""
-    from atmo3d.figures import settings as table
-    st = next(x for x in table.SETTINGS if x.widget == widget)
-    block, _, key = st.key.rpartition(".")
+def put(s, key, value):
+    """Spec s with setting `key` (a schema row's key, without look.: "axes.xstep") as if typed
+    in its control."""
+    from atmo3d.figures import schema as S
+    r = S.row_for("look." + key) or S.row(key)
+    block, name = r.block
     held = s.setdefault(block, {}) if block else s
-    if key == "*":
-        held.update(st.as_.read(value))
+    if r.packed:
+        held.update(r.as_.read(value))
     else:
-        held[key] = st.as_.read(value)
+        held[name] = r.as_.read(value)
     return s
 
 
@@ -305,7 +399,7 @@ def coarse_run(demo_root, tmp_path_factory):
 
 def difference_layer(ed, s):
     """Spec s's first fill as a difference: minus the run's first output, diverging about 0."""
-    from atmo3d.figures.cards.layercard import _nice
+    from atmo3d.figures.choices import _nice
     lay = next(x for x in s["layers"] if x["type"] == "fill")
     a = _nice(0.25 * (float(lay["vmax"]) - float(lay["vmin"])))
     lay.update(minus=dict(run=None, time_s=float(ed.run.times[0]), grid="ask"), cmap="RdBu",

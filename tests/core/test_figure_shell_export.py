@@ -340,7 +340,7 @@ def test_a_preset_is_one_undo_step(shell):
 
 
 def test_a_mixed_figures_height_follows_its_rows(shell):
-    pane = shell.inspector.grid
+    pane = shell.grid
     pane.add_panel("sounding", "new column")
     h = shell.doc["size"][1]
     rows = de.grid_shape(shell.doc)[0]
@@ -348,9 +348,11 @@ def test_a_mixed_figures_height_follows_its_rows(shell):
     assert shell.doc["size"][1] == pytest.approx(h * (rows + 1) / rows, abs=0.01)
 
 
-def test_the_figure_node_has_a_legend_section_for_maps(shell):
-    shell._show(nodes.FIGURE)
-    assert any(getattr(o, "title", "") == "Legend" for o in shell.inspector.body.objects)
+def test_the_figure_has_a_legend_section_for_maps(shell):
+    import panel as pn
+    from conftest import at_tool
+    at_tool(shell, "look", nodes.FIGURE)
+    assert any(c.title == "Legend" and c.visible for c in shell.frame.body.select(pn.Card))
 
 
 def _on_rows(ed):
@@ -369,17 +371,34 @@ def _on_rows(ed):
     return shell, shell.doc
 
 
-def _inspector_widgets(shell, node):
+def _drawer_widgets(shell, node):
+    """Every widget shown at node, every fold open: the frame's Layout, Layers and Look tools
+    (a layer's: Layers, as Look there is its panel's)."""
+    from conftest import at_tool
+
     def walk(o):
         out = [o]
         for c in getattr(o, "objects", None) or []:
             out += walk(c)
         return out
-    shell._show(node)
-    for o in walk(shell.inspector.body):
-        if hasattr(o, "collapsed"):
-            o.collapsed = False
-    return walk(shell.inspector.body)
+    out = []
+    for tool in ("layers",) if node.startswith("layer:") else ("layout", "layers", "look"):
+        fr = at_tool(shell, tool, node)
+        out += [w for w in walk(fr.body) if _shown(w, fr.body)]
+    return out
+
+
+def _shown(w, top):
+    """Whether w, and what holds it, are visible."""
+    import panel as pn
+    held = {id(o): o for o in top.select()}
+    if not getattr(w, "visible", True):
+        return False
+    for o in held.values():
+        if isinstance(o, (pn.Column, pn.Row, pn.Card)) and not o.visible and \
+                any(c is w for c in o.select()):
+            return False
+    return True
 
 
 def test_a_bar_has_one_controlling_panel(ed):
@@ -404,7 +423,7 @@ def test_arrows_set_on_the_controlling_panel_reach_its_whole_bar(ed):
     ends = lambda: [a._colorbar.extend for a in render(ed)[2].axes  # noqa: E731
                     if getattr(a, "_colorbar", None) is not None]
     assert ends() == ["max", "max"]
-    arrows = [w for w in _inspector_widgets(shell, "panel:0")
+    arrows = [w for w in _drawer_widgets(shell, "panel:0")
               if getattr(w, "name", "") == "Colorbar arrows"]
     assert len(arrows) == 1
     arrows[0].value = "neither"
@@ -413,12 +432,11 @@ def test_arrows_set_on_the_controlling_panel_reach_its_whole_bar(ed):
 
 def test_bar_settings_show_only_where_they_change_the_bar(ed):
     shell, doc = _on_rows(ed)
-    names = lambda node: {getattr(w, "name", "") for w in _inspector_widgets(shell, node)  # noqa: E731
-                          if getattr(w, "visible", True)}
+    names = lambda node: {getattr(w, "name", "") for w in _drawer_widgets(shell, node)}  # noqa: E731
     first, other = names("panel:0"), names("panel:1")
     assert {"Colorbar arrows", "Colorbar ticks (blank: the figure's, else auto)"} <= first
     assert "Colorbar arrows" not in other and "Go to panel a" in other
-    assert "Colorbar arrows" not in names("layer:0:0")  # (in the panel's section now)
+    assert "Colorbar arrows" not in names("layer:0:0")  # (in the panel's Colorbar section)
     assert "Colormap" in names("layer:0:0") and "Colormap" not in names("layer:1:0")
     doc["style"]["colorbar"]["mode"] = "each"
     assert "Colorbar arrows" in names("panel:1") and "Colormap" in names("layer:1:0")
@@ -433,24 +451,25 @@ def test_colours_on_a_shared_bar_follow_its_controlling_panel(ed):
     cmap = lambda pid: figdraw.panel_layers(  # noqa: E731
         shell.doc, de.panel_by_id(shell.doc, pid))[0][1]["cmap"]
     was = cmap(2)
-    w = next(w for w in _inspector_widgets(shell, "layer:0:0") if getattr(w, "name", "") == "Colormap")
+    w = next(w for w in _drawer_widgets(shell, "layer:0:0") if getattr(w, "name", "") == "Colormap")
     w.value = "viridis"
     assert cmap(0) == cmap(1) == "viridis" and cmap(2) == was
     de.write_panel(shell.doc, de.panel_by_id(shell.doc, 1), 0, {"cmap": "magma"})
     bar = bars.bar_of(shell.doc, 1)
     assert bars.colours_differ(shell.doc, bar, 1)
-    match = next(w for w in _inspector_widgets(shell, "layer:1:0")
+    match = next(w for w in _drawer_widgets(shell, "layer:1:0")
                  if getattr(w, "name", "") == "Match the bar")
     match.clicks += 1
     assert cmap(1) == "viridis" and not bars.colours_differ(shell.doc, bars.bar_of(shell.doc, 1), 1)
 
 
 def test_a_shared_layers_bar_settings_reach_every_panel(ed):
-    from atmo3d.figures.shell import layerrow
+    from atmo3d.figures import schema as S
+    from atmo3d.figures.schema import where as W
     from atmo3d.figures.shell import bars
     shell, doc = _on_rows(ed)
     bars.set_value(doc, bars.bar_of(doc, 0), "extend", "neither")
     lid = next(k for k, x in doc["layers"].items() if x["type"] == "fill")
-    layerrow.Shared(lid, "plan").write(doc, dict(extend="both"))
+    W.write(doc, S.row_for("layer.extend", "fill"), W.Where("kind", "plan", layer=lid), "both")
     assert bars.values(doc, bars.bar_of(doc, 0))["extend"] == "both"
     assert not any("extend" in (i.get("over") or {}) for p in doc["panels"] for i in p["layers"])
