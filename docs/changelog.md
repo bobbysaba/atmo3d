@@ -13,6 +13,9 @@ has a matching git tag.
 - **Windows**: every text file atmo3d writes or reads (figure bundles, storm tracks, series,
   settings, user fields) is UTF-8. Saving a figure bundle or a storm file failed there, and
   a file written on one OS could read garbled on another. A test checks every `open`.
+- **Saved figure scripts on Windows**: a bundle's script ran nowhere when a run's path was a
+  Windows one (`C:\Users\...` in its docstring read as an escape); it does now.
+- **Parcel colours**: the colour bar appears with the new colours, not a moment before them.
 - **WoFS file names without colons**: WRF's `nocolons` names (`wrfout_d01_2022-05-23_22_00_00_1`,
   the only ones Windows allows) are read as the usual ones. See [WoFS](guide/wofs.md).
 - **Run names on Windows**: the run picker, the figure's run lists and difference maps name
