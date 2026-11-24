@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "atmo3d"
-version = "2.0.0"
+version = "2.1.0"
 description = "Interactive web viewer for 3D atmospheric data (CM1, WoFS, radar)"
 readme = "README.md"
 requires-python = ">=3.11"

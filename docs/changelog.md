@@ -3,7 +3,7 @@
 What changed in each release, newest first. The version is in `pyproject.toml`; a release
 has a matching git tag.
 
-## Unreleased
+## 2.1.0 (2026-11-24)
 
 - **Your own computer**: atmo3d runs on Linux, macOS and Windows, and the tests run on all
   three. On macOS and Windows the reader processes now read 3D fields in parallel too
@@ -16,6 +16,9 @@ has a matching git tag.
 - **Saved figure scripts on Windows**: a bundle's script ran nowhere when a run's path was a
   Windows one (`C:\Users\...` in its docstring read as an escape); it does now.
 - **Parcel colours**: the colour bar appears with the new colours, not a moment before them.
+- **3D scenes without OpenGL**: on a machine with no working OpenGL, a 3D scene says why it
+  was not drawn instead of crashing atmo3d (VTK crashes rather than raising, so a test
+  picture is drawn once in a separate process first). See [Installing](install.md#3d-scene-figures-and-opengl).
 - **WoFS file names without colons**: WRF's `nocolons` names (`wrfout_d01_2022-05-23_22_00_00_1`,
   the only ones Windows allows) are read as the usual ones. See [WoFS](guide/wofs.md).
 - **Run names on Windows**: the run picker, the figure's run lists and difference maps name
