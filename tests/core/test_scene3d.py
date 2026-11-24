@@ -166,6 +166,44 @@ def test_scene_figure_draws_the_picture_ticks_legend_and_colorbars():
     assert not ax.texts and len(fig.axes) == 1
 
 
+def test_opengl_check_runs_once_and_says_why(monkeypatch):
+    """A test picture in a child process (VTK crashes, not raises, without OpenGL):
+    its exit code and last error line become the reason; checked once a process."""
+    import subprocess
+    calls = []
+
+    def crashed(*a, **kw):
+        calls.append(a)
+        return subprocess.CompletedProcess(a, -11, "", "warning\nbad X server connection")
+
+    monkeypatch.setattr(scene3d, "_gl", {})
+    monkeypatch.setattr(subprocess, "run", crashed)
+    why = scene3d.gl_problem()
+    assert "no working OpenGL" in why and "bad X server connection" in why
+    assert scene3d.gl_problem() == why and len(calls) == 1
+    monkeypatch.setattr(scene3d, "_gl", {})
+    monkeypatch.setattr(subprocess, "run", lambda *a, **kw: subprocess.CompletedProcess(
+        a, 0, "", ""))
+    assert scene3d.gl_problem() == ""
+
+
+def test_opengl_check_passes_here():
+    """(The machines the tests run on draw scenes: CI sets up a display.)"""
+    pytest.importorskip("pyvista")
+    assert scene3d.gl_problem() == ""
+
+
+def test_scene_without_opengl_says_so_instead_of_crashing(monkeypatch):
+    from atmo3d.figures import draw as figdraw
+    monkeypatch.setattr(scene3d, "_gl", {"why": "no working OpenGL (test)"})
+    monkeypatch.setattr(scene3d, "render", lambda *a, **kw: pytest.fail("rendered"))
+    fig = figdraw.draw(_scene_spec(), {0: _scene_panel_data()})
+    ax = fig._cv_axes[0]
+    assert not ax.images
+    assert any("3D scene not drawn: no working OpenGL (test)" in t.get_text()
+               for t in ax.texts)
+
+
 def test_scene_figure_bundle_redraws_from_its_script(tmp_path):
     pytest.importorskip("pyvista")
     import runpy

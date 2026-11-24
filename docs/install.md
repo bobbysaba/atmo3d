@@ -67,9 +67,11 @@ viewed there: install as above, start `atmo3d /path/to/run` and open
 3D scene figures ([3D scenes](guide/figures-panels.md#3d-scenes)) are rendered off-screen
 by PyVista (VTK), installed with the rest. VTK draws with the machine's OpenGL library
 (`libGL`/`libEGL`), which cluster login and compute nodes usually have even without a
-display. On a machine with none, everything else works and a 3D scene shows an error in
-the preview; install the system's Mesa OpenGL libraries (e.g. `libgl1-mesa-dri`,
-`mesa-libGL`) or ask your site's help desk.
+display. On a machine with none, everything else works and a 3D scene shows why it was
+not drawn in place of its picture (atmo3d draws a test picture first, in a separate process,
+since VTK without OpenGL crashes the program instead of reporting an error); install the
+system's Mesa OpenGL libraries (e.g. `libgl1-mesa-dri`, `mesa-libGL`) or ask your site's
+help desk.
 
 ## Check the install
 

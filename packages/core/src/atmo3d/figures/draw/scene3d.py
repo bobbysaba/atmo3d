@@ -554,6 +554,49 @@ def scene_dpi(spec):
                  (spec.get("export") or {}).get("dpi", 250))
 
 
+# A tiny scene drawn the way render() draws (off-screen, depth peeling): where there is
+# no working OpenGL, VTK does not raise but crashes the process (a segfault), so it is
+# tried in a child process first.
+_GL_PROBE = """
+try:
+    import pyvista as pv
+except ImportError:
+    raise SystemExit(0)  # (no pyvista: render() says so)
+pl = pv.Plotter(off_screen=True, window_size=(16, 16))
+pl.add_mesh(pv.Sphere())
+pl.enable_depth_peeling()
+pl.screenshot(return_img=True)
+pl.close()
+"""
+_gl = {}  # "why": "" once a test picture drew here, else the reason it did not
+
+
+def gl_problem():
+    """Why 3D scenes cannot be drawn on this machine ("" when they can): a test
+    picture rendered once per process, in a child process, since a missing OpenGL
+    crashes the process that renders instead of raising."""
+    if "why" not in _gl:
+        import subprocess
+        import sys
+        try:
+            r = subprocess.run([sys.executable, "-c", _GL_PROBE], capture_output=True,
+                               text=True, timeout=120)
+            import re
+            err = re.sub(r"\x1b\[[0-9;]*m", "", r.stderr or "").strip()  # (colour codes)
+            # (VTK's log lines: "<date> (<time>) [<thread>] <file>:<line> WARN| <message>")
+            last = [re.sub(r"^.*?\b(?:WARN|ERR|INFO)\|\s*", "", ln).strip()
+                    for ln in err.splitlines()[-1:]] or [""]
+            _gl["why"] = "" if r.returncode == 0 else (
+                "this machine has no working OpenGL for VTK to draw with"
+                + (f" ({last[0][:160]})" if last[0] else
+                   f" (a test picture crashed, exit code {r.returncode})"))
+        except subprocess.TimeoutExpired:
+            _gl["why"] = "a test picture with VTK did not finish in 2 minutes"
+        except OSError as e:
+            _gl["why"] = f"could not try VTK ({e})"
+    return _gl["why"]
+
+
 def finish_scenes(fig, dpi):
     """Render the pictures of fig's scene panels (scene_panel) at the size their axes
     have in the laid-out figure, dpi pixels per inch, and draw their axis ticks."""
@@ -569,6 +612,13 @@ def finish_scenes(fig, dpi):
         w, h = bb.width / root.dpi * dpi, bb.height / root.dpi * dpi
         k = min(1.0, SCENE_MAX_PX / max(w, h, 1.0))
         w, h = max(16, int(round(w * k))), max(16, int(round(h * k)))
+        why = gl_problem()
+        if why:
+            ax.text(0.5, 0.5, f"3D scene not drawn: {why}.\nInstall the system's Mesa OpenGL "
+                    "libraries\n(e.g. libgl1-mesa-dri, mesa-libGL); see Installing.",
+                    transform=ax.transAxes, ha="center", va="center", color="0.4",
+                    wrap=True)
+            continue
         try:
             img, proj = render(arrays, sc, (w, h), dpi * k)
         except ImportError:
