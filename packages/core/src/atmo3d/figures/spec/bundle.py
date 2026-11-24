@@ -238,7 +238,8 @@ def script(spec, npz_name, out_name, run=None, note="", draw_name="../_src/draw.
         return f"  (namelist sha256 {nml[path]})" if nml.get(path) else ""
 
     head = [
-        f'"""Figure made with atmo3d {made["atmo3d"]}'
+        # (raw: run paths on Windows, C:\Users\..., hold backslashes)
+        f'r"""Figure made with atmo3d {made["atmo3d"]}'
         + (f' (commit {made["commit"]})' if made["commit"] else "")
         + f' on {_time.strftime("%Y-%m-%d %H:%M")}.',
         "",

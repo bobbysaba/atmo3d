@@ -3,6 +3,7 @@ wrfout_d01_<time>_<member> files beside DART files that are ignored), its names,
 times, base state and perturbations, its terrain-following heights and maps at a height
 above ground or sea level, and how runs are found and opened; the ensemble mean (<root>/mean)."""
 import datetime
+import json
 import os
 
 import numpy as np
@@ -656,7 +657,8 @@ def test_recent_runs_keep_the_experiment(wofs_root, tmp_path, monkeypatch):
     registry.remember(os.path.join(exp, "mem02"))
     registry.remember(os.path.join(exp, "mean"))
     assert registry.recent_runs() == [exp]
-    recent.write_text(f'["{exp}/mem03", "{exp}"]', encoding="utf-8")  # (as kept before: members)
+    recent.write_text(json.dumps([os.path.join(exp, "mem03"), exp]),  # (as kept before: members)
+                      encoding="utf-8")
     assert registry.recent_runs() == [exp]
 
 

@@ -802,9 +802,6 @@ class ParcelsPanel:
         if vals:
             lo, hi = P.value_range(vals)
             self.par_mapper.update(palette=palette(self.par_cmap.value), low=lo, high=hi)
-            self.par_cbar.title = pf.title(cvar) if P.grid_field(cvar) else \
-                f"parcel {pf.title(cvar)}"
-        self.par_cbar.visible = bool(vals)
         color = transform("val", self.par_mapper) if cvar else "color"
         for r in (self.par_seg, self.par_xs_seg):
             r.glyph.line_color = color
@@ -829,6 +826,10 @@ class ParcelsPanel:
                                   pid=e["set"].ids[ok], set=np.full(ok.sum(), name)))
             heads = {k: np.concatenate([p[k] for p in parts]) for k in EMPTY_HEAD}
         self.par_head_src.data = heads
+        if vals:  # (the bar after the values it is for: never the old ones beside it)
+            self.par_cbar.title = pf.title(cvar) if P.grid_field(cvar) else \
+                f"parcel {pf.title(cvar)}"
+        self.par_cbar.visible = bool(vals)
         self._par_xs(trajs)
         self._par_3d(trajs)
         self._par_plot(trajs, ts)

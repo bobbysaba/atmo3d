@@ -716,12 +716,16 @@ def test_viewer_colours_and_plots_a_grid_field(pviewer):
          msg="coloured by @w")
     ps = v.psets["set 1"]["set"]
     tr = v.pf.trajectories(ps, ("@w",))["@w"]
-    vals = v.par_head_src.data["val"]
-    np.testing.assert_allclose(np.sort(vals[np.isfinite(vals)]),
-                               np.sort(P.at_time(v.pf, tr, 4800.0)[np.isfinite(
-                                   P.at_time(v.pf, tr, 4800.0)) & np.isfinite(
-                                   P.heads(v.pf, v.pf.trajectories(ps), 4800.0)[0])]),
-                               rtol=1e-5)
+    at = P.at_time(v.pf, tr, 4800.0)
+    want = np.sort(at[np.isfinite(at) & np.isfinite(
+        P.heads(v.pf, v.pf.trajectories(ps), 4800.0)[0])])
+
+    def shown():  # (the heads' values, drawn on the viewer's thread)
+        vals = np.asarray(v.par_head_src.data["val"])
+        return np.sort(vals[np.isfinite(vals)])
+
+    wait(lambda: shown().shape == want.shape and np.allclose(shown(), want, rtol=1e-5),
+         tmax=30, msg="the heads coloured by @w")
     v.par_plot_y.value = "@w"
     assert "at the parcels" in v.pp_fig.yaxis.axis_label and len(v.pp_mid.data["xs"])
 

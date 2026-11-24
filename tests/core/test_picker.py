@@ -29,7 +29,7 @@ def test_lists_runs_and_picking_enables_open(runs_root):
     p = RunPicker()
     p.rescan()
     assert list(p.list.options) == ["project/supercell", "project/supercell_weak"]
-    assert p.selected.endswith("/supercell") and not p.open.disabled  # the top one
+    assert os.path.basename(p.selected) == "supercell" and not p.open.disabled  # the top one
     p.list.value = p.list.options["project/supercell_weak"]
     assert not p.open.disabled and p.selected.endswith("supercell_weak")
     p._open()
@@ -45,7 +45,7 @@ def test_filter_keeps_selection_and_single_match_is_picked(runs_root):
     typed(p, "")
     p.list.value = p.list.options["project/supercell"]
     assert typed(p, "super cell") == ["project/supercell", "project/supercell_weak"]
-    assert p.selected.endswith("/supercell")
+    assert os.path.basename(p.selected) == "supercell"
 
 
 def test_typed_folders(runs_root):
@@ -58,7 +58,7 @@ def test_typed_folders(runs_root):
     assert typed(p, f"{proj}/supercell_w") == ["supercell_weak"]  # partly typed name
     # a run's own path: it is selected, with the runs next to it
     assert typed(p, f"{proj}/supercell") == ["supercell", "supercell_weak"]
-    assert p.selected == f"{proj}/supercell" and not p.open.disabled
+    assert p.selected == str(proj / "supercell") and not p.open.disabled
     typed(p, "/no/such/place")
     assert p.list.options == {} and "No such folder" in p.msg.object
 
@@ -70,7 +70,7 @@ def test_enter_looks_in_a_typed_folder(runs_root):
     assert list(p.list.options) == ["project/supercell", "project/supercell_weak"]
     assert p.go.value == ""  # (nothing opened)
     p._on_enter()  # a run chosen: Enter opens it
-    assert json.loads(p.go.value)[0].endswith("/supercell")
+    assert os.path.basename(json.loads(p.go.value)[0]) == "supercell"
 
 
 def test_shared_folders_never_searched(runs_root, monkeypatch):

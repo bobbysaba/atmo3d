@@ -22,6 +22,10 @@ def _html(text="", **kw):
 SEPS = tuple(dict.fromkeys(("/", os.sep)))  # (Windows takes / as well as \\)
 
 
+def _norm(path):
+    return os.path.normcase(os.path.normpath(path))
+
+
 def _is_path(text):
     """A typed path rather than words to filter by: /…, ~…, $…, and on Windows C:… or
     \\…."""
@@ -138,9 +142,12 @@ class RunPicker:
         self._select(keep or "", hint)
 
     def _known_options(self, text):
-        skip = {self.current} | set(self.exclude() if self.exclude else ())
-        recent = [p for p in registry.recent_runs() if p not in skip]
-        runs = recent + [r for r in self._known if r not in recent and r not in skip]
+        # (compared as normalized paths: a/b and a\\b are one run on Windows)
+        skip = {_norm(p) for p in [self.current, *(self.exclude() if self.exclude else ())]
+                if p}
+        recent = [p for p in registry.recent_runs() if _norm(p) not in skip]
+        seen = {_norm(p) for p in recent}
+        runs = recent + [r for r in self._known if _norm(r) not in seen | skip]
         words = text.lower().split()
         runs = [r for r in runs if all(w in r.lower() for w in words)]
         opts = {}
@@ -164,7 +171,7 @@ class RunPicker:
         Enter was pressed); a run typed in full is picked as it is; a partly typed name
         filters the runs found in its folder (if that was looked in).  Shared folders
         are never searched.  Also returns the run to select."""
-        p = config.expand(text)
+        p = os.path.normpath(config.expand(text))  # (a/b\\c on Windows: one form)
         looking = (search or text.endswith(SEPS)) and os.path.isdir(p)
         pick = None
         if looking:

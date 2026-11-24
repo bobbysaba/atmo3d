@@ -507,3 +507,14 @@ def test_animation_of_soundings(ed, tmp_path, layout):
     ed._anim_job(ed._anim_gen, s, offsets, base, dict(fps=5.0, dpi=40, loop=True, frames=False))
     assert "Saved" in txt(ed.an_msg.object), ed.an_msg.object
     assert Image.open(base + ".gif").n_frames == 2
+
+
+def test_script_with_windows_run_paths_compiles():
+    """Run paths are written into the script's docstring; on Windows they hold
+    backslashes (C:\\Users\\... reads as a \\U escape unless the docstring is raw)."""
+    from atmo3d.figures.spec import bundle
+    runs = [dict(id=0, path=r"C:\Users\me\new\run1", label="run1"),
+            dict(id=1, path=r"C:\Users\me\x\run2", label="run2")]
+    s = bundle.script(dict(runs=runs, panels=[]), "../_src/a.npz", "../a.png")
+    compile(s, "fig.py", "exec")
+    assert r"C:\Users\me\new\run1" in s
