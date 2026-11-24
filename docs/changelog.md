@@ -3,7 +3,7 @@
 What changed in each release, newest first. The version is in `pyproject.toml`; a release
 has a matching git tag.
 
-## Unreleased
+## 2.0.0 (2026-11-24)
 
 - **Field menus**: a field picker without a label (the map's and the cross-section's fill)
   no longer shows a made-up name such as "FieldSelect00506" above it, and the menu and its
