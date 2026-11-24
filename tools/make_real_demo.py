@@ -190,13 +190,13 @@ def parcels(src, dst, box, n_keep, seed, note):
 
 
 def write_namelist(src, dst, size):
-    text = open(src).read()
+    text = open(src, encoding="utf-8").read()
     for key in ("nx", "ny"):
         text, n = re.subn(rf"(?im)^(\s*{key}\s*=\s*)\d+", lambda m: m.group(1) + str(size),
                           text, count=1)
         if n != 1:
             raise SystemExit(f"{src}: no {key} = ... line")
-    with open(dst, "w") as fh:
+    with open(dst, "w", encoding="utf-8") as fh:
         fh.write(text)
 
 

@@ -266,7 +266,7 @@ def main(argv=None, root=ROOT):
 
     owners = os.path.join(root, ".github", "CODEOWNERS")
     if os.path.isfile(owners):
-        with open(owners, "a") as f:
+        with open(owners, "a", encoding="utf-8") as f:
             f.write(CODEOWNERS.format(name=name))
     rel = os.path.relpath(dest, root)
     print(f"""wrote {rel}/, tests/{name}/test_{name}.py; a commented line in .github/CODEOWNERS

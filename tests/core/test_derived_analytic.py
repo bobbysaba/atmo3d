@@ -262,7 +262,7 @@ def test_docs_page_lists_every_field_and_note():
     note (FieldDef.note) word for word."""
     from pathlib import Path
     page = (Path(__file__).resolve().parents[2] / "docs" / "guide"
-            / "derived-fields.md").read_text()
+            / "derived-fields.md").read_text(encoding="utf-8")
     assert [n for n in sorted(FF.CONFIRMED) if f"`{n}`" not in page] == []
     notes = set()
     for model in ("cm1", "wofs"):

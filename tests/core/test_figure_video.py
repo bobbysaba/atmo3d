@@ -18,9 +18,17 @@ open(args[-1], "wb").write((size + " " + str(len(data))).encode())
 """
 
 
-def fake_encoder(tmp_path, body=None):
-    exe = tmp_path / "fakeffmpeg"
-    exe.write_text((body or FAKE).format(py=sys.executable))
+def fake_encoder(tmp_path, body=None, name="fakeffmpeg"):
+    """The stand-in, as `name`: a script run by its #! line, or on Windows (no #!) a
+    name.bat that runs the script with this Python."""
+    text = (body or FAKE).format(py=sys.executable)
+    if os.name == "nt":
+        (tmp_path / f"{name}.py").write_text(text, encoding="utf-8")
+        exe = tmp_path / f"{name}.bat"
+        exe.write_text(f'@"{sys.executable}" "%~dp0{name}.py" %*\r\n', encoding="utf-8")
+        return str(exe)
+    exe = tmp_path / name
+    exe.write_text(text, encoding="utf-8")
     exe.chmod(exe.stat().st_mode | stat.S_IXUSR)
     return str(exe)
 
@@ -28,7 +36,7 @@ def fake_encoder(tmp_path, body=None):
 def test_frames_are_padded_to_one_even_size(tmp_path):
     imgs = [Image.new("RGB", (11, 7), "red"), Image.new("RGB", (9, 8), "blue")]
     out = fg.write_video(imgs, str(tmp_path / "sub" / "a.mp4"), 4.0, encoder=fake_encoder(tmp_path))
-    size, n = open(out).read().split()
+    size, n = open(out, encoding="utf-8").read().split()
     assert size == "12x8" and int(n) == 2 * 12 * 8 * 3
 
 
@@ -45,7 +53,6 @@ def test_no_encoder_is_a_clear_error(tmp_path, monkeypatch):
 
 
 def test_encoder_is_found_on_path(tmp_path, monkeypatch):
-    exe = fake_encoder(tmp_path)
+    exe = fake_encoder(tmp_path, name="ffmpeg")
     monkeypatch.setenv("PATH", os.path.dirname(exe))
-    os.rename(exe, str(tmp_path / "ffmpeg"))
-    assert fg.video_encoder() == str(tmp_path / "ffmpeg")
+    assert os.path.normcase(fg.video_encoder()) == os.path.normcase(exe)

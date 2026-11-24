@@ -52,7 +52,7 @@ def load_figure(arg):
                              f"(templates: {have})")
     elif not path.lower().endswith(".json"):
         path = fg.bundle_paths({}, path)["spec"]
-    with open(path) as f:
+    with open(path, encoding="utf-8") as f:
         spec = json.load(f)
     if not isinstance(spec, dict):
         raise ValueError(f"{path}: not an atmo3d figure")
@@ -350,8 +350,8 @@ def save_on_run(fd, spec, name, rp, base, fmt, bundle=False, time_s=None, code=F
 
 # ------------------------------------------------------------ command line
 def _out_pattern(out, run_path, name):
-    parent = os.path.basename(os.path.dirname(run_path.rstrip("/")))
-    return config.expand(out.format(run=os.path.basename(run_path.rstrip("/")),
+    parent = os.path.basename(os.path.dirname(run_path.rstrip("/\\")))
+    return config.expand(out.format(run=os.path.basename(run_path.rstrip("/\\")),
                                     parent=parent, name=name))
 
 

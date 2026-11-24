@@ -132,13 +132,13 @@ def save_template(spec, name):
         raise ValueError("give the template a name")
     path = os.path.join(templates_dir(), name + ".json")
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    with open(path, "w") as f:
+    with open(path, "w", encoding="utf-8") as f:
         json.dump(template(spec, name), f, indent=1)
     return path
 
 
 def load_template(path):
-    with open(_abs(path)) as f:
+    with open(_abs(path), encoding="utf-8") as f:
         tpl = json.load(f)
     if not isinstance(tpl, dict) or "template" not in tpl:
         raise ValueError("not an atmo3d figure template")

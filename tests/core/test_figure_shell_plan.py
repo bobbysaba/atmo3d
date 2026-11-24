@@ -677,7 +677,7 @@ def test_a_saved_figure_from_the_gallery_comes_here(shell, tmp_path):
     ed = shell.ed
     form = dict(new_spec(ed), suptitle="From the gallery")
     path = tmp_path / "saved_spec.json"
-    path.write_text(json.dumps(form, default=float))
+    path.write_text(json.dumps(form, default=float), encoding="utf-8")
     ed._quick_open(str(path))
     assert shell.showing and shell.doc["suptitle"] == "From the gallery"
     shell.undo()

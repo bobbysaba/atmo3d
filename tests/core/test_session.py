@@ -50,7 +50,7 @@ def test_session_round_trip(viewer, reg, tmp_path):
     path = str(tmp_path / "s" / "session.json")
     v._save_session(path)
     assert "Saved" in v.ses_msg.object
-    json.load(open(path))  # strict JSON
+    json.load(open(path, encoding="utf-8"))  # strict JSON
 
     run, F = reg.get()
     v2 = A.Viewer(run, F, reg=reg)
@@ -141,7 +141,7 @@ def test_session_of_another_run_reopens_the_page(viewer, demo_root, tmp_path):
     s = v.session_state()
     s["run"] = os.path.join(demo_root, "demo", "supercell_weak")
     path = tmp_path / "weak.json"
-    path.write_text(json.dumps(s))
+    path.write_text(json.dumps(s), encoding="utf-8")
     v.ses_path.value = str(path)
     v._on_load_session(None)
     assert v.ses_go.value == str(path)
@@ -150,7 +150,7 @@ def test_session_of_another_run_reopens_the_page(viewer, demo_root, tmp_path):
 def test_not_a_session_file(viewer, tmp_path):
     from atmo3d.viewer import session
     p = tmp_path / "x.json"
-    p.write_text('{"a": 1}')
+    p.write_text('{"a": 1}', encoding="utf-8")
     with pytest.raises(ValueError):
         session.read(str(p))
     viewer.ses_path.value = str(p)
@@ -309,7 +309,7 @@ def test_a_session_from_an_earlier_version_opens(viewer):
 
 
 def _autosaved(ed):
-    with open(ed._auto_path()) as f:
+    with open(ed._auto_path(), encoding="utf-8") as f:
         return json.load(f)
 
 

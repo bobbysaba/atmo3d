@@ -125,7 +125,7 @@ def query_variable_from_file(file_path, variable_name):
         The value of the queried variable.
     """
     value = None
-    with open(file_path, 'r') as file:
+    with open(file_path, 'r', encoding="utf-8") as file:
         for line in file:
             line = line.strip()
             if line.startswith(variable_name):

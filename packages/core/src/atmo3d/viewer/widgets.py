@@ -402,7 +402,7 @@ class Widgets:
         fn = config.cache_dir("switch", config.run_key(path) + ".json")
         try:
             os.makedirs(os.path.dirname(fn), mode=0o755, exist_ok=True)
-            with open(fn, "w") as f:
+            with open(fn, "w", encoding="utf-8") as f:
                 json.dump(s, f, indent=1)
         except OSError:  # (no view kept: just open it)
             self.picker.go.value = json.dumps([path, self.run.model])

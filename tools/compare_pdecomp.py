@@ -405,7 +405,7 @@ def main():
         lines += advection_check(path, G, Bcm1, periodic, scheme, levels, out, X, Y,
                                  (j0, j1, i0, i1), wl, a.margin)
 
-    with open(os.path.join(out, 'stats.txt'), 'w') as fh:
+    with open(os.path.join(out, 'stats.txt'), 'w', encoding="utf-8") as fh:
         fh.write('\n'.join(lines) + '\n')
     print('\n'.join(lines))
     log(f"figures and stats.txt in {out}")

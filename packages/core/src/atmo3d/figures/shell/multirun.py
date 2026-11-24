@@ -21,8 +21,8 @@ MAX_RUNS = 200  # (runs offered in the list)
 
 
 def run_label(path):
-    parent = os.path.basename(os.path.dirname(path.rstrip("/")))
-    return f"{parent}/{os.path.basename(path.rstrip('/'))}"
+    path = path.rstrip("/\\")
+    return f"{os.path.basename(os.path.dirname(path))}/{os.path.basename(path)}"
 
 
 def plan(runs, name, pattern, fmt):

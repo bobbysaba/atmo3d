@@ -82,7 +82,7 @@ def main():
     bands["pgrad_b"] = banding(pg_b[s])
     pgw_rms = rms(pgw[1:-1][s])  # interior w levels 1..nk-1
 
-    with open(os.path.join(a.out, "bands.txt"), "w") as fh:
+    with open(os.path.join(a.out, "bands.txt"), "w", encoding="utf-8") as fh:
         fh.write(f"file {a.file}\ninfo {out['info']}\n\n")
         names = list(cols)
         fh.write("  k   zh_km  dz_m  dz/dz-  thv0  dthv0/dz_K/km | rms: "

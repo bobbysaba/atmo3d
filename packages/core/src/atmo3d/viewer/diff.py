@@ -19,7 +19,7 @@ class Differences:
         for p in registry.sibling_runs(self.run.path) + registry.recent_runs():
             p = os.path.abspath(p)
             if p != here and p not in out.values() and (p != own or own == here):
-                lab = "/".join(p.rstrip("/").split("/")[-2:])
+                lab = "/".join(p.replace(os.sep, "/").rstrip("/").split("/")[-2:])
                 if own != here and models.root_of(p) == own:
                     lab = f"{os.path.basename(own)} · {models.part_label(p)}"
                 out[lab if lab not in out else p] = p

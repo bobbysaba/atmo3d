@@ -581,7 +581,7 @@ def store(run, recipe, ds):
         tmp = temp_name(path)
         # (the file there first: netCDF asks HDF5 about it, and off the main thread HDF5
         # prints a page of errors for a file not there yet, though the write is fine)
-        open(tmp, "x").close()
+        open(tmp, "x", encoding="utf-8").close()
         ds.to_netcdf(tmp)
         os.replace(tmp, path)
     except (OSError, ValueError, RuntimeError):
@@ -765,7 +765,7 @@ def save(ds, path):
             pickle.dump(dict(series=table(ds), profile=prof, recipe=json.loads(ds.attrs["recipe"]),
                              attrs=dict(ds.attrs)), f)
     else:
-        with open(path, "w") as f:
+        with open(path, "w", encoding="utf-8") as f:
             f.write(to_text(ds, "csv" if ext == ".csv" else "txt"))
     return path
 
@@ -851,7 +851,7 @@ def load(run, path, F=None):
     elif ext in (".csv", ".txt"):
         import pandas as pd
         recipe = None
-        with open(path) as f:
+        with open(path, encoding="utf-8") as f:
             for line in f:
                 if not line.startswith("#"):
                     break

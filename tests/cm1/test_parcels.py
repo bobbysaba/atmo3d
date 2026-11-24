@@ -744,7 +744,7 @@ def test_figure_layer_and_series_of_a_grid_field(reg, pcache):
 # ------------------------------------------------------------------ export (P5b)
 def _read_csv(path):
     """(rows with named columns, the # lines) of a parcel CSV export."""
-    with open(path) as f:
+    with open(path, encoding="utf-8") as f:
         head = [ln for ln in f if ln.startswith("#")]
     return np.genfromtxt(path, delimiter=",", skip_header=len(head), names=True), head
 

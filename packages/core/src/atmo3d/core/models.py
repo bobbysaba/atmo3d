@@ -47,7 +47,7 @@ class Model:
 
     def part_label(self, path):
         """The name of a run named inside a folder (parts) in a list: e.g. "Member 5"."""
-        return os.path.basename(path.rstrip("/"))
+        return os.path.basename(path.rstrip("/\\"))
 
     def parts_of(self, path):
         """The runs next to virtual run `path`, itself among them (default: its
@@ -288,7 +288,7 @@ def part_label(path):
         lab = m.folder_label(path)
         if lab:
             return lab
-    return os.path.basename(os.path.abspath(path).rstrip("/"))
+    return os.path.basename(os.path.abspath(path).rstrip("/\\"))
 
 
 def summary(path, key=None):

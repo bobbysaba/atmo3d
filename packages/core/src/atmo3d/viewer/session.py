@@ -77,7 +77,7 @@ DIST_BLANK = (("lo", "dist_lo"), ("hi", "dist_hi"), ("x0", "dist_x0"), ("x1", "d
 
 def read(path):
     """A session file's contents (ValueError when it is not one)."""
-    with open(config.expand(path)) as f:
+    with open(config.expand(path), encoding="utf-8") as f:
         s = json.load(f)
     if not isinstance(s, dict) or not ({"atmo3d_session", "cm1view_session"} & s.keys()):
         raise ValueError("not an atmo3d session file")   # files from cm1view still load
@@ -346,7 +346,7 @@ class Sessions:
     def _save_session(self, path):
         try:
             os.makedirs(os.path.dirname(path), exist_ok=True)
-            with open(path, "w") as f:
+            with open(path, "w", encoding="utf-8") as f:
                 f.write(self._session_text())
         except OSError as e:
             self._ses_note(f"Could not save: {e}", error=True)

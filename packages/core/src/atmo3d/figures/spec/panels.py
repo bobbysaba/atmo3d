@@ -482,7 +482,7 @@ def run_folder(spec, k):
     """Run k's folder name (a series of several runs tells its lines apart by it)."""
     runs = spec.get("runs") or []
     r = runs[k] if 0 <= k < len(runs) else {}
-    return os.path.basename(str(r.get("path", "")).rstrip("/")) or r.get("label", "") \
+    return os.path.basename(str(r.get("path", "")).rstrip("/\\")) or r.get("label", "") \
         or f"run {k + 1}"
 
 

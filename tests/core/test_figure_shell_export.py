@@ -143,7 +143,7 @@ def test_a_document_saves_as_version_2_and_opens_as_itself(ed, tmp_path):
     d = fg.to_doc(new_spec(ed))
     d["suptitle"] = "here"
     path = fg.save_spec(d, str(tmp_path / "f"))
-    with open(path) as f:
+    with open(path, encoding="utf-8") as f:
         raw = json.load(f)
     assert raw["version"] == 2 and raw["form"]["version"] == 3 and raw["panels"]
     back = fg.load_spec(path)
@@ -282,7 +282,7 @@ def test_the_example_is_not_kept_but_an_edit_is(shell):
     shell.edit(lambda d: d.update(suptitle="mine"))
     shell.request(force=True, delay=False)
     assert ed.own_figure()
-    with open(ed._auto_path()) as f:
+    with open(ed._auto_path(), encoding="utf-8") as f:
         state = json.load(f)
     assert state["doc"]["suptitle"] == "mine" and "spec" not in state
 

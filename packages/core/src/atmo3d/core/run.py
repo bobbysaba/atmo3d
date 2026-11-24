@@ -516,7 +516,7 @@ def parse_namelist(path):
     out = {}
     if not os.path.exists(path):
         return out
-    with open(path) as f:
+    with open(path, encoding="utf-8") as f:
         for line in f:
             line = line.split("!")[0]
             for m in re.finditer(r"(\w+)\s*=\s*([^,=]+?)\s*(?:,|$)", line):
@@ -713,7 +713,7 @@ class Source:
     # ------------------------------------------------------------------ meta
     @property
     def name(self):
-        parts = self.path.rstrip("/").split("/")
+        parts = self.path.replace(os.sep, "/").rstrip("/").split("/")  # (any OS)
         return "/".join(parts[-3:])
 
     def time_label(self, t):

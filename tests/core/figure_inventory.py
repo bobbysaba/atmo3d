@@ -33,7 +33,7 @@ def record_key(rec):
 
 
 def load_part(name):
-    with open(os.path.join(STORE, f"{name}.json")) as f:
+    with open(os.path.join(STORE, f"{name}.json"), encoding="utf-8") as f:
         return json.load(f)
 
 
@@ -137,7 +137,7 @@ def write(inv, path_md, left=()):
             lines.append(f"| {r['section']} | {r['label']} | {r['control']} | "
                          f"{', '.join('`' + k + '`' for k in r['keys'])} |")
         lines.append("")
-    with open(path_md, "w") as f:
+    with open(path_md, "w", encoding="utf-8") as f:
         f.write("\n".join(lines))
     os.chmod(path_md, 0o644)
 

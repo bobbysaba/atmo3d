@@ -216,11 +216,11 @@ def test_strip_averaged_section():
 
 def test_reopening_notes_a_changed_namelist(tmp_path):
     from atmo3d.figures import spec as fg
-    (tmp_path / "namelist.input").write_text("&param1\n dx = 250.0\n/\n")
+    (tmp_path / "namelist.input").write_text("&param1\n dx = 250.0\n/\n", encoding="utf-8")
     spec = dict(runs=[dict(path=str(tmp_path), label="a")])
     spec["made_with"] = fg.made_with(spec)
     assert fg.changed_runs(spec) == []
-    (tmp_path / "namelist.input").write_text("&param1\n dx = 500.0\n/\n")
+    (tmp_path / "namelist.input").write_text("&param1\n dx = 500.0\n/\n", encoding="utf-8")
     assert fg.changed_runs(spec) == [str(tmp_path)]
 
 

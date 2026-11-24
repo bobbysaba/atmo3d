@@ -40,7 +40,7 @@ def _a_saved_figure(folder, name, when):
     from PIL import Image
     os.makedirs(os.path.join(folder, "_src"), exist_ok=True)
     spec = os.path.join(folder, "_src", f"{name}_spec.json")
-    with open(spec, "w") as f:
+    with open(spec, "w", encoding="utf-8") as f:
         f.write("{}")
     os.utime(spec, (when, when))
     Image.new("RGB", (900, 600), "red").save(os.path.join(folder, f"{name}.png"))
@@ -108,7 +108,7 @@ def test_thumbnails_of_older_figures_and_redrawn_images(tmp_path):
     os.remove(png)
     os.remove(fg.thumb_path(spec))
     assert make_thumb(spec) is None and saved_thumb(spec) is None  # e.g. only a PDF
-    with open(png, "w") as f:
+    with open(png, "w", encoding="utf-8") as f:
         f.write("not an image")
     assert make_thumb(spec) is None
 

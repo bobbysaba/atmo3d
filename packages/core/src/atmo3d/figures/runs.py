@@ -134,14 +134,15 @@ class FigureRuns:
         if self._scan_new:
             self._scan_new = False
             self._find_runs()
-        roots = [config.expand(r).rstrip("/") + "/" for r in config.get("runs_root") or []]
+        roots = [config.expand(r).rstrip("/" + os.sep) + os.sep
+                 for r in config.get("runs_root") or []]
         out = {}
         for p in self._cands:
             if p in have:
                 continue
             lab = self._cand_labels.get(p) or \
-                next((p[len(r):] for r in roots if p.startswith(r)), None) or \
-                "/".join(p.rstrip("/").split("/")[-2:])
+                next((p[len(r):].replace(os.sep, "/") for r in roots if p.startswith(r)),
+                     None) or "/".join(p.replace(os.sep, "/").rstrip("/").split("/")[-2:])
             out[lab if lab not in out else p] = p
         return out
 

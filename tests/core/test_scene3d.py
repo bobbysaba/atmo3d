@@ -172,7 +172,7 @@ def test_scene_figure_bundle_redraws_from_its_script(tmp_path):
     from atmo3d.figures.spec import bundle
     out = bundle.save_bundle(_scene_spec(), {0: _scene_panel_data()}, str(tmp_path / "s3d"))
     first = (tmp_path / "s3d.png").stat().st_mtime_ns
-    assert "pyvista" in open(out["script"]).read()
+    assert "pyvista" in open(out["script"], encoding="utf-8").read()
     runpy.run_path(out["script"], run_name="__main__")
     assert (tmp_path / "s3d.png").stat().st_mtime_ns >= first
 

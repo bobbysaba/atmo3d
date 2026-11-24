@@ -65,7 +65,7 @@ expr = "().__class__"
 def fields_file(tmp_path, monkeypatch):
     """A fields file with FILE in it, in use (the setting by its environment variable)."""
     p = tmp_path / "fields.toml"
-    p.write_text(FILE)
+    p.write_text(FILE, encoding="utf-8")
     monkeypatch.setenv("ATMO3D_FIELDS_FILE", str(p))
     U.reset()
     yield p
@@ -128,7 +128,7 @@ def test_bad_names_are_refused():
 
 def test_a_broken_file_is_a_problem_not_a_crash(tmp_path, monkeypatch):
     p = tmp_path / "fields.toml"
-    p.write_text("[fields.x\nexpr = ")
+    p.write_text("[fields.x\nexpr = ", encoding="utf-8")
     monkeypatch.setenv("ATMO3D_FIELDS_FILE", str(p))
     U.reset()
     try:
@@ -140,7 +140,7 @@ def test_a_broken_file_is_a_problem_not_a_crash(tmp_path, monkeypatch):
 def test_a_broken_file_is_one_greyed_entry_in_the_menus(reg, tmp_path, monkeypatch):
     from atmo3d.core.fields import Fields
     p = tmp_path / "fields.toml"
-    p.write_text("[fields.x\nexpr = ")
+    p.write_text("[fields.x\nexpr = ", encoding="utf-8")
     monkeypatch.setenv("ATMO3D_FIELDS_FILE", str(p))
     U.reset()
     try:
@@ -268,7 +268,7 @@ def test_a_saved_spec_carries_the_definitions(F, tmp_path):
 
     from atmo3d.figures.spec import bundle
     path = bundle.write_spec(_doc("tempf"), {"version": 2}, str(tmp_path / "f" / "s.json"))
-    with open(path) as f:
+    with open(path, encoding="utf-8") as f:
         saved = json.load(f)
     assert saved["user_fields"]["tempf"]["expr"] == "tempc * 9/5 + 32"
     assert saved["form"]["user_fields"] == saved["user_fields"]
@@ -324,12 +324,12 @@ def test_the_docs_pages_examples_work(reg, tmp_path, monkeypatch):
     from pathlib import Path
     from atmo3d.core.fields import Fields
     page = (Path(__file__).resolve().parents[2] / "docs" / "guide"
-            / "user-fields.md").read_text()
+            / "user-fields.md").read_text(encoding="utf-8")
     blocks = [b for b in re.findall(r"```toml\n(.*?)```", page, re.S) if "[fields." in b]
     text = "\n".join(blocks)
     names = list(tomllib.loads(text)["fields"])
     p = tmp_path / "fields.toml"
-    p.write_text(text)
+    p.write_text(text, encoding="utf-8")
     monkeypatch.setenv("ATMO3D_FIELDS_FILE", str(p))
     U.reset()
     try:

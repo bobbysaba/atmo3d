@@ -25,7 +25,7 @@ def test_saved_figures_carry_field_names(tmp_path):
     import json
     from atmo3d.figures.spec import bundle
     p = bundle.write_spec({"version": 3}, {"version": 2}, str(tmp_path / "f.json"))
-    with open(p) as f:
+    with open(p, encoding="utf-8") as f:
         assert json.load(f)["form"]["field_names"] == C.FIELD_NAMES
 
 

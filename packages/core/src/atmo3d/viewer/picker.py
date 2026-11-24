@@ -19,8 +19,14 @@ def _html(text="", **kw):
     return pn.pane.HTML(text, stylesheets=[CSS], **kw)
 
 
+SEPS = tuple(dict.fromkeys(("/", os.sep)))  # (Windows takes / as well as \\)
+
+
 def _is_path(text):
-    return text[:1] in ("/", "~", "$")
+    """A typed path rather than words to filter by: /…, ~…, $…, and on Windows C:… or
+    \\…."""
+    return text[:1] in ("~", "$") + SEPS or (
+        os.name == "nt" and len(text) > 1 and text[1] == ":" and text[0].isalpha())
 
 
 def _shared(folder):
@@ -100,8 +106,9 @@ class RunPicker:
     def _label(self, run, base=None):
         roots = [base] if base else [config.expand(r) for r in config.get("runs_root")]
         for r in roots:
-            if run.startswith(r.rstrip("/") + "/"):
-                return os.path.relpath(run, r)
+            r = os.path.normpath(r)
+            if os.path.normpath(run).startswith(r.rstrip(os.sep) + os.sep):
+                return os.path.relpath(run, r).replace(os.sep, "/")  # (the same on any OS)
         return run
 
     def _runs_under(self, folder):
@@ -158,7 +165,7 @@ class RunPicker:
         filters the runs found in its folder (if that was looked in).  Shared folders
         are never searched.  Also returns the run to select."""
         p = config.expand(text)
-        looking = (search or text.endswith("/")) and os.path.isdir(p)
+        looking = (search or text.endswith(SEPS)) and os.path.isdir(p)
         pick = None
         if looking:
             base, part = p, ""
@@ -180,7 +187,8 @@ class RunPicker:
             return opts, _shared(base), pick
         runs, complete = self._runs_under(base)
         runs = [r for r in runs
-                if not part or os.path.relpath(r, base).lower().startswith(part)]
+                if not part or os.path.relpath(r, base).replace(os.sep, "/").lower()
+                .startswith(part)]
         if pick and pick not in runs:
             runs = [pick] + runs
         opts = {self._label(r, base): r for r in runs}

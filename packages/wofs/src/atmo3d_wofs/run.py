@@ -46,7 +46,16 @@ G = 9.81  # m/s^2, as WRF
 
 CYCLE_RE = re.compile(r"^\d{12}$")
 DATE_RE = re.compile(r"^\d{8}$")
-FILE_RE = re.compile(r"^wrfout_d01_(\d{4}-\d\d-\d\d_\d\d:\d\d:\d\d)_(\d+)$")
+# (WRF's nocolons option writes 22_00_00 for 22:00:00: the only names Windows allows)
+FILE_RE = re.compile(r"^wrfout_d01_(\d{4}-\d\d-\d\d_\d\d[:_]\d\d[:_]\d\d)_(\d+)$")
+TIME_SEP = "_" if os.name == "nt" else ":"  # (in the file names atmo3d writes: demo, tests)
+
+
+def file_name(when, m, sep=None):
+    """wrfout_d01_<YYYY-MM-DD_HH:MM:SS>_<member> of valid time `when` (a datetime),
+    with `sep` (default TIME_SEP) between hours, minutes and seconds."""
+    sep = TIME_SEP if sep is None else sep
+    return f"wrfout_d01_{when:%Y-%m-%d_%H}{sep}{when:%M}{sep}{when:%S}_{m}"
 MEMBER_RE = re.compile(r"^mem0*(\d+)$")
 MEAN = "mean"  # <root>/mean: the ensemble mean run
 
@@ -76,8 +85,8 @@ def member_path(root, m):
 
 def member_of(path):
     """(root, member) of a member path <root>/memNN, or None."""
-    m = MEMBER_RE.match(os.path.basename(os.path.abspath(path).rstrip("/")))
-    return (os.path.dirname(os.path.abspath(path).rstrip("/")), int(m.group(1))) if m \
+    m = MEMBER_RE.match(os.path.basename(os.path.abspath(path).rstrip("/\\")))
+    return (os.path.dirname(os.path.abspath(path).rstrip("/\\")), int(m.group(1))) if m \
         else None
 
 
@@ -87,7 +96,7 @@ def mean_path(root):
 
 def mean_of(path):
     """The root of a mean path <root>/mean, or None."""
-    p = os.path.abspath(path).rstrip("/")
+    p = os.path.abspath(path).rstrip("/\\")
     return os.path.dirname(p) if os.path.basename(p) == MEAN else None
 
 
@@ -182,6 +191,7 @@ def is_mean(path):
 
 
 def _when(s):
+    s = s[:11] + s[11:].replace("_", ":")  # (nocolons names)
     return datetime.datetime.strptime(s, "%Y-%m-%d_%H:%M:%S").replace(
         tzinfo=datetime.timezone.utc)
 
@@ -192,8 +202,10 @@ def member_files(root, m):
     for c in cycles(root):
         folder = os.path.join(root, c)
         b = os.path.basename(c)
-        name = (f"wrfout_d01_{b[:4]}-{b[4:6]}-{b[6:8]}_{b[8:10]}:{b[10:12]}:00_{m}")
-        if not os.path.isfile(os.path.join(folder, name)):
+        stem = f"wrfout_d01_{b[:4]}-{b[4:6]}-{b[6:8]}_{b[8:10]}"
+        name = next((n for n in (f"{stem}:{b[10:12]}:00_{m}", f"{stem}_{b[10:12]}_00_{m}")
+                     if os.path.isfile(os.path.join(folder, n))), None)
+        if name is None:
             name = _files_in(folder).get(m)  # (a file not at the cycle's own time)
             if name is None:
                 continue

@@ -39,7 +39,7 @@ def test_map_update_is_timed_and_measured(viewer, tmp_path):
     wait(lambda: len([r for r in tm.records if r.get("view") == "map"]) >= 2, msg="2nd map")
     r2 = [r for r in tm.records if r.get("view") == "map"][-1]
     assert r2["cached"] and r2["disk_reads"] == 0
-    lines = [json.loads(x) for x in log.read_text().splitlines()]
+    lines = [json.loads(x) for x in log.read_text(encoding="utf-8").splitlines()]
     assert len(lines) == len(tm.records)
 
 
@@ -53,7 +53,7 @@ def test_summary_of_a_log(tmp_path, capsys):
         recs.append(dict(kind="view", view="map", cached=i > 0, queue=0.0, read=0.5 * (i == 0),
                          compute=0.1, wait=0.0, apply=0.01, echo=0.2, browser=0.03,
                          total=0.8, bytes=40_000, superseded=0))
-    log.write_text("".join(json.dumps(r) + "\n" for r in recs))
+    log.write_text("".join(json.dumps(r) + "\n" for r in recs), encoding="utf-8")
     timing.summarize(str(log))
     out = capsys.readouterr().out
     assert "900 Bokeh models" in out and "ping" in out

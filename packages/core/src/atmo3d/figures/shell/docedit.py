@@ -1072,7 +1072,7 @@ def entry_titles(doc, kind):
     section (with several runs: its run first), a time-height panel's run and series, a time
     series panel's labels.  Titles that name the runs turn the run labels off."""
     mine = panels_of(doc, kind)
-    names = {r["id"]: r.get("label") or str(r.get("path", "")).rstrip("/").rsplit("/", 1)[-1]
+    names = {r["id"]: r.get("label") or str(r.get("path", "")).replace("\\", "/").rstrip("/").rsplit("/", 1)[-1]
              for r in doc.get("runs") or []}
     many = kind == "th" or (kind == "xsec" and len({p.get("run") for p in mine}) > 1)
     for p in mine:
@@ -1561,7 +1561,7 @@ def auto_titles(doc, fields=None, kind="plan"):
         return f"k = {int(round(float(p['z'])))}" if p.get("zmode") == "level" \
             else f"{float(p['z']):g} km"
 
-    names = {r["id"]: r.get("label") or str(r.get("path", "")).rstrip("/").rsplit("/", 1)[-1]
+    names = {r["id"]: r.get("label") or str(r.get("path", "")).replace("\\", "/").rstrip("/").rsplit("/", 1)[-1]
              for r in doc.get("runs") or []}
     many = {k: len({f(p) for p in mine}) > 1 for k, f in (
         ("run", run_of), ("field", field_of), ("z", z_word))}

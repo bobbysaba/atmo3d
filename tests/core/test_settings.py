@@ -64,7 +64,7 @@ def test_defaults_save_and_precedence(fresh, demo_root, monkeypatch):
     assert C.exists() and not C.needs_setup(), C.problems()
     assert C.get("cache_gb") == 12.0 and C.source("cache_gb") == "config file"
     assert C.get("workers") == "auto" and C.cache_gb() == (12.0, "set")
-    text = open(C.config_path()).read()
+    text = open(C.config_path(), encoding="utf-8").read()
     assert "[paths]" in text and "# Where your runs live" in text
     monkeypatch.setenv("ATMO3D_CACHE_GB", "20")
     assert C.get("cache_gb") == 20.0 and C.source("cache_gb").startswith("environment")
@@ -97,17 +97,17 @@ def test_runs_tracks_and_save_folders(fresh, demo_root):
     tracks = fresh / "tracks"
     C.save(dict(track_dirs=[str(tracks)], track_patterns=["{name}_*.csv"]))
     tracks.mkdir()
-    (tracks / "supercell_v2.csv").write_text("")
+    (tracks / "supercell_v2.csv").write_text("", encoding="utf-8")
     assert C.find_track(tor) == str(tracks / "supercell_v2.csv")
     assert C.find_track(weak) is None
-    (tracks / "notes.md").write_text("")
-    (tracks / "other.txt").write_text("")
+    (tracks / "notes.md").write_text("", encoding="utf-8")
+    (tracks / "other.txt").write_text("", encoding="utf-8")
     assert C.track_files(tor) == [str(tracks / "supercell_v2.csv"), str(tracks / "other.txt")]
     C.save(dict(track_dirs=["nowhere"], track_patterns=["{name}.csv"]))
     assert C.track_save_path(tor) == os.path.join(C.exports_dir(tor, "tracks"),
                                                   "supercell.csv")
     assert C.run_key(tor) == "demo_supercell"
-    assert C.exports_dir(tor, "series") == f"{fresh}/data/demo_supercell/series"
+    assert C.exports_dir(tor, "series") == os.path.normpath(f"{fresh}/data/demo_supercell/series")
 
 
 def test_viewer_follows_saved_settings(fresh, reg, demo_root):
@@ -120,8 +120,8 @@ def test_viewer_follows_saved_settings(fresh, reg, demo_root):
     v = A.Viewer(run, F, reg=reg)
     v.main()
     try:
-        assert v.ser_path.value == f"{out}/data/demo_supercell/series/series.nc"
-        assert v.figed.path.value == f"{out}/figs/demo_supercell/figure"
+        assert v.ser_path.value == os.path.normpath(f"{out}/data/demo_supercell/series/series.nc")
+        assert v.figed.path.value == os.path.normpath(f"{out}/figs/demo_supercell/figure")
         assert not pdecomp.writes_allowed() and v.pd_write.disabled and not v.pd_write.value
         # settings saved elsewhere: boxes still in the old default folder follow
         v.ser_path.value = str(fresh / "mine" / "keep.nc")
@@ -129,7 +129,7 @@ def test_viewer_follows_saved_settings(fresh, reg, demo_root):
                     allow_writes_to_output=True))
         v._config_changed()  # (scheduled on the session's document in the browser)
         assert v.ser_path.value == str(fresh / "mine" / "keep.nc")
-        assert v.figed.path.value == f"{out}/figs2/demo_supercell/figure"
+        assert v.figed.path.value == os.path.normpath(f"{out}/figs2/demo_supercell/figure")
         assert pdecomp.writes_allowed() and not v.pd_write.disabled and v.pd_write.value
 
         # the settings window: first-run form, check, save

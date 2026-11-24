@@ -35,5 +35,5 @@ def test_run_paths_drop_repeats_and_report_missing(tmp_path):
 def test_outputs_listed_for_the_overwrite_question():
     doc = {"export": {"format": "png"}}
     img_spec = batch.run_outputs(doc, "/x/fig", "pdf")
-    assert img_spec[0] == "/x/fig.pdf" and img_spec[1].endswith("_spec.json") and len(img_spec) == 2
+    assert img_spec[0] == os.path.abspath("/x/fig.pdf") and img_spec[1].endswith("_spec.json") and len(img_spec) == 2
     assert len(batch.run_outputs(doc, "/x/fig", "png", bundle=True)) > 2

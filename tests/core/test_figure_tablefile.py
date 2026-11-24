@@ -2,6 +2,8 @@
 arrays and table settings the figure draws (draw.tbl_grid), so these use arrays of the shape
 spec.tbl_panel makes and need no run."""
 
+import os
+
 from atmo3d.figures import batch, draw as figdraw, tablefile
 from atmo3d.figures.spec import tables as st
 
@@ -59,8 +61,8 @@ def test_files_named_by_count(tmp_path):
     doc["panels"].append(dict(doc["panels"][0], id=1, cell=[0, 1, 1, 1]))
     doc["grid"]["cols"] = 2
     two = tablefile.save_tables(doc, {0: d, 1: d}, str(tmp_path / "fig"), tex=False)
-    assert [p.split("/")[-1] for p in two] == ["fig_table_a.csv", "fig_table_b.csv"]
-    assert (tmp_path / "fig_table_b.csv").read_text().startswith(",")
+    assert [os.path.basename(p) for p in two] == ["fig_table_a.csv", "fig_table_b.csv"]
+    assert (tmp_path / "fig_table_b.csv").read_text(encoding="utf-8").startswith(",")
 
 
 def test_a_panel_without_values_is_left_out():

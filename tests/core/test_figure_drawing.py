@@ -195,7 +195,7 @@ def test_style_presets_and_matplotlib_styles(ed, tmp_path):
     assert figdraw.rc(s)["axes.edgecolor"] == "white" and figdraw.rc(s)["font.size"] == 14.0
     render(ed, s)
     f = tmp_path / "thick.mplstyle"
-    f.write_text("lines.linewidth: 3\nbackend: agg\n")
+    f.write_text("lines.linewidth: 3\nbackend: agg\n", encoding="utf-8")
     rc = figdraw.rc(dict(s, mplstyle=str(f)))
     assert rc["lines.linewidth"] == 3 and "backend" not in rc
     with pytest.raises(ValueError, match="no such style"):
@@ -228,7 +228,7 @@ def test_templates_apply_to_another_run(ed, coarse_run):
         render(ed)
         ed.open_quick()
         ed.qs_tpl.value = path
-        with open(path, "w") as f:
+        with open(path, "w", encoding="utf-8") as f:
             f.write("[]")
         ed.qs_tpl_go.clicks += 1
         assert ed.quick.open and ed.qs_load_note.visible and "Could not" in ed.qs_load_note.object
@@ -329,7 +329,7 @@ def test_script_redraws_the_identical_image(ed, tmp_path, start):
     ed._save_job(doc_now(ed), True, base)
     assert "Saved" in txt(ed.msg.object), ed.msg.object
     os.rename(base + ".png", base + "_viewer.png")
-    with open(_script_of(base)) as f:  # (short: the drawing code is in _src/)
+    with open(_script_of(base), encoding="utf-8") as f:  # (short: the drawing code is in _src/)
         assert "def _draw2" not in f.read()
     assert os.path.isfile(str(tmp_path / "_src" / f"{start}_draw.py"))
     r = subprocess.run([sys.executable, "-I", _script_of(base)], capture_output=True, text=True,

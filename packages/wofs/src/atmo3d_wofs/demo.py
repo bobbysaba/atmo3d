@@ -142,14 +142,16 @@ def write_member(fn, when, member, c):
 
 def write_run(root):
     """The demo ensemble in root: cycle folders of member files, DART files left empty."""
+    from .run import file_name
+
     os.makedirs(root, exist_ok=True)
     for c in range(NCYCLE):
         when = START + datetime.timedelta(minutes=STEP * c)
         cyc = os.path.join(root, f"{when:%Y%m%d%H%M}")
         os.makedirs(cyc, exist_ok=True)
-        open(os.path.join(cyc, f"obs_seq.final.{when:%Y%m%d%H%M}"), "w").close()
+        open(os.path.join(cyc, f"obs_seq.final.{when:%Y%m%d%H%M}"), "w", encoding="utf-8").close()
         for m in MEMBERS:
-            write_member(os.path.join(cyc, f"wrfout_d01_{when:%Y-%m-%d_%H:%M:%S}_{m}"),
+            write_member(os.path.join(cyc, file_name(when, m)),
                          when, m, c)
     return root
 
@@ -166,12 +168,12 @@ def make(root, force=False):
     run = os.path.join(root, "wofs")
     stamp_file = os.path.join(root, ".atmo3d-demo-wofs")
     try:
-        if not force and open(stamp_file).read().strip() == _stamp():
+        if not force and open(stamp_file, encoding="utf-8").read().strip() == _stamp():
             return run
     except OSError:
         pass
     write_run(run)
-    with open(stamp_file, "w") as fh:
+    with open(stamp_file, "w", encoding="utf-8") as fh:
         fh.write(_stamp() + "\n")
     return run
 

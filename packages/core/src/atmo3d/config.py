@@ -307,7 +307,7 @@ def save_text(text):
     p = config_path()
     os.makedirs(os.path.dirname(p), exist_ok=True)
     tmp = f"{p}.{os.getpid()}.tmp"
-    with open(tmp, "w") as f:
+    with open(tmp, "w", encoding="utf-8") as f:
         f.write(text)
     os.replace(tmp, p)
     load()
@@ -320,7 +320,7 @@ def save_text(text):
 
 def file_text():
     try:
-        with open(config_path()) as f:
+        with open(config_path(), encoding="utf-8") as f:
             return f.read()
     except OSError:
         return to_toml({k.name: file_value(k.name) for k in KEYS})
@@ -330,7 +330,7 @@ def state(name, default=""):
     """Small remembered values (e.g. the last folder chosen for a figure), kept in
     state.json next to the config file."""
     try:
-        with open(_state_path()) as f:
+        with open(_state_path(), encoding="utf-8") as f:
             return json.load(f).get(name, default)
     except (OSError, ValueError, AttributeError):
         return default
@@ -339,14 +339,14 @@ def state(name, default=""):
 def set_state(name, value):
     p = _state_path()
     try:
-        with open(p) as f:
+        with open(p, encoding="utf-8") as f:
             d = json.load(f)
     except (OSError, ValueError):
         d = {}
     d[name] = value
     try:
         os.makedirs(os.path.dirname(p), exist_ok=True)
-        with open(p, "w") as f:
+        with open(p, "w", encoding="utf-8") as f:
             json.dump(d, f, indent=1)
     except OSError:
         pass
@@ -402,7 +402,7 @@ def needs_setup():
 # ------------------------------------------------------------------ paths
 def run_key(path):
     """<parent>_<name>: one folder name per run for saved files."""
-    path = os.path.abspath(path).rstrip("/")
+    path = os.path.abspath(path).rstrip("/\\")
     return f"{os.path.basename(os.path.dirname(path))}_{os.path.basename(path)}"
 
 
@@ -437,7 +437,7 @@ def _track_dirs(path, levels=4):
 
 
 def _names(path):
-    path = os.path.abspath(path).rstrip("/")
+    path = os.path.abspath(path).rstrip("/\\")
     return path, os.path.basename(path), os.path.basename(os.path.dirname(path))
 
 
@@ -590,7 +590,7 @@ def job_memory_limit():
     if cg is None:
         return None
     try:
-        return int(open(os.path.join(cg[0], cg[1])).read())
+        return int(open(os.path.join(cg[0], cg[1]), encoding="utf-8").read())
     except (OSError, ValueError):
         return None
 
@@ -599,7 +599,7 @@ def _job_cgroup():
     """(folder, limit file, the two memory.stat rows) of the memory cgroup that limits
     this job, or None where nothing does (a laptop, a node with no memory limit)."""
     try:
-        lines = [line.strip().split(":", 2) for line in open("/proc/self/cgroup")]
+        lines = [line.strip().split(":", 2) for line in open("/proc/self/cgroup", encoding="utf-8")]
     except OSError:
         return None
     for line in lines:
@@ -616,7 +616,7 @@ def _job_cgroup():
         d = os.path.normpath(base + "/" + rel)
         while d.startswith(base):  # (the limit can be set on a parent)
             try:
-                if int(open(os.path.join(d, names[0])).read()) < 1 << 50:
+                if int(open(os.path.join(d, names[0]), encoding="utf-8").read()) < 1 << 50:
                     return (d, *names)
             except (OSError, ValueError):  # ("max", or no such file here)
                 pass
@@ -633,7 +633,7 @@ def job_memory_used_gb():
         return None
     d, _, *rows = cg
     try:
-        stat = dict(line.split()[:2] for line in open(os.path.join(d, "memory.stat")))
+        stat = dict(line.split()[:2] for line in open(os.path.join(d, "memory.stat"), encoding="utf-8"))
         return sum(int(stat[r]) for r in rows) / 1024**3
     except (OSError, KeyError, ValueError):
         return None
@@ -677,7 +677,10 @@ def suggestions(run_path=None):
             # the folder that holds the runs: their common parent, or the grandparent
             # of a single run (e.g. cm1/ for cm1/project/run1); never one as broad
             # as a filesystem root, whose scan would take long and cross into other projects
-            common = os.path.commonpath(recent)
+            try:
+                common = os.path.commonpath(recent)
+            except ValueError:  # (on Windows, runs on different drives)
+                common = ""
             if len(set(recent)) == 1 or common in recent or common.count(os.sep) < 3:
                 common = os.path.dirname(os.path.dirname(recent[0]))
             out["runs_root"] = [common]

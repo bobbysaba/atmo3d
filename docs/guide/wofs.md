@@ -29,6 +29,10 @@ the experiment's other folders (`FCST`, `postpr`, `summary`, ...) are ignored. E
 output time, so a run's times are the cycle times; they are shown in UTC, and run time is
 seconds since the first cycle.
 
+The time in a file name may also be written without colons, `wrfout_d01_2022-05-23_22_00_00_1`, as
+WRF writes it with `nocolons = .true.`. Windows allows no colons in file names, so WoFS output
+copied there has these names.
+
 ## Choosing the model
 
 The run picker has a **model** box next to the search box: *Auto-detect* (the default) or a

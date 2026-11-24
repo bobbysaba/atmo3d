@@ -217,7 +217,7 @@ def write(path, rec):
         return
     rec = dict(rec, at=time.strftime("%Y-%m-%dT%H:%M:%S"))
     with _write_lock:
-        with open(path, "a") as f:
+        with open(path, "a", encoding="utf-8") as f:
             f.write(json.dumps(rec) + "\n")
 
 
@@ -512,7 +512,7 @@ PARTS = ("queue", "read", "compute", "wait", "apply", "echo", "browser", "total"
 def summarize(path, out=print):
     """Median timings of a log, per view and cached / not cached."""
     recs = []
-    with open(path) as f:
+    with open(path, encoding="utf-8") as f:
         for line in f:
             try:
                 recs.append(json.loads(line))

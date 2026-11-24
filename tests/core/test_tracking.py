@@ -171,7 +171,7 @@ def test_manual_fixes_delete_save_load(viewer, demo_root, tmp_path):
                      for t, f in v.fixes.items()}
     v.trk_path.value = str(tmp_path / "manual.txt")
     v._on_save_track(None)
-    assert (tmp_path / "manual.txt").read_text().count("\n") > 3
+    assert (tmp_path / "manual.txt").read_text(encoding="utf-8").count("\n") > 3
     v.trk_path.value = str(tmp_path / "nope.csv")
     v._on_load_track(None)
     assert "nope.csv" in txt(v.trk_status.object)
@@ -186,7 +186,7 @@ def test_load_ground_relative_hms_file(viewer, tmp_path):
         s = run.times[t]
         rows.append(f"{int(s // 3600)}:{int(s % 3600 // 60):02d}:00 "
                     f"{5 + run.umove * s / 1000:.3f} {-2 + run.vmove * s / 1000:.3f}")
-    p.write_text("\n".join(rows) + "\n")
+    p.write_text("\n".join(rows) + "\n", encoding="utf-8")
     v.trk_path.value = str(p)
     v._on_load_track(None)
     assert sorted(v.fixes) == [2, 3]
@@ -225,7 +225,7 @@ def test_storm_box_loads_and_saves_storms(viewer, tmp_path):
     rows = ["storm,time_index,x_km,y_km"]
     rows += [f"A,{t},1.0,2.0" for t in (1, 2, 3)]
     rows += [f"cell b,{t},-3.0,4.0" for t in (2, 3)]
-    p.write_text("\n".join(rows) + "\n")
+    p.write_text("\n".join(rows) + "\n", encoding="utf-8")
     v.trk_path.value = str(p)
     assert v.trk_storm.options == ["A", "cell_b"] and v.trk_storm.visible
     v._on_load_track(None)

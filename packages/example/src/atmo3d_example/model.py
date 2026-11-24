@@ -69,7 +69,7 @@ class Example(Model):
         folder = os.path.join(root, "example")
         if not os.path.isfile(os.path.join(folder, DEMO_MARKER)):
             synthetic.write(folder)
-            with open(os.path.join(folder, DEMO_MARKER), "w") as f:
+            with open(os.path.join(folder, DEMO_MARKER), "w", encoding="utf-8") as f:
                 f.write("written by atmo3d_example.synthetic\n")
         return folder
 

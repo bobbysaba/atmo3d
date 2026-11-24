@@ -39,7 +39,7 @@ def sibling_runs(path, limit=60):
         if not config.searchable(base):  # (never list a shared folder's users)
             continue
         for d in sorted(glob.glob(os.path.join(base, "*", ""))):
-            d = d.rstrip("/")
+            d = d.rstrip("/\\")
             if is_run(d):
                 out.add(d)
             if len(out) >= limit:
@@ -71,7 +71,7 @@ def chosen(path):
 def recent_runs():
     for fn in (_recent_file(), _OLD_RECENT):  # (older versions kept it in ~/.cache)
         try:
-            with open(fn) as f:
+            with open(fn, encoding="utf-8") as f:
                 # (a WoFS member, as kept before: its experiment, once)
                 found = [models.root_of(p) for p in json.load(f) if models.exists(p)]
                 return list(dict.fromkeys(found))
@@ -88,7 +88,7 @@ def remember(path):
     lst = [path] + [p for p in recent_runs() if p != path]
     try:
         os.makedirs(os.path.dirname(_recent_file()), exist_ok=True)
-        with open(_recent_file(), "w") as f:
+        with open(_recent_file(), "w", encoding="utf-8") as f:
             json.dump(lst[:15], f)
     except OSError:
         pass

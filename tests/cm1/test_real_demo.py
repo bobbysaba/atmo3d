@@ -42,16 +42,16 @@ def test_copied_once_and_a_demo_run(real, monkeypatch):
 def test_copy_redone_when_the_shipped_one_changes(tmp_path, monkeypatch):
     data = tmp_path / "demo_data"
     (data / demo.RUN).mkdir(parents=True)
-    (data / demo.RUN / "namelist.input").write_text(" &param1\n nx = 4,\n /\n")
+    (data / demo.RUN / "namelist.input").write_text(" &param1\n nx = 4,\n /\n", encoding="utf-8")
     monkeypatch.setattr(demo, "DATA", str(data))
     root = str(tmp_path / "cache")
     run = demo.make(root)
-    assert open(os.path.join(run, "namelist.input")).read().count("nx = 4")
-    (data / demo.RUN / "namelist.input").write_text(" &param1\n nx = 8,\n /\n")
+    assert open(os.path.join(run, "namelist.input"), encoding="utf-8").read().count("nx = 4")
+    (data / demo.RUN / "namelist.input").write_text(" &param1\n nx = 8,\n /\n", encoding="utf-8")
     (data / demo.RUN / "cm1out_000001.nc").write_bytes(b"new")
     assert demo.make(root) == run
     assert sorted(os.listdir(run)) == ["cm1out_000001.nc", "namelist.input"]
-    assert open(os.path.join(run, "namelist.input")).read().count("nx = 8")
+    assert open(os.path.join(run, "namelist.input"), encoding="utf-8").read().count("nx = 8")
     assert not os.path.exists(run + ".part")
 
 

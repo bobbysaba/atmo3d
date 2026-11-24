@@ -298,7 +298,7 @@ def _table(path):
     import pandas as pd
 
     path = os.path.abspath(os.path.expanduser(os.path.expandvars(path)))
-    with open(path) as f:
+    with open(path, encoding="utf-8") as f:
         first = next((ln for ln in f if ln.strip() and not ln.lstrip().startswith("#")), "")
     sep = "," if "," in first else r"\s+"
     df = pd.read_csv(path, comment="#", sep=sep, engine="python")
@@ -645,6 +645,6 @@ def save(run, fixes, opts, path, fields=None, storm=None):
             else:
                 others.append(r)
     text = to_text(run, fixes, opts, fmt, fields, storm, others)
-    with open(path, "w") as f:
+    with open(path, "w", encoding="utf-8") as f:
         f.write(text)
     return path

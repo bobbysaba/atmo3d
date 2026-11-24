@@ -414,7 +414,7 @@ class ParcelFile:
             return self._lattice
         path = os.path.join(cache_dir(), f"lattice-{self.sig}.json")
         try:
-            with open(path) as f:
+            with open(path, encoding="utf-8") as f:
                 self._lattice = json.load(f)["lattice"]
             return self._lattice
         except (OSError, ValueError, KeyError):
@@ -423,7 +423,7 @@ class ParcelFile:
         try:
             os.makedirs(cache_dir(), exist_ok=True)
             tmp = temp_name(path)
-            with open(tmp, "w") as f:
+            with open(tmp, "w", encoding="utf-8") as f:
                 json.dump({"lattice": self._lattice}, f)
             os.replace(tmp, path)
         except OSError:
@@ -1164,7 +1164,7 @@ def export_set(pf, pset, path, names=None, times=None, compress=True, progress=N
             finally:
                 ds.close()
         else:
-            with open(part, "w") as f:
+            with open(part, "w", encoding="utf-8") as f:
                 for line in _export_notes(pf, pset, names, ti, frame if shift else ""):
                     f.write(f"# {line}\n")
                 f.write(",".join(["parcel", "time_s"] + [

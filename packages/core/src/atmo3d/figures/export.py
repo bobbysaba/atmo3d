@@ -305,7 +305,7 @@ class FigureExport:
         tmp = temp_name(path)
         try:
             os.makedirs(os.path.dirname(path), exist_ok=True)
-            with open(tmp, "w") as f:
+            with open(tmp, "w", encoding="utf-8") as f:
                 json.dump(self.figure_state(), f, default=float)
             if not self._auto_wrote and os.path.exists(path):
                 os.replace(path, self._auto_path(AUTOSAVE_LAST))
@@ -325,7 +325,7 @@ class FigureExport:
         None."""
         path = self._auto_path(AUTOSAVE_LAST if self._auto_wrote else AUTOSAVE)
         try:
-            with open(path) as f:
+            with open(path, encoding="utf-8") as f:
                 state = json.load(f)
             return (state, os.path.getmtime(path)) \
                 if isinstance(state.get("doc") or state.get("spec"), dict) else None

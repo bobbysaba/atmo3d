@@ -718,7 +718,7 @@ def decompose(path, periodic, t0_path=None, t=0, scheme=None, threads=None, log=
 def read_namelist(path):
     """{name: value string} from a namelist.input (lower-case names)."""
     vals = {}
-    with open(path) as fh:
+    with open(path, encoding="utf-8") as fh:
         for line in fh:
             line = line.split('!')[0].strip().rstrip(',')
             if '=' in line:

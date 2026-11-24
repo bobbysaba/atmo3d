@@ -430,7 +430,7 @@ def _compute(run, t, progress, write):
 def _has_run_decomposition(path):
     """True for a script with cm1_pdecomp's interface (a cheap look at its text)."""
     try:
-        with open(path) as fh:
+        with open(path, encoding="utf-8") as fh:
             return "def run_decomposition(" in fh.read()
     except OSError:
         return False

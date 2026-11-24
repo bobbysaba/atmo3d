@@ -97,7 +97,7 @@ def axis(rng, dx):
 
 def parse(path):
     """(radar folder, Settings) of a regridded run's path, or None."""
-    p = os.path.abspath(path).rstrip("/")
+    p = os.path.abspath(path).rstrip("/\\")
     m = _NAME.match(os.path.basename(p))
     if not m:
         return None

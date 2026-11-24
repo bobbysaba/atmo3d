@@ -78,7 +78,7 @@ def run_entry(run, track=None, storm=None):
     file holding several (a "storm" key; none: the file's first)."""
     if track is None:
         track = find_track(run.path) or ""
-    e = dict(path=run.path, label=os.path.basename(run.path.rstrip("/")), track=track)
+    e = dict(path=run.path, label=os.path.basename(run.path.rstrip("/\\")), track=track)
     if storm:
         e["storm"] = storm
     return e

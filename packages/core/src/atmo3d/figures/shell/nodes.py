@@ -107,7 +107,7 @@ def entry_name(lay, fields=None):
 
 def run_names(doc):
     """{run id: its label, or its folder's name}."""
-    return {r["id"]: r.get("label") or str(r.get("path", "")).rstrip("/").rsplit("/", 1)[-1]
+    return {r["id"]: r.get("label") or str(r.get("path", "")).replace("\\", "/").rstrip("/").rsplit("/", 1)[-1]
             for r in doc.get("runs") or []}
 
 

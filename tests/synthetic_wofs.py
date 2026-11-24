@@ -8,6 +8,7 @@ import netCDF4
 import numpy as np
 
 from atmo3d_wofs.demo import PROJ
+from atmo3d_wofs.run import file_name
 
 NI, NJ, NK, NC = 8, 6, 5, 3  # mass points, levels, cycles (every 3 minutes)
 G = 9.81
@@ -56,17 +57,17 @@ def make_wofs(root, members=(1, 2, 3), cycles=NC):
     """A synthetic WoFS run folder: `cycles` cycle folders of member files, each beside
     the DART files a real run has (left empty: they must not be read)."""
     os.makedirs(root, exist_ok=True)
-    open(os.path.join(root, "add_noise.csh"), "w").close()
+    open(os.path.join(root, "add_noise.csh"), "w", encoding="utf-8").close()
     for c in range(cycles):
         when = START + datetime.timedelta(minutes=3 * c)
         cyc = os.path.join(root, f"{when:%Y%m%d%H%M}")
         os.makedirs(cyc, exist_ok=True)
         for junk in (f"output_mean.nc.{when:%Y%m%d%H%M}", f"obs_seq.final.{when:%Y%m%d%H%M}",
                      "rsl.out.integration.1"):
-            open(os.path.join(cyc, junk), "w").close()
+            open(os.path.join(cyc, junk), "w", encoding="utf-8").close()
         for m in members:
-            open(os.path.join(cyc, f"wrfinput_d01.{m}"), "w").close()
-            fn = os.path.join(cyc, f"wrfout_d01_{when:%Y-%m-%d_%H:%M:%S}_{m}")
+            open(os.path.join(cyc, f"wrfinput_d01.{m}"), "w", encoding="utf-8").close()
+            fn = os.path.join(cyc, file_name(when, m))  # (no colons on Windows)
             with netCDF4.Dataset(fn, "w", format="NETCDF3_64BIT_OFFSET") as d:
                 d.createDimension("Time", None)
                 d.createDimension("DateStrLen", 19)

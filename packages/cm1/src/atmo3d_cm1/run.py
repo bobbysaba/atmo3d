@@ -86,7 +86,7 @@ class CM1Run(Run):
         cdir = os.path.join(os.path.expanduser("~"), ".cache", "atmo3d")
         cfile = os.path.join(cdir, f"scan-{sig}.json")
         try:
-            with open(cfile) as f:
+            with open(cfile, encoding="utf-8") as f:
                 c = json.load(f)
             return np.array(c["times"], dtype=np.float64), [set(n) for n in c["vars"]]
         except (OSError, ValueError, KeyError):
@@ -94,7 +94,7 @@ class CM1Run(Run):
         times, names = scan_files(self.files, self.workers)
         try:
             os.makedirs(cdir, exist_ok=True)
-            with open(cfile, "w") as f:
+            with open(cfile, "w", encoding="utf-8") as f:
                 json.dump(dict(times=times, vars=names), f)
         except OSError:
             pass

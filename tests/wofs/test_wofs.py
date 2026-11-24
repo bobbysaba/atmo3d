@@ -72,6 +72,22 @@ def test_date_folders_joined(tmp_path):
     assert os.path.basename(os.path.dirname(os.path.dirname(run.files[-1]))) == "20220524"
 
 
+@pytest.mark.parametrize("sep", [":", "_"])
+def test_names_with_or_without_colons(tmp_path, monkeypatch, sep):
+    """WRF's nocolons names (22_00_00: the only ones Windows allows) read as the usual
+    22:00:00 ones do.  (Colons only where the OS allows them.)"""
+    if sep == ":" and os.name == "nt":
+        pytest.skip("Windows file names have no colons")
+    monkeypatch.setattr(wofs, "TIME_SEP", sep)
+    root = make_wofs(str(tmp_path / "exp" / "20220523"))
+    files = [p for _, p in wofs.member_files(root, 2)]
+    assert len(files) == 3
+    assert all(os.path.basename(p).count(":") == (2 if sep == ":" else 0) for p in files)
+    run = models.open_run(os.path.join(root, "mem02"), workers=1)
+    np.testing.assert_allclose(run.times, [0.0, 180.0, 360.0])
+    assert run.time_label(1) == "22:03 UTC" and wofs.members(root) == [1, 2, 3]
+
+
 def test_member_run(wofs_root):
     run = models.open_run(os.path.join(wofs_root, "mem02"), workers=1)
     assert run.model == "wofs" and run.member == 2 and run.members == [1, 2, 3]
@@ -640,7 +656,7 @@ def test_recent_runs_keep_the_experiment(wofs_root, tmp_path, monkeypatch):
     registry.remember(os.path.join(exp, "mem02"))
     registry.remember(os.path.join(exp, "mean"))
     assert registry.recent_runs() == [exp]
-    recent.write_text(f'["{exp}/mem03", "{exp}"]')  # (as kept before: members)
+    recent.write_text(f'["{exp}/mem03", "{exp}"]', encoding="utf-8")  # (as kept before: members)
     assert registry.recent_runs() == [exp]
 
 
@@ -791,7 +807,7 @@ def test_figure_map_boundaries(wofs_root, tmp_path):
     out = bundle.save_bundle(sp, {0: d}, str(tmp_path / "out" / "fig"), run=run)
     with np.load(out["data"]) as z:
         assert f"p0__L{j}_b_states" in z.files and z[f"p0__L{j}_glab_t"].dtype.kind == "U"
-    assert "def _boundaries" in open(out["draw"]).read()
+    assert "def _boundaries" in open(out["draw"], encoding="utf-8").read()
     # an idealized run (no projection)
     run.geo = None
     assert "boundaries" not in [lay["type"] for lay in fg.default_spec(run, F, 1)["layers"]]
@@ -809,7 +825,7 @@ def test_member_switch_loads_the_same_storm(wofs_root, tmp_path, monkeypatch):
 
     def write(path, x):
         os.makedirs(os.path.dirname(path), exist_ok=True)
-        with open(path, "w") as f:
+        with open(path, "w", encoding="utf-8") as f:
             f.write("storm,time_index,x_km,y_km\n")
             f.write("".join(f"A,{t},{x},0.0\n" for t in range(NC)))
             f.write("".join(f"B,{t},{x + 10},5.0\n" for t in range(NC)))
@@ -883,7 +899,7 @@ def test_member_switch_keeps_the_view_without_a_reload(wofs_root, tmp_path, monk
         monkeypatch.setattr(swap, "same_grid", lambda *a: False)
         v.part_sel.value = os.path.join(os.path.dirname(mean), "mem01")
         assert v.run.path == mean
-        s = json.load(open(v.ses_go.value))
+        s = json.load(open(v.ses_go.value, encoding="utf-8"))
         assert s["run"].endswith("mem01") and s["track"]["member"]
     finally:
         v.close()

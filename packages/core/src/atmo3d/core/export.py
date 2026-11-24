@@ -446,7 +446,7 @@ def main(argv=None):
     except ValueError as e:
         return fail(str(e))
     out = default_path(run, p) if args.out is None else config.expand(args.out.format(
-        run=os.path.basename(run.path.rstrip("/")), name=default_name(run, p)))
+        run=os.path.basename(run.path.rstrip("/\\")), name=default_name(run, p)))
     if os.path.exists(out) and not args.overwrite:
         return fail(f"{out} is already there (--overwrite replaces it)")
     note = None
@@ -550,7 +550,7 @@ def _parcels_main(args, run, F, fail):
     ext = ".csv" if args.csv else ".nc"
     name = os.path.basename(P.export_path(run.path, ps, ext))
     out = P.export_path(run.path, ps, ext) if args.out is None else config.expand(
-        args.out.format(run=os.path.basename(run.path.rstrip("/")), name=name))
+        args.out.format(run=os.path.basename(run.path.rstrip("/\\")), name=name))
     try:
         fmt = P.export_format(out)
     except ValueError as e:

@@ -70,7 +70,7 @@ def make(root, force=False):
     run = os.path.join(root, RUN)
     stamp = _stamp(src)
     try:
-        if not force and open(stamp_file).read().strip() == stamp and os.path.isdir(run):
+        if not force and open(stamp_file, encoding="utf-8").read().strip() == stamp and os.path.isdir(run):
             return run
     except OSError:
         pass
@@ -82,7 +82,7 @@ def make(root, force=False):
     if os.path.isdir(run):
         shutil.rmtree(run)  # (the out-of-date copy of the demo: ours, in the cache)
     os.replace(tmp, run)
-    with open(stamp_file, "w") as fh:
+    with open(stamp_file, "w", encoding="utf-8") as fh:
         fh.write(stamp + "\n")
     return run
 

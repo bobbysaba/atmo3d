@@ -37,7 +37,7 @@ class Radar(Model):
         a session or figure may hold, not necessarily those in core.config)."""
         from . import regrid
         got = regrid.parse(path)
-        return [got[0], os.path.abspath(path).rstrip("/")] if got else []
+        return [got[0], os.path.abspath(path).rstrip("/\\")] if got else []
 
     def virtual(self, path):
         from . import regrid

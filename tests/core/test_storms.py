@@ -46,7 +46,7 @@ def test_one_storm_file_has_no_storm_column(tmp_path):
     run = FakeRun()
     fx = line(run, 10, 20, 10, 5, range(3, 8))
     p = trk.save(run, fx, OPTS, str(tmp_path / "a.csv"))
-    head = [ln for ln in open(p) if not ln.startswith("#")][0]
+    head = [ln for ln in open(p, encoding="utf-8") if not ln.startswith("#")][0]
     assert not head.startswith("storm,")
     assert trk.storms(p) == []
     back = trk.load(run, p)
@@ -88,7 +88,7 @@ def test_hand_made_file_with_numbered_storms(tmp_path):
     run = FakeRun()
     p = tmp_path / "hand.csv"
     p.write_text("# two storms\nstorm,time_s,x_km,y_km\n"
-                 "1,600,0,0\n1,900,1,0\n7,600,50,50\n7,900,50,52\n")
+                 "1,600,0,0\n1,900,1,0\n7,600,50,50\n7,900,50,52\n", encoding="utf-8")
     assert trk.storms(str(p)) == ["1", "7"]
     s7 = trk.load(run, str(p), "7")
     assert sorted(s7) == [2, 3] and s7[3]["y"] == 52

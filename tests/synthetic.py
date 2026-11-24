@@ -353,7 +353,7 @@ def write_run(path, vmax, wmax, cf=False):
     """One run: namelist.input + one cm1out file per time; returns the track rows.
     cf: CF-style dimension names (xh/xf/yh/yf/zh/zf), as newer CM1 versions write."""
     os.makedirs(path, exist_ok=True)
-    with open(os.path.join(path, "namelist.input"), "w") as fh:
+    with open(os.path.join(path, "namelist.input"), "w", encoding="utf-8") as fh:
         fh.write(NAMELIST.format(n=NI, nk=NK, dx=DX * 1000.0, umove=UMOVE, vmove=VMOVE))
     g = grid()
     k5 = int(np.argmin(np.abs(g["z"] - 5.0)))
@@ -498,7 +498,7 @@ def make(root, force=False, cf=False):
 
     def up_to_date():
         try:
-            return not force and open(stamp_file).read().strip() == _stamp(cf)
+            return not force and open(stamp_file, encoding="utf-8").read().strip() == _stamp(cf)
         except OSError:
             return False
 
@@ -535,11 +535,11 @@ def _write_all(root, stamp_file, cf):
         rows = write_run(os.path.join(root, "demo", name), cf=cf, **kw)
         if name == "supercell":
             write_parcels(os.path.join(root, "demo", name), **kw)
-        with open(os.path.join(root, "storm_tracks", f"demo_{name}.csv"), "w") as fh:
+        with open(os.path.join(root, "storm_tracks", f"demo_{name}.csv"), "w", encoding="utf-8") as fh:
             fh.write("time,loc_x,loc_y,storm_u,storm_v\n")
             for r in rows:
                 fh.write(",".join(f"{x:.4f}" for x in r) + "\n")
-    with open(stamp_file, "w") as fh:
+    with open(stamp_file, "w", encoding="utf-8") as fh:
         fh.write(_stamp(cf) + "\n")
 
 

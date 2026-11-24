@@ -124,7 +124,7 @@ def main(argv=None):
     out = args.out or config.cache_dir("timing", time.strftime("bench-%Y%m%d-%H%M%S.json"))
     res = Bench(config.expand(args.run), args).play()
     os.makedirs(os.path.dirname(os.path.abspath(out)), exist_ok=True)
-    with open(out, "w") as f:
+    with open(out, "w", encoding="utf-8") as f:
         json.dump(res, f, indent=1)
     print(f"\natmo3d bench: results in {out}")
     from .core import pool

@@ -70,7 +70,7 @@ def test_load_leaves_out_a_package_of_another_api(monkeypatch, toy_registered):
 
 # ------------------------------------------------------------------ the check
 def test_check_lists_every_problem(tmp_path, toy_registered):
-    (tmp_path / "a.toy").write_text("x")
+    (tmp_path / "a.toy").write_text("x", encoding="utf-8")
 
     class Broken:  # (the run class: opening fails)
         def __init__(self, path, **kw):

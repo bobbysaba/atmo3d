@@ -68,7 +68,7 @@ def test_in_repo(fake_repo, load_package, tmp_path, capsys):
     assert meta["project"]["entry-points"][models.GROUP] == {"toyna": "atmo3d_toyna:register"}
     assert os.listdir(fake_repo / "tests" / "toyna") == ["test_toyna.py"]
     assert "pytest tests/toyna " in out and "'tests/toyna/**'" in out
-    assert "# /packages/toyna/" in (fake_repo / ".github" / "CODEOWNERS").read_text()
+    assert "# /packages/toyna/" in (fake_repo / ".github" / "CODEOWNERS").read_text(encoding="utf-8")
     assert not ND.leftovers(dest)
     # it is the example, renamed: it passes the contract on its synthetic run
     mod = load_package(os.path.join(dest, "src"), "toyna")
@@ -96,7 +96,7 @@ def test_written_test_passes(fake_repo, tmp_path):
 
 def test_out_of_tree(fake_repo, tmp_path):
     out = tmp_path / "mine"
-    before = (fake_repo / ".github" / "CODEOWNERS").read_text()
+    before = (fake_repo / ".github" / "CODEOWNERS").read_text(encoding="utf-8")
     dest = ND.main(["toyout", "--out", str(out)], root=str(fake_repo))
     assert dest == str(out / "atmo3d-toyout")
     assert os.path.isfile(os.path.join(dest, "tests", "test_toyout.py"))
@@ -104,7 +104,7 @@ def test_out_of_tree(fake_repo, tmp_path):
         meta = tomllib.load(f)
     assert "real" in meta["tool"]["pytest"]["ini_options"]["markers"][0]
     # nothing in the repository changed
-    assert (fake_repo / ".github" / "CODEOWNERS").read_text() == before
+    assert (fake_repo / ".github" / "CODEOWNERS").read_text(encoding="utf-8") == before
     assert sorted(os.listdir(fake_repo / "tests")) == []
     assert sorted(os.listdir(fake_repo / "packages")) == ["example"]
 

@@ -24,7 +24,7 @@ def test_core_imports_no_data_type_package():
     pat = re.compile(r"^\s*(from|import)\s+atmo3d_(?!\w*\s*#\s*noqa)\w+", re.M)
     bad = []
     for f in glob.glob(os.path.join(CORE, "**", "*.py"), recursive=True):
-        with open(f) as fh:
+        with open(f, encoding="utf-8") as fh:
             if pat.search(fh.read()):
                 bad.append(os.path.relpath(f, CORE))
     assert not bad, bad
@@ -41,7 +41,7 @@ class Toy(Model):
 
 
 def test_a_model_registered_without_core_edits_is_detected(tmp_path):
-    (tmp_path / "a.toy").write_text("x")
+    (tmp_path / "a.toy").write_text("x", encoding="utf-8")
     try:
         models.register(Toy())
         assert "toy" in models.choices().values()

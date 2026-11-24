@@ -161,7 +161,7 @@ def write_spec(form, v2, path):
     if rec:
         form, v2 = dict(form, user_fields=rec), dict(v2, user_fields=rec)
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    with open(path, "w") as f:
+    with open(path, "w", encoding="utf-8") as f:
         json.dump(dict(v2, form=dict(form, field_names=FIELD_NAMES)), f, indent=1,
                   default=float)
     return path
@@ -187,9 +187,9 @@ def save_bundle(spec, data, base, run=None, note=""):
     out["image"] = save_image(v2, data, out["image"], thumb=thumb_path(out["spec"]))
     np.savez_compressed(out["data"], **flatten(data))
     write_spec(form, v2, out["spec"])
-    with open(out["draw"], "w") as f:
+    with open(out["draw"], "w", encoding="utf-8") as f:
         f.write(drawing_code())
-    with open(out["script"], "w") as f:
+    with open(out["script"], "w", encoding="utf-8") as f:
         f.write(script(v2, "../_src/" + os.path.basename(out["data"]),
                        "../" + os.path.basename(out["image"]), run, note,
                        "../_src/" + os.path.basename(out["draw"])))
@@ -345,7 +345,7 @@ def with_defaults(spec, run, F, t, track=None):
 def load_spec(path):
     """The editor's settings of a saved figure: a version-1 spec or a document as it is, of a
     version-2 one the settings that made it ("form", either of those)."""
-    with open(_abs(path)) as f:
+    with open(_abs(path), encoding="utf-8") as f:
         spec = json.load(f)
     if spec.get("version") == 2:
         if not isinstance(spec.get("form"), dict):

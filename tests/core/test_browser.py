@@ -43,7 +43,7 @@ def serve(args, cfg_dir, extra_env=None):
                **(extra_env or {}))
     os.makedirs(cfg_dir, exist_ok=True)
     log = os.path.join(cfg_dir, "server.log")  # (its tail is in the error if it fails)
-    with open(log, "w") as out:
+    with open(log, "w", encoding="utf-8") as out:
         p = subprocess.Popen([sys.executable, "-m", "atmo3d", *args, "--port", str(port)],
                              env=env, stdout=out, stderr=subprocess.STDOUT)
     url = f"http://127.0.0.1:{port}/atmo3d"
@@ -58,7 +58,7 @@ def serve(args, cfg_dir, extra_env=None):
     state = until(up, 240, 1.0)
     if state is not True:
         p.terminate()
-        with open(log) as f:
+        with open(log, encoding="utf-8") as f:
             tail = "".join(f.readlines()[-40:])
         raise RuntimeError(f"the server did not start ({'it stopped' if state else 'timed out'}"
                            f"); its output ({log}):\n{tail}")
@@ -79,7 +79,7 @@ def scanned_run(demo_run, tmp_path_factory):
 @pytest.fixture(scope="module")
 def server(demo_run, demo_root, scanned_run, tmp_path_factory):
     cfg = tmp_path_factory.mktemp("browser-cfg")
-    with open(cfg / "config.toml", "w") as f:
+    with open(cfg / "config.toml", "w", encoding="utf-8") as f:
         f.write(f'[paths]\nruns_root = ["{demo_root}", "{os.path.dirname(scanned_run)}"]\n')
     p, url = serve([demo_run], str(cfg))
     yield url
@@ -92,7 +92,7 @@ def ff(tmp_path):
     prof, dl = tmp_path / "profile", tmp_path / "downloads"
     prof.mkdir()
     dl.mkdir()
-    with open(prof / "user.js", "w") as f:  # downloads land in tmp_path/downloads, unasked
+    with open(prof / "user.js", "w", encoding="utf-8") as f:  # downloads land in tmp_path/downloads, unasked
         f.write(f'user_pref("browser.download.dir", "{dl}");\n'
                 'user_pref("browser.download.folderList", 2);\n'
                 'user_pref("browser.download.useDownloadDir", true);\n'
