@@ -517,6 +517,8 @@ def searchable(path):
         home = os.path.realpath(os.path.expanduser("~"))
         if home.startswith(p.rstrip(os.sep) + os.sep):
             return False
+        if os.name == "nt":  # (no root-owned folders: the drive and home checks above)
+            return True
         return os.stat(p).st_uid != 0 or os.getuid() == 0
     except (OSError, ValueError):
         return False
@@ -559,8 +561,27 @@ def job_memory_gb():
     else the node's)."""
     limit = job_memory_limit()
     if limit is None:
-        limit = os.sysconf("SC_PAGE_SIZE") * os.sysconf("SC_PHYS_PAGES")
+        limit = machine_memory()
     return limit / 1024**3
+
+
+def machine_memory():
+    """Bytes of memory the machine has (Linux, macOS: sysconf; Windows: the API)."""
+    if hasattr(os, "sysconf"):
+        return os.sysconf("SC_PAGE_SIZE") * os.sysconf("SC_PHYS_PAGES")
+    import ctypes
+
+    class _Status(ctypes.Structure):  # MEMORYSTATUSEX
+        _fields_ = [("dwLength", ctypes.c_ulong), ("dwMemoryLoad", ctypes.c_ulong)] + [
+            (n, ctypes.c_ulonglong) for n in (
+                "ullTotalPhys", "ullAvailPhys", "ullTotalPageFile", "ullAvailPageFile",
+                "ullTotalVirtual", "ullAvailVirtual", "ullAvailExtendedVirtual")]
+
+    st = _Status()
+    st.dwLength = ctypes.sizeof(_Status)
+    if not ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(st)):
+        return 8 * 1024**3  # (unknown: a modest machine)
+    return st.ullTotalPhys
 
 
 def job_memory_limit():

@@ -107,12 +107,14 @@ def test_map_distribution_panel(viewer):
     assert v.mode.value == "Distribution" and v.panel_col.visible and v.tabs.active == 4
     v.dist_field.value, v.dist_z.value = "winterp", 1.0
     v._dist_request()
-    wait(lambda: len(v.dists) == 1, msg="the distribution")
+    # (the table is drawn last, after the distribution is listed)
+    wait(lambda: v.dist_table.object.count("<tr>") == 1, msg="the distribution")
     assert "values" in txt(v.dist_status.object) and not v.dist_to_fig.disabled
     v.tslider.value = 4
     v._dist_request()
-    wait(lambda: len(v.dists) == 2, msg="the second distribution")
-    assert v.dist_table.object.count("<tr>") == 2  # (a row of statistics each)
+    wait(lambda: v.dist_table.object.count("<tr>") == 2,  # (a row of statistics each)
+         msg="the second distribution")
+    assert len(v.dists) == 2
     for kind in ("hist", "box", "violin", "ecdf"):
         v.dist_kind.value = kind
         assert v.dist_plot.object is not None

@@ -51,13 +51,23 @@ jobs:
   test:
     needs: changes
     if: needs.changes.outputs.all == 'true' || needs.changes.outputs.cm1 == 'true' || needs.changes.outputs.wofs == 'true' || needs.changes.outputs.radar == 'true' || needs.changes.outputs.example == 'true'
-    runs-on: ubuntu-latest
+    # atmo3d runs on clusters (Linux) and on people's own machines: every OS, each to
+    # the end (one failing does not cancel the others)
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+      # 3D scenes render with VTK, which needs OpenGL: the runners have no display, and
+      # VTK crashes (a segfault) without one.  (Xvfb and Mesa on Linux, Mesa on Windows.)
+      - uses: pyvista/setup-headless-display-action@v5
       - uses: conda-incubator/setup-miniconda@v3
         with:
           environment-file: environment.yml
           activate-environment: atmo3d
+          conda-remove-defaults: true
       # (not packages/example: it is no part of the app; its tests register it themselves)
       - name: Install the packages (editable)
         shell: bash -el {0}

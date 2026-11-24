@@ -31,7 +31,7 @@ import numpy as np
 
 from atmo3d import config
 from atmo3d.core import pool as readers
-from atmo3d.core.run import IO_LOCK, VarInfo
+from atmo3d.core.run import IO_LOCK, VarInfo, shared_dir
 
 NAMES = ("p_b", "p_l", "p_nl", "p_c", "acc_b", "acc_l", "acc_nl", "acc_c")
 CORE = ("p_b", "p_l", "p_nl", "acc_b", "acc_l", "acc_nl")   # (what every script gives)
@@ -182,7 +182,7 @@ def free_gb():
         return (m[0] - m[1]) / 1024**3
     try:
         return os.sysconf("SC_AVPHYS_PAGES") * os.sysconf("SC_PAGE_SIZE") / 1024**3
-    except (ValueError, OSError):
+    except (AttributeError, ValueError, OSError):  # (macOS, Windows: not known)
         return float("inf")
 
 
@@ -352,7 +352,7 @@ def _compute(run, t, progress, write):
             f"needs about {need_gb(run, False):.0f} GB of free memory, the job has {free:.0f} GB free "
             f"after emptying the 3D cache (start the viewer in a job with more memory, or "
             f"with a smaller --cache-gb)")
-    outdir = "/dev/shm" if os.path.isdir("/dev/shm") else os.path.expanduser("~/.cache")
+    outdir = shared_dir()[0]
     ctx = mp.get_context("spawn")
     t0 = time.time()
     pre0, pre_t, began, wrote = {}, {}, False, False

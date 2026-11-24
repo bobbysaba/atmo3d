@@ -45,6 +45,23 @@ something misbehaves, try the conda environment first. netCDF4 and numba ship bi
 wheels for common platforms. If pip has to build them from source, conda is the easier
 route.
 
+## On your own computer
+
+atmo3d runs on Linux, macOS and Windows, so a run small enough for your machine can be
+viewed there: install as above, start `atmo3d /path/to/run` and open
+`http://localhost:5006/atmo3d`. No job or tunnel is needed.
+
+- **Memory and CPUs** are taken from the machine: the 3D cache is about 40% of its
+  memory and the reader processes one per CPU, at most 16 (`--cache-gb` and
+  `--workers` to change them). Size a run by its grid as in the
+  [cluster table](hpc.md#resources): 16 GB is comfortable up to about 512 × 512 × 100,
+  and larger grids still work, read in parts ([Grids larger than the job](hpc.md#grids-larger-than-the-job)).
+- **macOS and Windows** have no `/dev/shm`: the reader processes hand their reads back
+  through the system's temporary folder, so it needs free disk space of about a 3D
+  field per reader at once.
+- **Windows**: `atmo3d.sh` is a bash script; run `atmo3d` (or `python -m atmo3d`) from
+  an Anaconda / Miniforge prompt instead.
+
 ## 3D scene figures and OpenGL
 
 3D scene figures ([3D scenes](guide/figures-panels.md#3d-scenes)) are rendered off-screen

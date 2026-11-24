@@ -262,7 +262,7 @@ def close_kept():
 
 
 def _read_volume_worker(src, name, stag, outdir):
-    """Process-pool worker: read one full 3D field, write it to tmpfs as .npy."""
+    """Process-pool worker: read one full 3D field, write it as .npy to the shared folder (shared_dir)."""
     with opened(src) as d:
         a = np.asarray(d[name][0], dtype=np.float32)
     a = np.ascontiguousarray(_destagger(a, stag), dtype=np.float32)
@@ -374,40 +374,97 @@ def level_blocks(shape, zchunk, nfields, workers):
     return [(k, min(k + step, nk)) for k in range(0, nk, step)]
 
 
+def shared_dir():
+    """(folder, in_memory) for the files the reader processes hand their reads back
+    through: /dev/shm (tmpfs, memory) where there is one (Linux), else the system's
+    temporary folder (macOS, Windows: on disk, but read back from the page cache)."""
+    if os.path.isdir("/dev/shm"):
+        return "/dev/shm", True
+    import tempfile
+
+    return tempfile.gettempdir(), False
+
+
+_leftover = set()  # files a reader still had open when removed (Windows): retried
+
+
+def _unlink(path):
+    """Remove a shared file.  Windows refuses while a reader (a cancelled read) still
+    has it open: it is kept to retry at the next volume and at exit."""
+    try:
+        os.remove(path)
+    except FileNotFoundError:
+        pass
+    except OSError:
+        if not _leftover:
+            import atexit
+
+            atexit.register(_sweep_leftover)
+        _leftover.add(path)
+
+
+def _sweep_leftover():
+    for p in list(_leftover):
+        _leftover.discard(p)
+        try:
+            os.remove(p)
+        except FileNotFoundError:
+            pass
+        except OSError:
+            _leftover.add(p)
+
+
 class _SharedVolume:
-    """A float32 volume in a file on tmpfs that reader processes write their level
-    blocks into; array() maps it into this process without a copy.  The file is
-    removed by array() or discard(); the mapping outlives it (the memory is freed when
-    the last view of the array goes)."""
+    """A float32 volume in a shared file (shared_dir) that reader processes write their
+    level blocks into.  array() gives it to this process: on tmpfs mapped without a
+    copy (the mapping outlives the file; the memory is freed when the last view of the
+    array goes), on disk read into memory (a mapped file could not be removed on
+    Windows).  The file is removed by array() or discard()."""
 
     def __init__(self, outdir, shape):
+        if _leftover:
+            _sweep_leftover()
         self.shape = tuple(int(s) for s in shape)
-        nbytes = 4 * int(np.prod(self.shape))
+        self.nbytes = 4 * int(np.prod(self.shape))
+        self.mapped = outdir == "/dev/shm"
         self.path = os.path.join(outdir, f"atmo3d-{os.getpid()}-{uuid.uuid4().hex}.vol")
-        self.fd = os.open(self.path, os.O_RDWR | os.O_CREAT | os.O_EXCL, 0o600)
+        flags = os.O_RDWR | os.O_CREAT | os.O_EXCL | getattr(os, "O_BINARY", 0)
+        self.fd = os.open(self.path, flags, 0o600)
         try:
-            # reserve the space now: a full tmpfs fails here rather than as a crash
-            # (SIGBUS) of a reader writing into it
-            os.posix_fallocate(self.fd, 0, nbytes)
+            if hasattr(os, "posix_fallocate"):
+                # reserve the space now: a full tmpfs fails here rather than as a crash
+                # (SIGBUS) of a reader writing into it
+                os.posix_fallocate(self.fd, 0, self.nbytes)
+            else:  # (macOS, Windows: on disk, where a full disk fails the reader's write)
+                os.ftruncate(self.fd, self.nbytes)
         except BaseException:
             self.discard()
             raise
 
     def array(self):
-        import mmap
+        if self.mapped:
+            import mmap
 
-        mm = mmap.mmap(self.fd, 0)
+            mm = mmap.mmap(self.fd, 0)
+            self.discard()
+            return np.frombuffer(mm, np.float32).reshape(self.shape)
+        os.lseek(self.fd, 0, os.SEEK_SET)
+        a = np.empty(self.shape, np.float32)
+        view, got = memoryview(a.reshape(-1)).cast("B"), 0
+        while got < self.nbytes:  # (os.readv / readinto: neither on every OS)
+            chunk = os.read(self.fd, min(self.nbytes - got, 1 << 30))
+            if not chunk:
+                break
+            view[got:got + len(chunk)] = chunk
+            got += len(chunk)
         self.discard()
-        return np.frombuffer(mm, np.float32).reshape(self.shape)
+        return a
 
     def discard(self):
         if self.fd is not None:
             os.close(self.fd)
             self.fd = None
-            try:
-                os.remove(self.path)
-            except OSError:
-                pass
+            _unlink(self.path)
 
 
 def _drop_pending(futs):
@@ -420,9 +477,10 @@ def _drop_pending(futs):
 
 def _remove_result(fut):
     try:
-        os.remove(fut.result())
+        path = fut.result()
     except Exception:  # noqa: BLE001
-        pass
+        return
+    _unlink(path)
 
 
 def _box(v, stag, i0, i1, j0, j1):
@@ -650,7 +708,7 @@ class Source:
         self.workers = max(1, min(int(workers), MAX_READERS))
         self._pool_uses = 0  # times this run went to the reader processes
         self._means = {}  # (name, tindex) -> domain-mean profile (nk,)
-        self._shm = "/dev/shm" if os.path.isdir("/dev/shm") else None
+        self._shm = shared_dir()[0]  # (where the readers hand back their reads)
 
     # ------------------------------------------------------------------ meta
     @property
@@ -1285,7 +1343,7 @@ class Run(Source):
                 shape = self._vol_shape(n, t)
                 try:
                     vols[n] = _SharedVolume(self._shm, shape)
-                except OSError:  # tmpfs full (or no fallocate): read it here instead
+                except OSError:  # shared folder full: read it here instead
                     continue
                 blocks = level_blocks(shape, self.vars[n].zchunk, len(missing),
                                       self.workers)

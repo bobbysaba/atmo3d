@@ -3,6 +3,14 @@
 What changed in each release, newest first. The version is in `pyproject.toml`; a release
 has a matching git tag.
 
+## Unreleased
+
+- **Your own computer**: atmo3d runs on Linux, macOS and Windows, and the tests run on all
+  three. On macOS and Windows the reader processes now read 3D fields in parallel too
+  (they hand reads back through the temporary folder, where Linux uses `/dev/shm`), and
+  on Windows the run picker's search, the automatic cache size and `atmo3d bench` no
+  longer fail. See [Installing](install.md#on-your-own-computer).
+
 ## 2.0.0 (2026-11-24)
 
 - **Field menus**: a field picker without a label (the map's and the cross-section's fill)

@@ -26,7 +26,6 @@ node: it reads several full 3D fields."""
 import argparse
 import json
 import os
-import resource
 import shutil
 import sys
 import tempfile
@@ -37,6 +36,34 @@ from contextlib import contextmanager
 import param
 
 from . import config
+
+
+def _peak_rss_gb():
+    """Most memory this process has held, GB (ru_maxrss: KB on Linux, bytes on macOS;
+    Windows: its peak working set)."""
+    try:
+        import resource
+    except ImportError:  # (Windows)
+        import ctypes
+        from ctypes import wintypes
+
+        class _Counters(ctypes.Structure):  # PROCESS_MEMORY_COUNTERS
+            _fields_ = [("cb", wintypes.DWORD), ("PageFaultCount", wintypes.DWORD)] + [
+                (n, ctypes.c_size_t) for n in (
+                    "PeakWorkingSetSize", "WorkingSetSize", "QuotaPeakPagedPoolUsage",
+                    "QuotaPagedPoolUsage", "QuotaPeakNonPagedPoolUsage",
+                    "QuotaNonPagedPoolUsage", "PagefileUsage", "PeakPagefileUsage")]
+
+        c = _Counters()
+        c.cb = ctypes.sizeof(c)
+        k32 = ctypes.windll.kernel32
+        k32.GetCurrentProcess.restype = wintypes.HANDLE
+        if not ctypes.windll.psapi.GetProcessMemoryInfo(
+                wintypes.HANDLE(k32.GetCurrentProcess()), ctypes.byref(c), c.cb):
+            return 0.0
+        return round(c.PeakWorkingSetSize / 1024**3, 2)
+    rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+    return round(rss / (1024**3 if sys.platform == "darwin" else 1024**2), 2)
 
 
 def _demo_keys():
@@ -432,8 +459,7 @@ class Bench:
         if n > 0:
             self._over_times(max(0, min(times[0], nt - 1 - n)), n)
 
-        self.info["peak_rss_gb"] = round(
-            resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024**2, 2)
+        self.info["peak_rss_gb"] = _peak_rss_gb()
         watched.set()
         if self.info["job_peak_gb"] is not None:
             self.info["job_peak_gb"] = round(self.info["job_peak_gb"], 2)
