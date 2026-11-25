@@ -112,7 +112,7 @@ The extension API is what a data-type package may use:
 - the capability names (`core.capabilities.CAPS`);
 - `atmo3d.testing.check_datatype`.
 
-Its version is `atmo3d.API_VERSION`, `MAJOR.MINOR` (`"1.0"`), apart from atmo3d's own
+Its version is `atmo3d.API_VERSION`, `MAJOR.MINOR` (`"1.1"`), apart from atmo3d's own
 version. **The rule:** a minor release only adds to the API; anything a package relies
 on changes only with a new major number, and the changelog says what changed. A
 data type says which version it is written for, on its Model:
@@ -120,7 +120,7 @@ data type says which version it is written for, on its Model:
 ```python
 class MyType(Model):
     key, label = "mytype", "My model"
-    api = "1.0"
+    api = "1.1"
 ```
 
 When the package loads, `core.models.register` checks it: the major must match the
@@ -181,6 +181,7 @@ auto-detect tries them in.
 | `viewer.panels.register(Tool(...))` | a rail button and its panel; `needs=` names a capability, `click=` handles map clicks while the tool is on |
 | `viewer.ext.register_mixin(cls)` | methods added to the Viewer (or the figure editor), for a panel |
 | `core.services.provide(name, impl)` | a service shared code reaches without importing the package (CM1's parcels) |
+| `viewer.picker.register_source(label, tip, build)` | another way to get a run: a button under the run picker's list (API 1.1). `build(done, back)` returns the panel shown in the list's place; it calls `done(folder)` to open the run it fetched there, `back()` to show the list again (the radar's *NEXRAD from AWS…*) |
 
 The first two are needed; the rest are for data types that bring tools of their own
 (see `atmo3d_radar/__init__.py`).

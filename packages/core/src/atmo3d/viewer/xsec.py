@@ -260,6 +260,7 @@ class SectionPanel:
         except Exception:  # noqa: BLE001
             w, h = 800, 360
         m = self.xs_main
+        have = set(vectors.options(self.F).values())
         spec = dict(t=self.t, A=self.xs_pts[0], B=self.xs_pts[1], fill=self.xs_fill.value,
                     ztop=float(self.xs_ztop.value), px=(w, h), storm=self._storm_motion(),
                     style=IMAGE.get(m["style"], m["style"]), nlev=int(m["nlevels"] or 15),
@@ -274,7 +275,10 @@ class SectionPanel:
                     ov=[dict(on=bool(o["on"]), var=o["field"], levels=o["levels"],
                              color=o["color"], width=float(o["lw"]),
                              negdash=bool(o["neg_dashed"])) for o in self.xs_ovs],
-                    vecs=[dict(on=bool(o["on"]), q=o["vector"], frame=o["frame"],
+                    # (a vector the run has no fields for, as the wind on a radar
+                    # without retrieved winds: off)
+                    vecs=[dict(on=bool(o["on"]) and o["vector"] in have, q=o["vector"],
+                               frame=o["frame"],
                                density=int(o["across"]),
                                ref=o["ref"] or vectors.VECTORS[o["vector"]].ref,
                                color=o["color"]) for o in self.xs_vecs],
@@ -288,6 +292,8 @@ class SectionPanel:
         F = self.F
         qs = ([o["q"] for o in spec["vecs"] if o["on"]] if spec is not None else
               [o["vector"] for o in self.xs_vecs if o["on"]])
+        have = set(vectors.options(F).values())
+        qs = [q for q in qs if q in have]  # (as xs_spec: vectors the run lacks are off)
         shown = self._xs_names(spec)
         names = []
         for n in shown:

@@ -3,6 +3,32 @@
 What changed in each release, newest first. The version is in `pyproject.toml`; a release
 has a matching git tag.
 
+## Unreleased
+
+- **NEXRAD Level II**: a folder of WSR-88D Level II files (`KTLX20130520_195111_V06`,
+  `.gz` or not) opens as a radar run, decoded by atmo3d itself. The low elevations'
+  split cuts are merged into one sweep, and SAILS repeats are listed with their times.
+  See [NEXRAD Level II](guide/radar.md#nexrad-level-ii).
+- **NEXRAD from AWS**: the run picker's *NEXRAD from AWS…* downloads a site's Level II
+  volumes for a time window from the public archive and opens them; `atmo3d-nexrad` does
+  the same from a shell (for login nodes: compute nodes often have no internet). New
+  setting `radar_nexrad_dir`. See [From the AWS archive](guide/radar.md#from-the-aws-archive).
+- **Dealiased velocity**: radar runs with radial velocity also offer *Radial velocity
+  (dealiased)*, unfolded sweep by sweep (region based). See
+  [Dealiased velocity](guide/radar.md#dealiased-velocity).
+- **Live NEXRAD**: *Live* in *NEXRAD from AWS…* (and `atmo3d-nexrad SITE --live`) keeps
+  fetching a site's new volumes as they come; a page at the newest time follows them
+  (*Follow new volumes* in the PPI tool). See [Live](guide/radar.md#live).
+- **Fix**: a cross-section of a run without winds (a NEXRAD Level II folder, a radar
+  without retrieved `u`, `v`) failed with `KeyError: 'u'`; its wind vectors are now off.
+- A run without the fields for any vector (no `u`, `v`: a NEXRAD Level II folder) no
+  longer offers the *Vectors* menu on the map or in the cross-section, nor 3D vectors
+  and streamlines; streamlines need the wind.
+- **Fix**: a 3D box on a run without winds (a NEXRAD Level II folder) did nothing: the
+  3D view failed as it first opened (`KeyError: None`) and the box was lost.
+- **Extension API 1.1**: `viewer.picker.register_source` lets a data type add another way
+  to get a run to the run picker ([the registration calls](datatypes.md#the-registration-calls)).
+
 ## 2.2.0 (2026-11-24)
 
 - **Your fields in the app**: ⚙ Settings has a *Your fields* tab (also *✎ Your fields…*

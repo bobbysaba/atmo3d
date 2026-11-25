@@ -3,7 +3,11 @@ under the runs_root setting; typing filters it, and a folder typed or pasted wit
 "/" at the end (or Enter) lists the runs inside it instead.  Shared folders (see
 config.searchable) are never searched.  The model box says which model's output to look
 for (auto-detect: any).  Opening a run reloads the page with ?run= (and ?model= when one
-was chosen)."""
+was chosen).
+
+A data type can add another way to get a run (register_source): a button under the list
+that shows the data type's own panel in its place, e.g. the radar's "NEXRAD from AWS…",
+which downloads volumes into a folder and then opens that folder as if it were picked."""
 
 import json
 import os
@@ -31,6 +35,29 @@ def _is_path(text):
     \\…."""
     return text[:1] in ("~", "$") + SEPS or (
         os.name == "nt" and len(text) > 1 and text[1] == ":" and text[0].isalpha())
+
+
+_SOURCES = []  # [(label, tip, build)]: register_source
+
+
+def register_source(label, tip, build):
+    """Add a button under every run picker's list (a data type's register() calls it).
+
+    build(done, back) -> a panel object shown in the list's place when the button is
+    clicked (built once per picker).  done(path) opens the run in folder `path` as if it
+    were picked; back() shows the list again.  A label registered again replaces the
+    old entry."""
+    for i, (lb, _, _) in enumerate(_SOURCES):
+        if lb == label:
+            _SOURCES[i] = (label, tip, build)
+            return
+    _SOURCES.append((label, tip, build))
+
+
+def sources():
+    """The registered sources [(label, tip, build)] (once the data types have loaded)."""
+    models.load()
+    return list(_SOURCES)
 
 
 def _shared(folder):
@@ -72,9 +99,21 @@ class RunPicker:
             if (m && m !== 'auto') q.set('model', m); else q.delete('model');
             window.location.search = q.toString();
         """)
-        self.body = pn.Column(pn.Row(self.query, self.model, self.open, margin=0, **size),
-                              self.list,
-                              self.msg, self.go, margin=0, **size)
+        self._main = pn.Column(pn.Row(self.query, self.model, self.open, margin=0, **size),
+                               self.list, self.msg, margin=0, **size)
+        self._other = pn.Column(margin=0, visible=False, **size)
+        self._built = {}  # source label -> its panel
+        buttons = []
+        for label, tip, build in sources():
+            b = pn.widgets.Button(name=label, button_type="light", button_style="outline",
+                                  description=tip, margin=(4, 8, 4, 0))
+            b.on_click(lambda e, lb=label, fn=build: self._show_source(lb, fn))
+            buttons.append(b)
+        self._sources = pn.Row(_html('<div class="cv-hint" style="margin-top:10px">Or '
+                                     'get a run:</div>'), *buttons, margin=0,
+                               visible=bool(buttons))
+        self._main.append(self._sources)
+        self.body = pn.Column(self._main, self._other, self.go, margin=0, **size)
         self.modal = pn.Modal(
             _html('<div class="cv-maptitle" style="font-size:16px"><b>Open a run</b>'
                   '</div>'),
@@ -250,6 +289,28 @@ class RunPicker:
                 self.on_open(self.selected)
             else:
                 self.go.value = json.dumps([self.selected, key])
+
+    # ------------------------------------------------------------------ sources
+    def _show_source(self, label, build):
+        """A registered source's panel in the list's place."""
+        got = self._built.get(label)
+        if got is None:
+            got = self._built[label] = build(self._source_done, self._source_back)
+        self._other.objects = [got]
+        self._main.visible, self._other.visible = False, True
+
+    def _source_back(self):
+        self._main.visible, self._other.visible = True, False
+
+    def _source_done(self, path):
+        """A source fetched a run into `path`: open it as if it were picked."""
+        self._source_back()
+        self._select(path)
+        if self.open.disabled:  # (nothing atmo3d reads there: say so)
+            self.msg.object = (f'<div class="cv-hint" style="color:#f87171">No run atmo3d '
+                               f'reads in {path}</div>')
+            return
+        self._open()
 
     def clear(self):
         """An empty box (after a pick), and the list of runs again."""

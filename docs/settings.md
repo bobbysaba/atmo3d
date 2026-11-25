@@ -28,6 +28,7 @@ edits the file itself). They are saved in `~/.config/atmo3d/config.toml`
 | `column_stride` | auto | CAPE, CIN, LCL, STP and SCP maps on every n-th column (auto: every column up to 500 × 500 points) |
 | `radar_max_gap_km` | auto | radar views off the sweeps (constant heights, sections, columns, 3D) leave a point empty where the two sweeps around it are further apart than this many km; auto: every gap is bridged |
 | `radar_sampling` | `linear` | radar values within a sweep: `linear` between the nearest rays and gates, or `nearest` gate |
+| `radar_nexrad_dir` | blank | where NEXRAD Level II volumes fetched from AWS go, one folder per site and day (`KTLX_20130520`); blank: `nexrad/` in the cache folder |
 | `radar_regrid_method`, `radar_regrid_dx`, `radar_regrid_dz`, `radar_regrid_range`, `radar_regrid_max_gap` | linear, 0.5, 0.5, 150, 0 | how a radar run is regridded (Regridded in the toolbar, confirmed in a dialog each time): sampling within a sweep, horizontal and vertical spacing (km), the grid's reach from the radar (km), the widest gap between sweeps bridged (km; 0: all). The regridded run's name holds them, so sessions, figures and exports keep them |
 | `cache_gb`, `workers` | auto | from the job's memory and CPUs (restart to apply) |
 | `port`, `maxpix` | 5006, 900 | server port (restart to apply), map pixels per axis |

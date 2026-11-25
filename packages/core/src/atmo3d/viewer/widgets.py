@@ -58,7 +58,9 @@ class Widgets:
     def _vec_vis(o, ev=None):
         """The frame for the wind only; the reference arrow in the vector's units.  On a new
         vector: its typical magnitude as the reference."""
-        d = vectors.VECTORS[o["q"].value]
+        d = vectors.VECTORS.get(o["q"].value)
+        if d is None:  # (a run with no vectors: its menu has none, and none is picked)
+            return
         if ev is not None and ev.name == "value" and ev.obj is o["q"]:
             o["ref"].value = d.ref
         o["frame"].visible = d.framed

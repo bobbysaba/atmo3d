@@ -5,9 +5,10 @@ from atmo3d.core.models import Model, is_file
 
 
 class Radar(Model):
-    """A folder of CfRadial volumes, one file per time (atmo3d_radar.cfradial)."""
+    """A folder of radar volumes, one file per time: CfRadial (atmo3d_radar.cfradial)
+    or NEXRAD Level II (atmo3d_radar.level2)."""
     key, label = "radar", "Radar"
-    api = "1.0"  # (atmo3d.API_VERSION it is written for)
+    api = "1.1"  # (atmo3d.API_VERSION it is written for)
 
     @property
     def run_class(self):
@@ -60,11 +61,16 @@ class Radar(Model):
         return self.run_class(path, **kw)
 
     def looks(self, entries):
-        # (the names, then the header of the first file that could be a volume)
-        from . import cfradial
-        for e in sorted((e for e in entries if is_file(e) and cfradial.candidate(e.name)),
-                        key=lambda e: e.name):
-            return cfradial.is_cfradial(e.path)
+        # (the names, then the header of the first file that could be a volume, of
+        # either format)
+        from . import cfradial, level2
+        for fmt, test in ((cfradial.candidate, cfradial.is_cfradial),
+                          (level2.candidate, level2.is_level2)):
+            for e in sorted((e for e in entries if is_file(e) and fmt(e.name)),
+                            key=lambda e: e.name):
+                if test(e.path):
+                    return True
+                break
         return False
 
     def summary(self, path):

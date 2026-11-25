@@ -1,7 +1,8 @@
-"""The radar reader: a folder of CfRadial volumes as a PolarRun (core.run.Source).
+"""The radar reader: a folder of radar volumes as a PolarRun (core.run.Source), one file
+per time: CfRadial (atmo3d_radar.cfradial) or NEXRAD Level II (atmo3d_radar.level2).
 
 Native polar is the source of truth (atmo3d-plan.md section 2): a field at one time is
-(sweeps, rays, gates) float32 (atmo3d_radar.cfradial), cached whole like a grid run's
+(sweeps, rays, gates) float32, cached whole like a grid run's
 3D fields.  The radar site is the origin: x east, y north (km) on the radar-centred
 azimuthal-equidistant plane, z (km) above the radar's level (atmo3d_radar.beam).  Views
 that are not a sweep go through a sampler (Phase 6 step 4); a sweep alone is read
@@ -14,7 +15,7 @@ import numpy as np
 
 from atmo3d.core.run import IO_LOCK, MissingAtTime, Source, VarInfo
 
-from . import beam, cfradial, ppi, sampler, scene
+from . import beam, cfradial, dealias, level2, ppi, sampler, scene
 
 # fields computed from the sweep table and the beam model, not read from the files
 # (hidden: for checking the geometry)
@@ -23,6 +24,9 @@ GEOMETRY = {
     "ground_range": ("Ground distance from the radar", "km"),
     "ray_azimuth": ("Ray azimuth", "degrees"),
 }
+
+# the radial velocity unfolded (atmo3d_radar.dealias), where the files have velocity
+DEALIASED, VELOCITY = "velocity_dealiased", "velocity"
 
 ZTOP_MAX = 20.0  # km: the top of height-based views (sections, 3D) at most
 
@@ -46,13 +50,24 @@ def _gate_vars(d):
     return out
 
 
+def _level2_vars(v):
+    """{name: VarInfo} of the moments of a decoded Level II volume."""
+    out = {}
+    for code in v.codes:
+        name, long, units = level2.MOMENTS.get(code, (code.lower(), code, ""))
+        out[name] = VarInfo(name, long, units, 3, None, 1, {"level2_moment": code})
+    return out
+
+
 class PolarRun(Source):
-    """A folder of radar volumes, one CfRadial file per time.
+    """A folder of radar volumes, one file per time (CfRadial, or NEXRAD Level II).
+
+      format     "cfradial" or "level2"
 
       valid      UTC time of each volume (from its file name)
       site       (lat, lon, altitude m) of the radar
       ranges     (ng,) slant range of each gate centre (km)
-      sweeps(t)  the sweep table at time t (cfradial.Sweeps; 13 or 14 sweeps here)
+      sweeps(t)  the sweep table at time t (cfradial.Sweeps, or a level2.Volume)
       volume(name, t)       (sweeps, rays, gates) float32
       read_sweep(name, t, k) (rays, gates) float32 of one sweep"""
 
@@ -65,23 +80,39 @@ class PolarRun(Source):
 
     def __init__(self, path, cache_gb=12.0, workers=None, cache=None):
         super().__init__(path, cache_gb, workers, cache)
-        found = cfradial.files_in(self.path)
+        found, self.format = cfradial.files_in(self.path), "cfradial"
         if not found:
-            raise FileNotFoundError(f"no CfRadial volumes in {self.path}")
+            found, self.format = level2.files_in(self.path), "level2"
+        if not found:
+            raise FileNotFoundError(f"no radar volumes (CfRadial or NEXRAD Level II) in "
+                                    f"{self.path}")
         self.valid = [w for w, _ in found]
         self.files = [f for _, f in found]
         self.times = np.array([(w - self.valid[0]).total_seconds() for w in self.valid],
                               dtype=np.float64)
         # (only the first file's header is read here: the others are taken to hold the
         # same fields until a time is read, in_file, sweeps)
-        with IO_LOCK, netCDF4.Dataset(self.files[0]) as d:
-            d.set_auto_mask(False)
-            self.attrs = {k: d.getncattr(k) for k in d.ncattrs()}
-            self.site = _site(d)
-            self.ranges = np.asarray(d["range"][:], np.float64) / 1000.0
-            self._sweeps = {0: cfradial.Sweeps(d)}
-            self.vars = _gate_vars(d)
+        if self.format == "level2":
+            with IO_LOCK:
+                v = level2.volume(self.files[0])
+            self.attrs = {"instrument_name": v.station, "vcp": v.vcp,
+                          "source": "NEXRAD Level II"}
+            self.site, self.ranges = v.site, v.ranges
+            self._sweeps = {0: v.table}
+            self.vars = _level2_vars(v)
+        else:
+            with IO_LOCK, netCDF4.Dataset(self.files[0]) as d:
+                d.set_auto_mask(False)
+                self.attrs = {k: d.getncattr(k) for k in d.ncattrs()}
+                self.site = _site(d)
+                self.ranges = np.asarray(d["range"][:], np.float64) / 1000.0
+                self._sweeps = {0: cfradial.Sweeps(d)}
+                self.vars = _gate_vars(d)
         self._names = {0: frozenset(self.vars)}  # time -> its file's (time, range) fields
+        if VELOCITY in self.vars:
+            self.vars[DEALIASED] = VarInfo(
+                DEALIASED, "Radial velocity, dealiased", self.vars[VELOCITY].units or "m/s",
+                3, None, 1, {"computed": "region-based dealiasing (atmo3d_radar.dealias)"})
         for n, (long, units) in GEOMETRY.items():
             self.vars[n] = VarInfo(n, long, units, 3, None, 1, {"computed": "beam model"})
         lat, lon, alt = self.site
@@ -92,8 +123,9 @@ class PolarRun(Source):
         name = self.attrs.get("instrument_name", "")
         name = name.decode() if isinstance(name, bytes) else str(name)
         self.instrument = name.strip() or "radar"
-        self.note = (f"Native {self.instrument} volumes, one file per time, shown on their "
-                     f"sweeps. Heights are above the radar ({alt:.0f} m above sea level); "
+        kind = " NEXRAD Level II" if self.format == "level2" else ""
+        self.note = (f"Native {self.instrument}{kind} volumes, one file per time, shown on "
+                     f"their sweeps. Heights are above the radar ({alt:.0f} m above sea level); "
                      f"each volume's time is the one in its file name.")
 
     # ------------------------------------------------------------------ meta
@@ -106,17 +138,44 @@ class PolarRun(Source):
         sw = self._sweeps.get(t)
         if sw is None:
             with IO_LOCK:
-                d = self._ds(t)
-                sw = cfradial.Sweeps(d)
-                self._names.setdefault(t, frozenset(_gate_vars(d)))
+                if self.format == "level2":
+                    self._not_writing(t)
+                    v = level2.volume(self.files[t])
+                    sw = v.table
+                    self._names.setdefault(t, frozenset(_level2_vars(v)))
+                else:
+                    d = self._ds(t)
+                    sw = cfradial.Sweeps(d)
+                    self._names.setdefault(t, frozenset(_gate_vars(d)))
             self._sweeps[t] = sw
         return sw
+
+    def _level2(self, t):
+        """Time t's decoded Level II volume (decoded again if it was let go)."""
+        with IO_LOCK:
+            self._not_writing(t)
+            return level2.volume(self.files[t])
+
+    def _on_ranges(self, a, v):
+        """(..., ng) of Level II volume v on the run's gates (the first file's: another
+        time's volume may reach less far, or farther)."""
+        r = self.ranges
+        if len(v.ranges) == len(r) and np.allclose(v.ranges, r):
+            return a
+        g = np.rint((r - v.ranges[0]) / (v.ranges[1] - v.ranges[0])).astype(np.int64) \
+            if len(v.ranges) > 1 else np.zeros(len(r), np.int64)
+        ok = (g >= 0) & (g < a.shape[-1])
+        out = np.full(a.shape[:-1] + (len(r),), np.nan, np.float32)
+        out[..., ok] = a[..., g[ok]]
+        return out
 
     def in_file(self, name, t):
         """Whether time t's file has field `name` (a time not read yet: as the first
         file).  The GEOMETRY fields are at every time."""
         if name in GEOMETRY:
             return True
+        if name == DEALIASED:
+            name = VELOCITY
         names = self._names.get(t)
         return name in (names if names is not None else self.vars)
 
@@ -144,6 +203,11 @@ class PolarRun(Source):
         sw = self.sweeps(t)
         if name in GEOMETRY:
             return self._geometry(name, sw, range(len(sw)))
+        if name == DEALIASED:  # (from velocity's volume, cached as any field's)
+            return dealias.dealias_volume(self.volume(VELOCITY, t), sw)
+        if self.format == "level2":
+            v = self._level2(t)
+            return self._on_ranges(v.volume(level2.code_of(name)), v)
         with IO_LOCK:
             return cfradial.read_volume(self._ds(t)[name], sw)
 
@@ -161,6 +225,12 @@ class PolarRun(Source):
                                          f"{len(sw)} sweeps (no sweep {k})")
         if name in GEOMETRY:
             return self._geometry(name, sw, [k])[0]
+        if name == DEALIASED:
+            return dealias.dealias(self.read_sweep(VELOCITY, t, k), sw.nyquist[k],
+                                   int(np.isfinite(sw.az[k]).sum()))
+        if self.format == "level2":
+            v = self._level2(t)
+            return self._on_ranges(v.sweep(level2.code_of(name), k), v)
         with IO_LOCK:
             return cfradial.read_sweep(self._ds(t)[name], sw, k)
 
@@ -296,4 +366,6 @@ class PolarRun(Source):
 
 
 def count(path):
-    return len(cfradial.files_in(path)) if os.path.isdir(path) else 0
+    if not os.path.isdir(path):
+        return 0
+    return len(cfradial.files_in(path)) or len(level2.files_in(path))

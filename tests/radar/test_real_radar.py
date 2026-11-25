@@ -1,8 +1,9 @@
-"""Checks on your own radar folder (CfRadial volumes, one file per time): it opens, its sweep
-tables make sense, the sampler gives back the beam model's heights on its real geometry,
-and each view (PPI, constant height, column max, section, column, 3D, a small regrid)
-comes out.  Reads only (never writes into the folder); the regrid's cache files go to
-the test session's own cache folder.  Reads a few fields at the first time (a minute or
+"""Checks on your own radar folder (CfRadial or NEXRAD Level II volumes, one file per time):
+it opens, its sweep tables make sense, the sampler gives back the beam model's heights on
+its real geometry, and each view (PPI, constant height, column max, section, column, 3D,
+a small regrid) comes out (a Level II folder: and its first volume is as MetPy reads it).
+Reads only (never writes into the folder); the regrid's cache files go to the test
+session's own cache folder.  Reads a few fields at the first time (a minute or
 so on 4 CPUs).
 
   ATMO3D_RADAR_ROOT=/path/to/folder pytest -m real tests/radar/test_real_radar.py
@@ -98,3 +99,32 @@ def test_a_small_regrid(rf):
     assert np.array_equal(a[4], want, equal_nan=True)
     assert os.path.isfile(g.cache_path("reflectivity", 0))
     g.clear_cache()
+
+
+def test_level2_same_as_metpy(rf):
+    """A Level II folder: its first volume as MetPy's reader has it (each sweep's moments,
+    from the cut they come from, ray by ray)."""
+    run, _ = rf
+    if run.format != "level2":
+        pytest.skip("not a NEXRAD Level II folder")
+    import logging
+    from metpy.io import Level2File
+    from atmo3d_radar import level2 as L
+    logging.getLogger("metpy").setLevel(logging.ERROR)
+    vol, m = L.volume(run.files[0]), Level2File(run.files[0])
+    checked = 0
+    for k in range(len(vol)):
+        for code in vol.codes:
+            if not vol.has(code, k):
+                continue
+            rays = m.sweeps[vol._sweeps[k]["src"][code].num - 1]
+            az = np.array([r.header.az_angle for r in rays])
+            ours = vol.sweep(code, k)
+            for j in range(int(np.isfinite(vol.az[k]).sum())):
+                i = int(np.argmin(L._ang_diff(az, vol.az[k, j])))
+                mom = rays[i].moments
+                _, vals = mom[code] if code in mom else mom[code.encode()]
+                np.testing.assert_allclose(ours[j, :len(vals)], vals, rtol=1e-5,
+                                           atol=1e-4, equal_nan=True)
+                checked += 1
+    assert checked > 1000

@@ -112,6 +112,10 @@ KEYS = [
     Key("radar_sampling", "data", "linear", "Radar: sampling within a sweep",
         "linear: between the two nearest rays and gates; nearest: the nearest gate. "
         "Between sweeps it is always linear in elevation.", advanced=True),
+    Key("radar_nexrad_dir", "paths", "", "Radar: NEXRAD downloads",
+        "Where NEXRAD Level II volumes fetched from the AWS archive go, one folder per "
+        "site and day (KTLX_20130520). Empty: nexrad/ in the cache folder.",
+        kind="outdir"),
     Key("radar_regrid_method", "data", "linear", "Radar regrid: sampling within a sweep",
         "How a radar run is regridded (Regridded in the toolbar; off unless chosen, and "
         "confirmed each time): linear between the nearest rays and gates, or nearest "
@@ -375,7 +379,7 @@ def check(name, value):
         return "File not found."
     if key.kind == "outdir" and value and not _creatable(expand(value)):
         return "Can't create or write to this folder."
-    if key.kind == "outdir" and not value:
+    if key.kind == "outdir" and not value and key.default:  # (default "": optional)
         return "Required."
     return ""
 

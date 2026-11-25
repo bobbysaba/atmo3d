@@ -148,8 +148,11 @@ class PPIPanel:
     def _ppi_layout(self):
         """The PPI panel."""
         self._ppi_build()
+        live = getattr(self, "_live_widgets", None)  # (atmo3d_radar.live_ui)
+        live = live() if live is not None else None
         return pn.Column(_html(HINT, sizing_mode="stretch_width"), self.ppi_site,
-                         self.ppi_head, self.ppi_table, self.ppi_gate, self.ppi_col,
+                         *([live] if live is not None else []), self.ppi_head,
+                         self.ppi_table, self.ppi_gate, self.ppi_col,
                          sizing_mode="stretch_width")
 
     def _ppi_sweep(self):
@@ -200,7 +203,7 @@ class PPIPanel:
         F, run = self.F, self.run
         shown = self._fill_name()
         names = [shown] + [n for n in (F.role("refl"), F.role("u"), F.role("v"),
-                                       F.role("w"), "velocity") if n]
+                                       F.role("w"), "velocity", "velocity_dealiased") if n]
         names = list(dict.fromkeys(n for n in names if n and n in F))
         # (read off the page thread: the radar has no soundings, so their pool is free)
         self.gen["snd"] += 1

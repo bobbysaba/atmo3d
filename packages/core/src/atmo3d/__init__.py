@@ -19,7 +19,7 @@ __version__ = "2.2.0"
 # it; anything a package could rely on changes only with the major number.  A Model says
 # which version it was written for (Model.api); core.models.register refuses one whose
 # major differs, or whose minor is newer than this core's.
-API_VERSION = "1.0"
+API_VERSION = "1.1"
 
 # numba's thread pool (sounding-parameter maps) starts one thread per CPU it sees; on a
 # shared login node that is far more than this job may use (readers stop at 8 too)

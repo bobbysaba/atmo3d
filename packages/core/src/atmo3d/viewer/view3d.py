@@ -183,7 +183,8 @@ class View3DPanel:
                     vecs=[dict(q=o["q"].value, level=float(o["level"].value),
                                frame=o["frame"].value, density=int(o["density"].value),
                                ref=float(o["ref"].value or vectors.VECTORS[o["q"].value].ref),
-                               color=o["color"].value) for o in self.svs if o["on"].value],
+                               color=o["color"].value) for o in self.svs
+                          if o["on"].value and o["q"].value in vectors.VECTORS],
                     stream=dict(on=self.st_on.value, z=float(self.st_z.value),
                                 n=int(self.st_n.value), length=float(self.st_len.value),
                                 dir=self.st_dir.value, frame=self.st_frame.value,

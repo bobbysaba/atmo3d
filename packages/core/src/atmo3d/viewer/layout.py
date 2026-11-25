@@ -237,6 +237,7 @@ class Layout:
                   'along-section component and the vertical one (w for the wind, ζ for '
                   'vorticity).  Several at once.</div>'),
             margin=0, sizing_mode="stretch_width"))
+        xs_vec.visible = bool(vectors.options(self.F))  # (no winds: a radar's, mostly)
         for b, _ in d.items.values():  # the same pill as the map's layer menus
             b.param.update(height=32, margin=(4, 2), button_type="light")
         xs_layers = (_group(self.xs_fill, xs_style), _group(xs_more, xs_cont, xs_vec))
@@ -346,6 +347,7 @@ class Layout:
             _html('<div class="cv-hint" style="margin:0 0 12px">Several at once.  '
                   'Storm-relative wind uses the sounding panel’s storm motion.</div>'),
             margin=0, sizing_mode="stretch_width"))
+        vec.visible = bool(vectors.options(self.F))  # (no winds: a radar's, mostly)
         geo = self._geo_bar(d)  # (None: a run not on a map projection)
         for b, _ in d.items.values():
             b.param.update(height=32, margin=(4, 2), button_type="light")
@@ -398,9 +400,12 @@ class Layout:
         for b in (self.v3_pick, self.v3_view, self.v3_render):
             b.param.update(height=32, margin=(4, 2))
         d.panel.styles = dict(d.panel.styles, **DRAWER)
-        # (a run with no grid draws no 3D vectors or streamlines yet: a radar's)
-        bar = _bar(_group(iso, fl, sv, st, scene) if self.run.grid else
-                   _group(iso, fl, scene),
+        # (a run with no grid draws no 3D vectors or streamlines yet: a radar's; nor
+        # does one without the fields: streamlines follow the wind)
+        have = set(vectors.options(self.F).values()) if self.run.grid else set()
+        sv.visible = bool(have)
+        st.visible = d.items["st"][0].visible = "wind" in have
+        bar = _bar(_group(iso, fl, sv, st, scene),
                    _group(self.v3_region, self.v3_pick, self.v3_view, self.v3_render))
         return pn.Column(bar, d.panel, styles=BAR, margin=0, sizing_mode="stretch_width")
 

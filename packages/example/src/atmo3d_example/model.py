@@ -25,7 +25,7 @@ class Example(Model):
     # name lists show
     key, label = "example", "Example (gridded netCDF)"
     # REQUIRED: the extension API this is written for (atmo3d.API_VERSION)
-    api = "1.0"
+    api = "1.1"
 
     @property
     def run_class(self):

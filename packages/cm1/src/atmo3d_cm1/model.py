@@ -8,7 +8,7 @@ from atmo3d.core.models import Model, is_file
 class CM1(Model):
     """CM1: a folder of netCDF output files (names by the output_glob setting)."""
     key, label = "cm1", "CM1"
-    api = "1.0"  # (atmo3d.API_VERSION it is written for)
+    api = "1.1"  # (atmo3d.API_VERSION it is written for)
 
     @property
     def run_class(self):

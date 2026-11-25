@@ -114,7 +114,7 @@ A monorepo: `packages/core` (import name `atmo3d`: everything below except the d
 parts), `packages/cm1` (`atmo3d_cm1`: the CM1 reader, field catalog, parcels, trajectory
 tracing, pressure decomposition and the Parcels panel), `packages/wofs` (`atmo3d_wofs`:
 the WoFS reader, catalog and demo) and `packages/radar` (`atmo3d_radar`: the CfRadial
-reader and catalog). `packages/example` (`atmo3d_example`) is the worked example of a
+and NEXRAD Level II readers and catalog). `packages/example` (`atmo3d_example`) is the worked example of a
 data type: no part of the app, it is the pattern new ones are copied from
 ([Writing a data type](datatypes.md#the-worked-example)). `tests/`, `docs/` and `tools/`
 stay at the top. Install the four

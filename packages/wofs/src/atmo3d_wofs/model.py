@@ -9,7 +9,7 @@ class WoFS(Model):
     member wrfouts.  The experiment is one run; its members (and their mean) are read
     as runs of their own (parts)."""
     key, label = "wofs", "WoFS"
-    api = "1.0"  # (atmo3d.API_VERSION it is written for)
+    api = "1.1"  # (atmo3d.API_VERSION it is written for)
 
     @property
     def run_class(self):

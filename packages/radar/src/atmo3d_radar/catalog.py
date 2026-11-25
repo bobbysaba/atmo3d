@@ -18,6 +18,9 @@ NATIVES = {
     # the radar's own fields
     "reflectivity": ("Reflectivity", "dBZ", 1.0, "reflectivity", (0, 75), False, MOMENTS),
     "velocity": ("Radial velocity", "m/s", 1.0, "RdBu_r", (-30, 30), True, MOMENTS),
+    # computed from velocity (atmo3d_radar.run.DEALIASED; not in the files)
+    "velocity_dealiased": ("Radial velocity (dealiased)", "m/s", 1.0, "RdBu_r", (-50, 50),
+                           True, MOMENTS),
     "differential_reflectivity": ("ZDR", "dB", 1.0, "turbo", (-2, 6), False, MOMENTS),
     "cross_correlation_ratio": ("ρhv", "", 1.0, "turbo", (0.7, 1.0), False, MOMENTS),
     "spectrum_width": ("Spectrum width", "m/s", 1.0, "magma", (0, 10), False, MOMENTS),
