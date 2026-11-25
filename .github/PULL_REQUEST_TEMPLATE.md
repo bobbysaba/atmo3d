@@ -18,5 +18,4 @@
 
 ## Documentation
 
-- [ ] The page in `docs/` that describes this is updated (or nothing a user sees changed)
-- [ ] A line under *Unreleased* in `docs/changelog.md` (or nothing a user notices changed)
+- [ ] A line under *Unreleased* in `CHANGELOG.md` (or nothing a user notices changed)

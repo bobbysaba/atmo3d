@@ -1,4 +1,4 @@
-"""User-defined derived fields (core/userfields.py; docs/guide/user-fields.md): the
+"""User-defined derived fields (core/userfields.py; the user-fields page on the site): the
 restricted evaluator and its escape suite, definitions read from the fields file,
 analytic answers on the demo run (display units, built-in and user fields as inputs,
 derivatives), why a field is left out, the menus, the series worker's binding, figures
@@ -317,14 +317,18 @@ def test_a_series_of_a_user_field_runs_in_the_workers(F):
 
 
 def test_the_docs_pages_examples_work(reg, tmp_path, monkeypatch):
-    """Every field in docs/guide/user-fields.md's TOML blocks loads and is computed on
-    the demo run."""
+    """Every field in the site's user-fields page (guides/user-fields.mdx), in its TOML
+    blocks, loads and is computed on the demo run. The pages are not in this repository:
+    set ATMO3D_SITE_DOCS to their directory (DEVELOPING.md); skipped without."""
+    import os
     import re
     import tomllib
     from pathlib import Path
     from atmo3d.core.fields import Fields
-    page = (Path(__file__).resolve().parents[2] / "docs" / "guide"
-            / "user-fields.md").read_text(encoding="utf-8")
+    root = os.environ.get("ATMO3D_SITE_DOCS")
+    if not root:
+        pytest.skip("ATMO3D_SITE_DOCS (the site's atmo3d pages) is not set")
+    page = (Path(root) / "guides" / "user-fields.mdx").read_text(encoding="utf-8")
     blocks = [b for b in re.findall(r"```toml\n(.*?)```", page, re.S) if "[fields." in b]
     text = "\n".join(blocks)
     names = list(tomllib.loads(text)["fields"])

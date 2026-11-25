@@ -10,7 +10,7 @@ The layout it reads (synthetic.py writes a small run of it):
   fields  (time, z, y, x) 3D on the scalar points, (time, z_stag, y, x) 3D on the w
           levels, (time, y, x) 2D; a field may be in some files only
 
-What the core needs from a Run is in docs/datatypes.md ("The reader").  In short: set
+What the core needs from a Run is in https://bobbysaba.com/docs/atmo3d/extend/data-types/ ("The reader").  In short: set
 files, times, xh, yh, z, zf, vars (and var_times, attrs), call _grid_done(), and make
 every field readable as d[name][0, ...] from what source(t) opens.  The core then reads
 in its reader processes, caches, destaggers, and computes the derived fields.

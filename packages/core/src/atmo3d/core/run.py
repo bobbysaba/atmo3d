@@ -600,7 +600,7 @@ def _var_info(name, v):
                    len(dims) - 1, stag, zchunk, dict(v.__dict__))
 
 
-var_info = _var_info  # (its name in the extension API: docs/datatypes.md)
+var_info = _var_info  # (its name in the extension API: https://bobbysaba.com/docs/atmo3d/extend/data-types/)
 
 
 class VarInfo:

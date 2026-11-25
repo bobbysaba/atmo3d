@@ -51,7 +51,7 @@ Homepage = "https://github.com/bobbysaba/atmo3d"
 atmo3d = "atmo3d.__main__:main"
 
 # Data types register here: each package names its Model class in this group
-# (see docs/developing.md).  atmo3d reads the group at start-up.
+# (see DEVELOPING.md).  atmo3d reads the group at start-up.
 [project.entry-points."atmo3d.datatypes"]
 
 [tool.setuptools.packages.find]

@@ -11,7 +11,7 @@ file says what is REQUIRED and what is optional.
   run.py        the reader: a core.run.Run subclass
   synthetic.py  writes a small run with known values, for the tests and the demo
 
-The contract is docs/datatypes.md; atmo3d.testing.check_datatype checks it.
+The contract is https://bobbysaba.com/docs/atmo3d/extend/data-types/; atmo3d.testing.check_datatype checks it.
 """
 
 

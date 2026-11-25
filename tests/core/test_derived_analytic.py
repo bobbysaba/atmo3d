@@ -258,11 +258,15 @@ def test_unconfirmed_is_hidden_and_marked(monkeypatch):
 # ---- step 5: the derived-field docs page agrees with the code
 
 def test_docs_page_lists_every_field_and_note():
-    """docs/guide/derived-fields.md names every confirmed field, and holds each field's
-    note (FieldDef.note) word for word."""
+    """The site's derived-fields page (ref/derived-fields.mdx) names every confirmed field,
+    and holds each field's note (FieldDef.note) word for word. The pages are not in this
+    repository: set ATMO3D_SITE_DOCS to their directory (DEVELOPING.md); skipped without."""
+    import os
     from pathlib import Path
-    page = (Path(__file__).resolve().parents[2] / "docs" / "guide"
-            / "derived-fields.md").read_text(encoding="utf-8")
+    root = os.environ.get("ATMO3D_SITE_DOCS")
+    if not root:
+        pytest.skip("ATMO3D_SITE_DOCS (the site's atmo3d pages) is not set")
+    page = (Path(root) / "ref" / "derived-fields.mdx").read_text(encoding="utf-8")
     assert [n for n in sorted(FF.CONFIRMED) if f"`{n}`" not in page] == []
     notes = set()
     for model in ("cm1", "wofs"):

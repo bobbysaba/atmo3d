@@ -2,8 +2,8 @@
 
 An interactive viewer for [CM1](https://www2.mmm.ucar.edu/people/bryan/cm1/) netCDF
 output (`output_format = 2`, one time per file). It runs where your output is (usually
-a cluster) and opens in your own browser. It also opens [WoFS and WRF ensembles](docs/guide/wofs.md)
-and [radar volumes](docs/guide/radar.md): CfRadial, and NEXRAD Level II folders, which it can
+a cluster) and opens in your own browser. It also opens [WoFS and WRF ensembles](https://bobbysaba.com/docs/atmo3d/guides/wofs/)
+and [radar volumes](https://bobbysaba.com/docs/atmo3d/guides/radar/): CfRadial, and NEXRAD Level II folders, which it can
 download from the AWS archive, live as the radar scans.
 
 - **Map**: layered plan views of any native or derived field (filled, contoured, wind
@@ -33,49 +33,30 @@ atmo3d /path/to/cm1/run          # your own output
 ```
 
 Open the URL it prints. On a cluster, start it in a batch or interactive job, or on any
-compute node you can log in to when there is no scheduler, with the resources below.
+compute node you can log in to when there is no scheduler. Memory depends on the size of
+the grid (about 4 GB plus 0.12 GB per million grid points); the
+[sizing table](https://bobbysaba.com/docs/atmo3d/help/performance/) has the rows.
 Reach it through the SSH tunnel command it prints, or through JupyterHub.
 
 Options (`atmo3d --help` lists them): `--port`, `--address`, `--config` (settings
 file), `--cache-gb` and `--workers` (memory and reader processes), `--maxpix` (map
 resolution sent to the browser) and `--pdecomp-script`. All but `--address` and
-`--config` also have a setting; see [Settings](docs/settings.md).
-
-## What resources to ask for
-
-Memory depends on the size of the grid, not on how many output times there are. Take
-`nx × ny × nz` from your `namelist.input` and use the row nearest yours:
-
-| Grid (nx × ny × nz) | Points | CPUs | Memory | With pressure decomposition |
-|---|---|---|---|---|
-| 256 × 256 × 80 | 5 million | 4 | 8 GB | 8 GB |
-| 512 × 512 × 100 | 26 million | 4 | 16 GB | 16 GB |
-| 1024 × 1024 × 100 | 105 million | 8 | 32 GB | 48 GB |
-| 1280 × 1280 × 115 | 188 million | 8 | 32 GB | 64 GB |
-| 2048 × 2048 × 150 | 629 million | 8 | 96 GB | 192 GB |
-
-Rule of thumb: about 4 GB plus 0.12 GB per million grid points to view a run, and another
-0.24 GB per million points free while a pressure decomposition runs. More than 8 CPUs
-doesn't help. See [Running on a cluster](docs/hpc.md#resources) for where the numbers
-come from and for machines without a scheduler.
+`--config` also have a setting; see [Settings](https://bobbysaba.com/docs/atmo3d/ref/settings/).
 
 ## Documentation
 
-The full documentation is at **https://bobbysaba.github.io/atmo3d/**, and also here
-in `docs/`:
+Everything else is at **<https://bobbysaba.com/docs/atmo3d/>**:
 
-- [Installing](docs/install.md): conda or pip, disk space, checking the install
-- [Running on a cluster](docs/hpc.md): Slurm / PBS jobs, SSH tunnels, JupyterHub,
-  resources
-- [Using atmo3d](docs/guide/index.md): the window, then a page each for the map,
-  soundings, tracking, sections, 3D, series and distributions, figures, and notes on the
-  fields
-- [Settings](docs/settings.md): the config file and every setting
-- [Contributing](CONTRIBUTING.md): fork, change, test and open a pull request
-- [Writing a data type](docs/datatypes.md): reading another model's or instrument's output
-- [Developing](docs/developing.md): tests, code layout, adding derived fields and vectors,
-  building these pages
-- [Changes](docs/changelog.md): what is new in each release
+- [Installing](https://bobbysaba.com/docs/atmo3d/install/): conda or pip, disk space, checking the install
+- [Running on a cluster](https://bobbysaba.com/docs/atmo3d/cluster/): Slurm / PBS jobs, SSH tunnels, JupyterHub,
+  and what CPUs and memory to ask for ([sizing table](https://bobbysaba.com/docs/atmo3d/help/performance/))
+- [Using atmo3d](https://bobbysaba.com/docs/atmo3d/interface/): the window, then a page for each tool
+- [Settings](https://bobbysaba.com/docs/atmo3d/ref/settings/): the config file and every setting
+- [Writing a data type](https://bobbysaba.com/docs/atmo3d/extend/data-types/): reading another model's or instrument's output
+
+In this repository: [Contributing](CONTRIBUTING.md) (fork, change, test, open a pull
+request), [Developing](DEVELOPING.md) (tests, code layout, releases) and
+[Changes](CHANGELOG.md) (what is new in each release).
 
 ## Requirements
 

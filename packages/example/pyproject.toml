@@ -1,4 +1,4 @@
-# The worked example of a data type (docs/datatypes.md).  Copy it with
+# The worked example of a data type (https://bobbysaba.com/docs/atmo3d/extend/data-types/).  Copy it with
 # tools/new_datatype.py rather than by hand: that renames everything below.
 [build-system]
 requires = ["setuptools>=64"]

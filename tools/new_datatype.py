@@ -23,7 +23,7 @@ The copy reads the example's layout (gridded netCDF with named x, y, z and time)
 passes atmo3d.testing.check_datatype as it is; its comments describe that layout until
 you change them.  Then adapt, in order: model.PATTERN, run.py's constants (and _info,
 TimeView if your files differ more), catalog.py, synthetic.py to your files' layout, and
-the tests.  docs/datatypes.md is the contract.
+the tests.  https://bobbysaba.com/docs/atmo3d/extend/data-types/ is the contract.
 
 It writes nothing outside the new files and the CODEOWNERS line, and refuses a name in use."""
 
@@ -83,7 +83,7 @@ and what is optional.
   run.py        the reader: a core.run.Run subclass
   synthetic.py  writes a small run with known values, for the tests
 
-The contract is docs/datatypes.md in atmo3d; atmo3d.testing.check_datatype checks it.
+The contract is at https://bobbysaba.com/docs/atmo3d/extend/data-types/; atmo3d.testing.check_datatype checks it.
 """'''
 
 README = """# atmo3d-{name}
@@ -261,7 +261,7 @@ def main(argv=None, root=ROOT):
               f"  pip install -e .     (in the environment atmo3d is installed in)\n"
               f"  pytest\n"
               f"  then adapt it to your files: model.py PATTERN, run.py, catalog.py, "
-              f"synthetic.py (docs/datatypes.md)")
+              f"synthetic.py (https://bobbysaba.com/docs/atmo3d/extend/data-types/)")
         return dest
 
     owners = os.path.join(root, ".github", "CODEOWNERS")
@@ -274,7 +274,7 @@ def main(argv=None, root=ROOT):
 next:
   pytest tests/{name}                  (passes as it is: the example's layout)
   adapt it to your files: model.py PATTERN, run.py, catalog.py, synthetic.py, the tests
-  (docs/datatypes.md is the contract)
+  (https://bobbysaba.com/docs/atmo3d/extend/data-types/ is the contract)
 
 before the pull request, by hand:
   .github/workflows/tests.yml   a '{name}' filter ('{rel}/**', 'tests/{name}/**'),

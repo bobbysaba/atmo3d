@@ -3,22 +3,29 @@
 What changed in each release, newest first. The version is in `pyproject.toml`; a release
 has a matching git tag.
 
+## Unreleased
+
+- **The documentation moved to <https://bobbysaba.com/docs/atmo3d/>.** The pages are no
+  longer in this repository (`docs/`, `mkdocs.yml` and the GitHub Pages site are gone).
+  `README.md`, `CONTRIBUTING.md`, `DEVELOPING.md` and this file stay here. The old
+  GitHub Pages address stops being updated.
+
 ## 2.3.0 (2026-11-24)
 
 - **NEXRAD Level II**: a folder of WSR-88D Level II files (`KTLX20130520_195111_V06`,
   `.gz` or not) opens as a radar run, decoded by atmo3d itself. The low elevations'
   split cuts are merged into one sweep, and SAILS repeats are listed with their times.
-  See [NEXRAD Level II](guide/radar.md#nexrad-level-ii).
+  See [NEXRAD Level II](https://bobbysaba.com/docs/atmo3d/guides/radar/#nexrad-level-ii).
 - **NEXRAD from AWS**: the run picker's *NEXRAD from AWS…* downloads a site's Level II
   volumes for a time window from the public archive and opens them; `atmo3d-nexrad` does
   the same from a shell (for login nodes: compute nodes often have no internet). New
-  setting `radar_nexrad_dir`. See [From the AWS archive](guide/radar.md#from-the-aws-archive).
+  setting `radar_nexrad_dir`. See [From the AWS archive](https://bobbysaba.com/docs/atmo3d/guides/radar/#from-the-aws-archive).
 - **Dealiased velocity**: radar runs with radial velocity also offer *Radial velocity
   (dealiased)*, unfolded sweep by sweep (region based). See
-  [Dealiased velocity](guide/radar.md#dealiased-velocity).
+  [Dealiased velocity](https://bobbysaba.com/docs/atmo3d/guides/radar/#dealiased-velocity).
 - **Live NEXRAD**: *Live* in *NEXRAD from AWS…* (and `atmo3d-nexrad SITE --live`) keeps
   fetching a site's new volumes as they come; a page at the newest time follows them
-  (*Follow new volumes* in the PPI tool). See [Live](guide/radar.md#live).
+  (*Follow new volumes* in the PPI tool). See [Live](https://bobbysaba.com/docs/atmo3d/guides/radar/#live).
 - **Fix**: a cross-section of a run without winds (a NEXRAD Level II folder, a radar
   without retrieved `u`, `v`) failed with `KeyError: 'u'`; its wind vectors are now off.
 - A run without the fields for any vector (no `u`, `v`: a NEXRAD Level II folder) no
@@ -27,7 +34,7 @@ has a matching git tag.
 - **Fix**: a 3D box on a run without winds (a NEXRAD Level II folder) did nothing: the
   3D view failed as it first opened (`KeyError: None`) and the box was lost.
 - **Extension API 1.1**: `viewer.picker.register_source` lets a data type add another way
-  to get a run to the run picker ([the registration calls](datatypes.md#the-registration-calls)).
+  to get a run to the run picker ([the registration calls](https://bobbysaba.com/docs/atmo3d/extend/data-types/#the-registration-calls)).
 
 ## 2.2.0 (2026-11-24)
 
@@ -35,7 +42,7 @@ has a matching git tag.
   at the bottom of every field menu) that edits your fields file, checks each field
   against the open run as you type, and applies it on *Save and apply*: no restart. A
   changed field is drawn again wherever it is shown. See
-  [Your own derived fields](guide/user-fields.md).
+  [Your own derived fields](https://bobbysaba.com/docs/atmo3d/guides/user-fields/).
 - **Layer functions** in your fields: `layer_mean`, `layer_integral`, `layer_max`,
   `layer_min` (between two heights, km above ground, or to `top`) and `at_height` make a
   2D column field, as the built-in updraft helicity is: `layer_mean(maximum(w, 0), 0, 3)`,
@@ -49,7 +56,7 @@ has a matching git tag.
   three. On macOS and Windows the reader processes now read 3D fields in parallel too
   (they hand reads back through the temporary folder, where Linux uses `/dev/shm`), and
   on Windows the run picker's search, the automatic cache size and `atmo3d bench` no
-  longer fail. See [Installing](install.md#on-your-own-computer).
+  longer fail. See [Installing](https://bobbysaba.com/docs/atmo3d/install/#on-your-own-computer).
 - **Windows**: every text file atmo3d writes or reads (figure bundles, storm tracks, series,
   settings, user fields) is UTF-8. Saving a figure bundle or a storm file failed there, and
   a file written on one OS could read garbled on another. A test checks every `open`.
@@ -58,9 +65,9 @@ has a matching git tag.
 - **Parcel colours**: the colour bar appears with the new colours, not a moment before them.
 - **3D scenes without OpenGL**: on a machine with no working OpenGL, a 3D scene says why it
   was not drawn instead of crashing atmo3d (VTK crashes rather than raising, so a test
-  picture is drawn once in a separate process first). See [Installing](install.md#3d-scene-figures-and-opengl).
+  picture is drawn once in a separate process first). See [Installing](https://bobbysaba.com/docs/atmo3d/install/#3d-scene-figures-and-opengl).
 - **WoFS file names without colons**: WRF's `nocolons` names (`wrfout_d01_2022-05-23_22_00_00_1`,
-  the only ones Windows allows) are read as the usual ones. See [WoFS](guide/wofs.md).
+  the only ones Windows allows) are read as the usual ones. See [WoFS](https://bobbysaba.com/docs/atmo3d/guides/wofs/).
 - **Run names on Windows**: the run picker, the figure's run lists and difference maps name
   runs as `project/run`, as elsewhere, not by their whole path; the first-run window no
   longer fails when recent runs are on different drives.
@@ -73,7 +80,7 @@ has a matching git tag.
   shifted away from it.
 - **Tests in parallel**: `pytest -n auto` (pytest-xdist, now in the environment and the
   `test` extra) runs the suite in one worker per CPU the job may use, at most 8; plain
-  `pytest` still runs them one at a time. See [Developing](developing.md#tests).
+  `pytest` still runs them one at a time. See [Developing](DEVELOPING.md#tests).
 - **Tests by package**: `tests/core/` for the core and a folder per data-type package
   (`tests/cm1/`, `tests/wofs/`, `tests/radar/`, `tests/example/`), so `pytest tests/wofs`
   runs one package's tests; the `tests/<package>-tests.txt` lists are gone.
@@ -84,7 +91,7 @@ has a matching git tag.
   slider. The tree and the inspector are gone: a switch at the top of the drawer (*Figure · All
   plan views · Panel b · Layer*) says where a change goes and follows the panel clicked in the
   preview. Every setting the old editor had is still there, at every level it could be set at,
-  drawn from one table of settings (a test checks none is lost). See [Figures](guide/figures.md#the-editor).
+  drawn from one table of settings (a test checks none is lost). See [Figures](https://bobbysaba.com/docs/atmo3d/figures/#the-editor).
   - **Find** is in the top bar: it opens the setting's tool at the panel picked (else the
     figure), its section open and the setting marked; it reaches the runs' settings too.
   - What a panel sets for itself is marked, with ↺ to take it back; a shared layer changed in a
@@ -115,7 +122,7 @@ has a matching git tag.
   **Use the shared ones**. *What the grid varies* (Layout, at the figure) lists each row's and
   column's value, editable in place. A plan view or cross-section added to a free cell starts as
   a copy of the one beside it, at its own row's and column's run and time. See
-  [Rows and columns](guide/figures-panels.md#picking-a-row-or-a-column).
+  [Rows and columns](https://bobbysaba.com/docs/atmo3d/figures/panels/#picking-a-row-or-a-column).
 - **Figure workspace, click a part of the preview**: clicking a panel's title, an axis label,
   a row label, a panel label, a legend, a colorbar, or the figure's title or legend opens that
   setting where it is set (its tool, the place that owns it, its section open, the setting
@@ -123,7 +130,7 @@ has a matching git tag.
   its row or column, or its panel, as its mode says; a shared one says which panels it serves and
   whose colours it shows, with **Jump to** buttons for that panel's fill, all colorbars and the
   panel's own colorbar settings. Clicking elsewhere in a panel still picks it, and the *Click*
-  list's placing still comes first. See [Figures](guide/figures.md#the-editor).
+  list's placing still comes first. See [Figures](https://bobbysaba.com/docs/atmo3d/figures/#the-editor).
 - **The map's and the cross-section's layers on the figures' controls**: the Style drawer, More
   fills, Contours and Vectors of the map and of the Cross-section tool are now the same
   component as a figure's layers, from the same table of settings, so the names, ranges and
@@ -131,7 +138,7 @@ has a matching git tag.
   where they apply: *Min* and *Max* when *Auto range* is off, *Contour intervals* for filled
   contours, *Minus run* and *Minus time* with a difference, *Arrows across* or *Streamline
   density* by the vectors' style (each keeps its value). Opacity and line width are number
-  boxes (steps of 0.05 and 0.25) where they were sliders. See [The map](guide/map.md#style-the-fill).
+  boxes (steps of 0.05 and 0.25) where they were sliders. See [The map](https://bobbysaba.com/docs/atmo3d/guides/map/).
 - **Sessions keep the layers as they are drawn** (session FORMAT 3): the map's and the section's
   layers are saved in a figure layer's own keys (`field`, `z`, `reverse`, `minus`, ...). Sessions
   saved by 1.1.0 and earlier still open (read into the new form when loaded); a session saved
@@ -146,24 +153,24 @@ has a matching git tag.
 ## 1.1.0 (2026-11-20)
 
 - **Contributing**: a new page for first-time contributors (fork, set up, test, open a
-  pull request, what review looks for), [Contributing](contributing.md); pull request and
+  pull request, what review looks for), [Contributing](CONTRIBUTING.md); pull request and
   issue templates; the maintainer's side (collaborators, code owners, tag protection,
-  releases) in [Developing](developing.md#maintaining-the-repository).
+  releases) in [Developing](DEVELOPING.md#maintaining-the-repository).
 - **Extension API 1.0**: what a data-type package may use is now named and versioned
   (`atmo3d.API_VERSION`): a minor release only adds to it. A data type says the version
   it is written for (`Model.api`); one the core cannot serve is left out with a warning.
   `atmo3d.testing.check_datatype(key, folder)` checks a data type against the contract
-  in one call. See [Writing a data type](datatypes.md).
+  in one call. See [Writing a data type](https://bobbysaba.com/docs/atmo3d/extend/data-types/).
 - **The worked example of a data type**, `packages/example` (`atmo3d_example`): a small,
   real reader of gridded netCDF with named x, y, z and time (several times to a file, a
   staggered field, a unit converted on read, fill values), its synthetic run and tests,
   every file saying what is required and what is optional. Not installed with the app;
   CI runs its tests on every core change. See
-  [Writing a data type](datatypes.md#the-worked-example).
+  [Writing a data type](https://bobbysaba.com/docs/atmo3d/extend/data-types/#the-worked-example).
 - `tools/new_datatype.py <name>` starts a data type as a copy of the example, renamed,
   with its tests: in this repository (`packages/<name>`), or as a package of your own
   (`--out DIR`).
-- [A playbook for a coding agent](agents/add-datatype.md) that adds a data type: what to
+- [A playbook for a coding agent](https://bobbysaba.com/docs/atmo3d/extend/agent-playbook/) that adds a data type: what to
   ask, how to inspect the files without loading them, when to stop and ask, and what to
   report. `AGENTS.md` at the top of the repository points agents to it.
 - **Your own derived fields**: write a field as an expression in `fields.toml` (beside the
@@ -174,21 +181,21 @@ has a matching git tag.
   reason. Figures and sessions record the definitions they use, and reopen with them
   where the field is not defined (the figure's own wins where yours differs); data exports
   record the expression. Installed packages can add fields the same way
-  (`atmo3d.fields` entry points). See [Your own derived fields](guide/user-fields.md);
+  (`atmo3d.fields` entry points). See [Your own derived fields](https://bobbysaba.com/docs/atmo3d/guides/user-fields/);
   the checklist for adding a built-in one is in
-  [Developing](developing.md#adding-a-derived-field).
+  [Developing](DEVELOPING.md#adding-a-derived-field).
 
 ## 1.0.0 (2026-11-19)
 
 One core with a data type per package (CM1, WoFS and radar under `packages/`), and a
-registration API for more ([Writing a data type](datatypes.md#the-registration-calls)).
+registration API for more ([Writing a data type](https://bobbysaba.com/docs/atmo3d/extend/data-types/#the-registration-calls)).
 
 ### Radar volumes
 - A folder of CfRadial volumes (the bistatic KTLX files) opens as a run, read in native
   polar geometry. The map draws a sweep, a constant height or the column max / min; the PPI
   tool lists the sweeps and gives the gate and column under a click; cross-sections and 3D
   sample the volumes. New settings: `radar_sampling`, `radar_max_gap_km`. See
-  [Radar volumes](guide/radar.md).
+  [Radar volumes](https://bobbysaba.com/docs/atmo3d/guides/radar/).
 - **Optional regrid**, off unless chosen: the toolbar's *Native sweeps | Regridded* switch
   opens a dialog that confirms the settings (`radar_regrid_*`) before opening a regular-grid
   run, so series, figures, sessions and derived wind fields work on radar. Views are labelled
@@ -321,7 +328,7 @@ parts; `cm1view bench` and `--timing` to size a job.
   a swath over `--window` outputs), split into reading and computing, and ends with the most
   memory the job held (processes and cached fields); `cm1view RUN --timing` logs
   every update of a real session, browser included (`cm1view bench --report FILE` summarizes
-  it). [Running on a cluster](hpc.md#how-fast-is-it-here) says how to use them to size a job,
+  it). [Running on a cluster](https://bobbysaba.com/docs/atmo3d/cluster/) says how to use them to size a job,
   and what a grid larger than the job's memory needs.
 - The run picker has a **model** box (*Auto-detect* or a model) and lists the runs of that model;
   `cm1view --model` and `cm1view export --model` do the same on the command line.
@@ -333,7 +340,7 @@ parts; `cm1view bench` and `--timing` to size a job.
   with the ground drawn, soundings and column fields on each column's heights, 3D views on terrain.
   Trajectories are traced through the winds, and turned off when the output comes less often than
   the new `traj_max_interval` setting (300 s). Not supported: pressure decomposition, a
-  probability-matched mean, DART files ([WoFS](guide/wofs.md)).
+  probability-matched mean, DART files ([WoFS](https://bobbysaba.com/docs/atmo3d/guides/wofs/)).
 - `cm1view --demo wofs` opens a small synthetic WoFS ensemble.
 - WoFS runs know where their grid sits on the Earth: the map projection in the files (Lambert
   conformal, polar stereographic or Mercator), checked against their `XLAT`, `XLONG`. cm1view now
@@ -341,7 +348,7 @@ parts; `cm1view bench` and `--timing` to size a job.
   and Natural Earth data, about 5 MB; nothing is downloaded) and needs `pyproj`.
 - WoFS maps have a **Boundaries** pill: coastlines, countries, states, lakes and US counties
   (each on or off, colour and width), dotted lat/lon lines with edge labels, and lat, lon in the
-  map's hover; sessions keep them ([WoFS](guide/wofs.md#on-the-map)).
+  map's hover; sessions keep them ([WoFS](https://bobbysaba.com/docs/atmo3d/guides/wofs/#on-the-map)).
 - Figures of WoFS runs: a **Map boundaries** layer for plan views (the same lines, lat/lon
   lines labelled at the panel edges), on top of a new figure and copied from the map's
   Boundaries by *New figure from the map*; saved with the figure's data, so exported scripts
@@ -355,7 +362,7 @@ parts; `cm1view bench` and `--timing` to size a job.
 - Track files can hold **several storms**: a `storm` column names each row's storm. Saving a
   named storm replaces only its rows, and loading picks one storm (by default the first);
   `cm1view export --track-storm NAME` does the same. One-storm files are unchanged
-  ([Several storms in one file](guide/tracking.md#several-storms-in-one-file)).
+  ([Several storms in one file](https://bobbysaba.com/docs/atmo3d/guides/track-a-storm/#several-storms-in-one-file)).
 - The Track panel has a **Storm** box (shown for WoFS members, or when the file has storms):
   pick one of the file's storms to load it, or type a new name to save the track as that storm.
   The Storm chip and sessions keep the name, and switching member loads the same storm from that
@@ -366,7 +373,7 @@ parts; `cm1view bench` and `--timing` to size a job.
   viewer's storm, and `cm1view render --storm NAME` picks one for every run.
 - New `track_motion_window` setting: storm motion is fitted over this many minutes of track.
   auto is 0 for CM1 (centred differences, as before) and 30 for WoFS, whose fixes jump from
-  cycle to cycle ([Storm motion](guide/tracking.md#storm-motion)).
+  cycle to cycle ([Storm motion](https://bobbysaba.com/docs/atmo3d/guides/track-a-storm/#storm-motion)).
 - The run picker looks in a typed folder once it ends in `/` (or on Enter), not on every key,
   and never searches shared folders (`/`, top-level folders, folders owned by root, the folders
   above your home); nor does the runs_root search or the list of runs next to a run.
@@ -388,7 +395,7 @@ live differences and run time alignment.
 ### Figures
 
 - **A new figure editor**: three panes, a tree of what the figure holds, the preview, and an
-  inspector of what is picked ([The editor](guide/figures.md#the-editor)). Where you pick says what an
+  inspector of what is picked ([The editor](https://bobbysaba.com/docs/atmo3d/figures/#the-editor)). Where you pick says what an
   edit reaches: the figure, all panels of a kind, or one panel. It replaces the tabs and the panel
   tree, and panels of any kinds now share one grid in place of figure parts. Figures, templates and
   sessions saved earlier open in it, and figures with parts open as one grid. Exported scripts keep
@@ -397,17 +404,17 @@ live differences and run time alignment.
   MP4 video, saving the figure for several runs, tables as CSV and LaTeX, a colour-vision preview,
   Find for any setting, and a mark on settings that have changed.
 - **Copy a layer**: a layer's card has a copy button, for a second contour field or a fill with
-  another range ([What a layer is](guide/figures-layers.md#what-a-layer-is)).
+  another range ([What a layer is](https://bobbysaba.com/docs/atmo3d/figures/layers/#what-a-layer-is)).
 - **Undo keeps the cards**: undo and redo leave cards folded or open as they were, and cards the
   step did not change are left alone instead of being built again.
 - **A gallery of saved figures**: the new-figure dialog shows saved figures as thumbnails, newest
   first, in place of a list, and a click opens one. It can also apply a template
-  ([The New dialog](guide/figures.md#the-new-dialog)). Saving writes the thumbnail to
+  ([The New dialog](https://bobbysaba.com/docs/atmo3d/figures/)). Saving writes the thumbnail to
   `_src/<name>_thumb.png`.
 - **Apply to this run** works straight away: it failed on a template listed when the page opened
   until you picked one from the list.
 - **A figure survives a closed page**: the editor keeps the figure as you work, and the new-figure
-  dialog offers *Reopen the last figure* ([Reopening](guide/figures-export.md#reopening-a-saved-figure)). Session files now hold
+  dialog offers *Reopen the last figure* ([Reopening](https://bobbysaba.com/docs/atmo3d/figures/export/)). Session files now hold
   the figure too.
 - **One Export dialog**: *Export* above the preview holds where and how a figure is saved (save as,
   format, DPI, background, image size, script and data, download), and the preview has the room
@@ -415,11 +422,11 @@ live differences and run time alignment.
 - **Every saved figure can be reopened**: *Save* now also writes `_src/<name>_spec.json`, so a figure
   saved as an image alone appears under *Saved figures*.
 - **Exact image size**: *Image size* adds *Exact width, trim the height*, so a 3.25 in figure saves
-  at 3.25 in, not 3.27 in ([Image size](guide/figures-export.md#image-size)).
+  at 3.25 in, not 3.27 in ([Image size](https://bobbysaba.com/docs/atmo3d/figures/export/#image-size)).
 - **Saving waits for series**: a figure whose series are still being computed saves when they are
   done, instead of asking you to save again.
 - **Style presets**: *Style → Apply a style* gives the figure the Default, AMS journal, Talk or Dark
-  look in one go ([Style preset](guide/figures-style.md#style-preset)).
+  look in one go ([Style preset](https://bobbysaba.com/docs/atmo3d/figures/style/#style-preset)).
 - **Label sizes follow the base font**: in new figures, a blank *Size* on the panel letters, time,
   height and run labels is 1.2 × the base size. Saved figures keep their sizes.
 - **A figure of parts saves the same whichever part you are editing**: format, DPI, trimming,
@@ -448,7 +455,7 @@ live differences and run time alignment.
 - **Tables**: a new kind of figure, *Tables*, sets out sounding parameters and field statistics
   you pick across runs and times: rows and columns either way round, the values or their
   differences from the first run or first time. Several cards make one table
-  ([Tables](guide/figures-panels.md#tables)).
+  ([Tables](https://bobbysaba.com/docs/atmo3d/figures/panels/#tables)).
 - **No more gaps in a card's options**: when a choice shows another option (say *Vertical: At a
   height* showing *Height*), it now sits right beside the options around it, not one cell along.
 - **Pick a run's track file from a list**: *Track file* in *Layers → Runs used* lists the
@@ -469,7 +476,7 @@ live differences and run time alignment.
   distribution or azimuthal mean goes in an empty panel of the rows and columns you set, or
   with the last card when they are full, instead of always in a new panel. A grid that grew
   for a card goes back to your rows and columns when the card moves back or is removed.
-- **Y range for one time-series panel** ([Time series](guide/figures-panels.md#time-series)):
+- **Y range for one time-series panel** ([Time series](https://bobbysaba.com/docs/atmo3d/figures/panels/#time-series)):
   the **Tree** tab sets a panel's own *y from* and *y to* for its left axis. Blank boxes use
   the figure's values from *Layers → Plot*. Saved figures are unchanged.
 - **Tidier cards and sections**: cards now run where (run, time, panel), what, look, extras.
@@ -493,7 +500,7 @@ live differences and run time alignment.
   the height axis's range *Axis from* / *Axis to*; *Plot* on series and profile cards is now
   *Then apply*. The sounding layout is *Sounding layout*. Long hints fold after their first
   sentence: click to read the rest. Saved figures are unchanged.
-- **The Style tab shows what applies** ([Style](guide/figures-style.md#style)): settings
+- **The Style tab shows what applies** ([Style](https://bobbysaba.com/docs/atmo3d/figures/style/)): settings
   that change nothing for a figure kind are hidden, such as *Colorbar* on joint and azimuthal
   panels, *Contour key* away from maps, and axis labels and grid on a 3D scene. Saved
   figures are unchanged.
@@ -504,7 +511,7 @@ live differences and run time alignment.
   the *Minutes counted from* box and the series cards' *Time zero* appear only in figures
   that use them, and still count there. Series cards no longer edit storm tracks: they say
   what each run's track gives and point to *Runs used*. Saved figures are unchanged.
-- **Time zero per run** ([Runs](guide/figures-panels.md#runs)): plan views and
+- **Time zero per run** ([Runs](https://bobbysaba.com/docs/atmo3d/figures/panels/#runs)): plan views and
   cross-sections of several runs line up by time since each run's time zero, including
   their time labels, differences and ensembles. A time picked for a run stays its model
   time; figures saved before are unchanged. New time label text `{model}`: model minutes.
@@ -515,18 +522,18 @@ live differences and run time alignment.
   time (soundings, distributions, profiles, joint distributions, azimuthal means) move
   with a time zero and with a new run, as section cards do. Time labels (3D scenes too) and
   automatic legends count from the time zero.
-- **Line runs up by output number** ([Runs](guide/figures-panels.md#runs)): a figure's runs
+- **Line runs up by output number** ([Runs](https://bobbysaba.com/docs/atmo3d/figures/panels/#runs)): a figure's runs
   can pair by their nth output instead of by time zero. The first run's times label the panels
   and time axes; past a shorter run's end its panels are blank.
 - **Custom grid for figure parts**
-  ([Figure parts](guide/figures-panels.md#layout-and-size)): besides side by side and stacked,
+  ([Figure parts](https://bobbysaba.com/docs/atmo3d/figures/panels/#layout-and-size)): besides side by side and stacked,
   parts can go anywhere on a grid of rows and columns, each spanning as many cells as it
   needs, e.g. a plan view on the left with a cross-section above a sounding on its right.
   A map in the editor shows where the parts are. Figures saved before keep their layout.
 
 ### Parcels
 
-- **Parcel trajectories** ([Parcels](guide/parcels.md)): runs with CM1 parcel output
+- **Parcel trajectories** ([Parcels](https://bobbysaba.com/docs/atmo3d/guides/parcels/)): runs with CM1 parcel output
   (`cm1out_pdata.nc`; new setting `parcel_glob`; several files, e.g. one per restart,
   are joined by time) get a **Parcels** tool. Click the map to choose the parcels near a
   point, or drag a box, limited by height, by a value range of a parcel variable and by
@@ -540,47 +547,47 @@ live differences and run time alignment.
   domain; parcels that leave an open domain stop there. The demo run `supercell` now
   has parcels, written every 60 s. Reading, selection and caching are in
   `cm1view/core/parcels.py`, usable without the viewer.
-- **Parcels on cross-sections, in 3D and in a plot** ([Parcels](guide/parcels.md)): the
+- **Parcels on cross-sections, in 3D and in a plot** ([Parcels](https://bobbysaba.com/docs/atmo3d/guides/parcels/)): the
   parcels within a distance of a cross-section's line are drawn on it, projected (the
   parts of their tails near it, or the whole tails of those near it now), at the
   section's time; the sets' tails and heads are drawn in the 3D view inside its region.
   The Parcels panel plots a parcel variable over the parcel times (each parcel, the mean
   or median, and a band) or two variables against each other at the shown time.
-- **Parcels in figures** ([Parcels](guide/parcels.md#in-figures)): plan-view and
+- **Parcels in figures** ([Parcels](https://bobbysaba.com/docs/atmo3d/guides/parcels/)): plan-view and
   cross-section figures have a *Parcels* layer (tails up to each panel's time and heads
   there, in the set's colour or coloured by a parcel variable, with its own colorbar
   when the panel has no fill). *From the map* and *From the cross-section* bring the
   viewer's sets along, drawn as the viewer draws them. A layer keeps the rule that chose
   its set and chooses the parcels again when drawn, so saved figures, templates,
   animations, `cm1view-render` and exported scripts all carry them.
-- **Parcels in 3D scene figures** ([Parcels](guide/parcels.md#in-figures)): a 3D scene
+- **Parcels in 3D scene figures** ([Parcels](https://bobbysaba.com/docs/atmo3d/guides/parcels/)): a 3D scene
   draws parcel sets as lines with balls at the scene's time, inside its region, in the
   set's colour or coloured by a parcel variable (with a colorbar). *Copy the 3D view*
   brings the sets the 3D view shows. Restyling the parcels or changing the sets does not
   recompute the isosurfaces.
-- **Parcel series** ([Parcels](guide/parcels.md#parcel-series)): time-series figures
+- **Parcel series** ([Parcels](https://bobbysaba.com/docs/atmo3d/guides/parcels/)): time-series figures
   draw a parcel set's variable over the parcel times (**+ Parcels**): mean or median,
   a band over the parcels (min–max, percentiles or ± 1 sd) and, if you like, some
   parcels' own lines; *d/dt along the parcel* gives e.g. Dw/Dt. They share panels and
   y axes with computed series and your own data.
-- **3D fields at the parcels** ([Parcels](guide/parcels.md#3d-fields-at-the-parcels)):
+- **3D fields at the parcels** ([Parcels](https://bobbysaba.com/docs/atmo3d/guides/parcels/)):
   parcels can be coloured and plotted by any 3D field of the run, native or derived,
   sampled at their positions (trilinear in space, linear in time between the 3D outputs
   around each parcel time), in the viewer and in figures (parcel layers, 3D scenes and
   parcel series). Sampled once per set and field, then cached; in specs and scripts
   `@<field>`, e.g. `@thpert`.
-- **Export a parcel set** ([Parcels](guide/parcels.md#exporting-a-set)): *Export set*
+- **Export a parcel set** ([Parcels](https://bobbysaba.com/docs/atmo3d/guides/parcels/)): *Export set*
   writes a set's trajectories (any parcel variables and 3D fields at the parcels; all
   parcel times, up to the shown time or the last minutes) to netCDF (`(time, parcel)`
   arrays) or CSV (one row per parcel and time), in the background with Stop.
   `cm1view export RUN --parcels SET` does it for a saved set without the viewer.
-- **Parcels relative to the storm** ([Parcels](guide/parcels.md#relative-to-the-storm)):
+- **Parcels relative to the storm** ([Parcels](https://bobbysaba.com/docs/atmo3d/guides/parcels/#relative-to-the-storm)):
   *Seen from* draws the tails in a frame moving with the tracked storm or at a set
   motion, the same as the grid at the shown time (heads stay where they are), on the
   map, the cross-section and in the 3D view; figures' parcel layers and 3D scenes have
   it too. Exports can add storm-relative `x_sr`, `y_sr` (`--relative MIN` on the
   command line).
-- **Lagrangian w budget** ([Parcels](guide/parcels.md#the-w-budget)): with *w*, *b* and
+- **Lagrangian w budget** ([Parcels](https://bobbysaba.com/docs/atmo3d/guides/parcels/)): with *w*, *b* and
   *vpg* in the parcel output, two parcel variables computed along the trajectories,
   *Dw/Dt* (`dwdt`, from the parcel's own w) and *Dw/Dt − b − vpg* (`wres`, mixing and
   the rest), wherever parcel variables go (colour, plots, figures, export). The
@@ -605,31 +612,31 @@ live differences and run time alignment.
   as you left the 3D view) or *Copy the 3D view*; camera, look and region are in
   *Layers*. Scenes animate (*Export → Animation*), the box optionally following the
   storm track and the camera orbiting. The saved script redraws it with PyVista
-  ([3D scenes](guide/figures-panels.md#3d-scenes)). **New dependency: pyvista** (with
+  ([3D scenes](https://bobbysaba.com/docs/atmo3d/figures/panels/#3d-scenes)). **New dependency: pyvista** (with
   vtk-base); run `conda env update -f environment.yml --prune` after pulling.
 - **Derivatives of any field**: a **Derivative** select beside the Field (the map's
   fill; a figure's fill, contour and shading layers on plan views and cross-sections)
   plots ∂/∂z, ∂/∂x, ∂/∂y or |∇h| of it, per km (∂w/∂z in 10⁻³ s⁻¹), on the stretched
-  grid ([Derivatives of any field](guide/fields.md#derivatives-of-any-field)).
+  grid ([Derivatives of any field](https://bobbysaba.com/docs/atmo3d/ref/fields/#derivatives-of-any-field)).
   Series (the Series tab, and a figure's series and profile cards) have it too: the
   derivative is taken before the reduction, e.g. the maximum ∂w/∂z at 2 km.
 - **Profiles of several runs**: a profile card's *Run* can be **All runs** or
   **Several runs…** (a line per run), with an optional ensemble band (min–max,
   percentiles or ± 1 sd) and mean or median line, and the cards have **Duplicate** and
   **One per run**. *Plot* **d/dz** draws a profile's vertical derivative
-  ([Vertical profiles](guide/figures-panels.md#vertical-profiles)).
+  ([Vertical profiles](https://bobbysaba.com/docs/atmo3d/figures/panels/#vertical-profiles)).
 - **Edit a profile's values and draw your own**: a profile card's *Values (edit
   points)* edits or blanks levels by hand and downloads CSV; **+ Your data** draws a
   profile pasted or loaded from a file (height in km, value)
-  ([Profiles: edits and your own data](guide/figures-layers.md#profiles-edits-and-your-own-data)).
+  ([Profiles: edits and your own data](https://bobbysaba.com/docs/atmo3d/figures/layers/#profiles-edits-and-your-own-data)).
   Saved profile figures open as before.
 - **Edit a time series' values**: a series card's *Values (edit points)* replaces or
   blanks points by hand, per run, and downloads the line as CSV. Edits are kept in the
   figure and the edited line's legend label ends in "(edited)" (*Panels → Time and value
-  axes → Mark edited lines*) ([Editing a series' values](guide/figures-layers.md#editing-a-series-values)).
+  axes → Mark edited lines*) ([Editing a series' values](https://bobbysaba.com/docs/atmo3d/figures/layers/)).
 - **Your own data in a time series**: *Layers → + Your data* draws a series pasted or
   loaded from a CSV file (time in minutes, value), kept in the figure
-  ([Your own data](guide/figures-layers.md#your-own-data)).
+  ([Your own data](https://bobbysaba.com/docs/atmo3d/figures/layers/#your-own-data)).
 - **Legend entries of your own**: *Annotate → Add: Legend entry* puts a line, marker,
   line and marker or filled box with your text in the panels' legends.
 - **A blank label leaves a line out of the legend**: it showed as `_child1` before.
@@ -642,7 +649,7 @@ live differences and run time alignment.
   sections are opened, 980 before).
 - **Time zero per series**: each time series and time–height card has a **Time zero
   (min)**, so runs line up on a common stage (e.g. initiation at 0 min in one run and
-  30 min in another) ([Time series](guide/figures-panels.md#time-series)).
+  30 min in another) ([Time series](https://bobbysaba.com/docs/atmo3d/figures/panels/#time-series)).
 - **A time series' look is on its card**: the card's **Line** style (new) and colour
   apply to its line, also in a figure of several runs (before, a panel's only series
   took its run's colour, and a run's line style came from *Runs used*). *Runs used*
@@ -675,9 +682,9 @@ live differences and run time alignment.
   copies a card down its column, and *Grid and size → Runs are* is gone. Older
   time–height figures open as the same panels, a card each; switching between time
   series and time–height splits or merges the cards
-  ([Panels](guide/figures-panels.md#timeheight-series)).
+  ([Panels](https://bobbysaba.com/docs/atmo3d/figures/panels/#timeheight-series)).
 - **Hatching and stippling**: a shading layer's *Pattern* hatches, cross-hatches or
-  stipples its area ([Layers](guide/figures-layers.md)).
+  stipples its area ([Layers](https://bobbysaba.com/docs/atmo3d/figures/layers/)).
 - **Wind barbs** on plan views, in knots or m/s, as a vector layer's *Draw as*.
 - **Strip-averaged cross-sections**: *Average across* (km) averages the sections within
   a strip along the line; a *Section line* layer shows the strip.
@@ -687,33 +694,33 @@ live differences and run time alignment.
 - **Vertical profile panels**: a field's maximum, minimum, mean or percentile over the
   domain, a box or around the storm, against height, one line per run and time (or the
   mean over a time window); computed like a layer series and cached with them
-  ([Panels](guide/figures-panels.md#vertical-profiles)).
+  ([Panels](https://bobbysaba.com/docs/atmo3d/figures/panels/#vertical-profiles)).
 - **Joint distribution panels**: one field against another at the same points (at a
   height, over a layer or the whole depth, in the domain, a box or around the storm, at
   one time or over a time window), as a 2D histogram, a scatter or density contours
   enclosing chosen percentages, with a fit line and n, r, r², fit and means in a box
-  ([Panels](guide/figures-panels.md#joint-distributions)).
+  ([Panels](https://bobbysaba.com/docs/atmo3d/figures/panels/#joint-distributions)).
 - **Azimuthal mean panels**: a field's mean, maximum or minimum in radius bins against
   height around the tracked storm or a fixed point, within a sector of azimuths
   (clockwise from the storm's motion or from north), at one time or as a
   storm-following composite over a time window; the first in a panel shaded, the others
-  as contour lines ([Panels](guide/figures-panels.md#azimuthal-means)). A **Sector**
+  as contour lines ([Panels](https://bobbysaba.com/docs/atmo3d/figures/panels/#azimuthal-means)). A **Sector**
   layer outlines the sector on plan views.
 - **Ensemble bands** on time-series panels: a series over several runs as its mean or
   median and a shaded min–max, 10–90 %, 25–75 % or ±1 sd range, the runs faint or hidden
-  ([Panels](guide/figures-panels.md#time-series)).
+  ([Panels](https://bobbysaba.com/docs/atmo3d/figures/panels/#time-series)).
 - **Ensemble fills**: a fill layer as the mean, median, spread, min, max, range or
   probability of exceeding a threshold over several runs
-  ([Layers](guide/figures-layers.md#ensembles)).
+  ([Layers](https://bobbysaba.com/docs/atmo3d/figures/layers/#ensembles)).
 - **Several cross-sections in a figure**: *Panels → Sections* lists named sections,
   each x–z, y–z, angled (clockwise from north) or A–B, through the storm or fixed
   (fixed x–z / y–z default to the domain's centre and full length), and a section panel
   picks its own in the panel tree. Older figures' one section opens as the list's first
-  ([Panels](guide/figures-panels.md)).
+  ([Panels](https://bobbysaba.com/docs/atmo3d/figures/panels/)).
 - **Rows × columns**: *Rows are* and *Columns are* each step through runs, sections,
   times, fields or heights (e.g. 3 runs × an x–z and a y–z section), replacing *Panels
   differ in* and *Fill a grid*; older figures open as the same panels
-  ([Panels](guide/figures-panels.md#rows-and-columns)).
+  ([Panels](https://bobbysaba.com/docs/atmo3d/figures/panels/#rows-and-columns)).
 - **Sections labelled and drawn as they run**: an x–z or y–z section panel's x axis is
   x or y (from the storm's, or the model's), an angled or A–B one's the distance along
   it, each labelled so unless an x label is typed; a grid of rows and columns is
@@ -722,21 +729,21 @@ live differences and run time alignment.
   share their sections.
 - **Sections along and across the storm motion**: they turn with the tracked motion
   at each time (or its mean over a few minutes), centred on the storm or ahead of / right
-  of it ([Panels](guide/figures-panels.md)).
+  of it ([Panels](https://bobbysaba.com/docs/atmo3d/figures/panels/)).
 - **Section cards, one per panel**: cross-section figures now work like soundings.
   *Layers → Sections* has a card per panel with its run, time, section and panel number
   (*Duplicate*, *One per run*: runs × sections in a few clicks); the Panels tab keeps only
   what the figure shares, and drops the sections list and *Rows are* / *Columns are* for
   sections. A card's label is its panel's title. Older section figures open as the same
   panels, a card each; a *Section line* layer draws each section once
-  ([Panels](guide/figures-panels.md#vertical-cross-sections)).
+  ([Panels](https://bobbysaba.com/docs/atmo3d/figures/panels/#vertical-cross-sections)).
 
 - **`cm1view render`**: draws a saved figure or a template from the command line, with
   no viewer: as saved, or for each of several runs (`--run`, as a template of it), at
   another time (`--time`), as an image, a bundle (`--bundle`) or an animated GIF
   (`--gif`), with `{run}` / `{name}` in `--out`. For batch jobs after the runs finish;
-  Slurm and PBS examples in [Running on a cluster](hpc.md#figures-in-a-batch-job)
-  ([Drawing figures without the viewer](guide/figures-export.md#drawing-figures-without-the-viewer)).
+  Slurm and PBS examples in [Running on a cluster](https://bobbysaba.com/docs/atmo3d/cluster/)
+  ([Drawing figures without the viewer](https://bobbysaba.com/docs/atmo3d/figures/export/)).
 
 ### The viewer
 
@@ -744,7 +751,7 @@ live differences and run time alignment.
   (*Style → Difference: minus another time or run*): minus the output before, a fixed
   time, or another run at the same time (interpolated if its grid differs), drawn in
   `RdBu_r` symmetric about zero. A figure made from the map or section keeps it
-  ([The map](guide/map.md#style-the-fill)).
+  ([The map](https://bobbysaba.com/docs/atmo3d/guides/map/)).
 - **Sessions**: the bookmark button in the top bar saves what the viewer shows (time,
   map view, fill with its level, style and difference, more fills, contours, vectors,
   storm motion, storm track, soundings, cross-section, 3D setup, series, distributions,
@@ -752,28 +759,28 @@ live differences and run time alignment.
   distributions computed again);
   `?session=/path/to/file.json` opens a session (and its run) from the address.
   Saved under `<exports_dir>/<parent>_<run>/sessions` by default
-  ([Sessions](guide/index.md#sessions)).
+  ([Sessions](https://bobbysaba.com/docs/atmo3d/interface/)).
 - **netCDF export**: the new *Export data* button in the top bar writes fields (native,
   derived, derivatives, column fields and sounding parameters) of the whole domain, the
   map's view or a box, at chosen times, on the model levels or at heights (the map's
   values there), to a CF-style netCDF file, one time after another, with progress and
   Stop (the file keeps the times done). `cm1view export RUN --fields ...` does the same
-  from the command line or a batch job ([Exporting data](guide/index.md#exporting-data)).
+  from the command line or a batch job ([Exporting data](https://bobbysaba.com/docs/atmo3d/interface/)).
 - **Vorticity tendencies**: a new field group with ζ stretching (ζ ∂w/∂z), tilting
   (ξ ∂w/∂x + η ∂w/∂y), their sum, and the Okubo–Weiss parameter, in 10⁻⁴ s⁻², on the
   map, sections, 3D, series and figures
-  ([Vorticity tendencies](guide/fields.md#vorticity-tendencies)).
+  ([Vorticity tendencies](https://bobbysaba.com/docs/atmo3d/ref/fields/#vorticity-tendencies)).
 - **Column fields**: a new 2D field group made from a layer of each column: updraft
   helicity 2–5 km and 0–1 km (∫ w ζ dz), maximum ζ 0–1 km and column maximum w, on the
   map, series, distributions and figures
-  ([Column fields](guide/fields.md#column-fields)).
+  ([Column fields](https://bobbysaba.com/docs/atmo3d/ref/fields/#column-fields)).
 - **Sounding parameters**: bulk shear 0–1 and 0–6 km and storm-relative helicity 0–1
   and 0–3 km of every column (helicity relative to the tracked storm motion, else the
   domain motion), as 2D fields on the map, series, distributions and figures; and the
   CAPE, CIN and LCL height of surface-based, mixed-layer and most-unstable parcels, and
   fixed-layer STP and SCP, as the soundings compute them. Parcels are lifted in parallel
   on every n-th column (the new `column_stride` setting; auto keeps to about 250 000
-  columns) ([Sounding parameters](guide/fields.md#sounding-parameters)).
+  columns) ([Sounding parameters](https://bobbysaba.com/docs/atmo3d/ref/fields/#sounding-parameters)).
 - Series of horizontal divergence and baroclinic generation over a box or a disc now
   match the map at the region's edge (they were taken with one-sided differences there).
 - **Linked clicks**: clicking the track's time series shows that time; clicking the
@@ -804,7 +811,7 @@ workspace (differences, swaths, legends, statistics, a quick start).
 
 - **More fills** (up to three) over the first fill, each with its own field, level,
   colormap, range, opacity and colorbar, and *Clear outside range* so the fill
-  underneath shows ([The map](guide/map.md#more-fills)).
+  underneath shows ([The map](https://bobbysaba.com/docs/atmo3d/guides/map/#more-fills)).
 - **Contours** are now a list of up to six rows, each with its own field, level, levels,
   colour and line width, in place of the two fixed contour sets.
 - **Vectors** are a list of up to three rows: the wind (ground-, grid- or storm-relative),
@@ -819,7 +826,7 @@ workspace (differences, swaths, legends, statistics, a quick start).
 
 - The section has the **same layers as the map**: a fill with its Style, more fills,
   contours and vectors. Vectors are the in-plane components (along the section and
-  vertical) ([Cross-sections](guide/cross-sections.md)).
+  vertical) ([Cross-sections](https://bobbysaba.com/docs/atmo3d/guides/cross-sections/)).
 
 ### 3D
 
@@ -832,7 +839,7 @@ workspace (differences, swaths, legends, statistics, a quick start).
   exactly at the maximum length or the region's edge.
 - **Vectors** at a height in the scene, a list of up to three with the same vectors as
   the map (this replaces *Surface winds*), and **Re-render when time changes** can be
-  turned off ([3D](guide/3d.md)).
+  turned off ([3D](https://bobbysaba.com/docs/atmo3d/guides/3d/)).
 
 ### Storm tracking
 
@@ -841,15 +848,15 @@ workspace (differences, swaths, legends, statistics, a quick start).
 - **Fix at: Centroid** puts each fix at the field-weighted centre of the area around the
   peak, for a smoother track.
 - A **From / To** window replaces the direction setting: track backward by choosing an
-  earlier *From* ([Storm tracking](guide/tracking.md)).
+  earlier *From* ([Storm tracking](https://bobbysaba.com/docs/atmo3d/guides/track-a-storm/)).
 
 ### Figures
 
 - **Quick start** dialog the first time the Figure workspace opens, and a new-figure
-  button ([Figures](guide/figures.md#starting-a-figure)).
+  button ([Figures](https://bobbysaba.com/docs/atmo3d/figures/)).
 - **Open a saved figure from a list**: the quick start and *Export → Open a saved
   figure* list the figures saved in the *Figures* folder (⚙ Settings), this run's first
-  ([Export](guide/figures-export.md#reopening-a-saved-figure)). A reopened figure's
+  ([Export](https://bobbysaba.com/docs/atmo3d/figures/export/)). A reopened figure's
   *Save as* is where it was saved.
 - **Difference fills**: a fill layer minus another run or time, with a choice for runs
   on different grids.
@@ -906,11 +913,11 @@ workspace (differences, swaths, legends, statistics, a quick start).
 ### Under the hood
 
 - The package is split into `core`, `viewer`, `figures` and `pdecomp`; the large modules
-  are split into mixins and subpackages. The layout is in [Developing](developing.md).
+  are split into mixins and subpackages. The layout is in [Developing](DEVELOPING.md).
   Figures saved by earlier versions open as before, and exported scripts do not import
   cm1view.
 - Image tests compare typical figures with baselines in `tests/baseline/`
-  ([Developing](developing.md#tests)).
+  ([Developing](DEVELOPING.md#tests)).
 - A new documentation site: one page per area of the viewer, a troubleshooting page, a
   page of shortcuts and a glossary.
 

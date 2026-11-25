@@ -1,4 +1,4 @@
-"""User-defined derived fields: TOML expressions (docs/guide/user-fields.md).
+"""User-defined derived fields: TOML expressions (https://bobbysaba.com/docs/atmo3d/guides/user-fields/).
 
 A definition is a small dict (from the fields_file setting's [fields.<name>] tables, an
 installed package's `atmo3d.fields` entry point, or a saved figure or session):

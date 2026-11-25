@@ -117,7 +117,7 @@ tracing, pressure decomposition and the Parcels panel), `packages/wofs` (`atmo3d
 the WoFS reader, catalog and demo) and `packages/radar` (`atmo3d_radar`: the CfRadial
 and NEXRAD Level II readers and catalog). `packages/example` (`atmo3d_example`) is the worked example of a
 data type: no part of the app, it is the pattern new ones are copied from
-([Writing a data type](datatypes.md#the-worked-example)). `tests/`, `docs/` and `tools/`
+([Writing a data type](https://bobbysaba.com/docs/atmo3d/extend/data-types/#the-worked-example)). `tests/` and `tools/`
 stay at the top. Install the four
 editable (`pip install -e packages/core -e packages/cm1 -e packages/wofs -e packages/radar`; the
 conda environment does it). The paths below are relative to `packages/core/src/` unless
@@ -258,7 +258,6 @@ figures/                  the Figure workspace
   times.py                helpers for model times and typed heights
 
 tests/                    pytest suite: core/, and a folder per data-type package
-docs/                     these pages
 ```
 
 A mixin's methods run as the Viewer's (or the editor's) own: they use its widgets and
@@ -271,7 +270,7 @@ A data type is a package of its own, found through an entry point; nothing in th
 changes. `tools/new_datatype.py <name>` starts one from the worked example
 (`packages/example`). The walk-through, what a data type must provide, the extension API
 and its version, and the conformance check `atmo3d.testing.check_datatype` are in
-[Writing a data type](datatypes.md).
+[Writing a data type](https://bobbysaba.com/docs/atmo3d/extend/data-types/).
 
 ## Adding a derived field
 
@@ -293,7 +292,7 @@ and its `func` gets `c["memo"]`, a dict shared by the fields of one time (so SB 
 SB CIN and STP lift the SB parcel once), and `c["threads"]`.
 
 A field only one person needs does not have to be built in: it can be an expression in
-their own file ([Your own derived fields](guide/user-fields.md)). Build one in when
+their own file ([Your own derived fields](https://bobbysaba.com/docs/atmo3d/guides/user-fields/)). Build one in when
 others will use it, or when an expression cannot write it (a column field, a parcel).
 
 ### Checklist for a new derived field
@@ -314,12 +313,13 @@ fails until it is added. A pull request that adds a field has:
    optional input.
 4. **A `note`**: what it leaves out or assumes, in a sentence ("Over liquid water at
    every temperature").
-5. **A row in [Derived fields](guide/derived-fields.md)**: name, label and units, the
+5. **A row in [Derived fields](https://bobbysaba.com/docs/atmo3d/ref/derived-fields/)**: name, label and units, the
    equation as coded, inputs, and the note word for word
-   (`test_docs_page_lists_every_field_and_note` checks both).
+   (`test_docs_page_lists_every_field_and_note` checks both, against the site's source
+   when `ATMO3D_SITE_DOCS` points at it).
 6. **Its name in `CONFIRMED`** (`core/fields.py`), added once the review agrees with the
    equation and the test.
-7. **A line in [Changes](changelog.md)** under *Unreleased*.
+7. **A line in [Changes](CHANGELOG.md)** under *Unreleased*.
 
 The reviewer checks the equation against its source, the units at each step, and that
 the test's answer was worked out independently of the code.
@@ -335,30 +335,27 @@ its components. Also add its arrow units to `KEY_UNITS` in
 `atmo3d/figures/draw/layers.py`, because exported figures draw their key arrows without
 the viewer.
 
-## Building the documentation
+## Documentation
 
-The site is built by MkDocs (Material theme) from `README.md` and `CONTRIBUTING.md` (the
-home page and *Contributing*, made by `docs/hooks/readme.py`, so each has one source) and
-`docs/`, with the pages listed under `nav` in `mkdocs.yml`:
+The user documentation is at <https://bobbysaba.com/docs/atmo3d/>; there are no doc pages
+in this repository. After a push to `master` the maintainer's site is brought up to date
+from the code and from [Changes](CHANGELOG.md), so a pull request does not edit pages.
+What it does need is a line under *Unreleased* in [Changes](CHANGELOG.md) for anything a
+user can notice, written so that someone who has not read the diff could document it:
+what changed, the setting or flag that goes with it, and the old behaviour if it differs.
 
-```bash
-pip install "mkdocs>=1.6,<2" "mkdocs-material>=9.5,<10"
-mkdocs serve           # preview at http://127.0.0.1:8000
-mkdocs build --strict  # what the GitHub Actions workflow runs
-```
+`README.md`, `CONTRIBUTING.md`, this file and `CHANGELOG.md` stay in the repository; the
+other files that explain the design (`docs-dev/`) are working notes, not user
+documentation.
 
-`--strict` turns warnings into errors, so a link to a missing page, or a page missing from
-`nav`, fails the build. A new page needs an entry in `nav`. Link between pages with
-relative paths (`soundings.md#comparing-places-and-times`); anchors are the lower-case,
-hyphenated headings. The workflow in `.github/workflows/docs.yml` publishes on a push that
-changes `README.md`, `CONTRIBUTING.md`, `docs/` or `mkdocs.yml`.
-
-When behaviour changes, change the page that describes it in the same commit, and add a
-line to [Changes](changelog.md).
+The page-by-page tests (`test_docs_page_lists_every_field_and_note`,
+`test_the_docs_pages_examples_work`) read the site's source. They skip unless
+`ATMO3D_SITE_DOCS` is set to the directory of the atmo3d pages
+(`src/content/docs/atmo3d` in the site's repository).
 
 ## Maintaining the repository
 
-How a contributor works is in [Contributing](contributing.md). This section is the
+How a contributor works is in [Contributing](CONTRIBUTING.md). This section is the
 maintainer's side: who can do what on GitHub, and how a release is made.
 
 ### Branch protection
@@ -406,7 +403,7 @@ Versions follow `MAJOR.MINOR.PATCH`, the same in every package, with a matching 
 
 1. On a branch, set the version in `pyproject.toml`, `packages/*/pyproject.toml` (all
    five, the example's too) and `__version__` in `packages/core/src/atmo3d/__init__.py`.
-2. Move the *Unreleased* heading of [Changes](changelog.md) to the new version and date.
+2. Move the *Unreleased* heading of [Changes](CHANGELOG.md) to the new version and date.
 3. Run the full suite (`pytest`, on a compute node), merge the pull request, then tag the
    merge commit on `master` and push the tag:
 

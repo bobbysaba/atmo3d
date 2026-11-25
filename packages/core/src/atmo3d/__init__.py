@@ -15,7 +15,7 @@ __version__ = "2.3.0"
 
 # The version of the extension API: what a data-type package may use (the registration
 # calls, Model, Catalog, Source / Run and their hooks, the roles and capabilities, and
-# atmo3d.testing; docs/datatypes.md lists it).  MAJOR.MINOR: a minor release only adds to
+# atmo3d.testing; https://bobbysaba.com/docs/atmo3d/extend/data-types/ lists it).  MAJOR.MINOR: a minor release only adds to
 # it; anything a package could rely on changes only with the major number.  A Model says
 # which version it was written for (Model.api); core.models.register refuses one whose
 # major differs, or whose minor is newer than this core's.

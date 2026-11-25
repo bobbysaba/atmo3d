@@ -19,10 +19,10 @@ documentation site as *Contributing*.
 
 A monorepo: `packages/core` (import name `atmo3d`: the viewer, figures, caching and the
 data-type registry) and one package per data type: `packages/cm1` (`atmo3d_cm1`),
-`packages/wofs` (`atmo3d_wofs`) and `packages/radar` (`atmo3d_radar`). `tests/`, `docs/`
+`packages/wofs` (`atmo3d_wofs`) and `packages/radar` (`atmo3d_radar`). `tests/`
 and `tools/` are shared. The core never imports a data-type package; a data type plugs
 in through an entry point. The file-by-file layout is in
-[Developing](docs/developing.md#layout).
+[Developing](DEVELOPING.md#layout).
 
 ## Set up
 
@@ -53,9 +53,11 @@ in through an entry point. The file-by-file layout is in
         git switch -c short-name-of-change
 
 2. Keep each commit to one step that works on its own. A pull request may hold several.
-3. **Change the documentation with the code.** If what the user sees changes, change the
-   page in `docs/` that describes it in the same commit, and add a line under
-   *Unreleased* in [Changes](docs/changelog.md).
+3. **Describe the change in [Changes](CHANGELOG.md).** If what the user sees changes, add
+   a line under *Unreleased*: what changed, the setting or flag that goes with it, and
+   the old behaviour if it differs. The documentation pages are on the
+   [documentation site](https://bobbysaba.com/docs/atmo3d/) and are updated from that
+   line and the code after the merge, so you do not edit them.
 4. If your branch falls behind `master`, rebase it (`git pull --rebase upstream master`)
    rather than merging `master` into it.
 
@@ -96,12 +98,12 @@ so it is as fast as the machine allows; plain `pytest` runs them one at a time.
 - **Image tests** (`tests/core/test_images.py`) compare figures with the PNGs in
   `tests/baseline/`. Do not rewrite baselines unless your change is meant to move a
   figure; when it is, say so in the pull request. How to rewrite them is in
-  [Developing](docs/developing.md#tests).
+  [Developing](DEVELOPING.md#tests).
 - **A new feature needs a test**, and a fix a test that failed before it. For a derived
   field, the test checks it against an answer worked out by hand (see
   `tests/core/test_derived_analytic.py`); the rest of what its review needs is the
-  [checklist](docs/developing.md#checklist-for-a-new-derived-field). A field only you
-  need can stay [your own](docs/guide/user-fields.md), with no pull request.
+  [checklist](DEVELOPING.md#checklist-for-a-new-derived-field). A field only you
+  need can stay [your own](https://bobbysaba.com/docs/atmo3d/guides/user-fields/), with no pull request.
 
 ## Open a pull request
 
@@ -125,7 +127,7 @@ owners of its own, who then review changes inside it.
 - **It is tested** as above, and the existing tests still pass.
 - **It stays in its place.** Core code does not import a data-type package; a data type
   adds itself through the registration API
-  ([Writing a data type](docs/datatypes.md#the-registration-calls)) instead of editing the core.
+  ([Writing a data type](https://bobbysaba.com/docs/atmo3d/extend/data-types/#the-registration-calls)) instead of editing the core.
 - **The documentation matches**, and the changelog has a line for anything a user notices.
 - **It is no bigger than it needs to be.** Unrelated clean-ups go in a pull request of
   their own.
@@ -153,5 +155,5 @@ own under `packages/<name>/`, with a `pyproject.toml` and an entry point in the
 which copies the worked example (`packages/example`) under the new name, with its tests
 and test list, and prints the few lines left to add by hand (CI, `environment.yml`, the
 root `pyproject.toml`, yourself as its owner in `.github/CODEOWNERS`). Then follow
-[Writing a data type](docs/datatypes.md#step-by-step). CM1, WoFS and radar are the
+[Writing a data type](https://bobbysaba.com/docs/atmo3d/extend/data-types/#step-by-step). CM1, WoFS and radar are the
 examples of what more a data type can do.

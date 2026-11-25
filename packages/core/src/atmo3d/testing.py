@@ -1,4 +1,4 @@
-"""Checks for data-type packages (part of the extension API, docs/datatypes.md).
+"""Checks for data-type packages (part of the extension API, https://bobbysaba.com/docs/atmo3d/extend/data-types/).
 
     from atmo3d.testing import check_datatype
     check_datatype("mytype", folder)      # a test of a new data type: one line

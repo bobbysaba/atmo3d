@@ -32,5 +32,5 @@ body:
     attributes:
       label: Writing it
       options:
-        - label: I would like to write it myself (see "Adding a data type" in docs/developing.md)
+        - label: I would like to write it myself (see "Adding a data type" in DEVELOPING.md)
         - label: I could be its owner and review changes to it
