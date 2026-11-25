@@ -98,7 +98,8 @@ The first row starts as w at 3 km with levels `5, 15, 25`. The second you add st
 ## Vectors
 
 *Vectors* draws arrows or streamlines, up to three layers. The first row starts off (tick
-its **Drawn** box to show it); the others you add start on.
+its **Drawn** box to show it); the others you add start on. A run with none of the fields a
+vector needs (no `u`, `v`: a NEXRAD Level II folder) has no *Vectors* menu.
 
 | Setting | Meaning |
 |---|---|

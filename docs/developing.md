@@ -18,7 +18,7 @@ processes and renders figures.
   data-type packages installed, though the core never imports them); `tests/cm1/`,
   `tests/wofs/`, `tests/radar/` and `tests/example/` test one package each. The shared
   setup stays in `tests/`: `conftest.py`, the synthetic data (`synthetic.py`,
-  `synthetic_wofs.py`, `synthetic_radar.py`), `catalog_checks.py` and `baseline/`. A test imports these by name (`from synthetic_wofs import make_wofs`),
+  `synthetic_wofs.py`, `synthetic_radar.py`, `synthetic_level2.py`), `catalog_checks.py` and `baseline/`. A test imports these by name (`from synthetic_wofs import make_wofs`),
   never another test file.
 - **In parallel.** `pytest -n auto` (pytest-xdist) runs the tests in one worker per CPU
   the job may use, at most 8: the CPUs the process is allowed (a PBS or Slurm job's
@@ -106,6 +106,7 @@ Files in `tests/core/` unless the row says otherwise.
 | `cm1/test_real.py`, `wofs/test_real_wofs.py` | Your own output (marker `real`) |
 | `example/test_example.py`, `example/test_new_datatype.py` | The worked example data type (`packages/example`), on its own synthetic run: the contract check and its reads; the scaffold (`tools/new_datatype.py`) in both modes |
 | `radar/test_radar_*.py` | Radar, on `tests/synthetic_radar.py` (analytic answers): reader, PPI, sampler, regrid, hand-worked cases |
+| `radar/test_radar_level2.py`, `test_radar_aws.py`, `test_radar_live.py`, `test_radar_dealias.py` | NEXRAD Level II on `tests/synthetic_level2.py`: the decoder and runs, AWS fetching and live mode (a fake archive, no network), velocity dealiasing on folded analytic winds |
 | `radar/test_real_radar.py` | Your own radar folder: `ATMO3D_RADAR_ROOT=... pytest -m real` |
 
 ## Layout

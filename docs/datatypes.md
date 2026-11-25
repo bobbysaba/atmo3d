@@ -194,7 +194,7 @@ The first two are needed; the rest are for data types that bring tools of their 
 | | Member | What it is |
 |---|---|---|
 | needed | `key`, `label` | the data type's key (also `Run.model` and the catalog's key) and its name in lists |
-| needed | `api` | the extension API it is written for (`"1.0"`) |
+| needed | `api` | the extension API it is written for (`"1.1"`; one written for `"1.0"` still loads) |
 | needed | `run_class` | the reader class (a property, so the module loads only when a run opens) |
 | needed | `looks(entries)` | from one folder listing (`os.scandir` entries, no more reads): is it a run of this type? |
 | needed | `count(path)` | the number of output times in the folder (0: none) |

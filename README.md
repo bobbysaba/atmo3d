@@ -2,7 +2,9 @@
 
 An interactive viewer for [CM1](https://www2.mmm.ucar.edu/people/bryan/cm1/) netCDF
 output (`output_format = 2`, one time per file). It runs where your output is (usually
-a cluster) and opens in your own browser.
+a cluster) and opens in your own browser. It also opens [WoFS and WRF ensembles](docs/guide/wofs.md)
+and [radar volumes](docs/guide/radar.md): CfRadial, and NEXRAD Level II folders, which it can
+download from the AWS archive, live as the radar scans.
 
 - **Map**: layered plan views of any native or derived field (filled, contoured, wind
   arrows or streamlines), at a height, a model level, or a column max / min.
