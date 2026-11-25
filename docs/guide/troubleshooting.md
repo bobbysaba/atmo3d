@@ -102,6 +102,24 @@ see [Installing](../install.md#3d-scene-figures-and-opengl).
 **Clicking a streamline does nothing.** An isosurface in front of it can catch the click.
 Lower its opacity or switch it off.
 
+## Radar
+
+**NEXRAD from AWS says it could not reach the archive.** The machine running atmo3d has
+no internet, as compute nodes often do. Fetch from a login node with `atmo3d-nexrad`
+and open the folder; for live data, run `atmo3d-nexrad SITE --live` there and turn on
+*Follow new volumes*. See [Radar volumes](radar.md#from-the-aws-archive).
+
+**A live page does not move to new volumes.** Only a page at the newest time follows
+them; one looking back says how many came (↻ reload adds them). Where another process
+fetches, *Follow new volumes* must be on. The page checks the folder every 20 s.
+
+**Dealiased velocity has a patch of the wrong sign.** A small echo touching no other, or
+very sharp shear, can be unfolded wrongly; compare with *Radial velocity*. See
+[Dealiased velocity](radar.md#dealiased-velocity).
+
+**There are no Vectors, or no 3D streamlines.** The run has no winds (`u`, `v`), as
+Level II folders never do; a native radar run has no 3D vectors or streamlines at all.
+
 ## Settings
 
 **A setting did not take effect.** `port`, `cache_gb` and `workers` apply after a restart.

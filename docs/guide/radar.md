@@ -35,6 +35,12 @@ The picker lists the folder as *N volumes*. Times are the files' times, in UTC.
   from the retrieved `u` and `v`.
 - **Radial velocity (dealiased)** is offered wherever the files have `velocity` (below).
 
+Off on a native radar run: Series and Distribution, 3D vectors and streamlines, the Figure
+workspace and sessions. They work on a regridded run.
+
+A radar without retrieved winds (`u`, `v`; every Level II folder) has no vectors: the
+map's and the cross-section's *Vectors* menus are not shown.
+
 ## Dealiased velocity
 
 A Doppler radar measures radial velocity only within ± its Nyquist velocity: faster winds
@@ -52,12 +58,6 @@ It takes about 0.1 s a sweep, and is kept like any other field once read. Like e
 dealiasing method it can be wrong where the echo is patchy or the shear is sharp (a
 tornado's couplet); compare with *Radial velocity* when a value looks off. A sweep with
 no Nyquist velocity in its file is shown as measured.
-
-Off on a native radar run: Series and Distribution, 3D vectors and streamlines, the Figure
-workspace and sessions. They work on a regridded run.
-
-A radar without retrieved winds (`u`, `v`; every Level II folder) has no vectors: the
-map's and the cross-section's *Vectors* menus are not shown.
 
 ## NEXRAD Level II
 
@@ -125,6 +125,8 @@ atmo3d-nexrad KTLX --live --hours 3 --every 120 # from 3 hours ago, checking eve
 ```
 
 and turn on **Follow new volumes** in the PPI tool of the page showing that folder.
+`atmo3d-nexrad KTLX 2013-05-20T19:30 --live` starts from a given time instead; `--every`
+is at least 15 s.
 `Ctrl-C` stops the command. A live folder grows by about 10 MB a volume (some 3 GB a
 day): delete old volumes when done.
 
@@ -166,5 +168,13 @@ Switching between native and regridded changes sweep-mode map layers to a 1 km h
 
 ## Trying it
 
-There is no shipped radar demo run. The tests use a small synthetic radar
-(`tests/synthetic_radar.py`); see [Developing](../developing.md).
+There is no shipped radar demo run, but any past case can be fetched from the archive:
+the 20 May 2013 Moore, Oklahoma tornado, for one, is
+
+```sh
+atmo3d-nexrad KTLX 2013-05-20T19:30 2013-05-20T20:30   # about 14 volumes, 120 MB
+```
+
+(or *NEXRAD from AWS…* in the run picker). The tests use small synthetic folders
+(`tests/synthetic_radar.py`, CfRadial; `tests/synthetic_level2.py`, Level II); see
+[Developing](../developing.md).
