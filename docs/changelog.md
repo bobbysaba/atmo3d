@@ -3,7 +3,7 @@
 What changed in each release, newest first. The version is in `pyproject.toml`; a release
 has a matching git tag.
 
-## Unreleased
+## 2.3.0 (2026-11-24)
 
 - **NEXRAD Level II**: a folder of WSR-88D Level II files (`KTLX20130520_195111_V06`,
   `.gz` or not) opens as a radar run, decoded by atmo3d itself. The low elevations'

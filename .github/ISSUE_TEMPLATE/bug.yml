@@ -33,7 +33,7 @@ body:
       label: Versions
       description: The output of `pip list | grep -i atmo3d`, and the operating system and browser.
       placeholder: |
-        atmo3d-core 2.2.0 ...
+        atmo3d-core 2.3.0 ...
         Linux (Casper), Firefox 140
       render: text
     validations:

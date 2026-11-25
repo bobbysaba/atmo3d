@@ -11,7 +11,7 @@ or <https://www.gnu.org/licenses/>."""
 
 import os as _os
 
-__version__ = "2.2.0"
+__version__ = "2.3.0"
 
 # The version of the extension API: what a data-type package may use (the registration
 # calls, Model, Catalog, Source / Run and their hooks, the roles and capabilities, and
