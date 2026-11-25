@@ -1,6 +1,7 @@
 """Field catalog (native + derived), display defaults and colormaps."""
 
 import threading
+import weakref
 from collections import OrderedDict
 
 import numpy as np
@@ -732,6 +733,13 @@ def layer_top(d, run):
     return float(run.zf[-1]) if d.layer[1] is None else float(d.layer[1])
 
 
+def layer_faces(zf, ks):
+    """(bottoms, tops) km of the cells of levels ks, from cell faces zf ((nk + 1,), or
+    each column's (nk + 1, ...)): a column field's c["faces"] (user layer functions)."""
+    zf, ks = np.asarray(zf, dtype=np.float64), np.asarray(ks, dtype=np.int64)
+    return zf[ks], zf[ks + 1]
+
+
 def column_levels(z, zf, z0, z1, edges=False):
     """(ks, dz) of a column layer z0..z1 km AGL (z1 None: the model top): the model
     levels (heights z, km) whose cells (between the zf levels) reach into it, and each
@@ -830,9 +838,12 @@ def listed(d):
 class Groups(OrderedDict):
     """group_options' {group: {label: name}}, with .tips: {name: the field's note} for
     the pickers' tooltips (a copy made of it by hand just goes without tips), and .off:
-    [(group, label, why)] of user fields this run cannot compute (shown greyed out)."""
+    [(group, label, why)] of user fields this run cannot compute (shown greyed out),
+    and .user_ndim: the ndim the lists were made for (None: every field), so a menu's
+    User section can be made again when the definitions change (viewer.fieldmenu)."""
     tips = {}
     off = ()
+    user_ndim = "?"  # (not known: a list not made by group_options)
 
 
 def user_group(group):
@@ -874,6 +885,7 @@ def group_options(defs, ndim=None, label=None, off=()):
     out.off = [(user_group(u["group"]),
                 f"{u['label']} [{u['name']}]" if u["name"] else u["label"], why)
                for u, why in off]
+    out.user_ndim = ndim
     return out
 
 
@@ -1032,6 +1044,15 @@ def _batch(d, n, got):
     return [m for m in deps[deps.index(n):] if m not in got]
 
 
+_ALL = weakref.WeakSet()  # (every Fields made: sync_all_user)
+
+
+def sync_all_user():
+    """Every open run's Fields binds the user fields again (core.userfields.reload)."""
+    for F in list(_ALL):
+        F.sync_user()
+
+
 class Fields:
     def __init__(self, run):
         from .services import pdecomp
@@ -1075,6 +1096,7 @@ class Fields:
         # session brings definitions of its own (sync_user)
         self.user_off, self._user_key = [], None
         self.sync_user()
+        _ALL.add(self)
 
     # ---- user-defined fields
     def sync_user(self):
@@ -1084,27 +1106,59 @@ class Fields:
         package that could not be read (userfields.problems)."""
         from . import userfields
         specs = userfields.current()
-        key = tuple((d["name"], d["expr"], d["units"], d["error"]) for d in specs)
+        key = tuple(tuple((k, str(d.get(k))) for k in sorted(d)) for d in specs)
         if key == self._user_key:
             return
-        natives = {n: d for n, d in self.defs.items() if not d.derived and d.user is None}
-        made, off = userfields.bind(specs, self.run.vars, self.cat, self._builtins,
-                                    scales={n: d.scale for n, d in natives.items()},
-                                    ndims={n: d.ndim for n, d in natives.items()})
+        if self._user_key is not None:  # (definitions changed: drop what they made)
+            self._forget_user({n for n, d in self.defs.items() if d.user is not None}
+                              | {d["name"] for d in specs})
+        made, off = self.bind_user(specs)
         defs = OrderedDict((n, d) for n, d in self.defs.items() if d.user is None)
-        grid = getattr(self.run, "grid", True)
         for d in made:
-            if d.storm and not getattr(self.run, "storm_relative", True):
-                off.append((d.user, "needs a storm motion, which this run has none"))
-            elif not grid and not d.pointwise:
-                off.append((d.user, "uses derivatives, which need a grid this run lacks"))
-            else:
-                defs[d.name] = d
+            defs[d.name] = d
         probs = userfields.problems()  # (a file or package that could not be read)
         if probs:
             off.insert(0, (dict(name="", label=userfields.NOT_READ, group=""),
                            "; ".join(probs)))
         self.defs, self.user_off, self._user_key = defs, off, key
+
+    def bind_user(self, specs, mark=True):
+        """(FieldDefs, off) of user-field definitions `specs` on this run
+        (core.userfields.bind, then what this run lacks: a storm motion, a grid); mark
+        False: only a check (the editor's, of text not saved)."""
+        from . import userfields
+        natives = {n: d for n, d in self.defs.items() if not d.derived and d.user is None}
+        made, off = userfields.bind(specs, self.run.vars, self.cat, self._builtins,
+                                    scales={n: d.scale for n, d in natives.items()},
+                                    ndims={n: d.ndim for n, d in natives.items()},
+                                    mark=mark)
+        grid = getattr(self.run, "grid", True)
+        ok = []
+        for d in made:
+            if d.storm and not getattr(self.run, "storm_relative", True):
+                off.append((d.user, "needs a storm motion, which this run has none"))
+            elif not grid and d.column:
+                off.append((d.user, "uses layer functions, which need a grid this run "
+                                    "lacks"))
+            elif not grid and not d.pointwise:
+                off.append((d.user, "uses derivatives, which need a grid this run lacks"))
+            else:
+                ok.append(d)
+        return ok, off
+
+    def _forget_user(self, names):
+        """Drop every cached plane and volume of user fields `names` and their
+        derivatives (their definitions changed: core.userfields.reload)."""
+        hit = {n for n in names if n}
+        with self._lock:
+            for k in [k for k in self._planes if split_deriv(k[0])[1] in hit]:
+                self._plane_bytes -= self._planes.pop(k).nbytes
+            derivs = [n for n in self._derivs if split_deriv(n)[1] in hit]
+            for n in derivs:
+                del self._derivs[n]
+        forget = getattr(self.run, "forget_fields", None)
+        if forget is not None:
+            forget(hit | set(derivs))
 
     def user_task(self):
         """What the series worker needs to bind this run's user fields (it is its own
@@ -1257,12 +1311,12 @@ class Fields:
         every column_stride-th column, each block of columns showing its middle one)."""
         run = self.run
         if run.terrain:  # (each column's own levels: per-column thickness, heights)
-            ks, dz, zk = column_levels_3d(run.heights(t), run.heights(t, w=True),
-                                          *d.layer, edges=d.edges)
+            zw = run.heights(t, w=True)
+            ks, dz, zk = column_levels_3d(run.heights(t), zw, *d.layer, edges=d.edges)
         else:
             ks, dz = d.levels(run.z, run.zf)
-            zk = run.z[ks]
-        c = dict(ctx, dz=dz, zk=zk, top=layer_top(d, run))
+            zk, zw = run.z[ks], run.zf
+        c = dict(ctx, dz=dz, zk=zk, top=layer_top(d, run), faces=layer_faces(zw, ks))
         got = {}  # (the inputs' levels, read together when the first is asked for)
 
         def layers(n, rows=None, cols=None):
@@ -1289,7 +1343,8 @@ class Fields:
         c0, c1, ti, bi = stride_cols(0, run.ni, run.ni, s)
         if run.terrain:  # (the heights of the columns computed)
             c.update(dz=dz[:, r0:r1, c0:c1][:, tj][:, :, ti],
-                     zk=zk[:, r0:r1, c0:c1][:, tj][:, :, ti])
+                     zk=zk[:, r0:r1, c0:c1][:, tj][:, :, ti],
+                     faces=tuple(x[:, r0:r1, c0:c1][:, tj][:, :, ti] for x in c["faces"]))
         a = d.func(lambda n: layers(n, r0 + tj, c0 + ti), c)  # (only those columns)
         return np.asarray(a)[np.ix_(bj, bi)]
 

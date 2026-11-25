@@ -805,6 +805,13 @@ class Source:
         self._vc.drop(lambda k: k[0] == self.path and k[2] == t
                       and (k[1] in names or k[1].split("@")[0].lstrip("~") in names))
 
+    def forget_fields(self, names):
+        """Drop cached volumes of `names` at every time (and derived volumes '~name...'
+        of them): user fields whose definitions changed (core.fields.Fields)."""
+        names = set(names)
+        self._vc.drop(lambda k: k[0] == self.path
+                      and (k[1] in names or k[1].split("@")[0].lstrip("~") in names))
+
     def fits(self, nbytes):
         """Whether volumes of nbytes together belong in the 3D cache: within 1 /
         FIT_SHARE of its budget.  A larger request reads only the part of each field

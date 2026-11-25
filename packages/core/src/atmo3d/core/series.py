@@ -263,8 +263,8 @@ def _worker(task):
     npts) or dict(t, error).  A derivative (task "op", of field task "field") and
     derived fields that are not pointwise are computed on the region plus a one-point
     border (task "halo"), so their values at its edge are those of the map."""
-    from .fields import (column_levels_3d, ddz_level, hgrad, hgrad_level, split_deriv,
-                         stride_cols)
+    from .fields import (column_levels_3d, ddz_level, hgrad, hgrad_level, layer_faces,
+                         split_deriv, stride_cols)
     from .run import open_source
 
     t = task["t"]
@@ -302,16 +302,19 @@ def _worker(task):
             def base(fetch):
                 """The field (not yet differentiated) on the box read."""
                 if fdef is not None and fdef.column:  # (its layer's levels only)
-                    ks, dz, zk, top = task["column"]
+                    ks, dz, zk, top, faces = task["column"]
                     s = task.get("stride", 1)
                     if zname:  # (each column's own levels)
                         r0, r1, tj, _ = stride_cols(f0, f1, task["nj"], s)
                         c0, c1, ti, _ = stride_cols(e0, e1, task["ni"], s)
-                        ks, dz, zk = column_levels_3d(*heights(r0, r1, c0, c1), *fdef.layer,
+                        zlev, zw = heights(r0, r1, c0, c1)
+                        ks, dz, zk = column_levels_3d(zlev, zw, *fdef.layer,
                                                       edges=fdef.edges)
+                        faces = layer_faces(zw, ks)
                         if s > 1:
                             dz, zk = dz[:, tj][:, :, ti], zk[:, tj][:, :, ti]
-                    c = dict(ctx, dz=dz, zk=zk, top=top, memo={})
+                            faces = tuple(x[:, tj][:, :, ti] for x in faces)
+                    c = dict(ctx, dz=dz, zk=zk, top=top, faces=faces, memo={})
                     if s == 1:
                         return np.asarray(fdef.func(lambda n: np.stack(
                             [_read(d[n], info[n][0], k, f0, f1, e0, e1, info[n][2])
@@ -628,7 +631,7 @@ def compute(run, F, recipe, ds, centers=None, storm=None, on_result=None, cancel
     to the reads of the page)."""
     centers, storm = centers or {}, storm or {}
     from . import pool
-    from .fields import column_stride, layer_top, split_deriv
+    from .fields import column_stride, layer_faces, layer_top, split_deriv
 
     d = F[recipe["field"]]
     op, name = split_deriv(recipe["field"])  # (a derivative: op of field `name`)
@@ -647,7 +650,7 @@ def compute(run, F, recipe, ds, centers=None, storm=None, on_result=None, cancel
     column = None
     if b.column:  # (levels of its layer, their thickness in it, heights)
         ks_c, dz_c = b.levels(run.z, run.zf)
-        column = (ks_c, dz_c, run.z[ks_c], layer_top(b, run))
+        column = (ks_c, dz_c, run.z[ks_c], layer_top(b, run), layer_faces(run.zf, ks_c))
     ctx = dict(F.ctx)
     user = F.user_task() if b.user is not None else None  # (the worker binds it itself)
     skipped, tasks = {}, []

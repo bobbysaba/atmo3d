@@ -34,6 +34,10 @@ FUNCS = {n: getattr(np, n) for n in (
     "arctan", "arctan2", "hypot", "minimum", "maximum", "where", "clip", "isfinite",
     "floor", "ceil", "sign")}
 CONSTS = {"pi": np.pi, "e": np.e, "nan": np.nan, "inf": np.inf}
+# layer functions: a field (any pointwise expression of 3D fields) reduced over a layer
+# of each column, km above ground, z1 `top`: the model top.  An expression using them
+# is a column field (2D), as the built-in UH or shear are.
+LAYER_FUNCS = ("layer_mean", "layer_integral", "layer_max", "layer_min", "at_height")
 MAX_EXPR = 500
 KEYS = ("label", "units", "expr", "group", "cmap", "vrange", "diverging", "note")
 USER_MARK = " (user)"
@@ -75,9 +79,43 @@ class _Floats(ast.NodeTransformer):
         return ast.copy_location(ast.Name(name, ast.Load()), node)
 
 
+def _layer_spec(node):
+    """(kind, z0, z1) of layer-function call `node` (z1 None: the model top; at_height:
+    (kind, z, z)); Unsafe when its arguments are not a field and plain heights."""
+    kind, args = node.func.id, node.args
+    want = 2 if kind == "at_height" else 3
+    usage = ("at_height(field, z)" if kind == "at_height"
+             else f"{kind}(field, z0, z1)") + ": heights in km above ground"
+    if node.keywords or len(args) != want:
+        raise Unsafe(f"{kind} takes {want} arguments, {usage}")
+
+    def height(a, top_ok):
+        if top_ok and isinstance(a, ast.Name) and a.id == "top":
+            return None
+        neg = isinstance(a, ast.UnaryOp) and isinstance(a.op, ast.USub)
+        c = a.operand if neg else a
+        if not (isinstance(c, ast.Constant) and isinstance(c.value, (int, float))
+                and not isinstance(c.value, bool)):
+            raise Unsafe(f"{kind}'s heights are numbers (km)"
+                         + (" or top" if top_ok else "") + f": {usage}")
+        v = -float(c.value) if neg else float(c.value)
+        if not 0.0 <= v < 1.0e4:
+            raise Unsafe(f"{kind}'s heights are km above ground, 0 or more: {usage}")
+        return v
+
+    if kind == "at_height":
+        z = height(args[1], False)
+        return kind, z, z
+    z0, z1 = height(args[1], False), height(args[2], True)
+    if z1 is not None and z1 <= z0:
+        raise Unsafe(f"{kind}'s layer is z0 to z1 km with z1 above z0")
+    return kind, z0, z1
+
+
 def compile_expr(text):
     """(code, input names) of expression `text` (code: for evaluate); Unsafe (a
-    ValueError) when it uses anything but the allowed syntax, or is not an expression."""
+    ValueError) when it uses anything but the allowed syntax, or is not an expression.
+    Layer functions (LAYER_FUNCS) make it a column field: see layers_of."""
     if not isinstance(text, str) or not text.strip():
         raise Unsafe("expr is empty")
     if len(text) > MAX_EXPR:
@@ -89,8 +127,10 @@ def compile_expr(text):
         tree = ast.parse(src, mode="eval")
     except SyntaxError as e:
         raise Unsafe(f"not an expression (column {e.offset}): {e.msg}") from None
-    names = []
-    for n in ast.walk(tree):
+    names, outside, layers = [], [], []
+
+    def check(n, inside):
+        """Validate node n (inside: within a layer function's field argument)."""
         if isinstance(n, (ast.BoolOp, ast.Not, ast.IfExp)):
             raise Unsafe("and, or, not, if-else do not work on fields: use &, |, ~ "
                          "(with brackets) and where(cond, a, b)")
@@ -100,32 +140,77 @@ def compile_expr(text):
                                             or not isinstance(n.value, (int, float))):
             raise Unsafe("only numbers may be written as values")
         if isinstance(n, ast.Call):
-            if not isinstance(n.func, ast.Name) or n.func.id not in FUNCS:
-                what = n.func.id if isinstance(n.func, ast.Name) else "that"
-                raise Unsafe(f"unknown function {what} (allowed: {', '.join(FUNCS)})")
+            fn = n.func.id if isinstance(n.func, ast.Name) else None
+            if fn in LAYER_FUNCS:
+                if inside:
+                    raise Unsafe(f"{fn} inside another layer function: write them side "
+                                 "by side, layer_mean(a, 0, 1) - layer_mean(a, 1, 3)")
+                layers.append(_layer_spec(n))
+                before = len(names)
+                check(n.args[0], True)
+                if len(names) == before:
+                    raise Unsafe(f"{fn} needs a field: {fn}(w, ...)")
+                return
+            if fn not in FUNCS:
+                raise Unsafe(f"unknown function {fn or 'that'} (allowed: "
+                             f"{', '.join(FUNCS)}, and {', '.join(LAYER_FUNCS)})")
             if n.keywords or any(isinstance(a, ast.Starred) for a in n.args):
                 raise Unsafe("functions take plain arguments only")
+            for a in n.args:
+                check(a, inside)
+            return
         if isinstance(n, ast.Name):
             if n.id.startswith("_"):
                 raise Unsafe(f"names may not start with _: {n.id}")
-            if n.id in FUNCS and not _called(tree, n):
+            if n.id in FUNCS or n.id in LAYER_FUNCS:
                 raise Unsafe(f"{n.id} is a function: call it")
-            if n.id not in FUNCS and n.id not in CONSTS:
+            if n.id not in CONSTS:
                 names.append(_input_name(n.id))
+                if not inside:
+                    outside.append(_input_name(n.id))
+            return
+        for c in ast.iter_child_nodes(n):
+            check(c, inside)
+
+    check(tree, False)
+
+    class _Layers(ast.NodeTransformer):
+        """Each layer function's call as _L<i>(field): its heights are in `layers`."""
+        i = 0
+
+        def visit_Call(self, node):
+            if isinstance(node.func, ast.Name) and node.func.id in LAYER_FUNCS:
+                inner = self.visit(node.args[0])
+                name, self.i = f"_L{self.i}", self.i + 1
+                return ast.copy_location(ast.Call(ast.Name(name, ast.Load()), [inner], []),
+                                         node)
+            return self.generic_visit(node)
+
+    if layers:
+        tree = _Layers().visit(tree)
     floats = _Floats()
     tree = ast.fix_missing_locations(floats.visit(tree))
-    return ((compile(tree, "<user field>", "eval"), floats.values),
+    return ((compile(tree, "<user field>", "eval"), floats.values, tuple(layers),
+             tuple(dict.fromkeys(outside))),
             tuple(dict.fromkeys(names)))
 
 
-def _called(tree, name):
-    return any(isinstance(n, ast.Call) and n.func is name for n in ast.walk(tree))
+def layers_of(code):
+    """(layers, names outside them) of compiled code: layers [(kind, z0, z1)] (km above
+    ground, z1 None: the model top), empty for a pointwise expression."""
+    return code[2], code[3]
 
 
-def evaluate(code, get):
-    """The value of compiled expression `code`, its input names fetched by get(name)."""
-    code, numbers = code
+def evaluate(code, get, layer=None):
+    """The value of compiled expression `code`, its input names fetched by get(name);
+    layer(spec, value) reduces a layer function's field (spec: (kind, z0, z1))."""
+    code, numbers, layers, _ = code
     env = dict(FUNCS, **CONSTS, **numbers)
+    if layers:
+        if layer is None:
+            raise Unsafe("layer functions are computed on a column field only")
+        env.update({f"_L{i}": (lambda v, sp=sp: layer(sp, v))
+                    for i, sp in enumerate(layers)})
 
     class Names(dict):
         def __missing__(self, k):
@@ -237,13 +322,39 @@ def read_file(path):
         return [], ""
     try:
         with open(path, "rb") as f:
-            doc = tomllib.load(f)
-    except (OSError, tomllib.TOMLDecodeError) as e:
+            text = f.read().decode("utf-8")
+    except (OSError, UnicodeDecodeError) as e:
         return [], f"{path}: {e}"
+    defs, problem = parse_text(text)
+    return defs, f"{path}: {problem}" if problem else ""
+
+
+def parse_text(text):
+    """(definitions, problem) of a fields file's text (the editor checks it unsaved)."""
+    try:
+        doc = tomllib.loads(text)
+    except tomllib.TOMLDecodeError as e:
+        return [], str(e)
     tables = doc.get("fields", {})
     if not isinstance(tables, dict):
-        return [], f"{path}: [fields] must be a table of [fields.<name>] tables"
+        return [], "[fields] must be a table of [fields.<name>] tables"
     return [normalize(n, t, "file") for n, t in tables.items()], ""
+
+
+def write_file(text):
+    """Save the fields file's text (the editor): refused (ValueError) when it is not
+    TOML or not [fields.<name>] tables, so a file atmo3d cannot read is never written.
+    A definition with an error is written (and listed greyed out, as on a restart)."""
+    _, problem = parse_text(text)
+    if problem:
+        raise ValueError(problem)
+    path = fields_path()
+    os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+    tmp = f"{path}.tmp{os.getpid()}"
+    with open(tmp, "w", encoding="utf-8", newline="\n") as f:
+        f.write(text)
+    os.replace(tmp, path)
+    return path
 
 
 def read_packages():
@@ -292,6 +403,18 @@ def problems():
     """Why the fields file or a package's definitions could not be read."""
     loaded()
     return list(_state["problems"])
+
+
+def reload():
+    """Read the fields file and the packages again (the editor's Save; atmo3d reads
+    them once otherwise), keeping the definitions figures brought.  Every run's Fields
+    picks the change up: core.fields.sync_all_user.  Returns problems()."""
+    with _lock:
+        _state["loaded"], _state["problems"] = None, []
+    loaded()
+    from .fields import sync_all_user
+    sync_all_user()
+    return problems()
 
 
 def reset():
@@ -371,13 +494,14 @@ class _Off(Exception):
     """A definition that cannot be made for this run, and why."""
 
 
-def bind(defs, avail, cat, builtins, scales=None, ndims=None):
+def bind(defs, avail, cat, builtins, scales=None, ndims=None, mark=True):
     """(FieldDefs, off) of definitions `defs` for fields `avail` of a data type with
     catalog `cat` and built-in derived FieldDefs `builtins` (already bound to the
     catalog's names).  scales / ndims: {native: display scale / ndim} (default: the
     catalog's look, 3D).  off: [(definition, why)] of those that cannot be made, e.g.
     an input the run lacks.  A definition named like a native or built-in field is off
-    (the built-in one wins)."""
+    (the built-in one wins).  mark: count the ones made as in use (record; not for the
+    editor's check of text not saved)."""
     from .catalog import ROLES
     from .fields import FieldDef, split_deriv
     avail = avail if isinstance(avail, dict) else {n: None for n in avail}
@@ -425,6 +549,8 @@ def bind(defs, avail, cat, builtins, scales=None, ndims=None):
             return (lambda f, c: f(key)), (key,), ndim(nat), False
         if n in specs and n not in built and n not in avail:
             d = make(n)
+            if d.column:
+                raise _Off(f"uses {n}, a column field (column fields cannot be inputs)")
             return d.func, d.deps, d.ndim, d.storm
         nat = native(n)
         if n in built and (nat is None or n in file_first):
@@ -466,27 +592,46 @@ def bind(defs, avail, cat, builtins, scales=None, ndims=None):
         deps = tuple(dict.fromkeys(x for p in parts.values() for x in p[1]))
         nd = max(p[2] for p in parts.values())
         storm = any(p[3] for p in parts.values())
+        layers, outside = layers_of(code)
+        if layers:  # (a column field: every input inside a layer function, 3D, pointwise)
+            try:
+                if outside:
+                    raise _Off(f"uses {', '.join(outside)} outside a layer function: in "
+                               "an expression with layer functions every field goes "
+                               "inside one, layer_mean(w, 0, 3)")
+                for n, p in parts.items():
+                    if any(split_deriv(x)[0] for x in p[1]):
+                        raise _Off(f"uses {n}: derivatives cannot be used inside layer "
+                                   "functions")
+                    if p[2] != 3:
+                        raise _Off(f"uses {n}, which is 2D: layer functions work on 3D "
+                                   "fields")
+            except _Off as e:
+                off[name] = str(e)
+                raise
+            fd = _column_def(name, d, code, getters, deps, storm, layers)
+        else:
+            def func(f, c, code=code, getters=getters):
+                got = {}
 
-        def func(f, c, code=code, getters=getters):
-            got = {}
+                def get(n):
+                    if n not in got:
+                        got[n] = np.asarray(getters[n](f, c))
+                    return got[n]
 
-            def get(n):
-                if n not in got:
-                    got[n] = np.asarray(getters[n](f, c))
-                return got[n]
+                out = np.asarray(evaluate(code, get), dtype=np.float64)
+                shape = np.broadcast_shapes(*(v.shape for v in got.values()))
+                return np.broadcast_to(out, shape).astype(np.float32)
 
-            out = np.asarray(evaluate(code, get), dtype=np.float64)
-            shape = np.broadcast_shapes(*(v.shape for v in got.values()))
-            return np.broadcast_to(out, shape).astype(np.float32)
-
-        fd = FieldDef(name, d["label"], d["units"], d["group"] or "User", ndim=nd,
-                      cmap=d["cmap"], vrange=tuple(d["vrange"]) if d["vrange"] else None,
-                      diverging=d["diverging"], deps=deps, func=func, storm=storm,
-                      note=d["note"], confirmed=False)
+            vr = tuple(d["vrange"]) if d["vrange"] else None
+            fd = FieldDef(name, d["label"], d["units"], d["group"] or "User", ndim=nd,
+                          cmap=d["cmap"], vrange=vr, diverging=d["diverging"], deps=deps,
+                          func=func, storm=storm, note=d["note"], confirmed=False)
         fd.user = d
         made[name] = fd
-        with _lock:
-            _state["bound"].add(name)
+        if mark:
+            with _lock:
+                _state["bound"].add(name)
         return fd
 
     out = []
@@ -496,6 +641,74 @@ def bind(defs, avail, cat, builtins, scales=None, ndims=None):
         except _Off:
             pass
     return out, [(specs[n], why) for n, why in off.items()]
+
+
+def layer_span(layers):
+    """(z0, z1) km of the column levels a field with layer functions `layers` reads:
+    the lowest and highest of their heights (z1 None: the model top)."""
+    z0 = min(max(a - 1e-3, 0.0) if k == "at_height" else a for k, a, _ in layers)
+    tops = [b + 1e-3 if k == "at_height" else b for k, _, b in layers]
+    return z0, (None if any(b is None for b in tops) else max(tops))
+
+
+def reduce_layer(spec, a, c):
+    """Layer function spec (kind, z0, z1) of a field's values `a` on a column field's
+    levels (context c: core.fields.Fields._column's: "faces" the levels' cell bottoms and
+    tops, km; "zk" their heights; "top" the model top where z1 is None): (ny, nx).
+    Each level counts with the part of its cell inside the layer (as the built-in column
+    fields do); NaN where none is, and where a column has no value there."""
+    from .fields import at_height
+    kind, z0, z1 = spec
+    a = np.asarray(a, dtype=np.float64)  # ((L, ...): its inputs are 3D)
+    if kind == "at_height":
+        return np.asarray(at_height(a, c["zk"], z0), dtype=np.float64)
+    top = float(c["top"]) if z1 is None else float(z1)
+    lo, hi = (np.asarray(x, dtype=np.float64) for x in c["faces"])
+    th = 1000.0 * (np.clip(hi, z0, top) - np.clip(lo, z0, top))  # (m in the layer)
+    th = th.reshape(th.shape + (1,) * (a.ndim - th.ndim))
+    th = np.broadcast_to(th, a.shape)
+    inl = th > 0
+    ok = inl & np.isfinite(a)
+    with np.errstate(all="ignore"):
+        if kind == "layer_integral":
+            s = np.where(ok, th * a, 0.0).sum(axis=0)
+            return np.where(ok.any(axis=0), s, np.nan)
+        if kind == "layer_mean":
+            w = np.where(ok, th, 0.0)
+            return np.where(ok.any(axis=0), np.where(ok, w * a, 0.0).sum(axis=0)
+                            / np.where(ok.any(axis=0), w.sum(axis=0), 1.0), np.nan)
+        fill = -np.inf if kind == "layer_max" else np.inf
+        b = np.where(ok, a, fill)
+        r = b.max(axis=0) if kind == "layer_max" else b.min(axis=0)
+        return np.where(ok.any(axis=0), r, np.nan)
+
+
+def _column_def(name, d, code, getters, deps, storm, layers):
+    """The FieldDef of user field `name` (definition d) whose expression uses layer
+    functions: a column field over layer_span(layers), with the levels just outside
+    it too (edges: so at_height can interpolate)."""
+    from .fields import FieldDef
+
+    def func(f, c, code=code, getters=getters):
+        got = {}
+
+        def get(n):
+            if n not in got:
+                got[n] = np.asarray(getters[n](f, c))
+            return got[n]
+
+        out = np.asarray(evaluate(code, get, lambda sp, v: reduce_layer(sp, v, c)),
+                         dtype=np.float64)
+        shapes = [v.shape[1:] for v in got.values() if v.ndim >= 3]
+        if shapes:
+            out = np.broadcast_to(out, np.broadcast_shapes(*shapes))
+        return out.astype(np.float32)
+
+    fd = FieldDef(name, d["label"], d["units"], d["group"] or "User", ndim=2,
+                  cmap=d["cmap"], vrange=tuple(d["vrange"]) if d["vrange"] else None,
+                  diverging=d["diverging"], deps=deps, func=func, storm=storm,
+                  layer=layer_span(layers), edges=True, note=d["note"], confirmed=False)
+    return fd
 
 
 def describe(d):

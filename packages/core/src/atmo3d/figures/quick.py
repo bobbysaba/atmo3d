@@ -39,7 +39,7 @@ def with_none(groups):
     """The field menu's groups with None on top (a figure that draws nothing yet)."""
     out = type(groups)({"": {NO_FILL: ""}, **groups}) if isinstance(groups, dict) else \
         {"": {NO_FILL: ""}}
-    for k in ("tips", "off"):
+    for k in ("tips", "off", "user_ndim"):
         if hasattr(groups, k):
             setattr(out, k, getattr(groups, k))
     return out

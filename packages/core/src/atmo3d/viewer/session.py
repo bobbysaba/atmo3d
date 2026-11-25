@@ -379,6 +379,8 @@ class Sessions:
         """Put a session (session_state's dict) back.  Values this run cannot take are
         left as they are; returns their names."""
         upgrade(s)
+        from .fieldmenu import refresh_user
+        refresh_user(self.F)  # (user fields the session brought: in the menus now)
         skipped = []
 
         def put(w, v, name, blank=False):

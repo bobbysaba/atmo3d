@@ -62,7 +62,12 @@ class Settings:
         self.path_html = _html()
         raw = pn.Column(self.path_html, self.raw, pn.Row(self.raw_save), self.raw_msg,
                         margin=0, sizing_mode="stretch_width")
-        self.tabs = pn.Tabs(("Settings", form), ("Config file", raw), dynamic=False,
+        from .fieldsedit import FieldsEditor
+        # (the viewer gives it the open run's fields and what to redraw: fields_of,
+        # on_applied)
+        self.fields_ed = FieldsEditor()
+        self.tabs = pn.Tabs(("Settings", form), ("Config file", raw),
+                            ("Your fields", self.fields_ed.body), dynamic=False,
                             sizing_mode="stretch_width")
         # kept in view at the bottom of the window while the form scrolls
         self.buttons = pn.Row(self.save_btn, self.cancel_btn, pn.Spacer(), self.reset_btn,
@@ -237,7 +242,16 @@ class Settings:
                           else k.default)
         self.msg.object = _note("Defaults filled in: press Save to keep them.")
 
+    def show_fields(self):
+        """Open the window on the Your fields tab (a field menu's "Your fields…")."""
+        self.show()
+        if self.tabs.active == 2:
+            self.fields_ed.load()
+        self.tabs.active = 2
+
     def _on_tab(self, ev):
+        if ev.new == 2:
+            self.fields_ed.load()
         if ev.new == 1:
             self.path_html.object = _note(
                 f"<code>{html.escape(config.config_path())}</code>"

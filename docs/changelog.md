@@ -3,6 +3,20 @@
 What changed in each release, newest first. The version is in `pyproject.toml`; a release
 has a matching git tag.
 
+## Unreleased
+
+- **Your fields in the app**: ⚙ Settings has a *Your fields* tab (also *✎ Your fields…*
+  at the bottom of every field menu) that edits your fields file, checks each field
+  against the open run as you type, and applies it on *Save and apply*: no restart. A
+  changed field is drawn again wherever it is shown. See
+  [Your own derived fields](guide/user-fields.md).
+- **Layer functions** in your fields: `layer_mean`, `layer_integral`, `layer_max`,
+  `layer_min` (between two heights, km above ground, or to `top`) and `at_height` make a
+  2D column field, as the built-in updraft helicity is: `layer_mean(maximum(w, 0), 0, 3)`,
+  `(at_height(tempc, 1) - at_height(tempc, 3)) / 2`.
+- A loaded session's own fields are in the viewer's field menus at once (they needed a
+  page reload).
+
 ## 2.1.0 (2026-11-24)
 
 - **Your own computer**: atmo3d runs on Linux, macOS and Windows, and the tests run on all

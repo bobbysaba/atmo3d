@@ -430,6 +430,20 @@ class Widgets:
         self._set_status(f"{added} new time{'s' if added != 1 else ''}: reopening")
         self._open_with_view(run.path, s)
 
+    def _user_fields_changed(self):
+        """The user fields changed (the editor's Save: every run has bound them again,
+        core.userfields.reload): the menus list them, and what is shown is drawn again
+        (a changed definition's cached values were dropped)."""
+        from .fieldmenu import refresh_user
+        refresh_user(self.F)
+        d = getattr(getattr(self, "figed", None), "data", None)
+        if d is not None:
+            for c in (d.cache, d.snd_cache, d.dist_cache, d.scene_cache):
+                c.clear()
+        self.apply_session(self.session_state())
+        if getattr(self, "figed", None) is not None:
+            self.figed.request(force=True)
+
     def _run_info_html(self):
         """The run picker's "This run" box."""
         run = self.run
@@ -489,6 +503,10 @@ class Widgets:
             height=32, margin=(4, 2), description="Settings: where runs live, where figures "
                                                   "and saved data go, ...")
         self.settings = Settings(run.path)
+        ed = self.settings.fields_ed  # (Your fields: this run's, applied to this page)
+        ed.fields_of, ed.on_applied = (lambda: self.F), self._user_fields_changed
+        from .fieldmenu import on_edit
+        on_edit(pn.state.curdoc, self.settings.show_fields)
         self.confirm = ConfirmOverwrite()
         self.gear_btn.on_click(lambda e: self.settings.show())
         self._on_config = lambda: self._schedule(self._config_changed)

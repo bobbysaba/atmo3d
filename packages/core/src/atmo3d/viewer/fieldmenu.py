@@ -24,6 +24,8 @@ above it), description (its tooltip), width, disabled, visible, and param.watch 
 value.  As a Select, a value not in the options is kept (a saved figure's hidden field):
 the button shows its name."""
 
+import weakref
+
 import param
 from panel.custom import JSComponent
 
@@ -103,6 +105,9 @@ class FieldSelect(JSComponent):
     name = param.String(default="")
     description = param.String(default="")
     docs_link = param.String(default="")  # (the derived-fields page's address, or "")
+    # the menu's "Your fields…" link (a page that can edit them: on_edit), and its clicks
+    edit_link = param.Boolean(default=False)
+    edit_clicks = param.Integer(default=0)
     disabled = param.Boolean(default=False)
 
     _rename = {"groups": None}
@@ -111,19 +116,29 @@ class FieldSelect(JSComponent):
         if groups is None and options is not None:
             groups = {"": dict(options)}
         tips, off = getattr(groups, "tips", {}), getattr(groups, "off", ())
+        user_ndim = getattr(groups, "user_ndim", "?")
         groups = Groups(groups or {})  # (a copy that keeps the notes)
-        groups.tips, groups.off = tips, off
+        groups.tips, groups.off, groups.user_ndim = tips, off, user_ndim
         params.pop("tree", None)  # (made from groups: a clone() passes its own too)
         # no name given: none shown (param would make up "FieldSelect00506" and the
         # button would show it as its label)
         params.setdefault("name", "")
         params.setdefault("docs_link", derived_docs_link())
+        params.setdefault("edit_link", user_ndim != "?")  # (a menu of a run's fields)
         params.setdefault("height", 52 if params.get("name") else 32)
         params.setdefault("margin", (5, 10))  # (a widget's, as the Select's was)
         if "sizing_mode" not in params:
             params.setdefault("width", 300)  # (the Select's default width)
         super().__init__(groups=groups, options=flat_options(groups),
                          tree=menu_tree(groups), **params)
+        _OPEN.add(self)
+
+    @param.depends("edit_clicks", watch=True)
+    def _on_edit(self):
+        import panel as pn
+        cb = _EDIT.get(pn.state.curdoc)
+        if cb is not None:
+            cb()
 
     @param.depends("groups", watch=True)
     def _new_groups(self):
@@ -298,6 +313,15 @@ export function render({ model, el }) {
       a.title = 'What each derived field computes, and what it leaves out'
       menu.append(a)
     }
+    if (model.edit_link) {
+      const a = document.createElement('a'); a.className = 'fs-docs'; a.href = '#'
+      a.textContent = '✎ Your fields…'
+      if (model.docs_link) { a.style.borderTop = 'none'; a.style.marginTop = '0' }
+      a.title = 'Define fields of your own: expressions of the fields of the run'
+      a.addEventListener('click', (e) => {
+        e.preventDefault(); close(); model.edit_clicks = (model.edit_clicks || 0) + 1 })
+      menu.append(a)
+    }
     const tree = model.tree || []
     fill(list, tree, 0)
     let first = null
@@ -344,3 +368,70 @@ export function render({ model, el }) {
   paint()
 }
 """
+
+
+# ------------------------------------------------------------------ user fields changed
+_OPEN = weakref.WeakSet()  # (every FieldSelect made: refresh_user)
+_EDIT = weakref.WeakKeyDictionary()  # (page -> what its menus' "Your fields…" opens)
+
+
+def on_edit(doc, callback):
+    """Menus on page `doc` open callback() from their "Your fields…" link."""
+    if doc is not None:
+        _EDIT[doc] = callback
+
+
+def _user_ndim(groups, F):
+    """The ndim a menu's User section is made for (Groups.user_ndim; a menu built by
+    hand: 3 if every field it lists is 3D, else None), or "skip": not a field menu
+    for user fields (it lists none, nor any field of F)."""
+    from ..core.fields import USER_PREFIX
+    nd = getattr(groups, "user_ndim", "?")
+    if nd != "?":
+        return nd
+    if any(g.startswith(USER_PREFIX) for g in groups) or getattr(groups, "off", ()):
+        known = [F.defs[v].ndim for g, o in groups.items() if not g.startswith(USER_PREFIX)
+                 for v in o.values() if v in F.defs]
+        return 3 if known and all(k == 3 for k in known) else None
+    return "skip"
+
+
+def with_user(groups, F):
+    """Menu `groups` with its User section made again from F (the definitions changed):
+    the other sections, their order and the extra entries (None, "Along the
+    streamline") are kept; None if the menu is not one for user fields."""
+    from ..core.fields import USER_PREFIX
+    nd = _user_ndim(groups, F)
+    if nd == "skip":
+        return None
+    fresh = F.groups(nd)
+    out = Groups((g, o) for g, o in groups.items() if not g.startswith(USER_PREFIX))
+    out.update((g, o) for g, o in fresh.items() if g.startswith(USER_PREFIX))
+    user = {v for g, o in fresh.items() if g.startswith(USER_PREFIX) for v in o.values()}
+    old = getattr(groups, "tips", {})
+    out.tips = {**{k: v for k, v in old.items() if k not in user},
+                **{k: v for k, v in fresh.tips.items() if k in user}}
+    out.off, out.user_ndim = fresh.off, nd
+    return out
+
+
+def refresh_user(F, doc=None):
+    """Make the User section of every field menu of page `doc` (default: the current
+    one) again from Fields F, after the user fields changed (the editor's Save, a
+    session's definitions).  A menu whose field is gone keeps it chosen (as a Select
+    keeps a value not in its options).  Returns how many menus changed."""
+    import panel as pn
+    doc = doc if doc is not None else pn.state.curdoc
+    n = 0
+    for w in list(_OPEN):
+        if doc is not None and w._models and not any(
+                m.document is doc for m, _ in w._models.values()):
+            continue  # (another page's: it refreshes on its own)
+        g = with_user(w.groups, F)
+        if g is not None and (dict(g) != dict(w.groups)
+                              or list(g.off) != list(getattr(w.groups, "off", ()))
+                              or g.tips != getattr(w.groups, "tips", {})):
+            w.param.update(groups=g, edit_link=True)
+            n += 1
+    return n
+
