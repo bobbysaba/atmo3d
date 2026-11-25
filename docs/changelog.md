@@ -3,7 +3,7 @@
 What changed in each release, newest first. The version is in `pyproject.toml`; a release
 has a matching git tag.
 
-## Unreleased
+## 2.2.0 (2026-11-24)
 
 - **Your fields in the app**: ⚙ Settings has a *Your fields* tab (also *✎ Your fields…*
   at the bottom of every field menu) that edits your fields file, checks each field
