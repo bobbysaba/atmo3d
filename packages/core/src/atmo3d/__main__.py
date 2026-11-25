@@ -47,7 +47,7 @@ def main(argv=None):
                     help="memory budget for cached 3D fields (default: ~40%% of the job's "
                          "memory, max 48)")
     ap.add_argument("--workers", type=int, default=None,
-                    help="parallel reader processes (default: CPUs in this job, max 8)")
+                    help="parallel reader processes (default: CPUs in this job, max 16)")
     ap.add_argument("--maxpix", type=int, default=None,
                     help="max map pixels sent per axis (zoom in for full resolution)")
     ap.add_argument("--pdecomp-script", default=None,

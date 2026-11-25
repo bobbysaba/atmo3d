@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "atmo3d: An Interactive Viewer for 3D Atmospheric Data"
+abstract: >-
+  atmo3d is an interactive, browser-based viewer for 3D atmospheric data: CM1
+  model output, WoFS and other WRF ensembles, and radar volumes (CfRadial and
+  NEXRAD Level II). It runs next to the data, usually on a cluster, and provides
+  plan-view maps, soundings, storm tracking, cross-sections, 3D scenes, parcel
+  analysis, time series and publication figures.
+authors:
+  - family-names: Saba
+    given-names: Robert
+    affiliation: "University of Oklahoma / CIWRO / NSSL"
+repository-code: "https://github.com/bobbysaba/atmo3d"
+url: "https://github.com/bobbysaba/atmo3d"
+license: GPL-3.0-or-later
+version: "2.3.0"
+date-released: "2026-11-24"
+keywords:
+  - atmospheric science
+  - numerical weather prediction
+  - CM1
+  - WoFS
+  - NEXRAD
+  - radar
+  - visualization
+  - supercell
